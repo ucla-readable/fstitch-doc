@@ -23,7 +23,7 @@ number of blocks. Although the interface is simple, there is hidden complexity
 in some types of block device modules when dealing with change descriptors (to
 be explained later).
 
-The next layer starts with modules that uses a BD module, and provide LFS
+The next layer starts with modules that use BD modules, and provide LFS
 interfaces. It includes any other modules which are LFS-LFS modules, that is,
 modules which use an LFS interface and provide another LFS interface. The LFS
 interface provides extremely low-level filesystem operations, sort of like the
@@ -91,11 +91,11 @@ dependency has been satisfied. Then the change descriptor is freed.
 
 The KudOS file server provides services allowing for online configuration
 and introspection through three means. The modman component (module
-manager) tracks module instance existence and which module instances use
+manager) tracks the existence of module instance and which module instances use
 another module instance. Many modules provide ``out of band'' functions for
 changing a module instance's configuration; for example, the mirror block
-device (\S~\ref{sec:solution:impl:raid}) has a function to add another block
-device to the mirror. The KudOS file server also provides remote procedure
+device (\S~\ref{sec:solution:impl:raid}) has functions to add and remove block
+device from the mirror. The KudOS file server also provides remote procedure
 calls for all modman and module out of band functions, allowing client
 programs to mount new filesystems or inspect the KudOS file server's
 current state, for example.
@@ -109,7 +109,7 @@ associate internal information with client requests. For example, the table
 classifier (a CFS-CFS module similar to a Unix mount table) associates a FID
 with its corresponding CFS module instance. These FIDs need be unique across all
 modules, and across time to make bugs easier to detect. The fidman component
-(FID manager) generates unique FIDs. The fidfairies, fidcloser and fidprotector,
-are CFS-CFS modules. fidcloser determines when a FID can be closed, taking into
-account client dup()s, fork()s, spawn()s, and death, while fidprotector prevents
-unauthorized access to FIDs by clients.
+(FID manager) generates unique FIDs. The two fidfairies, fidcloser and
+fidprotector, are CFS-CFS modules. Fidcloser determines when a FID can be
+closed, taking into account client dup()s, fork()s, spawn()s, and death, while
+fidprotector prevents unauthorized access to FIDs by clients.
