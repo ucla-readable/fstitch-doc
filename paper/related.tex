@@ -3,10 +3,36 @@
 
 \subsection{Linux JFS and ext3}
 
+ext3 was full data journaling too until they figured out what to
+do. our journaling is modeled off of ext3. ours is full only.
+
 \subsection{BSD Soft Updates}
+
+we made softupdates, we did it at a lower level w/ chdescs refering to
+data, not with references to higher level primatives. we are the
+taking the idea of rolling back block changes. theirs is more closely
+tied to FFS and help the rest of the system make certain decisions,
+that we would have a tough time discovering.
+
+we are more general -- journaling is part of our system.
 
 \subsection{Stackable File Systems}
 
+we can do similar things at either the cfs or lfs layer. we allow a
+lot more flexibility and we have a larger scope than just stacking
+stuff.
+
 \subsection{BSD GEOM}
 
+they did the hot-swap that we can do w/ modules. we can't hot-swap
+modules w/ state. problem for cfs moduels and some lfs ones. even bd
+modules have some state (point to other bd modules). we have what we
+think is important (raid thingy).
+
 \subsection{Flux OSkit}
+
+we replaced parts. but smaller, more manageable than they provided. we
+did some things lke they did -- wrapped up the original josfs like
+flux wrapped up drivers.
+
+they weren't looking to replace or break up the basefs.

@@ -1,24 +1,109 @@
 \subsection{Implementation}
 \label{subsec:impl}
 
+(talk about how we did some speed optimizations already somewhere in this file)
+
+intro paragraph, we implemented these things... blah blah
+
 \subsubsection{KPL}
 
-\subsubsection{josfs\_base}
-
-\subsubsection{josfs\_cfs Legacy Module}
+must integrate user level file descriptor interface. (why this is
+warranted). provides capabilities page.
 
 \subsubsection{UHFS}
 
-\subsubsection{wb\_cache}
+probably common for all FSes w/ an lfs interface. implements all
+routine operations. e.g. allocate a block, push to end of file when
+writing to a file. or you need to delete all blocks from a file when
+the file it freed. handles doing non-block aligned reads/writes,
+etc. (append 6 byes to the end of a file which needs to allocate a new
+block). chaining up chdescs.
+
+no cfs call needs to depend on a previous or future cfs call.
+
+uhfs doesn' keep state around, so it depends on cfs calls not
+depending on each other.
+
+\subsubsection{josfs\_base}
+
+in principle, only module in the system which needs to know about hwo
+the bytes are arranged on the disk. in fact, that's all it knows. also
+must order writes, generate change descriptors, possible chain them
+up. this module implements the low level operations that UHFS requests
+(e.g. allocate a block).
+
+\subsubsection{josfs\_cfs Legacy Module}
+
+not used anymore. tests the top half of kfsd server (ipc, table
+classifier) before we'd implemented the bottom stuff. this was
+relatively easy -- our modules are good!
 
 \subsubsection{Reliable File System Features}
-journalling, soft updates
+
+soft updates is more pervasive. because of this, we cna't just have a
+moduel to do it. we need clues (a must happen beofre b). josfs base
+and uhfs cooperate to give us the hints/clues (actually dependencies)
+to hookup the chdecs into a graph that would comply w/ soft
+updates. (wb cache make sure this is honored).
+
+diagram that shows journal format. full data only. uses Q to intercept
+things. unlike ext3 we have a bandwidth limitation which we could (?)
+work around. very similar to ext3. fs doesn't know ti's being
+journaled. it's a xaction layer on top of BD. guaranatess sets fo
+writes are atomic. each high level cfs op is atomic now. maybe sets
+clumped together, but a cfs call is never broken apart.
+
+\subsubsection{wb\_cache}
+
+makes sure that dep graph is satisifed
+
+direct mapped cache. talk about algo used to evict blocks. the algo is
+not optimal. in practice it is optimal, but in practice we don't have
+very complex graphs. produces ooutput that's serialized and safe for
+writing to stable storage.
+
+design philosophy: can't stack the wb cache. it has to know that
+writes go to disk in the correct order. sync() to make sure stuff goes
+to disk at the correct order.
+
+sure, stacking wb cache seems cool, but why not just put a wb cache
+above a disk and call it a day? floating deps down gives no benefit.
+
+you could probably do a wb cache that doesn't honor deps but depends
+on this wb cache to honor them. but aht's a problem sucking blocks
+down.
 
 \subsubsection{RAID}
 
+lets you strip or mirror reads/writes to 1 or 2 disks. mirroring
+driver can handle disk failure and go into degraded mode where it's a
+pass thru. also mirroring can do what geom did where you hot swap in a
+new disk, syn, ditch the old disk (w/ help of modman and userland
+utilities).
+
 \subsubsection{Loop Device}
+
+take a file and makes it look like a block device. depds go in and
+right out. forwarded by depman.
 
 \subsubsection{Network Block Device}
 
+simple tcp connection to implement dead simple serial interface of bd
+interface.
+
+describe the serializations in detail.
+
+short time to write -- modules rock.
+
 \subsubsection{Online Configuration}
-mount and friends, kfsgraph(viz)
+
+important to mount filesystesmw hile the fs is running (cdrom,
+nfs). mount and unount take ocmmon cases of what you want to do and
+make them easy to use. some of what they need is to get names of
+existing modules or find and existing module (like table classifier)
+to perform ops. rpc fxns.
+
+kfsgraph uses modman to find out which modules exists, which use each
+other, and their status. uses this to describe a grph of the current
+module configuration. output can be fed to dot, or plain text output.
+

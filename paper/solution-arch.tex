@@ -1,17 +1,74 @@
 \subsection{Architecture}
 \label{subsec:arch}
 
+many layers
+
+different modules
+
+connected via different interfaces
+
+structures to represent disk data and changes to disk data
+
+out of band things off to the side: dependency management, online
+configuration, client tracking
+
 \subsubsection{Interface Layers}
-bd, lfs, cfs, kpl
+
+bd layer - lowest layer. interface for manipulating disks. you know
+how this works :P
+
+lfs layer - asm (as opposed to C). specifies lowest level operations
+to apply to filesystems that represent files on disk.
+
+cfs layer - similar to VFS (slightly lower level; simplified, w/ an
+extension interface). high level operations on files. interfaces with
+other environments
+
+kpl layer - one presentation layer, tho many are possible. presents a
+``traditional'' api to user environments (in the JOS sense). reverse
+compatible. analogy: it's like libraries rather than system
+calls. implements higher level things like ``stat'' in terms of lower
+level mechanisms.
 
 \subsubsection{Structures}
-bdesc/ddesc, chdesc
+
+bdesc - represents a disk block. has parent bdevice, which block \#,
+pointer to data, and has ref counts.
+
+ddesc - represents the actual of a data block, independently of a
+bdesc (can be shared among many bdescs).
+
+chdesc - describe a change to a block. they store the old and the new
+data, which block they changed. they can depend on other changes and
+other changes can depend on this. (it has forward/back deps).
 
 \subsubsection{Dependency Management}
-depman and dependency forwarding
+
+when a chdesc is created, it's registered w/ depman. he tracks the
+life of it until it has been written to disk (actually satisfied). as
+it is written through many layers, it is automatically forwarded
+among the proper bdescs to reach the lowest level (this usually
+happens automatically).
 
 \subsubsection{Online Configuration}
-modman and online config
+
+what we want to do: add/remove modules are runtime. for example, the
+mount command in unix. so we need to keep track of all modules in the
+system and know how they are connected together.
+
+modman stores this info for people and fields requests for updates
+(he's the manager).
 
 \subsubsection{Client Tracking}
-fidman and fairies
+
+we want fids to be unique across all modules and time. even after it
+has been closed it should not be reused for some time (to avoid bugs),
+and each file currently open needs a unique fid. even in very
+different modules.
+
+fidman creates fids and you tell it when a fid is no longer in use.
+
+fidfairies pass on the close message when everyone is done with a
+fid. handles a client fork()ing or dieing w/o calling close(), and
+enforces a certain amount of protection for files that claim to have
+files open, but haven't called open.
