@@ -62,4 +62,17 @@ distance from stable storage, or their distance from the place they were
 generated.
 
 \subsection{More Features}
-journal size limitations, metadata only journaling
+
+The KudOS filesystem could also benefit from more features.
+Specifically there two journaling limitations that would be nice to
+change.
+
+Firstly, the journal currently has a fixed length. If the length of the
+journal is exceeded before it can be flushed, the system goes into
+non-journaled mode. Perhaps a better solution would be to grow the
+stack, or commit the journal more frequently.
+
+Secondly, the journal currently can only do full data journaling. We
+would like to be able to metadata only journaling, but at the moment
+we don't have the facilities for the journal to know which writes are
+for data and which for metadata.
