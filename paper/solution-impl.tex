@@ -32,11 +32,38 @@ uhfs\_write() updates the file size metadata.
 
 \subsubsection{josfs\_base}
 
-in principle, only module in the system which needs to know about hwo
-the bytes are arranged on the disk. in fact, that's all it knows. also
-must order writes, generate change descriptors, possible chain them
-up. this module implements the low level operations that UHFS requests
-(e.g. allocate a block).
+The josfs\_base module provides low-level operations to the JOS File System.
+Its purpose as a base LFS module is to encapsulate all knowledge specific to
+the file system. As such, only josfs\_base knows about the free block bitmap
+and files with indirect blocks. No other module in the system needs to know the
+details of how a JOS File System is laid out on disk. LFS modules such as
+josfs\_base only knows how to perform micro-ops like allocating a block,
+appending a block, and writing a block. For each operation, josfs\_base will
+make appropriate changes to the underlying block device, so the structures on
+disk correctly reflect the semantics of the operation.
+
+Josfs\_base also supports ``optional'' features such as file size and the
+concept of directories. UHFS can query josfs\_base to see what features it
+supports and then act accordingly. For the most part, josfs\_base treats
+metadata as pure metadata. It is up to UHFS to set file sizes correctly,
+although the file size metadata is not necessary for josfs\_base to work. The
+exception to this is directory size. When adding a directory entry requires
+josfs\_base to allocate a new block, josfs\_base will increase the directory
+size, since UHFS is not aware of this.
+
+To support reliability features like soft-updates and journaling, josfs\_base
+orders all writes to the underlying block device in a safe manner consistant
+with soft-updates. Additionally, josfs\_base generates change descriptors,
+chained in the right dependency order, for use by other modules in the system.
+
+The josfs\_base module started from JOS's fs.c, but quickly evolved on its own.
+It is one of the biggest modules in the system and it took many iterations to
+get right. This is partly do to the number of calls a LFS module has to support.
+Most of the calls needed to implement some logic and only a few were simple
+pass-throughs to the underlying layer. Also, because much of KudOS was a design
+in progress, it was not always completely clear how some aspects of LFS will
+interact with the rest of the system. Several times, design changes were not
+apparent until after implementation.
 
 \subsubsection{josfs\_cfs Legacy Module}
 
