@@ -72,7 +72,7 @@ an interface, developers can add features to existing file systems. These new
 features can then be used together by stacking them on top of each other.
 Existing stackable file systems implementations, such as FiST
 \cite{zadok00fist}, start with a ``basefs'' module that interfaces with the
-pre-existing file system and exposes an extensible interface for use with
+preexisting file system and exposes an extensible interface for use with
 stacking modules. This base file system needs to be ported to every operating
 system it runs on. For FiST, they included a description language for writing
 stackable modules, so that modules written in the FiST language can easily
@@ -121,9 +121,9 @@ of implementing it and the marginal benefits we could see from this ability.
 
 The Flux OSKit \cite{ford97oskit} provides a framework for constructing
 operating systems. It breaks up the operating system into modules, and provides
-a library of pre-made modules. This way researchers can concentrate on the more
+a library of premade modules. This way researchers can concentrate on the more
 interesting components in their OS, like the scheduler or the virtual memory
-system, and use pre-existing modules for the more mundane components, like the
+system, and use preexisting modules for the more mundane components, like the
 boot loader or device drivers.
 
 One interesting aspect of Flux is the use of components from other operating
