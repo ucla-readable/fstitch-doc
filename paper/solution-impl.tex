@@ -79,7 +79,7 @@ modules in the system.
 
 The josfs\_base module started from JOS's fs.c, but quickly evolved on its own.
 It is one of the biggest modules in the system and it took many iterations to
-get right. This is partly do to the number of calls a LFS module has to support.
+get right. This is partly due to the number of calls an LFS module has to support.
 Most of the calls need to implement some logic and only a few are simple
 pass-throughs to the underlying layer. Also, because much of KudOS was a design
 in progress, it was not always completely clear how some aspects of LFS would
@@ -190,7 +190,7 @@ mandate this to go to stable storage, not another cache), but this write may
 depend on other blocks being written first. To decide how to write out the
 blocks, a directed acyclic graph of changes is obtained from depman. The root of
 this graph is a special ``NOOP'' change descriptor that points to all of the
-changes in the block that needs to be evicted. These changes then point to
+changes in the block that need to be evicted. These changes then point to
 other changes, and so on.
 
 The maximum hop distance from each change descriptor to the root change

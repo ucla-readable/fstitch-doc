@@ -89,9 +89,9 @@ like journaling or soft updates.
 
 With the KudOS File System, we applied the idea of stacking to all interface
 layers. By having modules that use the same interface on both ends, it is easy
-to attach modules together. Many KudOS modules can be arbitrarily arrange, and
-have little dependencies on other modules. The lack of complex dependencies also
-make individual components easy to write. In comparison, KudOS has a much larger
+to attach modules together. Many KudOS modules can be arbitrarily arranged, and
+have few dependencies on other modules. The lack of complex dependencies also
+makes individual components easy to write. In comparison, KudOS has a much larger
 scope that ranges from the userspace interface to the block devices, compared to
 Stackable File Systems, which is confined to a small area between VFS and the
 underlying file system.

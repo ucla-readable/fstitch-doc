@@ -94,7 +94,7 @@ and introspection through three means. The modman component (module
 manager) tracks the existence of module instance and which module instances use
 another module instance. Many modules provide ``out of band'' functions for
 changing a module instance's configuration; for example, the mirror block
-device (\S~\ref{sec:solution:impl:raid}) has functions to add and remove block
+device (\S~\ref{sec:solution:impl:raid}) has functions to add and a remove block
 device from the mirror. The KudOS file server also provides remote procedure
 calls for all modman and module out of band functions, allowing client
 programs to mount new filesystems or inspect the KudOS file server's
