@@ -111,7 +111,7 @@ original JOS file server - and with good reason: it's doing a whole lot more.
 The original file server followed the exokernel spirit a little more closely,
 and mapped entire files into client environments when they were opened. Thus all
 file I/O could take place without actually communicating with the file server,
-as reads and writes could be done to shared memory. This notable absense of
+as reads and writes could be done to shared memory. This notable absence of
 explicit communication with the file server for the most common operations on
 files greatly sped up the original file server most of the time.
 

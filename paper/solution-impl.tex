@@ -1,7 +1,7 @@
 \subsection{Implementation}
 \label{sec:solution:impl}
 
-We wil describe the implementation of some of the more important parts of the
+We will describe the implementation of some of the more important parts of the
 KudOS file server in this section, approximately in order from userspace toward
 the disk. We will also describe the online configuration mechanism, and the
 userspace tools that make use of it. Figure~\ref{fig:loc} shows the relative
@@ -25,7 +25,7 @@ function uses CFS's get\_metadata() function to get the data to return.
 Additionally, KPL provides the authorization tokens to fidprotector.
 
 This allows existing user programs to call into this file server in the same way
-they called into the existing fileserver. User programs can be switched back to
+they called into the existing file server. User programs can be switched back to
 use the original file server by changing only a small set of wrapper functions
 which call either the new KPL functions or the original functions.
 
@@ -73,7 +73,7 @@ size, since UHFS is not aware of this.
 
 To support reliability features like soft updates~\cite{ganger00soft} and
 journaling, josfs\_base orders all writes to the underlying block device in a
-safe manner consistant with soft updates. Additionally, josfs\_base generates
+safe manner consistent with soft updates. Additionally, josfs\_base generates
 change descriptors, chained in the right dependency order, for use by other
 modules in the system.
 
@@ -190,8 +190,8 @@ mandate this to go to stable storage, not another cache), but this write may
 depend on other blocks being written first. To decide how to write out the
 blocks, a directed acyclic graph of changes is obtained from depman. The root of
 this graph is a special ``NOOP'' change descriptor that points to all of the
-changes in the block that need to be evicted. These changes then point to
-other changes, and so on.
+changes in the block that need to be evicted. These changes then point to other
+changes, and so on.
 
 The maximum hop distance from each change descriptor to the root change
 descriptor is calculated. The write back cache then writes each leaf change to
@@ -209,10 +209,10 @@ this is the case, we simply tell that cache to write out the change descriptor,
 rather than having this cache write it.
 
 Once a change has been written to the lower level, it is marked as satisfied and
-removed from the graph of changes that need to be written to the disk. The
-cache then finds the next chdesc furthest from the root change descriptor and
-writes it to disk in the same way, and so on. Once all changes have been
-written to disk, the block we wish to evict will be fully written to disk.
+removed from the graph of changes that need to be written to the disk. The cache
+then finds the next chdesc furthest from the root change descriptor and writes
+it to disk in the same way, and so on. Once all changes have been written to
+disk, the block we wish to evict will be fully written to disk.
 
 One may notice that this algorithm, while simple, is not optimal. That is, it
 does not necessarily result in the minimal number of block writes from the write
