@@ -3,8 +3,37 @@
 
 \subsection{Linux JFS and ext3}
 
-ext3 was full data journaling too until they figured out what to
-do. our journaling is modeled off of ext3. ours is full only.
+In Linux, journalling in the ext3 filesystem is implemented as two distinct
+modules that cooperate: JFS and ext3. The JFS module does not know anything
+about filesystems, and the ext3 module does not know anything about journalling.
+What the JFS module does is to provide transaction support for block devices.
+That is, it provides the facility to tell the block device what writes will be
+part of what transaction, and when transactions are to be committed, and it
+makes sure that either the whole transaction is committed, or none of it. It
+does this by keeping a journal, but this is not part of the interface
+specification.
+
+The ext3 module uses transactions to accomplish its safety properties. It groups
+changes to the filesystem into transactions that guarantee the disk will always
+be in a consistent state, and lets the JFS module do the hard work. It keeps a
+flag in the filesystem superblock that indicates whether it has been cleanly
+unmounted, and upon mounting a dirty filesystem, it signals the JFS module to do
+any necessary recovery before it proceeds. In this way, the complexity of
+journalling is broken into two separate pieces.
+
+Full journalling is actually not very difficult to implement. It is what we have
+implemented in the KudOS file server. In full journalling, everything that will
+be written to the disk is written to the journal first, as part of some
+transaction. Obviously this is much less efficient than we'd like, which is why
+there is another technique for doing journalling: metadata-only journalling. In
+metadata-only journalling, only changes to the filesystem metadata (like
+directory structure, file names, sizes, and link counts) are grouped into
+transactions and written to the journal. File data changes are written directly,
+since they do not contribute to the validity of the filesystem and do not need
+to be made ``safe'' in order to avoid needing fsck. Although it seems simple
+initially, metadata-only journalling introduces a large number of special cases
+involving resource reuse which greatly increase its complexity and the necessary
+implementation time.
 
 \subsection{BSD Soft Updates}
 
