@@ -39,7 +39,7 @@ implementations take care of non-block aligned accesses, lower level operations
 such as block allocation during write, and orders inter-LFS function call chdesc
 dependencies.
 
-uhfs\_write() provides an example of a typical UHFS function. UHFS's client
+Uhfs\_write() provides an example of a typical UHFS function. UHFS's client
 passes an open file's FID, data to write, and where in the file this data
 belongs. uhfs\_write() looks up the FID's associated LFS handle and if the
 underlying LFS supports file sizes, looks up the file's current size in bytes.
@@ -72,14 +72,14 @@ size, since UHFS is not aware of this.
 
 To support reliability features like soft updates~\cite{ganger00soft} and
 journalling, josfs\_base orders all writes to the underlying block device in a
-safe manner consistant with soft-updates. Additionally, josfs\_base generates
+safe manner consistant with soft updates. Additionally, josfs\_base generates
 change descriptors, chained in the right dependency order, for use by other
 modules in the system.
 
 The josfs\_base module started from JOS's fs.c, but quickly evolved on its own.
 It is one of the biggest modules in the system and it took many iterations to
 get right. This is partly do to the number of calls a LFS module has to support.
-Most of the calls needed to implement some logic and only a few were simple
+Most of the calls need to implement some logic and only a few are simple
 pass-throughs to the underlying layer. Also, because much of KudOS was a design
 in progress, it was not always completely clear how some aspects of LFS would
 interact with the rest of the system. Several times, design changes were not
@@ -91,7 +91,7 @@ apparent until after implementation.
 In the beginning of the KudOS file server's development we wanted to begin
 testing CFS modules, CFS RPC, and KPL before the LFS and BD layers were ready
 for use. The josfs\_cfs module allowed this testing by providing a full file
-system, using JOS's existing file server daemon as a back-end. josfs\_cfs's
+system, using JOS's existing file server daemon as a back-end. Josfs\_cfs's
 simplicity also served as a first validation that the CFS interface is flexible
 enough to host new and helpful uses.
 
@@ -103,7 +103,7 @@ journalling. Both use change descriptors to ensure that some disk writes will
 occur before others, but what writes exactly they are and how they depend on one
 another are substantially different.
 
-In journalling, changes to the disk are written to a journal before being
+In journaling, changes to the disk are written to a journal before being
 written to the disk itself. After being written to the journal, a single disk
 sector (the ``commit record'') is written in the journal that commits the whole
 sequence of writes atomically. Afterward, the data is written to the disk, and
@@ -117,11 +117,10 @@ already been written, writing it again will not cause any problems. Once the
 journal has been recovered to the disk, the commit record will be erased and the
 filesystem will once again be in a consistent state.
 
-To effect this behavior, we use two modules: a journal LFS module, and a journal
-queue BD module. The function of the journal queue BD module is to hold disk
+To effect this behavior, we use two modules: a journal LFS module, and a journalqueue BD module. The function of the journal queue BD module is to hold disk
 blocks that would otherwise have been written to the disk in a queue until asked
-to release them, and it is placed below the base LFS module (as its BD). The
-journal LFS module is placed above the base LFS module, and it knows how to
+to release them. It is typically placed below the base LFS module (as its BD).
+The journal LFS module is placed above the base LFS module, and it knows how to
 construct, write, and recover the journal. Ordinarily, it keeps the journal
 queue BD in a hold state, so that all filesystem changes are queued up. Every so
 often (the ``commit interval''), it asks the journal queue BD for all the blocks
@@ -200,10 +199,10 @@ this is the case, we simply tell that cache to write out the change descriptor,
 rather than having this cache write it.
 
 Once a change has been written to the lower level, it is marked as satisfied and
-removed from the graph of changes that need to be written to the disk. The next
-furthest from root change descriptor is found and written to disk in the same
-way, and so on. Once all changes have been written to disk, the block we wish to
-evict will be fully written to disk.
+removed from the graph of changes that need to be written to the disk. The
+wbcache then finds the next chdesc furthest from the root change descriptor and
+writes it to disk in the same way, and so on. Once all changes have been
+written to disk, the block we wish to evict will be fully written to disk.
 
 One may notice that this algorithm, while simple, is not optimal. That is, it
 does not necessarily result in the minimal number of block writes from the write
@@ -230,23 +229,23 @@ this wb cache to honor them. but aht's a problem sucking blocks down.)
 \subsubsection{RAID}
 \label{sec:solution:impl:raid}
 
-The mirror\_bd module implements RAID 1 using two disks. It connects to two
+The mirror\_bd module implements RAID 1 using two block devices. It connects two
 BD interfaces together and presents a single BD interface to the layer above.
 During normal operation, reads alternate between the two underlying block
 devices based on the stripe size set at configuration time. Write and sync
 operations are duplicated, once for each block device.
 
 In the case where a BD operation fails, the mirror\_bd module will mark the
-device as failed and switch to degraded mode. There is also a userspace tool to
-explicitly fail a device using the online configuration facility. In degraded
-mode, the RAID module acts as a pass-through for the working device. However,
-mirror\_bd will never fail both devices at the same time. To make BD failures
-possible for disks, we enhanced the ide\_pio\_bd module so operations time out
-instead of polling forever. With the mirror\_bd device in degraded mode, users
-can add a block device to the raid module and return to normal mode. The RAID
-module will take any module that exports a BD interface, as long as it has the
-same block size and is sufficiently large. Upon device addition, the RAID module
-will sync the two block devices.
+device as failed and switch to degraded mode. There is also a userspace tool,
+mirror, to explicitly fail a device using the online configuration facility. In
+degraded mode, the RAID module acts as a pass-through for the working device.
+However, mirror\_bd will never fail both devices at the same time. To make BD
+failures possible for disks, we enhanced the ide\_pio\_bd module so operations
+time out instead of polling forever. With the mirror\_bd device in degraded
+mode, users can add a block device to the raid module and return to normal mode.
+The RAID module will take any module that exports a BD interface, as long as it
+has the same block size and is sufficiently large. Upon device addition, the
+RAID module will sync the two block devices.
 
 Mirror\_bd has some creative uses as well. One possibility is to start with
 mirror\_bd in degraded mode, in place of just a disk. While the system is
@@ -261,7 +260,7 @@ removed. This effectively implements disk hot swapping, as inspired by GEOM
 The loop device provides a BD interface to an LFS file. Through change
 descriptors and the LFS interface, the loop device is able to easily pass
 dependency information to the underlying filesystem, preserving soft updates and
-journalling dependencies. To write or sync a block, the loop device sets the
+journaling dependencies. To write or sync a block, the loop device sets the
 block's BD pointer and block number for use by the LFS's underlying BD, makes
 the appropriate LFS call, reverts its changes to the block, and returns.
 
