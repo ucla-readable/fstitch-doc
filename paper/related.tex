@@ -103,9 +103,22 @@ think is important (raid thingy).
 
 \subsection{Flux OSKit}
 
-\cite{ford97oskit}
-we replaced parts. but smaller, more manageable than they provided. we
-did some things lke they did -- wrapped up the original josfs like
-flux wrapped up drivers.
+The Flux OSKit \cite{ford97oskit} provides a framework for constructing
+operating systems. It breaks up the operating system into modules, and provides
+a library of pre-made modules. This way researchers can concentrate on the more
+interesting components in their OS, like the scheduler or the VM, and use
+pre-existing modules for the more mundane components, like the boot loader or
+device drivers.
 
-they weren't looking to replace or break up the basefs.
+One interesting aspect of Flux is the use of components from other operating
+systems. Rather than writing drivers and networking code from scratch, the
+Flux OSKit provides glue code to make it possible for the FreeBSD TCP/IP stack,
+Linux network device drivers, and the NetBSD file system code to work as parts
+of the same kernel. In KudOS, we did something similar in josfs_cfs, which is
+the glue code to tie the JOS File Server with our CFS layer.
+
+With both Flux and KudOS, the philosophy is to componentize the system. Of
+course, the two projects have different level of granularity. The two projects
+also have different goals. Flux tries to facilitate faster OS development
+through reuse of existing component. KudOS uses components to make it easier to
+come up with new and interesting configurations.
