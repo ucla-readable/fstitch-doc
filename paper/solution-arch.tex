@@ -62,7 +62,7 @@ device they came from, the block number, a pointer to the block data, and a
 reference count. Data descriptors represent the actual data in a disk block,
 independent of any particular bdesc. This allows the data to be shared between
 several bdescs, which is an optimization to avoid unnecessary copying in many
-situations. Finally, change descriptors represent changes to disk data, and
+situations. Finally, change descriptors represent changes to disk data. They
 store the old and new data, which block they changed, and lists of other chdescs
 which depend upon them or which they depend on.
 
