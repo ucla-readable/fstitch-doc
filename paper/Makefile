@@ -1,18 +1,11 @@
-default: paper.dvi paper.pdf
+default: paper.pdf
 
-DVI_IMAGES = \
-	kfsgraph_journal.eps kfsgraph_su_on_su.eps kfsgraph_journal_on_su.eps \
-	kfsgraph_mount.eps
-PDF_IMAGES = \
-	kfsgraph_journal.pdf kfsgraph_su_on_su.pdf kfsgraph_journal_on_su.pdf \
-	kfsgraph_mount.pdf
+DVI_IMAGES = kfsgraph_journal.eps kfsgraph_su_on_su.eps kfsgraph_journal_on_su.eps kfsgraph_mount.eps
+PDF_IMAGES = kfsgraph_journal.pdf kfsgraph_su_on_su.pdf kfsgraph_journal_on_su.pdf kfsgraph_mount.pdf
 
-OUTPUT_FILES = \
-	paper.dvi paper.pdf paper.pdf paper.txt \
-	$(DVI_IMAGES)
+OUTPUT_FILES = paper.dvi paper.pdf paper.pdf paper.txt $(DVI_IMAGES)
 
-TMP_FILES = \
-	$(PDF_IMAGES)
+TMP_FILES = $(PDF_IMAGES)
 
 paper.dvi paper.pdf paper.txt: \
 	paper.tex intro.tex problem.tex solution.tex solution-arch.tex \
