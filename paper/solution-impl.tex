@@ -115,9 +115,9 @@ The modman component is central to most online configuration and introspection,
 providing existence, usage, configuration, and status information for CFS, LFS,
 and BD module instances. Each module instance registers/unregisters itself with
 modman at creation/destruction time and registers/unregisters module instance
-usage, modman stores this information to respond to others' queries.
+usage. modman stores this information to respond to others' queries.
 
-KFS RPC is implemented in a similar manner as CFS RPC, a serialized KFS is used
+KFS RPC is implemented in a similar manner to CFS RPC: a serialized KFS is used
 to communicate between KFS server and clients via KudOS IPC message passing.
 Each KFS function is re-implemented as an RPC stub, allowing an object file to
 be linked to either the KFS IPC Client or Server library. Client programs are
