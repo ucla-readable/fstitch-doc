@@ -95,16 +95,19 @@ define latex-generic # args: latex cmd, latex opts, input_file basename
 	fi
 endef
 
-%.dvi: %.tex %.bib
+%.dvi: %.tex %.bbl
 	$(call latex-generic,$(LATEX),$(LATEX_OPTS),$*)
 
 %.dvi: %.tex
 	$(call latex-generic,$(LATEX),$(LATEX_OPTS),$*)
 
+%.bbl: %.bib
+	$(BIBTEX) $(BIBTEX_OPTS) $*
+
 %.ps: %.dvi
 	$(DVIPS) $(DVIPS_OPTS) -o $@ $<
 
-%.pdf: %.tex %.bib
+%.pdf: %.tex %.bbl
 	$(call latex-generic,$(PDFLATEX),$(PDFLATEX_OPTS),$*)
 
 %.pdf: %.tex
