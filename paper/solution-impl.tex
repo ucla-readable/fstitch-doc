@@ -175,7 +175,7 @@ they can reference as little as one bit, or as much as an entire block). The
 higher levels require not that disk blocks be written in a valid order, but that
 the \emph{changes} are written back in a valid order. Furthermore, we are
 guaranteed that a dependency graph of changes will contain no cycles; thus it is
-possible to write back the changes in order.
+possible to write back the changes in a valid order.
 
 The cache currently is fixed size and direct mapped. When a block is read from
 the cache, a reference is held to it by the cache.
