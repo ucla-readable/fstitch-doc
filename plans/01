@@ -1,0 +1,61 @@
+Group Report #1
+New Multicians: Andrew de los Reyes, Chris Frost, Lei Zhang, Mike Mammarella
+    rks@crystalorb.net
+Project: Kudos: uberJOS + Componentized File System
+
+Project Goals:
+
+-& Reorganize file system into readable components
+  - Simplify process to add new file system features
+- Implement existing filesystems in Kudos using components
+  -# JOS
+  -3 FAT
+  -3 Minix, FFS?
+  -3 DevFS
+- Implement proof of concept features for uberJOS
+  -@ IPC interface and KFS
+
+  -! UHFS
+
+  - File System Features
+    -2 Journaling
+    -@ Encryption
+    -3 Soft Updates?
+
+  - Block Devices
+    -* Disk
+    -* Partitions
+    -2 Loop
+    -3 RAID
+    -3 Network Block Device
+
+  -2 Caches
+    - Simple Write-through Cache
+    - Simple Write-back Cache
+    - Dependency-aware Write-back Cache
+    - [fancy cache]
+
+  -2 Classifiers
+    - Mount Table
+    - Chroot
+
+  -2 Dep Man
+
+  -3 Component-structure-compiler-thing
+
+  - Misc
+    -# oracle module
+    -3 Santa claus
+    -# /dev/null
+
+Personal Responsibilities:
+
+First Stage:
+All:    &
+Andrew: @
+Chris:  !
+Mike:   *
+Lei:    #
+
+Second Stage: 2
+Third+ Stage: 3
