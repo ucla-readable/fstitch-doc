@@ -53,16 +53,47 @@ this mount.
 \end{center}
 \end{figure}
 
+\subsection{Simplicity}
+\label{sec:eval:simplicity}
+
+One motivating factor for this system was to make understanding existing code
+and creating new code easier. The ease with which the network block device,
+RAID, and even the journal modules were written is a testament to the success of
+this part of the project. The larger modules, like josfs\_base and wb\_cache,
+are not quite as easy to read, but still they are not intractable. Further, the
+corresponding code in existing systems is not so well isolated, and makes
+reading other code harder due to its presence there.
+
+However, there is one problem in the system that makes writing new modules a
+little bit more difficult than it might otherwise be. The two major structures
+we use, bdescs and chdescs, both have usage conventions that the programmer is
+required to follow in order to make reference counting work correctly. Violating
+these rules can cause hidden bugs that happen rarely, but cause anywhere from
+data corruption to a file server crash when they do. Failing to follow the
+conventions as they evolved during the development of the system was a major
+source of bugs, and it would likely cause problems for other module
+implementors. A system to automatically generate modules that follow the
+conventions from higher-level descriptions could perhaps alleviate this problem,
+similar to the system in \cite{zadok00fist}.
+
+Another reason to create the KudOS file server was to be able to easily tune
+filesystems for the way they will be used, and to be able to look at a file
+server configuration and understand how it will behave (or how to change its
+behavior to match how it will be used). This goal has been met quite well by the
+variety of modules we have created, the flexibility of the interfaces to add new
+modules, and the kfsgraph tool for graphically viewing the configuration of a
+running KudOS file server.
 
 \subsection{Performance}
 \label{sec:eval:performance}
 
-Since one motivating factor for this system is to be able to easily tune
-filesystems for the way they will be used, it is obviously important to evaluate
-the performance of the system. Comparisons to several other filesystem
-implementations could be made here: the original JOS file server, Linux running
-on the same hardware, and Linux using PIO disk access but using the same
-hardware all seem relevant.
+Tuning a file server configuration to make it handle its expected work optimally
+is all well and good, but if the file server's maximum performance is not so
+good in the first place, it is unlikely to be immediately useful. It is
+therefore important to evaluate the performance of the system. Comparisons to
+several other filesystem implementations could be made here: the original JOS
+file server, Linux running on the same hardware, and Linux using PIO disk access
+but using the same hardware all seem relevant.
 
 Compared to the original JOS file server, the KudOS file server is generally
 slower except in two specific ways. First, it can open files much more quickly
@@ -91,8 +122,3 @@ obviously is a poor scheduling policy. We have a mechanism to solve this
 problem, and the journal module uses it for its own scheduling, but it has not
 yet been used for the caches. We will save numerical performance testing until
 the KudOS file server's caches are more like other caches in these respects.
-
-\subsection{Simplicity}
-\label{sec:eval:simplicity}
-
-rules are hard to follow.
