@@ -1,0 +1,77 @@
+\section{Journaling}
+
+The proceedings from the 2000 USENIX conference features a comparison
+between journaling and soft updates~\cite{seltzer00journaling}. This
+paper discusses the two different techniques, variations among
+different types of journals, and how well they maintain metadata
+integrity. It then benchmarks the different systems against the
+baseline filesystem to see how well they perform.
+
+The main goal of a filesystem is to reliably store data. Filesystems
+must keep track of everything using bookkeeping information called
+metadata. The metadata must remain consistent or the filesystem will
+get confused about where it stored data. Early filesystems like FFS
+writes data out in a specific order using synchronous writes to
+guarantee consistency. However, synchronous writes are slow and the
+filesystem becomes a performance bottleneck. Two solutions to this
+problem are journaling and soft updates. Both techniques attempt to
+maintain consistency as well as FFS with synchronous writes, while
+providing better performance.
+
+Soft updates also order writes to the disk such that metadata
+consistency is maintained. Unlike synchronous FFS, soft updates allow
+the writes to be delayed.  Soft updates keep track of dependencies
+between different operations. As such, when writes occur, soft updates
+will examine the dependencies and do appropriate rollbacks so that the
+writes to the disk will never destroy filesystem consistency. If the
+system crashes, the disk will still be consistent. However, soft
+updates does not guarantee all free resources are accounted for. In
+this way, soft updates has a looser definition of 'consistency'. Soft
+update can recover instantly and work in the background to recount the
+free resources.
+
+Journaling maintains filesystem integrity by keeping a log of
+operations that will occur, and checking them off after the operations
+finish. This way, in the event of a system crash, the computer can
+replay the journal on the next boot and figure out the events leading
+up to the crash. The system can then either finish playing out the
+journal or rollback to a consistent state. By writing data to the
+journal synchronously, journaling can guarantee the same level of
+consistency as synchronous FFS. Writing data to the journal
+asynchronous will guarantee the same protections as soft updates.
+
+The benchmarks compare asynchronous FFS, synchronous FFS, soft
+updates, and a variety of journaling variations. For journaling, there
+are asynchronous and synchronous versions of Logging-FFS that keeps
+the log in a file and that which keeps the log on a separate
+filesystem. The benchmarks themselves separate into two catagories:
+microbenchmarks that tests specific operations, and macrobenchmarks
+that simulates workloads.
+
+With both soft updates and journaling, the system will have to do
+additional writes. For soft updates, the ability to defer writes
+offsets the additional work. In the case of journaling, the additional
+writes can be done efficiently because the writes are sequential. For
+the benchmarks, soft updates performed very well. In particular, the
+ability to delay writes helped out greatly on the file deletion
+benchmark. On the other hand, journaling filesystems all incurred a
+penalty at the 96 KB mark because they had to read an indirect
+block. Overall, both soft updates and asynchronous journaling achieved
+performance close to that of asynchronous FFS.
+
+From this paper, it is obvious that any modern operating system that
+demands good filesystem performance will want either journaling or
+soft updates. For KudOS, we would like the ability to support both
+techniques. After much thought, we determined both journaling and soft
+updates require dependencies to work. In the case of journaling, the
+dependency states the journal has to be written before the actual
+data.
+
+To support dependencies, we created the concept of change
+descriptors. Change descriptors describe changes to a specific block
+device. The change descriptors link to each other to form the
+dependency relationships. As filesystems perform operations, they will
+have to generate change descriptors and chain them up in the proper
+order depending. We will need an intelligent cache that understands
+how to deal with change descriptors. Lastly, we will need have a
+dependency manager to send change descriptors between components.
