@@ -153,11 +153,29 @@ down.
 \subsubsection{RAID}
 \label{sec:solution:impl:raid}
 
-lets you strip or mirror reads/writes to 1 or 2 disks. mirroring
-driver can handle disk failure and go into degraded mode where it's a
-pass thru. also mirroring can do what geom did where you hot swap in a
-new disk, syn, ditch the old disk (w/ help of modman and userland
-utilities).
+The mirror\_bd module implements raid 1 using two disks. It connects to two
+BD interfaces together and presents a single BD interface to the layer above.
+During normal operation, reads alternate between the two underlying block
+devices based on the stripe size set at configuration time. Write and sync
+operations are duplicated, once for each block device.
+
+In the case where a BD operation fails, the mirror\_bd module will mark the
+device as failed and switch to degraded mode. There is also a userland tool
+to explicitly fail a device using the online configuration facility. In degraded
+mode, the raid module acts as a pass-through for the working device. However,
+mirror\_bd will never fail both devices at the same time. To make BD failures
+possible for disks, we enhanced the ide\_pio\_bd module so operations timeout
+instead of polling forever. With the mirror\_bd device in degraded mode, users
+can add a block device to the raid module and return to normal mode. The RAID
+module will take any module that exports a BD interface, as long as it has the
+same block size and is sufficiently big enough. Upon device addition, the RAID
+module will sync the two block devices.
+
+Mirror\_bd has some creative uses as well. One idea is to start with mirror\_bd
+in degraded mode, in place of just a disk. While the system is running, it is
+now possible to add in a second block device into mirror\_bd. After the block
+devices are synchronized, the original disk can be safely removed. This
+effectively implements disk hot swapping, as inspired by GEOM.
 
 \subsubsection{Loop Device}
 \label{sec:solution:impl:loop}
