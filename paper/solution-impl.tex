@@ -94,8 +94,13 @@ utilities).
 \subsubsection{Loop Device}
 \label{sec:solution:impl:loop}
 
-take a file and makes it look like a block device. depds go in and
-right out. forwarded by depman.
+The loop device provides a BD interface to an LFS file. Through change
+descriptors and the LFS interface, the loop device is able to easily
+pass change descriptors to the underlying filesystem, preserving
+softupdates and journaling dependencies. To write or sync a block, the
+loop device sets the block's BD pointer and block number for use by
+the LFS's underlying BD, makes the appropriate LFS call, reverts the
+block's changes, and returns.
 
 \subsubsection{Network Block Device}
 
