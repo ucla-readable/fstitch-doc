@@ -1,0 +1,36 @@
+\documentclass{article}
+
+\title{The KudOS File System\\ Related Work}
+\author{The New Multicians}
+
+\usepackage{url, html, hyperref, ifpdf}
+\ifpdf
+  \usepackage[pdftex]{graphicx}
+  \usepackage[monochrome]{color}
+  \DeclareGraphicsExtensions{.jpg,.pdf,.mps,.png}
+  \pdfinfo
+  { 
+    /Title (CS239-4 Project: JASO)
+    /Author (Chris Frost and Robert Nelson, [frost, rlnelson]@cs.ucla.edu)
+  }
+  \pdfcompresslevel=9
+\else
+  \usepackage{graphicx}
+  \DeclareGraphicsExtensions{.eps,.jpg,.mps,.png}
+\fi
+
+
+\begin{document}
+\maketitle
+
+\input{intro.tex}
+
+\input{stackable.tex}
+\input{semantic.tex}
+\input{softupdates.tex}
+\input{journaling.tex}
+
+\bibliography{related}
+\bibliographystyle{plain}
+
+\end{document}
