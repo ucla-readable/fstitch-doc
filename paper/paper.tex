@@ -1,11 +1,13 @@
 \documentclass[11pt,twocolumn]{article}
 \usepackage{fullpage}
 
+% A list of stuff not to hyphenate
+\hyphenation{KudOS}
+% We'd also like not to hyphenate these, but apparently _ can't be used in \hyphenation
+% devfs\_cfs get\_metadata ide\_pio\_bd josfs\_base josfs\_cfs mirror\_bd read\_block truncate\_block uhfs\_write wb\_cache
+
 \renewcommand{\topfraction}{.8}
 \renewcommand{\bottomfraction}{.8}
-
-\title{The KudOS F\makebox[0pt][l]{i}\makebox[0.0815cm][r]{\raisebox{.3535cm}{\includegraphics[scale=0.0029]{nakedsanta}}}\hspace{.075cm}le Server}
-\author{Andrew de los Reyes, Chris Frost, Mike Mammarella, Lei Zhang\\ \{adlr,frost,mikem,leiz\}@cs.ucla.edu}
 
 \usepackage{url, hyperref, ifpdf}
 \ifpdf
@@ -23,6 +25,8 @@
   \DeclareGraphicsExtensions{.eps,.jpg,.mps,.png}
 \fi
 
+\title{The KudOS F\makebox[0pt][l]{i}\makebox[0.0815cm][r]{\raisebox{.3535cm}{\includegraphics[scale=0.0029]{nakedsanta}}}\hspace{.075cm}le Server}
+\author{Andrew de los Reyes, Chris Frost, Mike Mammarella, Lei Zhang\\ \{adlr,frost,mikem,leiz\}@cs.ucla.edu}
 
 \begin{document}
 \maketitle
