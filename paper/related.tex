@@ -3,10 +3,10 @@
 
 \subsection{Linux JFS and ext3}
 
-In Linux, journalling in the ext3 filesystem is implemented as two distinct
+In Linux, journaling in the ext3 filesystem is implemented as two distinct
 modules that cooperate: JFS and ext3~\cite{tweedie98journaling}. The JFS module
 does not know anything about filesystems, and the ext3 module does not know
-anything about journalling. What the JFS module does is to provide transaction
+anything about journaling. What the JFS module does is to provide transaction
 support for block devices. That is, it provides the facility to tell the block
 device what writes will be part of what transaction, and when transactions are
 to be committed, and it makes sure that either the whole transaction is
@@ -19,19 +19,19 @@ be in a consistent state, and lets the JFS module do the hard work. It keeps a
 flag in the filesystem superblock that indicates whether it has been cleanly
 unmounted, and upon mounting a dirty filesystem, it signals the JFS module to do
 any necessary recovery before it proceeds. In this way, the complexity of
-journalling is broken into two separate pieces.
+journaling is broken into two separate pieces.
 
-Full journalling is actually not very difficult to implement. It is what we have
-implemented in the KudOS file server. In full journalling, everything that will
+Full journaling is actually not very difficult to implement. It is what we have
+implemented in the KudOS file server. In full journaling, everything that will
 be written to the disk is written to the journal first, as part of some
 transaction. Obviously this is much less efficient than we'd like, which is why
-there is another technique for doing journalling: metadata-only journalling. In
-metadata-only journalling, only changes to the filesystem metadata (like
+there is another technique for doing journaling: metadata-only journaling. In
+metadata-only journaling, only changes to the filesystem metadata (like
 directory structure, file names, sizes, and link counts) are grouped into
 transactions and written to the journal. File data changes are written directly,
 since they do not contribute to the validity of the filesystem and do not need
 to be made ``safe'' in order to avoid needing fsck. Although it seems simple
-initially, metadata-only journalling introduces a large number of special cases
+initially, metadata-only journaling introduces a large number of special cases
 involving resource reuse which greatly increase its complexity and the necessary
 implementation time.
 
@@ -53,13 +53,13 @@ have to depend on the first, as although each logically does the same thing
 correspondingly have to be written in the same order as they were requested.
 
 To do something like the BSD implementation, we would have to allow change
-descriptors, which are currently passive data structures, contain enough
+descriptors, which are currently passive data structures, to contain enough
 information to describe some action that will be taken when it is written to
 disk, or that must happen before it is written to disk. This could be done, but
 we decided to take the more general approach that we did in order to minimize
 the complexity of the already rather complex write-back cache, and to make the
 system more efficient when dealing with other uses of dependency information
-like journalling.
+like journaling.
 
 \subsection{Stackable File Systems}
 
@@ -90,14 +90,14 @@ to attach modules together. Many KudOS modules can be arbitrarily arrange, and
 have little dependencies on other modules. The lack of complex dependencies also
 make individual components easy to write. In comparison, KudOS has a much larger
 scope that ranges from the userspace interface to the block devices, compared to
-Stackable File Systems which are confined to a small area between VFS and the
+Stackable File Systems, which is confined to a small area between VFS and the
 underlying file system.
 
 \subsection{BSD GEOM}
 \label{sec:related:geom}
 
 The GEOM framework in FreeBSD is similar to our BD layer, in that it allows
-various block device interfaces to be layered on top of one another. In FreeBSD
+various block device interfaces to be layered on top of one another. In FreeBSD,
 it is used to implement partitions, RAID, and logical volume management. One
 feature of GEOM, explained in the manual page \cite{geom}, is that it can
 perform mounted disk hot-swapping by inserting a mirroring RAID module between
@@ -123,11 +123,11 @@ system, and use pre-existing modules for the more mundane components, like the
 boot loader or device drivers.
 
 One interesting aspect of Flux is the use of components from other operating
-systems. Rather than writing drivers and networking code from scratch, the Flux
-OSKit provides glue code to make it possible for the FreeBSD TCP/IP stack, Linux
-network device drivers, and the NetBSD file system code to work as parts of the
-same kernel. In KudOS, we did something similar in josfs\_cfs, which is the glue
-code to connect the JOS File Server with our CFS layer.
+systems. Rather than rewriting drivers and networking code from scratch, the
+Flux OSKit provides glue code to make it possible for the FreeBSD TCP/IP stack,
+and the Linux network device drivers to work as parts of the same kernel. In
+KudOS, we did something similar in josfs\_cfs, which is the glue code to connec
+the JOS File Server with our CFS layer.
 
 With both Flux and KudOS, the philosophy is to componentize the system. Of
 course, the two projects have different levels of granularity. The projects also

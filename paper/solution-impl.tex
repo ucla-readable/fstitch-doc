@@ -71,7 +71,7 @@ josfs\_base to allocate a new block, josfs\_base will increase the directory
 size, since UHFS is not aware of this.
 
 To support reliability features like soft updates~\cite{ganger00soft} and
-journalling, josfs\_base orders all writes to the underlying block device in a
+journaling, josfs\_base orders all writes to the underlying block device in a
 safe manner consistant with soft updates. Additionally, josfs\_base generates
 change descriptors, chained in the right dependency order, for use by other
 modules in the system.
@@ -99,7 +99,7 @@ enough to host new and helpful uses.
 \label{sec:solution:impl:reliable}
 
 We implemented two types of reliable file system features: soft updates and
-journalling. Both use change descriptors to ensure that some disk writes will
+journaling. Both use change descriptors to ensure that some disk writes will
 occur before others, but what writes exactly they are and how they depend on one
 another are substantially different.
 
@@ -131,7 +131,7 @@ filesystem is in a consistent state.
 
 FIXME we should put a diagram here
 
-Soft updates is somewhat more pervasive, because unlike full journalling, it
+Soft updates is somewhat more pervasive, because unlike full journaling, it
 needs to have more information about what a filesystem is and what it means for
 it to be ``consistent.'' Briefly, soft updates needs to guarantee that
 structures on the disk are always initialized and marked as in use before they
@@ -145,9 +145,9 @@ they are relatively simple to make because of how much the work is divided up
 into individual LFS operations.
 
 The write-back cache, described below, then makes sure that the changes are
-written in a safe order, just as it does for journalling above. This is one of
+written in a safe order, just as it does for journaling above. This is one of
 the big advantages of generalizing the write ordering requirements of soft
-updates and journalling: they can share a good deal of the more complicated
+updates and journaling: they can share a good deal of the more complicated
 code.
 
 \subsubsection{wb\_cache}
@@ -303,7 +303,7 @@ Given a BD type of IDE, nbd, loop, or an existing BD and a mount point, mount
 constructs the given base BD, caches and block resizers as appropriate, a
 josfs\_base or wholedisk as appropriate, UHFS, and connects these to the table
 classifier at the given mount point. mount optionally allows specification of
-whether journalling is to be used or not (and where to journal to), whether to
+whether journaling is to be used or not (and where to journal to), whether to
 fsck the filesystem, how large a cache to use, and whether to use a write back
 or write through cache. umount takes a mount point and destructs all modules
 down the chain that are no longer in use.

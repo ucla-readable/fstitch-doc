@@ -32,7 +32,7 @@ to a network block device. This is likely due to the long round trip time of the
 network. To help speed this up, we have considered batching reads to do
 automatic pre-fetching.
 
-Journalling is also a performance problem for us. Right now, when a journal is
+Journaling is also a performance problem for us. Right now, when a journal is
 being written out, the file server is blocking and thus hangs when requests come
 in. We would like to interleave requests with writing of the journal.
 
@@ -62,4 +62,4 @@ distance from stable storage, or their distance from the place they were
 generated.
 
 \subsection{More Features}
-journal size limitations, metadata only journalling
+journal size limitations, metadata only journaling

@@ -12,12 +12,12 @@ are also example's of kfsgraph's dot output. Figure~\ref{fig:kfsgraph-journal}
 shows ``/'' mounted as an internally journalled filesystem using the first IDE
 disk. Figure~\ref{fig:kfsgraph-su-on-su} shows ``/loop'' using loop device and
 soft updates on top of ``/''. Figure~\ref{fig:kfsgraph-journal-on-su} shows
-journalling on soft updates.
+journaling on soft updates.
 
 \begin{figure}[htb]
 \begin{center}
   \includegraphics[scale=\kfsgraphscale]{kfsgraph_journal}
-  \caption{kfsd Modules: Journalling}
+  \caption{kfsd Modules: Journaling}
   \label{fig:kfsgraph-journal}
 \end{center}
 \end{figure}
@@ -33,14 +33,14 @@ journalling on soft updates.
 \begin{figure}[htb]
 \begin{center}
   \includegraphics[scale=\kfsgraphscale]{kfsgraph_journal_on_su}
-  \caption{kfsd Modules: Journalling on Soft Updates}
+  \caption{kfsd Modules: Journaling on Soft Updates}
   \label{fig:kfsgraph-journal-on-su}
 \end{center}
 \end{figure}
 
 An example use of the mount program is to mount a network block device to
-``/net'' with external journalling and a 1024 block write back cache, and to
-fsck the filesystem after enabling journalling:\\
+``/net'' with external journaling and a 1024 block write back cache, and to
+fsck the filesystem after enabling journaling:\\
 \indent \texttt{\$ mount -d nbd 192.168.2.1 -m /net -j /.journal -fsck on -\$ 1024 -wb}\\
 Figure~\ref{fig:kfsgraph-mount} depicts kfsd's configuration before and after
 this mount.
@@ -48,7 +48,7 @@ this mount.
 \begin{figure}[htb]
 \begin{center}
   \includegraphics[scale=\kfsgraphscale]{kfsgraph_mount}
-  \caption{kfsd Modules: NBD Mount with External Journalling}
+  \caption{kfsd Modules: NBD Mount with External Journaling}
   \label{fig:kfsgraph-mount}
 \end{center}
 \end{figure}
