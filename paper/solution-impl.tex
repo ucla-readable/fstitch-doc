@@ -31,6 +31,7 @@ data is written and if the below LFS supports the file size feature,
 uhfs\_write() updates the file size metadata.
 
 \subsubsection{josfs\_base}
+\label{sec:solution:impl:base}
 
 The josfs\_base module provides low-level operations to the JOS File System.
 Its purpose as a base LFS module is to encapsulate all knowledge specific to the
@@ -67,6 +68,7 @@ interact with the rest of the system. Several times, design changes were not
 apparent until after implementation.
 
 \subsubsection{josfs\_cfs Legacy Module}
+\label{sec:solution:impl:legacy}
 
 In the beginning of the KudOS file server's development we wanted to begin
 testing CFS modules, CFS RPC, and KPL before the LFS and BD layers were ready
@@ -76,6 +78,7 @@ simplicity also served as a first validation that the CFS interface is flexible
 enough to host new and helpful uses.
 
 \subsubsection{Reliable File System Features}
+\label{sec:solution:impl:reliable}
 
 We implemented two types of reliable file system features: soft updates and
 journalling. Both use change descriptors to ensure that some disk writes will
@@ -153,29 +156,30 @@ down.
 \subsubsection{RAID}
 \label{sec:solution:impl:raid}
 
-The mirror\_bd module implements raid 1 using two disks. It connects to two
+The mirror\_bd module implements RAID 1 using two disks. It connects to two
 BD interfaces together and presents a single BD interface to the layer above.
 During normal operation, reads alternate between the two underlying block
 devices based on the stripe size set at configuration time. Write and sync
 operations are duplicated, once for each block device.
 
 In the case where a BD operation fails, the mirror\_bd module will mark the
-device as failed and switch to degraded mode. There is also a userland tool
-to explicitly fail a device using the online configuration facility. In degraded
-mode, the raid module acts as a pass-through for the working device. However,
+device as failed and switch to degraded mode. There is also a userspace tool to
+explicitly fail a device using the online configuration facility. In degraded
+mode, the RAID module acts as a pass-through for the working device. However,
 mirror\_bd will never fail both devices at the same time. To make BD failures
-possible for disks, we enhanced the ide\_pio\_bd module so operations timeout
+possible for disks, we enhanced the ide\_pio\_bd module so operations time out
 instead of polling forever. With the mirror\_bd device in degraded mode, users
 can add a block device to the raid module and return to normal mode. The RAID
 module will take any module that exports a BD interface, as long as it has the
-same block size and is sufficiently big enough. Upon device addition, the RAID
-module will sync the two block devices.
+same block size and is sufficiently large. Upon device addition, the RAID module
+will sync the two block devices.
 
-Mirror\_bd has some creative uses as well. One idea is to start with mirror\_bd
-in degraded mode, in place of just a disk. While the system is running, it is
-now possible to add in a second block device into mirror\_bd. After the block
-devices are synchronized, the original disk can be safely removed. This
-effectively implements disk hot swapping, as inspired by GEOM.~\ref{sec:related:geom}
+Mirror\_bd has some creative uses as well. One possibility is to start with
+mirror\_bd in degraded mode, in place of just a disk. While the system is
+running, it is then possible to add a second block device into mirror\_bd.
+After the block devices are synchronized, the original disk can be safely
+removed. This effectively implements disk hot swapping, as inspired by GEOM
+(\S~\ref{sec:related:geom}).
 
 \subsubsection{Loop Device}
 \label{sec:solution:impl:loop}
@@ -188,6 +192,7 @@ block's BD pointer and block number for use by the LFS's underlying BD, makes
 the appropriate LFS call, reverts its changes to the block, and returns.
 
 \subsubsection{Network Block Device}
+\label{sec:solution:impl:nbd}
 
 The network block device is extremely simple. It uses a straightforward
 serialization of the BD interface over a TCP connection. During initialization,

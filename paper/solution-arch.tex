@@ -12,6 +12,7 @@ the data structures that are used to store disk blocks and other filesystem
 data, like change dependency information and client file IDs.
 
 \subsubsection{Interface Layers}
+\label{sec:solution:arch:layers}
 
 The modules that make up the filesystem server are generally divided into four
 major layers in the simple case. At the lowest layer, there are modules that
@@ -52,6 +53,7 @@ metadata query functions, and is nominally 100\% reverse-compatible with the old
 file server.
 
 \subsubsection{Structures}
+\label{sec:solution:arch:structs}
 
 There are three major data structures in the KudOS file server. They are block
 descriptors (bdesc), data descriptors (ddesc), and change descriptors (chdesc).
@@ -65,6 +67,7 @@ store the old and new data, which block they changed, and lists of other chdescs
 which depend upon them or which they depend on.
 
 \subsubsection{Dependency Management}
+\label{sec:solution:arch:depman}
 
 when a chdesc is created, it's registered w/ depman. he tracks the
 life of it until it has been written to disk (actually satisfied). as
@@ -73,6 +76,7 @@ among the proper bdescs to reach the lowest level (this usually
 happens automatically).
 
 \subsubsection{Online Configuration}
+\label{sec:solution:arch:online}
 
 % This paragraph is set to 75 columns because it looks much nicer in the TeX that way
 
@@ -81,13 +85,14 @@ and introspection through three means. The modman component (module
 manager) tracks module instance existence and which module instances use
 another module instance. Many modules provide ``out of band'' functions for
 changing a module instance's configuration; for example, the mirror block
-device~(\ref{sec:solution:impl:raid}) has a function to add another block
+device (\S~\ref{sec:solution:impl:raid}) has a function to add another block
 device to the mirror. The KudOS file server also provides remote procedure
 calls for all modman and module out of band functions, allowing client
 programs to mount new filesystems or inspect the KudOS file server's
 current state, for example.
 
 \subsubsection{Client Tracking}
+\label{sec:solution:arch:clients}
 
 Each file opened by a client has an associated FID (File ID) that the client
 then uses to perform operations on the open file. CFS modules use FIDs to
