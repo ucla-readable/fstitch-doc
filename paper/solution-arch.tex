@@ -74,10 +74,12 @@ happens automatically).
 
 \subsubsection{Online Configuration}
 
+% This paragraph is set to 75 columns because it looks much nicer in the TeX that way
+
 The KudOS file server provides services allowing for online configuration
 and introspection through three means. The modman component (module
 manager) tracks module instance existence and which module instances use
-another module instance. Many modules provide out of band functions for
+another module instance. Many modules provide ``out of band'' functions for
 changing a module instance's configuration; for example, the mirror block
 device~(\ref{sec:solution:impl:raid}) has a function to add another block
 device to the mirror. The KudOS file server also provides remote procedure
@@ -87,14 +89,13 @@ current state, for example.
 
 \subsubsection{Client Tracking}
 
-Each file opened by a client has an associated FID (File ID) that the
-client then uses to perform operations on the open file, CFS modules use
-FIDs to associate internal information with client requests. For example,
-the table classifier (a CFS-CFS module similar to a Unix mount table)
-associates a FID with its corresponding CFS module instance. These FIDs
-need be unique across all modules, and across time to make bugs easier to
-detect. The fidman component (FID manager) generates unique FIDs. The
-fidfairies, fidcloser and fidprotector, are CFS-CFS modules. fidcloser
-determines when a FID can be closed, taking into account client dup()s,
-fork()s, spawn()s, and death. fidprotector prevents unauthorized access to
-FIDs by clients.
+Each file opened by a client has an associated FID (File ID) that the client
+then uses to perform operations on the open file. CFS modules use FIDs to
+associate internal information with client requests. For example, the table
+classifier (a CFS-CFS module similar to a Unix mount table) associates a FID
+with its corresponding CFS module instance. These FIDs need be unique across all
+modules, and across time to make bugs easier to detect. The fidman component
+(FID manager) generates unique FIDs. The fidfairies, fidcloser and fidprotector,
+are CFS-CFS modules. fidcloser determines when a FID can be closed, taking into
+account client dup()s, fork()s, spawn()s, and death, while fidprotector prevents
+unauthorized access to FIDs by clients.
