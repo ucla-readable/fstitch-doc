@@ -25,46 +25,18 @@
 
 \input{intro.tex}
 
-Abstract
+\input{problem.tex}
 
-Problem
-Solution
-* Architecture
- - bd, lfs, cfs, kpl
- - bdesc/ddesc, chdesc
- - depman and dependency forwarding
- - modman and online config
- - fidman and fairies
-* Implementation
- - kpl
- - josfs\_base
- - josfs\_cfs driver
- - uhfs
- - wb\_cache
- - journalling / soft updates
- - raid
- - loop
- - nbd
- - mount and friends
- - kfsgraph[viz]
-Influence
-* Related work
- - ext3
- - stackable FS
- - soft updates
- - GEOM
- - Flux OSkit
-* Other groups (ideas and criticize)
- - DDoS (critical)
- - P (influence by config file)
-Evaluation
-* slow
-Future work
-* speed problems, async I/O, memory mapping
-* nesting caches, better chdesc tracking
-* journal size limitations, metadata only journalling
-Conclustion
+\section{Solution}
+\label{sec:solution}
+\input{solution-arch.tex}
+\input{solution-impl.tex}
 
+\input{related.tex}
+\input{groups.tex}
+\input{evaluation.tex}
+\input{future.tex}
+\input{conclusion.tex}
 
 \bibliography{paper}
 \bibliographystyle{plain}
