@@ -44,7 +44,7 @@ The benchmarks compare asynchronous FFS, synchronous FFS, soft
 updates, and a variety of journaling variations. For journaling, there
 are asynchronous and synchronous versions of Logging-FFS that keeps
 the log in a file and that which keeps the log on a separate
-filesystem. The benchmarks themselves separate into two catagories:
+filesystem. The benchmarks themselves separate into two categories:
 microbenchmarks that tests specific operations, and macrobenchmarks
 that simulates workloads.
 
@@ -71,7 +71,7 @@ To support dependencies, we created the concept of change
 descriptors. Change descriptors describe changes to a specific block
 device. The change descriptors link to each other to form the
 dependency relationships. As filesystems perform operations, they will
-have to generate change descriptors and chain them up in the proper
-order depending. We will need an intelligent cache that understands
+have to generate and chain change descriptors with the proper
+order dependencies. We will need an intelligent cache that understands
 how to deal with change descriptors. Lastly, we will need have a
 dependency manager to send change descriptors between components.

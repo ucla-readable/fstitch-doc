@@ -28,7 +28,7 @@ journalling, and use a single order-aware cache to handle all such
 cases. Our design therefore calls for a generalized ``change
 descriptor'' structure that describes an arbitrary change to a disk
 block, and which can have other change descriptors as dependencies.
-Using this system, we can acheive the same effect as Soft Updates, and
+Using this system, we can achieve the same effect as Soft Updates, and
 even allow our change descriptors to cross block translation modules
 like the partitioner or the loopback device so that the underlying
 disk is updated in the order needed by the top-level filesystem.
