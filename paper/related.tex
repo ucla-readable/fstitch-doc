@@ -4,9 +4,9 @@
 \subsection{Linux JFS and ext3}
 \label{sec:related:ext3}
 
-In Linux, journaling in the ext3 filesystem is implemented as two distinct
+In Linux, journaling in the ext3 file system is implemented as two distinct
 modules that cooperate: JFS and ext3~\cite{tweedie98journaling}. The JFS module
-does not know anything about filesystems, and the ext3 module does not know
+does not know anything about file systems, and the ext3 module does not know
 anything about journaling. What the JFS module does is to provide transaction
 support for block devices. That is, it provides the facility to tell the block
 device what writes will be part of what transaction, and when transactions are
@@ -15,10 +15,10 @@ committed, or none of it. It does this by keeping a journal, but this is not
 part of the interface specification.
 
 The ext3 module uses transactions to accomplish its safety properties. It groups
-changes to the filesystem into transactions that guarantee the disk will always
+changes to the file system into transactions that guarantee the disk will always
 be in a consistent state, and lets the JFS module do the hard work. It keeps a
-flag in the filesystem superblock that indicates whether it has been cleanly
-unmounted, and upon mounting a dirty filesystem, it signals the JFS module to do
+flag in the file system superblock that indicates whether it has been cleanly
+unmounted, and upon mounting a dirty file system, it signals the JFS module to do
 any necessary recovery before it proceeds. In this way, the complexity of
 journaling is broken into two separate pieces.
 
@@ -27,10 +27,10 @@ implemented in the KudOS file server. In full journaling, everything that will
 be written to the disk is written to the journal first, as part of some
 transaction. Obviously this is much less efficient than we would like, which is
 why there is another technique for doing journaling: metadata-only journaling.
-In metadata-only journaling, only changes to the filesystem metadata (like
+In metadata-only journaling, only changes to the file system metadata (like
 directory structure, file names, sizes, and link counts) are grouped into
 transactions and written to the journal. File data changes are written directly,
-since they do not contribute to the validity of the filesystem and do not need
+since they do not contribute to the validity of the file system and do not need
 to be made ``safe'' in order to avoid needing fsck. Although it seems simple
 initially, metadata-only journaling introduces a large number of special cases
 involving resource reuse which greatly increase its complexity and the necessary
@@ -40,13 +40,13 @@ implementation time.
 \label{sec:related:soft}
 
 The BSD implementation of soft updates \cite{ganger00soft} is specific to BSD's
-Fast File System (FFS), and uses dependency structures that know what filesystem
-structures they are representing alterations to. As a result, it can do a few
-tricks to optimize its behavior. For instance, when two links to an inode are
-deleted, each gets an unlink structure that decrements the usage count of the
-inode when the change is written to disk. Either unlink may be written to disk
-first, because the change to the inode is actually calculated and made when the
-directory entry change is written, not when it is requested. In the KudOS
+Fast File System (FFS), and uses dependency structures that know what file
+system structures they are representing alterations to. As a result, it can do a
+few tricks to optimize its behavior. For instance, when two links to an inode
+are deleted, each gets an unlink structure that decrements the usage count of
+the inode when the change is written to disk. Either unlink may be written to
+disk first, because the change to the inode is actually calculated and made when
+the directory entry change is written, not when it is requested. In the KudOS
 implementation of soft updates, changes are created when requested, and written
 passively at a later time. The second change to the inode's usage count would
 have to depend on the first, as although each logically does the same thing
@@ -104,15 +104,15 @@ various block device interfaces to be layered on top of one another. In FreeBSD,
 it is used to implement partitions, RAID, and logical volume management. One
 feature of GEOM, explained in the manual page \cite{geom}, is that it can
 perform mounted disk hot-swapping by inserting a mirroring RAID module between
-the filesystem code and the disk, then adding a second disk to the set and
+the file system code and the disk, then adding a second disk to the set and
 synchronizing it, removing the original disk from the RAID, and finally removing
-the RAID module. This effectively moves a mounted filesystem to a new disk,
+the RAID module. This effectively moves a mounted file system to a new disk,
 without having to unmount it or otherwise disrupt the system.
 
 The KudOS file server cannot insert a module between two others, or remove a
 module from between two others, but if there is already a RAID module between
 the base LFS module and the rest of the BD layer, we can also move a mounted
-filesystem. The ability to insert and remove modules from within the module
+file system. The ability to insert and remove modules from within the module
 graph is something we considered, and decided to leave out due to the complexity
 of implementing it and the marginal benefits we could see from this ability.
 

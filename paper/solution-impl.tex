@@ -19,7 +19,7 @@ sizes of various modules in the system, in lines of code.
 \label{sec:solution:impl:kpl}
 
 The KudOS Presentation Layer (KPL) integrates the user level file descriptor
-interface with the CFS interface. Many filesystem functions are mapped directly
+interface with the CFS interface. Many file system functions are mapped directly
 from KPL to CFS, but some require some extra work. For example, the stat()
 function uses CFS's get\_metadata() function to get the data to return.
 Additionally, KPL provides the authorization tokens to fidprotector.
@@ -110,13 +110,13 @@ sector (the ``commit record'') is written in the journal that commits the whole
 sequence of writes atomically. Afterward, the data is written to the disk, and
 once all the data has been written, the commit record is cleared. Should the
 system crash before the commit record is written, none of the writes will be
-made to the disk, and the filesystem will be in the consistent state it was in
+made to the disk, and the file system will be in the consistent state it was in
 before whatever operation triggered the writes. Should it crash after the commit
 record is written, then the journal will be ``replayed'' in order to write all
 the information in the journal to the disk. Even if some or all of it had
 already been written, writing it again will not cause any problems. Once the
 journal has been recovered to the disk, the commit record will be erased and the
-filesystem will once again be in a consistent state. The journal file format is
+file system will once again be in a consistent state. The journal file format is
 depicted in Figure~\ref{fig:journal}.
 
 \begin{figure}[htb]
@@ -133,15 +133,15 @@ blocks that would otherwise have been written to the disk in a queue until asked
 to release them. It is typically placed below the base LFS module (i.e., as that
 module's BD). The journal LFS module is placed above the base LFS module, and it
 knows how to construct, write, and recover the journal. Ordinarily, it keeps the
-journal queue BD in a hold state, so that all filesystem changes are queued up.
+journal queue BD in a hold state, so that all file system changes are queued up.
 Every so often (the ``commit interval''), it asks the journal queue BD for all
 the blocks in the queue, writes them to the journal, sets up dependencies so
 that the journal will be written before the disk blocks themselves, and releases
 the queued blocks. This process is always guaranteed to occur at times when the
-filesystem is in a consistent state.
+file system is in a consistent state.
 
 Soft updates is somewhat more pervasive, because unlike full journaling, it
-needs to have more information about what a filesystem is and what it means for
+needs to have more information about what a file system is and what it means for
 it to be ``consistent.'' Briefly, soft updates needs to guarantee that
 structures on the disk are always initialized and marked as in use before they
 are pointed to, and that all pointers to structures are cleared before the
@@ -216,7 +216,7 @@ disk, the block we wish to evict will be fully written to disk.
 
 One may notice that this algorithm, while simple, is not optimal. That is, it
 does not necessarily result in the minimal number of block writes from the write
-back cache. In our usage with typical filesystem operations, however, we have
+back cache. In our usage with typical file system operations, however, we have
 found that this algorithm performs the same as the optimal algorithm would.
 
 The current write back cache has a caveat: write back caches cannot be stacked.
@@ -266,8 +266,8 @@ removed. This effectively implements disk hot swapping, as inspired by GEOM
 
 The loop device provides a BD interface to an LFS file. Through change
 descriptors and the LFS interface, the loop device is able to easily pass
-dependency information to the underlying filesystem, preserving soft updates and
-journaling dependencies. To write or sync a block, the loop device sets the
+dependency information to the underlying file system, preserving soft updates
+and journaling dependencies. To write or sync a block, the loop device sets the
 block's BD pointer and block number for use by the LFS's underlying BD, makes
 the appropriate LFS call, reverts its changes to the block, and returns.
 
@@ -311,6 +311,6 @@ constructs the given base BD, caches and block resizers as appropriate, a
 josfs\_base or wholedisk as appropriate, UHFS, and connects these to the table
 classifier at the given mount point. mount optionally allows specification of
 whether journaling is to be used or not (and where to journal to), whether to
-fsck the filesystem, how large a cache to use, and whether to use a write back
+fsck the file system, how large a cache to use, and whether to use a write back
 or write through cache. umount takes a mount point and destructs all modules
 down the chain that are no longer in use.

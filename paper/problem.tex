@@ -1,20 +1,20 @@
 \section{The Problem}
 \label{sec:problem}
 
-Filesystems today are an integral part of any computer system, and for many
-applications like databases or web servers, the choice of filesystem can have a
+File systems today are an integral part of any computer system, and for many
+applications like databases or web servers, the choice of file system can have a
 dramatic impact on the resulting performance and stability of the application.
 Often these performance and stability differences come from small feature
-differences in the filesystem, like supporting large directory traversals
+differences in the file system, like supporting large directory traversals
 efficiently at the expense of disk space, being able to store many small files
 in the same disk block, or having some sort of reliable recovery mechanism for
 system crashes.
 
-Even though this is the case, existing filesystems are generally implemented as
-monolithic blocks of code that conform to the disk infrastructure used in an OS
-on one side, and to the userspace filesystem interface on the other. These
+Even though this is the case, existing file systems are generally implemented as
+monolithic blocks of code that conform to the disk infrastructure used in the OS
+on one side, and to the userspace file system interface on the other. These
 modules can be tens of thousands of lines long, and are difficult to change
 without understanding large amounts of code that in principle does not have
-anything to do with filesystems. Furthermore, there is a lot of duplication
-between different filesystems, especially in the higher-level parts of the
-filesystem code that interfaces with userspace.
+anything to do with file systems. Furthermore, there is a lot of duplication
+between different file systems, especially in the higher-level parts of the file
+system code that interfaces with userspace.

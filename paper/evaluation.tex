@@ -9,7 +9,7 @@
 Figures~\ref{fig:kfsgraph-journal}, \ref{fig:kfsgraph-su-on-su}, and
 \ref{fig:kfsgraph-journal-on-su} show three example kfsd configurations. They
 are also examples of kfsgraph's dot output. Figure~\ref{fig:kfsgraph-journal}
-shows ``/'' mounted as an internally journaled filesystem using the first IDE
+shows ``/'' mounted as an internally journaled file system using the first IDE
 disk. Figure~\ref{fig:kfsgraph-su-on-su} shows ``/loop'' using loop device and
 soft updates on top of ``/''. Figure~\ref{fig:kfsgraph-journal-on-su} shows
 journaling on soft updates.
@@ -40,7 +40,7 @@ journaling on soft updates.
 
 An example use of the mount program is to mount a network block device to
 ``/net'' with external journaling and a 1024 block write back cache, and to
-fsck the filesystem after enabling journaling:\\
+fsck the file system after enabling journaling:\\
 \indent \texttt{\$ mount -d nbd 192.168.2.1 -m /net -j /.journal -fsck on -\$ 1024 -wb}\\
 Figure~\ref{fig:kfsgraph-mount} depicts kfsd's configuration before and after
 this mount.
@@ -77,7 +77,7 @@ conventions from higher-level descriptions could perhaps alleviate this problem,
 similar to the system in \cite{zadok00fist}.
 
 Another reason to create the KudOS file server was to be able to easily tune
-filesystems for the way they will be used, and to be able to look at a file
+file systems for the way they will be used, and to be able to look at a file
 server configuration and understand how it will behave (or how to change its
 behavior to match how it will be used). This goal has been met quite well by the
 variety of modules we have created, the flexibility of the interfaces to add new
@@ -91,7 +91,7 @@ Tuning a file server configuration to make it handle its expected work optimally
 is all well and good, but if the file server's maximum performance is not so
 good in the first place, it is unlikely to be immediately useful. It is
 therefore important to evaluate the performance of the system. Comparisons to
-several other filesystem implementations could be made here: the original JOS
+several other file system implementations could be made here: the original JOS
 file server, Linux running on the same hardware, and Linux using PIO disk access
 but using the same hardware all seem relevant.
 
