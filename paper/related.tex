@@ -37,14 +37,29 @@ implementation time.
 
 \subsection{BSD Soft Updates}
 
-\cite{ganger00soft}
-we made soft updates, we did it at a lower level w/ chdescs refering to
-data, not with references to higher level primatives. we are the
-taking the idea of rolling back block changes. theirs is more closely
-tied to FFS and help the rest of the system make certain decisions,
-that we would have a tough time discovering.
+The BSD implementation of soft updates \cite{ganger00soft} is specific to BSD's
+Fast File System (FFS), and uses dependency structures that know what filesystem
+structures they are representing alterations to. As a result, it can do a few
+tricks to optimize its behavior. For instance, when two links to an inode are
+deleted, each gets an unlink structure that decrements the usage count of the
+inode when the change is written to disk. Either unlink may be written to disk
+first, because the change to the inode is actually calculated and made when the
+directory entry change is written, not when it is requested. In the KudOS
+implementation of soft updates, changes are created when requested, and written
+passively at a later time. The second change to the inode's usage count would
+have to depend on the first, as although each logically does the same thing
+(decrement the usage count), they actually do different things (one writes $n$,
+the other $n - 1$ as the usage count). The changes would then correspondingly
+have to be written in the same order as they were requested.
 
-we are more general -- journalling is part of our system.
+To do something like the BSD implementation, we would have to allow change
+descriptors, which are currently passive data structures, contain enough
+information to describe some action that will be taken when it is written to
+disk, or that must happen before it is written to disk. This could be done, but
+we decided to take the more general approach that we did in order to minimize
+the complexity of the already rather complex write-back cache, and to make the
+system more efficient when dealing with other uses of dependency information
+like journalling.
 
 \subsection{Stackable File Systems}
 
