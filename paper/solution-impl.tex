@@ -88,12 +88,14 @@ right out. forwarded by depman.
 
 \subsubsection{Network Block Device}
 
-simple tcp connection to implement dead simple serial interface of bd
-interface.
-
-describe the serializations in detail.
-
-short time to write -- modules rock.
+The network block device is extremely simple. It uses a straightforward
+serialization of the BD interface over a TCP connection. During initialization,
+it receives the block size and number of blocks from the server. For each read
+request, it sends a read command and a block number to the server, and waits for
+the block to be returned. For a write request, it sends a write command, block
+number, and the block data. Both the client and server (which can run on either
+a POSIX system or KudOS itself) required only a few hours to develop and test,
+and they fit right into the rest of the system like any other block device.
 
 \subsubsection{Online Configuration}
 
