@@ -7,8 +7,15 @@ intro paragraph, we implemented these things... blah blah
 
 \subsubsection{KPL}
 
-must integrate user level file descriptor interface. (why this is
-warranted). provides capabilities page.
+The KudOS Presentation Layer (KPL) integrates the user level file
+descriptor interface with the CFS interface. Many filesystem functions
+are mapped directly from KPL to CFS, but some require some extra
+work. For example, the stat() function uses CFS's get\_metadata()
+function to get the data to return.
+
+This allows existing user programs to call into this fileserver in the
+same way they called into the existing fileserver. Additionally, KPL
+provides the authorization tokens to fidprotector.
 
 \subsubsection{UHFS}
 \label{sec:solution:impl:uhfs}
