@@ -7,14 +7,12 @@
 \newcommand{\kfsgraphscale}{0.5}
 
 Figures~\ref{fig:kfsgraph-journal}, \ref{fig:kfsgraph-su-on-su}, and
-\ref{fig:kfsgraph-journal-on-su} show three example kfsd
-configurations, they are also example's of kfsgraph's dot output.
-Figure~\ref{fig:kfsgraph-journal} shows ``/'' mounted as an internally
-journaled filesystem using the first ide disk.
-Figure~\ref{fig:kfsgraph-su-on-su} shows ``/loop'' using loop device
-and soft updates on top of ``/''.
-Figure~\ref{fig:kfsgraph-journal-on-su} shows journaling on soft
-updates.
+\ref{fig:kfsgraph-journal-on-su} show three example kfsd configurations. They
+are also example's of kfsgraph's dot output. Figure~\ref{fig:kfsgraph-journal}
+shows ``/'' mounted as an internally journalled filesystem using the first IDE
+disk. Figure~\ref{fig:kfsgraph-su-on-su} shows ``/loop'' using loop device and
+soft updates on top of ``/''. Figure~\ref{fig:kfsgraph-journal-on-su} shows
+journalling on soft updates.
 
 \begin{figure}[htb]
 \begin{center}
@@ -41,9 +39,11 @@ updates.
 \end{figure}
 
 An example use of the mount program is to mount a network block device to
-``/net'' with external journalling and a 1024 block write back cache and to fsck the filesystem after enabling journalling:\\
+``/net'' with external journalling and a 1024 block write back cache, and to
+fsck the filesystem after enabling journalling:\\
 \indent \texttt{\$ mount -d nbd 192.168.2.1 -m /net -j /.journal -fsck on -\$ 1024 -wb}\\
-Figure~\ref{fig:kfsgraph-mount} depicts kfsd's configuration before and after this mount.
+Figure~\ref{fig:kfsgraph-mount} depicts kfsd's configuration before and after
+this mount.
 
 \begin{figure}[htb]
 \begin{center}
@@ -56,11 +56,36 @@ Figure~\ref{fig:kfsgraph-mount} depicts kfsd's configuration before and after th
 
 \subsection{Performance}
 
-compare to fs (faster b/c it does less)
+Since one motivating factor for this system is to be able to easily tune
+filesystems for the way they will be used, it is obviously important to evaluate
+the performance of the system. Comparisons to several other filesystem
+implementations could be made here: the original JOS file server, Linux running
+on the same hardware, and Linux using PIO disk access but using the same
+hardware all seem relevant.
+
+Compared to the original JOS file server, the KudOS file server is generally
+slower except in two specific ways. First, it can open files much more quickly
+than the original file server. This is because the original file server had to
+read the entire file off the disk before it could be opened, due to the way all
+file read and write operations used shared memory. Second, the KudOS file server
+can delete files much more quickly than the original file server, and for the
+same reason. (Note that earlier versions of the KudOS file server had the same
+issue, but it was easily fixed. This seems to indicate that the new module
+structure is reasonable, because it isolated the cause of the inefficiency and
+made it easy to change.)
+
+In most other ways, however, the KudOS file server is currently slower than the
+original JOS file server - and with good reason: it's doing a whole lot more.
+The original file server followed the exokernel spirit a little more closely,
+and mapped entire files into client environments when they were opened. Thus all
+file I/O could take place without actually communicating with the file server,
+as reads and writes could be done to shared memory. This notable absense of
+explicit communication with the file server for the most common operations on
+files greatly sped up the original file server most of the time.
 
 compare to linux
 
 Too slow, rules are hard to follow.
 
-limitation: no memory mapping. kfs rpc client leaks memory all over
-the place. modman leaks memory. not thread safe!
+limitation: no memory mapping. kfs rpc client leaks memory all over the place.
+client modman stubs leak memory. not thread safe!
