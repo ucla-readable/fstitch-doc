@@ -48,9 +48,9 @@ directory entry change is written, not when it is requested. In the KudOS
 implementation of soft updates, changes are created when requested, and written
 passively at a later time. The second change to the inode's usage count would
 have to depend on the first, as although each logically does the same thing
-(decrement the usage count), they actually do different things (one writes $n$,
-the other $n - 1$ as the usage count). The changes would then correspondingly
-have to be written in the same order as they were requested.
+(decrement the usage count), they actually do different things (one writes $n -
+1$, the other $n - 2$ as the usage count). The changes would then
+correspondingly have to be written in the same order as they were requested.
 
 To do something like the BSD implementation, we would have to allow change
 descriptors, which are currently passive data structures, contain enough
