@@ -70,7 +70,7 @@ are two journaling limitations that would be nice to change.
 
 Firstly, the journal currently has a fixed length. If the length of the journal
 is exceeded before it can be flushed, the system temporarily goes into non-journaled mode.
-Perhaps a better solution would be to grow the stack, or detect when the
+Perhaps a better solution would be to grow the journal, or detect when the
 journal needs flushing.
 
 Secondly, the journal currently can only do full data journaling. We would like
