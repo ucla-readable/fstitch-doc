@@ -1,0 +1,31 @@
+digraph kfs
+{
+nodesep=0.15;
+ranksep=0.15;
+node [shape=record,color=black];
+n268440896 [label="ide_pio_hda",fillcolor=slateblue1,style=filled]
+n268440504 [label="wb_cache_bd-6b8",fillcolor=slateblue1,style=filled]
+        n268440504 -> n268440896 [label=""];
+n268440104 [label="block_resizer_bd-3180",fillcolor=slateblue1,style=filled]
+        n268440104 -> n268440504 [label=""];
+n268439696 [label="wt_cache_bd-32d8",fillcolor=slateblue1,style=filled]
+        n268439696 -> n268440104 [label=""];
+n268439296 [label="journal_queue_bd-3468",fillcolor=slateblue1,style=filled]
+        n268439296 -> n268439696 [label=""];
+n268438872 [label="josfs-3628",fillcolor=cyan3,style=filled]
+        n268438872 -> n268439296 [label=""];
+n268438392 [label="journal_lfs-7bb8",fillcolor=cyan3,style=filled]
+        n268438392 -> n268439296 [label="Queue"];
+        n268438392 -> n268438872 [label="Journal"];
+        n268438392 -> n268438872 [label="Filesystem"];
+n268437920 [label="devfs_cfs-268",fillcolor=springgreen,style=filled]
+n268437472 [label="uhfs-e760",fillcolor=springgreen,style=filled]
+        n268437472 -> n268438392 [label=""];
+n268437032 [label="table_classifier_cfs-e900",fillcolor=springgreen,style=filled]
+        n268437032 -> n268437920 [label="/dev"];
+        n268437032 -> n268437472 [label="/"];
+n268436576 [label="fidprotector_cfs-eb20",fillcolor=springgreen,style=filled]
+        n268436576 -> n268437032 [label=""];
+n268436136 [label="fidcloser_cfs-eca0",fillcolor=springgreen,style=filled]
+        n268436136 -> n268436576 [label=""];
+}

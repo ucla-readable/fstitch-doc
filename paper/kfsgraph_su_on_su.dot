@@ -1,0 +1,34 @@
+digraph kfs
+{
+nodesep=0.15;
+ranksep=0.15;
+node [shape=record,color=black];
+n268441704 [label="ide_pio_hda",fillcolor=slateblue1,style=filled]
+n268441312 [label="wb_cache_bd-6b8",fillcolor=slateblue1,style=filled]
+        n268441312 -> n268441704 [label=""];
+n268440912 [label="block_resizer_bd-3180",fillcolor=slateblue1,style=filled]
+        n268440912 -> n268441312 [label=""];
+n268440504 [label="wt_cache_bd-32d8",fillcolor=slateblue1,style=filled]
+        n268440504 -> n268440912 [label=""];
+n268439960 [label="loop_bd-11420",fillcolor=slateblue1,style=filled]
+        n268439960 -> n268439256 [label=""];
+n268439656 [label="wt_cache_bd-9148",fillcolor=slateblue1,style=filled]
+        n268439656 -> n268439960 [label=""];
+n268439256 [label="josfs-3468",fillcolor=cyan3,style=filled]
+        n268439256 -> n268440504 [label=""];
+n268438680 [label="josfs-9498",fillcolor=cyan3,style=filled]
+        n268438680 -> n268439656 [label=""];
+n268438216 [label="devfs_cfs-268",fillcolor=springgreen,style=filled]
+n268437768 [label="uhfs-79b8",fillcolor=springgreen,style=filled]
+        n268437768 -> n268439256 [label=""];
+n268437328 [label="table_classifier_cfs-7b58",fillcolor=springgreen,style=filled]
+        n268437328 -> n268438216 [label="/dev"];
+        n268437328 -> n268437768 [label="/"];
+        n268437328 -> n268436128 [label="/loop"];
+n268437016 [label="fidprotector_cfs-7d98",fillcolor=springgreen,style=filled]
+        n268437016 -> n268437328 [label=""];
+n268436560 [label="fidcloser_cfs-7f18",fillcolor=springgreen,style=filled]
+        n268436560 -> n268437016 [label=""];
+n268436128 [label="uhfs-1e358",fillcolor=springgreen,style=filled]
+        n268436128 -> n268438680 [label=""];
+}
