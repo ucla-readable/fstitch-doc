@@ -1,5 +1,5 @@
 \subsection{Implementation}
-\label{subsec:impl}
+\label{sec:solution:impl}
 
 (talk about how we did some speed optimizations already somewhere in this file)
 
@@ -11,9 +11,7 @@ must integrate user level file descriptor interface. (why this is
 warranted). provides capabilities page.
 
 \subsubsection{UHFS}
-\label{sec:soln:impl:uhfs}
-
-
+\label{sec:solution:impl:uhfs}
 
 probably common for all FSes w/ an lfs interface. implements all
 routine operations. e.g. allocate a block, push to end of file when
@@ -77,7 +75,7 @@ on this wb cache to honor them. but aht's a problem sucking blocks
 down.
 
 \subsubsection{RAID}
-\label{sec:soln:impl:raid}
+\label{sec:solution:impl:raid}
 
 lets you strip or mirror reads/writes to 1 or 2 disks. mirroring
 driver can handle disk failure and go into degraded mode where it's a
@@ -86,7 +84,7 @@ new disk, syn, ditch the old disk (w/ help of modman and userland
 utilities).
 
 \subsubsection{Loop Device}
-\label{sec:soln:impl:loop}
+\label{sec:solution:impl:loop}
 
 take a file and makes it look like a block device. depds go in and
 right out. forwarded by depman.
@@ -103,7 +101,7 @@ a POSIX system or KudOS itself) required only a few hours to develop and test,
 and they fit right into the rest of the system like any other block device.
 
 \subsubsection{Online Configuration}
-\label{sec:soln:impl:onlineconfig}
+\label{sec:solution:impl:online}
 
 
 important to mount filesystesmw hile the fs is running (cdrom,
@@ -115,4 +113,3 @@ to perform ops. rpc fxns.
 kfsgraph uses modman to find out which modules exists, which use each
 other, and their status. uses this to describe a grph of the current
 module configuration. output can be fed to dot, or plain text output.
-

@@ -1,5 +1,5 @@
 \subsection{Architecture}
-\label{subsec:arch}
+\label{sec:solution:arch}
 
 The KudOS file server is composed of many modules, each of which may use the
 services of other modules and provides a service of its own for other modules.
@@ -74,26 +74,27 @@ happens automatically).
 
 \subsubsection{Online Configuration}
 
-The KudOS file server provides services allowing for online
-configuration and introspection through three means. The modman
-component (module manager) tracks module instance existence and which
-module instances use another module instance. Many modules provide out
-of band functions for changing a module instance's configuration; for
-example, the mirror block device~(\ref{sec:soln:impl:raid}) has a
-function to add another block device to the mirror. The KudOS file
-server also provides a remote procedure calls to all modman and module
-out of band functions, allowing client programs to mount new
-filesystems or inspect the KudOS file server's current state, for example.
+The KudOS file server provides services allowing for online configuration
+and introspection through three means. The modman component (module
+manager) tracks module instance existence and which module instances use
+another module instance. Many modules provide out of band functions for
+changing a module instance's configuration; for example, the mirror block
+device~(\ref{sec:solution:impl:raid}) has a function to add another block
+device to the mirror. The KudOS file server also provides a remote
+procedure calls to all modman and module out of band functions, allowing
+client programs to mount new filesystems or inspect the KudOS file server's
+current state, for example.
 
 \subsubsection{Client Tracking}
 
-Each file opened by a client has an associated fid (File ID) that the
-client then uses to perform operations on the open file, CFS modules
-use fids to associate internal information with client requests. For
-example, the table classifier associates a fid with its corresponding
-CFS module instance. These fids need be unique across all modules, and
-across time to make bugs easier to detect. The fidman component (fid
-manager) generates unique fids. The fidfairies, fidcloser and
-fidprotector, are CFS-CFS modules. fidcloser determines when a fid can
-be closed, taking into account client dup()s, fork()s, spawn()s, and death.
-fidprotector prevents unauthorized access to fids by clients.
+Each file opened by a client has an associated FID (File ID) that the
+client then uses to perform operations on the open file, CFS modules use
+FIDs to associate internal information with client requests. For example,
+the table classifier (a CFS-CFS module similar to a Unix mount table)
+associates a FID with its corresponding CFS module instance. These FIDs
+need be unique across all modules, and across time to make bugs easier to
+detect. The fidman component (FID manager) generates unique FIDs. The
+fidfairies, fidcloser and fidprotector, are CFS-CFS modules. fidcloser
+determines when a FID can be closed, taking into account client dup()s,
+fork()s, spawn()s, and death. fidprotector prevents unauthorized access to
+FIDs by clients.
