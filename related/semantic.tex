@@ -1,0 +1,50 @@
+\section{Semantic File System}
+\label{sec:sfs}
+
+Gifford, Jouvelot, Sheldon, and O'Toole's Semantic File
+System~\cite{jouvelot91semantic} provides field-value access to file
+information through a file system interface. Their works explores the
+thesis ``\textit{semantic file systems} present a more effective
+storage abstraction than do traditional tree structured file systems
+for information sharing and command level programming.''
+
+An example of a field-value view, given that the semantic file system
+is mounted at /sfs/, is /sfs/owner:/smith/ containing all files owned
+by user smith. SFS provides this associative access to a system's
+contents by automatically extracting associative attributes
+(field-value pairs) using type specific \textit{transducers}. They
+describe five example transducers, for New York Times articles (type:,
+date:, subject:, etc), object files (exports: and imports:), the
+programming languages C, Pascal, and Scheme (exports: and imports:),
+mail (from:, to:, subject:, and text:), text files (text:), and
+file system metadata (owner:, group:, name:, etc). Associate access is
+integrated into the tree structured view of file systems using
+\textit{virtual directories}, which are interpreted as queries
+describing the desired attributes, such as /sfs/owner:/smith/ in the
+above example. Rapid access to contents is implemented using a static
+file index.
+
+In relation to KFS, SFS can be seen as an example use of the classifier
+concept, operating as a CFS-CFS block. In fact, operating as a classifier
+block allows SFS three benefits:
+\begin{enumerate}
+\item SFS is no longer restricted to integrating with the file
+  hierarchy through /sfs/. For example, given a mail file
+  /home/smith/mail, /home/\-smith/\-mail/\-from/\-kohler/ could
+  contain all mails from kohler. Semantic information could thus be
+  seen as an extension of existing directories and files, perhaps
+  helpful in both finding and using semantic information, and scaling
+  the SFS interface to larger numbers of users and/or files by
+  allowing users' file layouts to layout file semantic information.
+\item As individual environments also use the CFS interface,
+  environment, user, and group specific transducers are natural
+  extensions. Further, such extensions come without a need to modify
+  the machine or network-wide SFS server.
+\item SFS' implementation and administration can be simplified. The
+  authors of SFS found implementing the SFS server program as an NFS
+  server to be the easiest way to integrate SFS with the existing file
+  hierarchy. Implementing SFS as a classifier block means SFS need
+  only implement the CFS interface, not a more complicated NFS server.
+  This also easily allows exporting SFS interfaces using any existing
+  file system interface, not just NFS.
+\end{enumerate}
