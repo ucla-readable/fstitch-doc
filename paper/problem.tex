@@ -1,13 +1,20 @@
 \section{The Problem}
 \label{sec:problem}
 
-This is the problem description.
+Filesystems today are an integral part of any computer system, and for many
+applications like databases or web servers, the choice of filesystem can have a
+dramatic impact on the resulting performance and stability of the application.
+Often these performance and stability differences come from small feature
+differences in the filesystem, like supporting large directory traversals
+efficiently at the expense of disk space, being able to store many small files
+in the same disk block, or having some sort of reliable recovery mechanism for
+system crashes.
 
-problem is existing fses have xxx lines and support many oses
-
-lots of duplication
-
-maybe we can abstract out common features
-
-and make it easier to add/modify features/customize
-
+Even though this is the case, existing filesystems are generally implemented as
+monolithic blocks of code that conform to the disk infrastructure used in an OS
+on one side, and to the userspace filesystem interface on the other. These
+modules can be tens of thousands of lines long, and are difficult to change
+without understanding large amounts of code that in principle does not have
+anything to do with filesystems. Furthermore, there is a lot of duplication
+between different filesystems, especially in the higher-level parts of the
+filesystem code that interfaces with userspace.

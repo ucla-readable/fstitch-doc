@@ -1,12 +1,20 @@
 \section{The Solution}
 \label{sec:solution}
 
-Our solution is a prototype system we call the KudOS file server. It runs in a
-small operating system (also called KudOS) which was originally based on an
-educational exokernel system called JOS. It follows a microkernel approach in
-that it is a separate user environment (the JOS term for a process), but it
-could be made part of the kernel with relatively small changes (mostly to the
-client interface mechanisms).
+In this paper, we present a prototype system that attempts to address much of
+the inflexibility and extensibility limitations of existing filesystem drivers.
+It works by abstracting a large amount of code common across many filesystems
+and reliability features, and breaking up the system into small modules which
+are easier to understand than a single large driver. Extra features can be
+added, mixed and matched, or changed much more easily than with a monolithic
+filesystem driver design.
+
+We call our system the KudOS file server. It runs in a small operating system
+(also called KudOS) which was originally based on an educational exokernel
+system called JOS. It follows a microkernel approach in that it is a separate
+user environment (the JOS term for a process), but it could be made part of the
+kernel with relatively small changes (mostly to the client interface
+mechanisms).
 
 \input{solution-arch.tex}
 \input{solution-impl.tex}
