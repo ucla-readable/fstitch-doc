@@ -16,6 +16,7 @@ sizes of various modules in the system, in lines of code.
 \end{figure}
 
 \subsubsection{KPL}
+\label{sec:solution:impl:kpl}
 
 The KudOS Presentation Layer (KPL) integrates the user level file descriptor
 interface with the CFS interface. Many filesystem functions are mapped directly
@@ -181,8 +182,9 @@ A block that needs to be evicted must be written to a lower level (currently we
 mandate this to go to stable storage, not another cache), but this write may
 depend on other blocks being written first. To decide how to write out the
 blocks, a directed acyclic graph of changes is obtained from depman. The root of
-this graph is a NOOP change descriptor that points to all of the changes in the
-block that needs to be evicted. These changes then point to others changes, etc.
+this graph is a special ``NOOP'' change descriptor that points to all of the
+changes in the block that needs to be evicted. These changes then point to
+other changes, and so on.
 
 The maximum hop distance from each change descriptor to the root change
 descriptor is calculated. The write back cache then writes each leaf change to

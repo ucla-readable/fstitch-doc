@@ -2,6 +2,7 @@
 \label{sec:related}
 
 \subsection{Linux JFS and ext3}
+\label{sec:related:ext3}
 
 In Linux, journaling in the ext3 filesystem is implemented as two distinct
 modules that cooperate: JFS and ext3~\cite{tweedie98journaling}. The JFS module
@@ -36,6 +37,7 @@ involving resource reuse which greatly increase its complexity and the necessary
 implementation time.
 
 \subsection{BSD Soft Updates}
+\label{sec:related:soft}
 
 The BSD implementation of soft updates \cite{ganger00soft} is specific to BSD's
 Fast File System (FFS), and uses dependency structures that know what filesystem
@@ -62,6 +64,7 @@ system more efficient when dealing with other uses of dependency information
 like journaling.
 
 \subsection{Stackable File Systems}
+\label{sec:related:sfs}
 
 Stackable File Systems \cite{heidemann93stack} attempts to make file system
 development easier by providing an extensible file system interface. With such
@@ -114,6 +117,7 @@ graph is something we considered, and decided to leave out due to the complexity
 of implementing it and the marginal benefits we could see from this ability.
 
 \subsection{Flux OSKit}
+\label{sec:related:flux}
 
 The Flux OSKit \cite{ford97oskit} provides a framework for constructing
 operating systems. It breaks up the operating system into modules, and provides

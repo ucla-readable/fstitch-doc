@@ -2,14 +2,14 @@
 \label{sec:eval}
 
 \subsection{kfsd Configuration}
-\label{sec:eval:kfsd-config}
+\label{sec:eval:configuration}
 
 \newcommand{\kfsgraphscale}{0.5}
 
 Figures~\ref{fig:kfsgraph-journal}, \ref{fig:kfsgraph-su-on-su}, and
 \ref{fig:kfsgraph-journal-on-su} show three example kfsd configurations. They
 are also example's of kfsgraph's dot output. Figure~\ref{fig:kfsgraph-journal}
-shows ``/'' mounted as an internally journalled filesystem using the first IDE
+shows ``/'' mounted as an internally journaled filesystem using the first IDE
 disk. Figure~\ref{fig:kfsgraph-su-on-su} shows ``/loop'' using loop device and
 soft updates on top of ``/''. Figure~\ref{fig:kfsgraph-journal-on-su} shows
 journaling on soft updates.
@@ -55,6 +55,7 @@ this mount.
 
 
 \subsection{Performance}
+\label{sec:eval:performance}
 
 Since one motivating factor for this system is to be able to easily tune
 filesystems for the way they will be used, it is obviously important to evaluate
@@ -83,9 +84,15 @@ as reads and writes could be done to shared memory. This notable absense of
 explicit communication with the file server for the most common operations on
 files greatly sped up the original file server most of the time.
 
-compare to linux
+Compared to Linux, the KudOS file server does not yet seem competitive. We
+believe most of this speed discrepancy is due to the fact that our caches
+currently only write blocks when they are evicted out of necessity, which
+obviously is a poor scheduling policy. We have a mechanism to solve this
+problem, and the journal module uses it for its own scheduling, but it has not
+yet been used for the caches. We will save numerical performance testing until
+the KudOS file server's caches are more like other caches in these respects.
 
-Too slow, rules are hard to follow.
+\subsection{Simplicity}
+\label{sec:eval:simplicity}
 
-limitation: no memory mapping. kfs rpc client leaks memory all over the place.
-client modman stubs leak memory. not thread safe!
+rules are hard to follow.
