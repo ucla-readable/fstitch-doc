@@ -69,11 +69,20 @@ which depend upon them or which they depend on.
 \subsubsection{Dependency Management}
 \label{sec:solution:arch:depman}
 
-when a chdesc is created, it's registered w/ depman. he tracks the
-life of it until it has been written to disk (actually satisfied). as
-it is written through many layers, it is automatically forwarded
-among the proper bdescs to reach the lowest level (this usually
-happens automatically).
+When a change descriptor is created, it gets registered with the dependency
+manager. The dependency manager keeps track of all outstanding change
+descriptors, and what blocks (or block descriptors, really) they change. As the
+block descriptors are written from one block device to another (for instance, as
+they pass through caches, partitions, or RAID), the dependency manager tracks
+their associated change descriptors and automatically forwards them from block
+descriptors at one level of the graph to the next. A few types of block
+operations require explicit hints to the dependency manager for it to track the
+change descriptors correctly, like block resizer changes, but most of the
+operations that the dependency manager does are automatically invoked by the
+block descriptor reference counting code. When a change descriptor is finally
+satisfied by being written to disk, the dependency manager updates all the other
+change descriptors that depended upon it, so that they will know that their
+dependency has been satisfied. Then the change descriptor is freed.
 
 \subsubsection{Online Configuration}
 \label{sec:solution:arch:online}
