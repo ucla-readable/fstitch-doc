@@ -135,23 +135,89 @@ code.
 
 \subsubsection{wb\_cache}
 
-makes sure that dep graph is satisifed
+In the higher levels of the system (josfs\_base, UHFS, etc) writes are
+generated. The writes are arranged with dependency information that
+restricts the order with which they can be written to disk. A
+write back cache is desirable for performance reasons, but extreme
+care must be taken here because a write back cache can reorder disk
+writes. It is imperative that writes from the cache are in an order
+that does not violate the dependency information set up by the higher
+levels.
 
-direct mapped cache. talk about algo used to evict blocks. the algo is
-not optimal. in practice it is optimal, but in practice we don't have
-very complex graphs. produces ooutput that's serialized and safe for
-writing to stable storage.
+Recall that change descriptors can reference a portion of a disk block
+(in fact, they can reference as little as one bit, or as much as an
+entire block). The higher levels require not that disk blocks be
+written in a valid order, but that the \emph{changes} are written back
+in a valid order. Furthermore, we are guaranteed that a dependency
+graph of changes will contain no cycles; thus it is possible to write
+back the changes in order.
 
-design philosophy: can't stack the wb cache. it has to know that
-writes go to disk in the correct order. sync() to make sure stuff goes
-to disk at the correct order.
+The cache currently is fixed size and direct mapped. When a block is
+read from the cache, a reference is held to it by the cache.
 
-sure, stacking wb cache seems cool, but why not just put a wb cache
-above a disk and call it a day? floating deps down gives no benefit.
+If a block is written to an empty slot, a reference is held. If a
+block is written over a previous version of the block, the change
+descriptors of the block being written are applied to the block in the
+cache. If the block being written has no slot in the cache, a block
+must be evicted.
 
-you could probably do a wb cache that doesn't honor deps but depends
-on this wb cache to honor them. but aht's a problem sucking blocks
-down.
+A block that needs to be evicted must be written to a lower level
+(currently we mandate this to go to stable storage, not another
+cache), but this write may depend on other blocks being written
+first. To decide how to write out the blocks, a directed acyclic graph
+of changes is obtained from depman. The root of this graph is a NOOP
+change descriptor that points to all of the changes in the block that
+needs to be evicted. These changes then point to others changes, etc.
+
+The maximum hop distance from each change descriptor to the root
+change descriptor is calculated. The write back cache then writes each
+leaf change to disk. For each block that needs to be written out, if
+there are other changes on the block that cannot be written (because
+they have dependencies on another block), these change descriptors are
+``rolled back.'' This causes the changes to be temporarily
+undone. This block can then be written, and only the non-rolled back
+changes will be written out. Then those change descriptors are
+``rolled forward.'' Thus, we have the capability to write out data
+atomically in smaller units than whole blocks.
+
+Note that a change descriptor may depend on a change descriptor in
+another write back cache (imagine an external journal with a separate
+write back cache). If this is the case, we simply tell that cache to
+write out the change descriptor, rather than having this cache write
+it.
+
+Once a change has been written to the lower level, it is marked as
+satisfied and removed from the graph of changes that need to be
+written to the disk. The next furthest from root change descriptor is
+found and written to disk in the same way, and so on. Once all changes
+have been written to disk, the block we wish to evict will be fully
+written to disk.
+
+One may notice that this algorithm, while simple, is not optimal. That
+is, it does not necessarily result in the minimal number of block
+writes from the write back cache. In our usage with typical filesystem
+operations, however, we have found that this algorithm performs the
+same as the optimal algorithm would.
+
+The current write back cache has a caveat: write back caches cannot be
+stacked. At an anecdotal level, this makes sense: when writing out
+many change descriptors, we want to make sure some changes are written
+out to stable storage before writing out other changes. If the change
+descriptors are not going straight to disk when they are written, then
+what is the purpose of carefully managing the dependencies? The next
+lower level will also have to be responsible for ordering them
+properly before they are written to disk. More concretely, we run into
+a problem with change descriptor dependencies. If we write out a
+change from the write back cache to a lower level, we then expect
+changes that depended on that to be able to be written now. However,
+these changes still cannot be written out because their dependencies
+have not been satisfied. In the end, this problem goes back to an
+assumption we make: when changes are written out from the write back
+cache, they are expected to hit stable storage.
+
+(XXX you could probably do a wb cache that doesn't honor deps but
+depends on this wb cache to honor them. but aht's a problem sucking
+blocks down.)
 
 \subsubsection{RAID}
 \label{sec:solution:impl:raid}
