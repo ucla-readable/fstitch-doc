@@ -1,5 +1,18 @@
 \begin{abstract}
 
-This is the abstract.
+Traditional filesystems are large and rigid. While they have been
+carefully tuned to today's typical needs, they are difficult to
+modify. This makes not only experimentation difficult, but hinders the
+implementation of new features.
+
+We introduce the KudOS File Server, a componentized file system
+server. All the functionality of a traditional filesystem has been
+broken down into rearrangeable components. The components can be
+arranged to easily support existing filesystem features, like
+journaling, loop back devices, etc. Furthermore, the modular nature of
+the system makes it very easy to add new features. This allows new
+filesystems to plug into existing functionality more than was
+previously possible, thus speeding development and reducing code
+duplication.
 
 \end{abstract}
