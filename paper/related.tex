@@ -83,7 +83,7 @@ size, there seem to be limitations to what a Stackable File System can do.
 Due to the fact that modules can only be added in the space between basefs and
 the VFS layer, Stackable File Systems does not have the same level of
 flexibility as a fully componentized file system. From the examples in FiST, it
-appears trivial to add encryption or ACL to an existing file system, but it is
+appears trivial to add encryption or ACLs to an existing file system, but it is
 not clear how a system such as FiST can implement more sophisticated features
 like journaling or soft updates.
 
@@ -128,10 +128,10 @@ boot loader or device drivers.
 
 One interesting aspect of Flux is the use of components from other operating
 systems. Rather than rewriting drivers and networking code from scratch, the
-Flux OSKit provides glue code to make it possible for the FreeBSD TCP/IP stack,
-and the Linux network device drivers to work as parts of the same kernel. In
-KudOS, we did something similar in josfs\_cfs, which is the glue code to connect
-the JOS File Server with our CFS layer.
+Flux OSKit provides glue code to make it possible for the FreeBSD TCP/IP stack
+and Linux network device drivers to work as parts of the same kernel. In KudOS,
+we did something similar in josfs\_cfs, which is the glue code to connect the
+JOS File Server with our CFS layer.
 
 With both Flux and KudOS, the philosophy is to componentize the system. Of
 course, the two projects have different levels of granularity. The projects also

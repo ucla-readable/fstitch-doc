@@ -25,7 +25,7 @@ function uses CFS's get\_metadata() function to get the data to return.
 Additionally, KPL provides the authorization tokens to fidprotector.
 
 This allows existing user programs to call into this file server in the same way
-they called into the existing file server. User programs can be switched back to
+they called into the original file server. User programs can be switched back to
 use the original file server by changing only a small set of wrapper functions
 which call either the new KPL functions or the original functions.
 
@@ -35,34 +35,34 @@ which call either the new KPL functions or the original functions.
 If the CFS layer is akin to C and the LFS layer to assembly, the UHFS (Uniform
 High level File System) module is a CFS to LFS interpreter. UHFS is intended to
 be the common CFS-LFS module for all file systems with an LFS interface; this
-includes josfs\_base, but does not include devfs\_cfs. UHFS's CFS function
-implementations take care of non-block aligned accesses, lower level operations
-such as block allocation during write, and orders inter-LFS function call chdesc
-dependencies.
+includes josfs\_base, but does not include \mbox{devfs\_cfs}. UHFS's CFS
+function implementations take care of non-block aligned accesses and lower level
+operations such as block allocation during write, and set up inter-LFS function
+call chdesc dependencies.
 
-Uhfs\_write() provides an example of a typical UHFS function. UHFS's client
+uhfs\_write() provides an example of a typical UHFS function. UHFS's client
 passes an open file's FID, data to write, and where in the file this data
-belongs. uhfs\_write() looks up the FID's associated LFS handle and if the
+belongs. uhfs\_write() looks up the FID's associated LFS handle and, if the
 underlying LFS supports file sizes, looks up the file's current size in bytes.
 uhfs\_write() then writes the data a block at a time to the underlying LFS,
 allocating and then appending blocks as the file needs enlargement. Once all
-data is written and if the underlying LFS supports the file size feature,
+data is written, and if the underlying LFS supports the file size feature,
 uhfs\_write() updates the file size metadata.
 
 \subsubsection{josfs\_base}
 \label{sec:solution:impl:base}
 
-The josfs\_base module provides low-level operations to the JOS File System.
+The josfs\_base module provides low-level operations to the JOS file system.
 Its purpose as a base LFS module is to encapsulate all knowledge specific to the
-file system. As such, only josfs\_base knows about the free block bitmap and
-files with indirect blocks. No other module in the system needs to know the
-details of how a JOS File System is laid out on disk. LFS modules such as
-josfs\_base only know how to perform micro-ops like allocating a block,
+file system. As such, only josfs\_base knows about disk structures like the free
+block bitmap and files with indirect blocks. No other module in the system needs
+to know the details of how a JOS file system is laid out on disk. LFS modules
+such as josfs\_base only know how to perform micro-ops like allocating a block,
 appending a block, and writing a block. For each operation, josfs\_base will
 make appropriate changes to the underlying block device, so the structures on
 disk correctly reflect the semantics of the operation.
 
-Josfs\_base also supports ``optional'' features such as file size and the
+josfs\_base also supports ``optional'' features such as file size and the
 concept of directories. UHFS can query josfs\_base to see what features it
 supports and then act accordingly. For the most part, josfs\_base treats
 metadata as pure metadata. It is up to UHFS to set file sizes correctly,
@@ -92,7 +92,7 @@ apparent until after implementation.
 In the beginning of the KudOS file server's development we wanted to begin
 testing CFS modules, CFS RPC, and KPL before the LFS and BD layers were ready
 for use. The josfs\_cfs module allowed this testing by providing a full file
-system, using JOS's existing file server daemon as a back-end. Josfs\_cfs's
+system, using JOS's existing file server daemon as a back-end. josfs\_cfs's
 simplicity also served as a first validation that the CFS interface is flexible
 enough to host new and helpful uses.
 
@@ -148,27 +148,27 @@ are pointed to, and that all pointers to structures are cleared before the
 structures are marked as free or reused. To accomplish this, we need the base
 LFS module to help us out a little bit, by giving us ``hints'' (really, change
 descriptor dependency information) as to what needs to happen before what for
-each of its micro-ops, and we need those small hints to be composed into larger
-hints by UHFS. These are relatively small changes to both of these modules, and
-they are relatively simple to make because of how much the work is divided up
-into individual LFS operations.
+each of its micro-ops. Additionally, we need those small hints to be composed
+into larger hints by UHFS. These are relatively small changes to both of these
+modules, and they are relatively simple to make because of how much the work is
+divided up into individual LFS operations.
 
-The write-back cache, described below, then makes sure that the changes are
-written in a safe order, just as it does for journaling above. This is one of
-the big advantages of generalizing the write ordering requirements of soft
-updates and journaling: they can share a good deal of the more complicated
-code.
+The write-back cache, described in section \ref{sec:solution:impl:wbcache}, then
+makes sure that the changes are written in a safe order, just as it does for
+journaling above. This is one of the big advantages of generalizing the write
+ordering requirements of soft updates and journaling: they can share a good deal
+of the more complicated code.
 
 \subsubsection{wb\_cache}
 \label{sec:solution:impl:wbcache}
 
 In the higher levels of the system (josfs\_base, UHFS, etc) writes are
 generated. The writes are arranged with dependency information that restricts
-the order with which they can be written to disk. A write back cache is
-desirable for performance reasons, but extreme care must be taken here because a
-write back cache can reorder disk writes. It is imperative that writes from the
-cache are in an order that does not violate the dependency information set up by
-the higher levels.
+the order in which they can be written to disk. A write back cache is desirable
+for performance reasons, but extreme care must be taken here because a write
+back cache can reorder disk writes. It is imperative that writes from the cache
+are in an order that does not violate the dependency information set up by the
+higher levels.
 
 Recall that change descriptors can reference a portion of a disk block (in fact,
 they can reference as little as one bit, or as much as an entire block). The
@@ -183,14 +183,14 @@ the cache, a reference is held to it by the cache.
 If a block is written to an empty slot, a reference is held. If a block is
 written over a previous version of the block, the change descriptors of the
 block being written are applied to the block in the cache. If the block being
-written has no slot in the cache, a block must be evicted.
+written has no slot in the cache, a block must be evicted to make room for it.
 
 A block that needs to be evicted must be written to a lower level (currently we
 mandate this to go to stable storage, not another cache), but this write may
 depend on other blocks being written first. To decide how to write out the
 blocks, a directed acyclic graph of changes is obtained from depman. The root of
-this graph is a special ``NOOP'' change descriptor that points to all of the
-changes in the block that need to be evicted. These changes then point to other
+this graph is a special ``no-op'' change descriptor that points to all of the
+changes in the block that need to be written. These changes then point to other
 changes, and so on.
 
 The maximum hop distance from each change descriptor to the root change
@@ -198,15 +198,15 @@ descriptor is calculated. The write back cache then writes each leaf change to
 disk. For each block that needs to be written out, if there are other changes on
 the block that cannot be written (because they have dependencies on another
 block), these change descriptors are ``rolled back.'' This causes the changes to
-be temporarily undone. This block can then be written, and only the non-rolled
+be temporarily undone. The block can then be written, and only the non-rolled
 back changes will be written out. Then those change descriptors are ``rolled
 forward.'' Thus, we have the capability to write out data atomically in smaller
 units than whole blocks.
 
 Note that a change descriptor may depend on a change descriptor in another write
 back cache (imagine an external journal with a separate write back cache). If
-this is the case, we simply tell that cache to write out the change descriptor,
-rather than having this cache write it.
+this is the case, we simply tell that cache to write out the change descriptor
+(with its sync() function), rather than having this cache write it itself.
 
 Once a change has been written to the lower level, it is marked as satisfied and
 removed from the graph of changes that need to be written to the disk. The cache
@@ -217,21 +217,22 @@ disk, the block we wish to evict will be fully written to disk.
 One may notice that this algorithm, while simple, is not optimal. That is, it
 does not necessarily result in the minimal number of block writes from the write
 back cache. In our usage with typical file system operations, however, we have
-found that this algorithm performs the same as the optimal algorithm would.
+found that the graphs which cause non-optimal behavior do not tend to arise and
+this algorithm generally gives the optimal solution.
 
 The current write back cache has a caveat: write back caches cannot be stacked.
-At an anecdotal level, this makes sense: when writing out many change
-descriptors, we want to make sure some changes are written out to stable storage
-before writing out other changes. If the change descriptors are not going
-straight to disk when they are written, then what is the purpose of carefully
-managing the dependencies? The next lower level will also have to be responsible
-for ordering them properly before they are written to disk. More concretely, we
-run into a problem with change descriptor dependencies. If we write out a change
-from the write back cache to a lower level, we then expect changes that depended
-on that to be able to be written now. However, these changes still cannot be
-written out because their dependencies have not been satisfied. In the end, this
-problem goes back to an assumption we make: when changes are written out from
-the write back cache, they are expected to hit stable storage.
+Intuitively, this makes sense: when writing out many change descriptors, we want
+to make sure some changes are written out to stable storage before writing out
+other (dependent) changes. If the change descriptors are not going straight to
+disk when they are written, then what is the purpose of carefully managing the
+dependencies? The next lower level will also have to be responsible for ordering
+them properly before they are written to disk. More concretely, we run into a
+problem with change descriptor dependencies. If we write out a change from the
+write back cache to a lower level, we then expect changes that depended on that
+to be able to be written now. However, these changes still cannot be written out
+because their dependencies have not been satisfied. In the end, this problem
+boils down to the assumption that when changes are written out from the write
+back cache, they will hit stable storage.
 
 \subsubsection{RAID}
 \label{sec:solution:impl:raid}
@@ -254,7 +255,7 @@ The RAID module will take any module that exports a BD interface, as long as it
 has the same block size and is sufficiently large. Upon device addition, the
 RAID module will sync the two block devices.
 
-Mirror\_bd has some creative uses as well. One possibility is to start with
+mirror\_bd has some creative uses as well. One possibility is to start with
 mirror\_bd in degraded mode, in place of just a disk. While the system is
 running, it is then possible to add a second block device into mirror\_bd.
 After the block devices are synchronized, the original disk can be safely
@@ -292,15 +293,15 @@ and BD module instances. Each module instance registers/unregisters itself with
 modman at creation/destruction time and registers/unregisters module instance
 usage. modman stores this information to respond to others' queries.
 
-KFS RPC is implemented in a similar manner to CFS RPC: a serialized KFS is used
-to communicate between KFS server and clients via KudOS IPC message passing.
-Each KFS function is re-implemented as an RPC stub, allowing an object file to
-be linked to either the KFS IPC Client or Server library. Client programs are
-thus able to reconfigure the kfsd environment using the same functions that
-would be used within kfsd.
+KFS RPC is implemented very much like CFS RPC: a serialized KFS is used to
+communicate between KFS server and clients via KudOS IPC message passing.  Each
+KFS function is reimplemented as an RPC stub, allowing an object file to be
+linked to either the KFS IPC client or server library. Client programs are thus
+able to reconfigure the kfsd environment using the same functions that would be
+used within kfsd.
 
-The program kfsgraph uses KFS RPC to construct a module usage graph, showing
-module instance existence, which instances use which others, and instances'
+The kfsgraph program uses KFS RPC to construct a module usage graph, showing
+existing module instances, which instances use which others, and instances'
 configuration and status. kfsgraph can output this graph to text or to AT\&T's
 graphviz dot format. Section~\ref{sec:eval} shows examples of kfsgraph's output.
 
@@ -310,7 +311,7 @@ Given a BD type of IDE, nbd, loop, or an existing BD and a mount point, mount
 constructs the given base BD, caches and block resizers as appropriate, a
 josfs\_base or wholedisk as appropriate, UHFS, and connects these to the table
 classifier at the given mount point. mount optionally allows specification of
-whether journaling is to be used or not (and where to journal to), whether to
+whether journaling is to be used (and if so, where to journal to), whether to
 fsck the file system, how large a cache to use, and whether to use a write back
 or write through cache. umount takes a mount point and destructs all modules
 down the chain that are no longer in use.

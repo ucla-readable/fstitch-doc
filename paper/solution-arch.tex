@@ -20,8 +20,8 @@ provide a BD interface. They can be disks, partitions on other block devices,
 caches, network block devices, RAM disks, and so on. The BD interface contains
 functions for reading and writing blocks, as well as querying the block size and
 number of blocks. Although the interface is simple, there is hidden complexity
-in some types of block device modules when dealing with change descriptors (to
-be explained later).
+in some types of block device modules when dealing with change descriptors (see
+section \ref{sec:solution:arch:structs}).
 
 The next layer starts with modules that use BD modules, and provide LFS
 interfaces. It includes any other modules which are LFS-LFS modules, that is,
@@ -87,18 +87,18 @@ dependency has been satisfied. Then the change descriptor is freed.
 \subsubsection{Online Configuration}
 \label{sec:solution:arch:online}
 
-% This paragraph is set to 75 columns because it looks much nicer in the TeX that way
+% This paragraph is set to 78 columns because it looks much nicer in the TeX that way
 
-The KudOS file server provides services allowing for online configuration
-and introspection through three means. The modman component (module
-manager) tracks the existence of module instance and which module instances
-use another module instance. Many modules provide ``out of band'' functions
-for changing a module instance's configuration; for example, the mirror
-block device (\S~\ref{sec:solution:impl:raid}) has functions to add and
-remove block devices from the mirror. The KudOS file server also provides
-remote procedure calls for all modman and module out of band functions,
-allowing client programs to mount new file systems or inspect the KudOS
-file server's current state, for example.
+The KudOS file server provides services allowing for online configuration and
+introspection through three means. The modman component (module manager)
+tracks the existence of module instances and which module instances use
+another module instance. Many modules provide ``out of band'' functions for
+changing a module instance's configuration; for example, the mirror block
+device (\S~\ref{sec:solution:impl:raid}) has functions to add and remove block
+devices from the mirror. The KudOS file server also provides remote procedure
+calls for all such out of band and modman functions, allowing client programs
+to mount new file systems or inspect the KudOS file server's current state,
+for example.
 
 \subsubsection{Client Tracking}
 \label{sec:solution:arch:clients}
@@ -109,7 +109,7 @@ associate internal information with client requests. For example, the table
 classifier (a CFS-CFS module similar to a Unix mount table) associates a FID
 with its corresponding CFS module instance. These FIDs need to be unique across
 all modules, and across time to make bugs easier to detect. The fidman component
-(FID manager) generates unique FIDs. The two fidfairies, fidcloser and
+(FID manager) generates unique FIDs. The two ``fidfairies,'' fidcloser and
 fidprotector, are CFS-CFS modules. Fidcloser determines when a FID can be
 closed, taking into account client dup()s, fork()s, spawn()s, and death, while
 fidprotector prevents unauthorized access to FIDs by clients.
