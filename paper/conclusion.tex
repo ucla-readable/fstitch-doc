@@ -4,7 +4,14 @@
 Traditionally, file systems have been monolithic and inflexible in design. In
 KudOS, we describe a componentized system where the file server consists of the
 CFS, LFS, and BD layers, along with services for dependency management and
-online configuration. We have demonstrated the power of KudOS through the use of
-common code and infrastructure to implement different features, the ability to
-easily extend the system with new modules, and the flexibility to rearrange
-components to achieve a variety of configurations.
+online configuration. 
+
+We have demonstrated the power of KudOS through the use of common code
+and infrastructure to implement different features. After the
+necessary modules were implemented, adding extra features like
+journaling and RAID was relatively painless. The system also is ripe
+for new features; modules are easy to implement and can take advantage
+of any preexisting infrastructure in the system.
+
+KudOS is light, flexible, and powerful. It is an excellent platform
+for file system development.
