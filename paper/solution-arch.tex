@@ -23,7 +23,7 @@ number of blocks. Although the interface is simple, there is hidden complexity
 in some types of block device modules when dealing with change descriptors (see
 section \ref{sec:solution:arch:structs}).
 
-The next layer starts with modules that use BD modules, and provide LFS
+The next layer starts with modules that use BD modules and provide LFS
 interfaces. It includes any other modules which are LFS-LFS modules, that is,
 modules which use an LFS interface and provide another LFS interface. The LFS
 interface provides extremely low-level file system operations, sort of like the
@@ -34,7 +34,7 @@ is possible, using the LFS interface, to effect changes to the underlying
 file system that are not ordinarily allowed - for instance, assigning the same
 disk block to multiple files.
 
-The third layer starts with modules that use an LFS module, and provide CFS
+The third layer starts with modules that use an LFS module and provide CFS
 interfaces. It includes any other modules which are CFS-CFS modules, as well as
 the IPC mechanism which allows client environments to access the top-level CFS
 modules in the file server. The CFS interface is similar to the ``VFS''
