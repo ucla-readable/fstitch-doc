@@ -1,20 +1,19 @@
 \section{Stackable Filesystem Works}
 
-The FiST project at Columbia~\cite{zadok00fist}
-describes a system for stackable file
-systems. The goal of the project was to allow programmers the ability
-to easily add one or many features to existing filesystems. When many
-additions are added, they are stacked. For maximum utility, the
-modifications are designed to be platform independent, but are still
-able to take advantage of platform-specific features. Additionally,
-the modifications are written in a special language that facilitates
-ease of development, freeing the developer from wading through
-thousands of lines of C code.
+The FiST project at Columbia~\cite{zadok00fist} describes a system for
+stackable file systems. The goal of the project was to allow
+programmers the ability to easily add one or many features to existing
+filesystems. When many additions are added, they are stacked. For
+maximum utility, the modifications are designed to be platform
+independent, but are still able to take advantage of platform-specific
+features. Additionally, the modifications are written in a special
+language that facilitates ease of development, freeing the developer
+from wading through thousands of lines of C code.
 
 There are a few components to FiST that allow it to fulfill these
 goals. First of all, glue code has been written that exposes a place
-in the kernel where stackable, FiST produced filesystems can reside
-and operate on the vnode layer. This glue was ported to three
+in the kernel where stackable, FiST-produced filesystems can reside
+and operate on the ``vnode'' layer. This glue was ported to three
 operating systems (Solaris, FreeBSD, Linux).
 
 The next component is a filesystem generator. This generator accepts
@@ -22,9 +21,9 @@ code written according to the FiST grammar. This code contains a few
 sections: C declarations, FiST declarations, FiST rules, and
 additional C code. C and FiST declarations allow the programmer to
 define data structures. The heart of the filesystem is in the FiST
-Rules, section, though. Each vnode operation has three rules. The
-first rule is code that is executed in the filesystem before the call
-to the underlying filesystem is made. The second rule is code that is
+rules section, though. Each vnode operation has three rules. The first
+rule is code that is executed in the filesystem before the call to the
+underlying filesystem is made. The second rule is code that is
 executed after the call to the underlying filesystem is made, and the
 final rule is any code that can execute in place of the underlying
 filesystem call. By default, the first two rules do nothing, and the
@@ -45,16 +44,16 @@ modified, and the software around it. Since FiST presents a consistent
 interface, the developer only needs to worry about being compatible
 with FiST.
 
-FiST then, is operating on a far different scale than our
-filesystem. FiST sits between VFS and the underlying filesystem driver
-on a normal UNIX system. This closely resembles the area around our
-element that converts from CFS (a very high level interface) to LFS (a
-very low level interface) in KudOS, since CFS is higher level than
-standard VFS and LFS is lower level than standard VFS. The stackable
+FiST then, is operating on a far different scale than our filesystem.
+FiST sits between VFS and the underlying filesystem driver on a normal
+UNIX system. This closely resembles the area around our element that
+converts from CFS (a relatively high level interface) to LFS (a very
+low level interface) in KudOS, since CFS is higher level than standard
+VFS and LFS is lower level than standard VFS. The stackable
 filesystems that FiST generates could be used in a KudOS-like
 environment: two elements would replace the existing CFS to LFS
-conversion node and expose a vnode-like interface in the middle of the
-two new elements. FiST can then stack filesystems here.
+conversion element and expose a vnode-like interface in the middle of
+the two new elements. FiST can then stack filesystems here.
 
 The vnode interface, while a convenient location to allow many
 programmers the ability to easily implement filesystem changes, also
@@ -62,12 +61,14 @@ has some drawbacks. One drawback is that the vnode layer can only
 operate on fixed blocks of data in files. As such, it can modify file
 data but not the size of the data, which makes a compression system
 impossible. Also, it cannot affect the order of lower level
-operations, making a soft updates layer impossible.
+operations, making a soft updates layer impossible. It is best for
+simply adding extra metadata or simple semantics to an existing
+filesystem.
 
 Another related work, a precursor to FiST, is File System Development
-with Stackable Layers~\cite{heidemann93stack}.
-It describes a similar vnode layer to the FiST
-paper. One unique idea this paper gives is the ability to have a vnode
-layer be split between two machines, and pass the calls over an RPC
-interface. Again, work is operating on a very different scale from
-ours, and could be implemented in our work in the same manner as FiST.
+with Stackable Layers~\cite{heidemann93stack}. It describes a similar
+vnode layer to the FiST paper. One unique idea this paper gives is the
+ability to have a vnode layer be split between two machines, and pass
+the calls over an RPC interface. Again, this work is operating on a
+very different scale from ours, and could be implemented in our work
+in the same manner as FiST.
