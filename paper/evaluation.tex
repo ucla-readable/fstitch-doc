@@ -1,34 +1,61 @@
 \section{Evaluation}
 \label{sec:eval}
 
-\newcommand{\kfsgraphscale}{0.3}
+\subsection{KFSD Configuration}
+\label{sec:eval:kfsd-config}
+
+\newcommand{\kfsgraphscale}{0.5}
+
+Figures~\ref{fig:kfsgraph-journal}, \ref{fig:kfsgraph-su-on-su}, and
+\ref{fig:kfsgraph-journal-on-su} show three example kfsd
+configurations, they are also example's of kfsgraph's dot output.
+Figure~\ref{fig:kfsgraph-journal} shows ``/'' mounted as an internally
+journaled filesystem using the first ide disk.
+Figure~\ref{fig:kfsgraph-su-on-su} shows ``/loop'' using loop device
+and soft updates on top of ``/''.
+Figure~\ref{fig:kfsgraph-journal-on-su} shows journaling on soft
+updates.
 
 \begin{figure}[htb]
 \begin{center}
   \includegraphics[scale=\kfsgraphscale]{kfsgraph_journal}
-  \label{fig:kfsgraph-journal}
   \caption{KFSD Module Configuration: Journalling}
+  \label{fig:kfsgraph-journal}
 \end{center}
 \end{figure}
 
 \begin{figure}[htb]
 \begin{center}
   \includegraphics[scale=\kfsgraphscale]{kfsgraph_su_on_su}
-  \label{fig:kfsgraph-su-on-su}
   \caption{KFSD Module Configuration: Soft Updates on Soft Updates}
+  \label{fig:kfsgraph-su-on-su}
 \end{center}
 \end{figure}
 
 \begin{figure}[htb]
 \begin{center}
   \includegraphics[scale=\kfsgraphscale]{kfsgraph_journal_on_su}
-  \label{fig:kfsgraph-journal-on-su}
   \caption{KFSD Module Configuration: Journalling on Soft Updates}
+  \label{fig:kfsgraph-journal-on-su}
 \end{center}
 \end{figure}
 
-show some example config graphs for su on su, journalling, journalling
-to su fs. they work! show what mount does. fsck to verify.
+An example use of the mount program is to mount a network block device to
+``/net'' with external journalling and a 1024 block write back cache and to fsck the filesystem after enabling journalling:\\
+\indent \texttt{\$ mount -d nbd 192.168.2.1 -m /net -j /.journal -fsck on -\$ 1024 -wb}\\
+Figure~\ref{fig:kfsgraph-mount} depicts kfsd's configuration before and after this mount.
+
+\begin{figure}[htb]
+\begin{center}
+  \includegraphics[scale=\kfsgraphscale]{kfsgraph_mount_pre}
+  \includegraphics[scale=\kfsgraphscale]{kfsgraph_mount_post}
+  \caption{KFSD Module Configuration: NBD Mount with External Journalling, Pre- and Post- Mount}
+  \label{fig:kfsgraph-mount}
+\end{center}
+\end{figure}
+
+
+\subsection{TODO}
 
 compare to fs (faster b/c it does less)
 

@@ -1,0 +1,25 @@
+digraph kfs
+{
+nodesep=0.15;
+ranksep=0.15;
+node [shape=record,color=black];
+n268439984 [label="{ ide_pio_hda |{(0, 0), count: 201600|}}",fillcolor=slateblue1,style=filled]
+n268439592 [label="{ wb_cache_bd-6b8 |{512 x 32|}}",fillcolor=slateblue1,style=filled]
+        n268439592 -> n268439984 [label=""];
+n268439192 [label="{ block_resizer_bd-3180 |{512 to 4096|}}",fillcolor=slateblue1,style=filled]
+        n268439192 -> n268439592 [label=""];
+n268438784 [label="{ wt_cache_bd-32d8 |{4096 x 16|}}",fillcolor=slateblue1,style=filled]
+        n268438784 -> n268439192 [label=""];
+n268438384 [label="josfs-3468",fillcolor=cyan3,style=filled]
+        n268438384 -> n268438784 [label=""];
+n268437920 [label="{ devfs_cfs-268 |{|devices: 4, fids: 0}}",fillcolor=springgreen,style=filled]
+n268437472 [label="{ uhfs-79b8 |{|fids: 0}}",fillcolor=springgreen,style=filled]
+        n268437472 -> n268438384 [label=""];
+n268437032 [label="{ table_classifier_cfs-7b58 |{|fids: 0}}",fillcolor=springgreen,style=filled]
+        n268437032 -> n268437920 [label="/dev"];
+        n268437032 -> n268437472 [label="/"];
+n268436576 [label="{ fidprotector_cfs-7d98 |{|fids: 0}}",fillcolor=springgreen,style=filled]
+        n268436576 -> n268437032 [label=""];
+n268436136 [label="{ fidcloser_cfs-7f18 |{|fids: 0}}",fillcolor=springgreen,style=filled]
+        n268436136 -> n268436576 [label=""];
+}
