@@ -233,9 +233,6 @@ written out because their dependencies have not been satisfied. In the end, this
 problem goes back to an assumption we make: when changes are written out from
 the write back cache, they are expected to hit stable storage.
 
-(XXX you could probably do a wb cache that doesn't honor deps but depends on
-this wb cache to honor them. but aht's a problem sucking blocks down.)
-
 \subsubsection{RAID}
 \label{sec:solution:impl:raid}
 
