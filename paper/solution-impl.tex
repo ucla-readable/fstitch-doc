@@ -4,7 +4,16 @@
 We wil describe the implementation of some of the more important parts of the
 KudOS file server in this section, approximately in order from userspace toward
 the disk. We will also describe the online configuration mechanism, and the
-userspace tools that make use of it.
+userspace tools that make use of it. Figure~\ref{fig:loc} shows the relative
+sizes of various modules in the system, in lines of code.
+
+\begin{figure}[htb]
+\begin{center}
+  \includegraphics[scale=0.5]{loc_graph}
+  \caption{Lines of Code for Various Modules}
+  \label{fig:loc}
+\end{center}
+\end{figure}
 
 \subsubsection{KPL}
 
