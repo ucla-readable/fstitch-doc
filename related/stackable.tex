@@ -1,6 +1,7 @@
 \section{Stackable Filesystem Works}
 
-The FiST project at Columbia describes a system for stackable file
+The FiST project at Columbia~\cite{zadok00fist}
+describes a system for stackable file
 systems. The goal of the project was to allow programmers the ability
 to easily add one or many features to existing filesystems. When many
 additions are added, they are stacked. For maximum utility, the
@@ -64,7 +65,8 @@ impossible. Also, it cannot affect the order of lower level
 operations, making a soft updates layer impossible.
 
 Another related work, a precursor to FiST, is File System Development
-with Stackable Layers. It describes a similar vnode layer to the FiST
+with Stackable Layers~\cite{heidemann93stack}.
+It describes a similar vnode layer to the FiST
 paper. One unique idea this paper gives is the ability to have a vnode
 layer be split between two machines, and pass the calls over an RPC
 interface. Again, work is operating on a very different scale from
