@@ -1,7 +1,10 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-flexibility has given us a lot of freedom to tinker with the
-filesystem and make it very extensible. this has been shown by the
-ease with which we hvae implemented. should be easy to add a new
-filesystem.
+Traditionally, file systems have been monolithic and inflexable in design. In
+KudOS, we describe a componentized system where the file server consists of the
+CFS, LFS, and BD layers, along with services for dependency management and
+online configuration. We have demonstrated the power of KudOS through the
+use of common code and infrastructure to implement different features, the
+ability to easily extend the system with new modules, and the flexibility to
+rearrange components to achieve a variety of configurations.
