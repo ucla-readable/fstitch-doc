@@ -26,6 +26,20 @@ invoked with bootloader or kernel-specified commands to set up an initial
 filesystem, and from there a simple configuration file like /etc/fstab in unix
 could be used to finish the configuration.
 
+Another group which contributed to our design was the Cobra group, which is
+coincidentally the other component group. They had a module message handler
+function registration system that was fairly complicated, and used strings,
+IDs, magic numbers, and a variety of other identification tokens in order to
+register each module's services with the module dispatch system. We wanted to do
+something similar in our KFS RPC interface for configuring the file server, as
+described above (as a replacement for a configuration file), but given the
+amount of confusion that resulted from Cobra's complicated system, we opted for
+a much simpler approach to solve our simpler problem. We assign each function a
+unique number, and just perform RPC function calls by number. This technique
+works for us because the functions that need to be called are not dynamically
+changing: they change only when the file server is recompiled, and in that case,
+the client code will be recompiled as well.
+
 \subsection{Criticisms}
 
 The DoSers group was attempting to make a system that would be ``DDoS free'' in
