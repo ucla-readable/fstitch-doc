@@ -1,0 +1,72 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+
+\title{The KudOS File System}
+\author{Andrew de los Reyes, Chris Frost, Mike Mammarella, Lei Zhang\\ \{adlr,frost,mikem,leiz\}@cs.ucla.edu}
+
+\usepackage{url, hyperref, ifpdf}
+\ifpdf
+  \usepackage[pdftex]{graphicx}
+  \usepackage[monochrome]{color}
+  \DeclareGraphicsExtensions{.jpg,.pdf,.mps,.png}
+  \pdfinfo
+  { 
+    /Title (The KudOS File System)
+    /Author (Andrew de los Reyes, Chris Frost, Mike Mammarella, Lei Zhang\\ \{adlr,frost,mikem,leiz\}@cs.ucla.edu)
+  }
+  \pdfcompresslevel=9
+\else
+  \usepackage{graphicx}
+  \DeclareGraphicsExtensions{.eps,.jpg,.mps,.png}
+\fi
+
+\begin{document}
+\maketitle
+
+\input{intro.tex}
+
+Abstract
+
+Problem
+Solution
+* Architecture
+ - bd, lfs, cfs, kpl
+ - bdesc/ddesc, chdesc
+ - depman and dependency forwarding
+ - modman and online config
+ - fidman and fairies
+* Implementation
+ - kpl
+ - josfs\_base
+ - josfs\_cfs driver
+ - uhfs
+ - wb\_cache
+ - journalling / soft updates
+ - raid
+ - loop
+ - nbd
+ - mount and friends
+ - kfsgraph[viz]
+Influence
+* Related work
+ - ext3
+ - stackable FS
+ - soft updates
+ - GEOM
+ - Flux OSkit
+* Other groups (ideas and criticize)
+ - DDoS (critical)
+ - P (influence by config file)
+Evaluation
+* slow
+Future work
+* speed problems, async I/O, memory mapping
+* nesting caches, better chdesc tracking
+* journal size limitations, metadata only journalling
+Conclustion
+
+
+\bibliography{paper}
+\bibliographystyle{plain}
+
+\end{document}
