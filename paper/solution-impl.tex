@@ -80,7 +80,7 @@ enough to host new and helpful uses.
 We implemented two types of reliable file system features: soft updates and
 journalling. Both use change descriptors to ensure that some disk writes will
 occur before others, but what writes exactly they are and how they depend on one
-another are completely different.
+another are substantially different.
 
 In journalling, changes to the disk are written to a journal before being
 written to the disk itself. After being written to the journal, a single disk
@@ -112,7 +112,7 @@ filesystem is in a consistent state.
 FIXME we should put a diagram here
 
 Soft updates is somewhat more pervasive, because unlike full journalling, it
-needs to have some information about what a filesystem is and what it means for
+needs to have more information about what a filesystem is and what it means for
 it to be ``consistent.'' Briefly, soft updates needs to guarantee that
 structures on the disk are always initialized and marked as in use before they
 are pointed to, and that all pointers to structures are cleared before the
