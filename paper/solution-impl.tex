@@ -130,14 +130,14 @@ depicted in Figure~\ref{fig:journal}.
 To effect this behavior, we use two modules: a journal LFS module, and a journal
 queue BD module. The function of the journal queue BD module is to hold disk
 blocks that would otherwise have been written to the disk in a queue until asked
-to release them. It is typically placed below the base LFS module (as its BD).
-The journal LFS module is placed above the base LFS module, and it knows how to
-construct, write, and recover the journal. Ordinarily, it keeps the journal
-queue BD in a hold state, so that all filesystem changes are queued up. Every so
-often (the ``commit interval''), it asks the journal queue BD for all the blocks
-in the queue, writes them to the journal, sets up dependencies so that the
-journal will be written before the disk blocks themselves, and releases the
-queued blocks. This process is always guaranteed to occur at times when the
+to release them. It is typically placed below the base LFS module (i.e., as that
+module's BD). The journal LFS module is placed above the base LFS module, and it
+knows how to construct, write, and recover the journal. Ordinarily, it keeps the
+journal queue BD in a hold state, so that all filesystem changes are queued up.
+Every so often (the ``commit interval''), it asks the journal queue BD for all
+the blocks in the queue, writes them to the journal, sets up dependencies so
+that the journal will be written before the disk blocks themselves, and releases
+the queued blocks. This process is always guaranteed to occur at times when the
 filesystem is in a consistent state.
 
 Soft updates is somewhat more pervasive, because unlike full journaling, it
