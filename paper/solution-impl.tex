@@ -35,8 +35,8 @@ which call either the new KPL functions or the original functions.
 If the CFS layer is akin to C and the LFS layer to assembly, the UHFS (Uniform
 High level File System) module is a CFS to LFS interpreter. UHFS is intended to
 be the common CFS-LFS module for all file systems with an LFS interface; this
-includes josfs\_base, but does not include \mbox{devfs\_cfs}. UHFS's CFS
-function implementations take care of non-block aligned accesses and lower level
+includes josfs\_base, but does not include devfs\_cfs. UHFS's CFS function
+implementations take care of non-block aligned accesses and lower level
 operations such as block allocation during write, and set up inter-LFS function
 call chdesc dependencies.
 
