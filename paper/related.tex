@@ -96,29 +96,41 @@ underlying file system.
 \subsection{BSD GEOM}
 \label{sec:related:geom}
 
-they did the hot-swap that we can do w/ modules. we can't hot-swap
-modules w/ state. problem for cfs moduels and some lfs ones. even bd
-modules have some state (point to other bd modules). we have what we
-think is important (raid thingy).
+The GEOM framework in FreeBSD is similar to our BD layer, in that it allows
+various block device interfaces to be layered on top of one another. In FreeBSD
+it is used to implement partitions, RAID, and logical volume management. One
+feature of GEOM, explained in the manual page \cite{geom}, is that it can
+perform mounted disk hot-swapping by inserting a mirroring RAID module between
+the filesystem code and the disk, then adding a second disk to the set and
+synchronizing it, removing the original disk from the RAID, and finally removing
+the RAID module. This effectively moves a mounted filesystem to a new disk,
+without having to unmount it or otherwise disrupt the system.
+
+The KudOS file server cannot insert a module between two others, or remove a
+module from between two others, but if there is already a RAID module between
+the base LFS module and the rest of the BD layer, we can also move a mounted
+filesystem. The ability to insert and remove modules from within the module
+graph is something we considered, and decided to leave out due to the complexity
+of implementing it and the marginal benefits we could see from this ability.
 
 \subsection{Flux OSKit}
 
 The Flux OSKit \cite{ford97oskit} provides a framework for constructing
 operating systems. It breaks up the operating system into modules, and provides
 a library of pre-made modules. This way researchers can concentrate on the more
-interesting components in their OS, like the scheduler or the VM, and use
-pre-existing modules for the more mundane components, like the boot loader or
-device drivers.
+interesting components in their OS, like the scheduler or the virtual memory
+system, and use pre-existing modules for the more mundane components, like the
+boot loader or device drivers.
 
 One interesting aspect of Flux is the use of components from other operating
-systems. Rather than writing drivers and networking code from scratch, the
-Flux OSKit provides glue code to make it possible for the FreeBSD TCP/IP stack,
-Linux network device drivers, and the NetBSD file system code to work as parts
-of the same kernel. In KudOS, we did something similar in josfs\_cfs, which is
-the glue code to tie the JOS File Server with our CFS layer.
+systems. Rather than writing drivers and networking code from scratch, the Flux
+OSKit provides glue code to make it possible for the FreeBSD TCP/IP stack, Linux
+network device drivers, and the NetBSD file system code to work as parts of the
+same kernel. In KudOS, we did something similar in josfs\_cfs, which is the glue
+code to connect the JOS File Server with our CFS layer.
 
 With both Flux and KudOS, the philosophy is to componentize the system. Of
-course, the two projects have different level of granularity. The two projects
-also have different goals. Flux tries to facilitate faster OS development
-through reuse of existing component. KudOS uses components to make it easier to
+course, the two projects have different levels of granularity. The projects also
+have different goals. Flux tries to facilitate faster OS development through
+reuse of existing components, while KudOS uses components to make it easier to
 come up with new and interesting configurations.
