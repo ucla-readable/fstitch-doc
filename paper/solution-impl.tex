@@ -9,7 +9,7 @@ sizes of various modules in the system, in lines of code.
 
 \begin{figure}[htb]
 \begin{center}
-  \includegraphics[width=8.35cm]{loc_graph}
+  \includegraphics[width=8.1cm]{loc_graph}
   \caption{Lines of Code for Various Modules}
   \label{fig:loc}
 \end{center}
@@ -131,7 +131,9 @@ journal will be written before the disk blocks themselves, and releases the
 queued blocks. This process is always guaranteed to occur at times when the
 filesystem is in a consistent state.
 
-FIXME we should put a diagram here
+\includegraphics[width=7.5cm]{journal_diagram}
+
+XXX this should be a figure or something
 
 Soft updates is somewhat more pervasive, because unlike full journaling, it
 needs to have more information about what a filesystem is and what it means for
