@@ -107,7 +107,7 @@ structure is reasonable, because it isolated the cause of the inefficiency and
 made it easy to change.)
 
 In most other ways, however, the KudOS file server is currently slower than the
-original JOS file server - and with good reason: it's doing a whole lot more.
+original JOS file server -- and with good reason: it's doing a whole lot more.
 The original file server followed the exokernel spirit a little more closely,
 and mapped entire files into client environments when they were opened. Thus all
 file I/O could take place without actually communicating with the file server,
