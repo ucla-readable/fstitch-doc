@@ -1,0 +1,12 @@
+\section{The Solution}
+\label{sec:solution}
+
+Our solution is a prototype system we call the KudOS file server. It runs in a
+small operating system (also called KudOS) which was originally based on an
+educational exokernel system called JOS. It follows a microkernel approach in
+that it is a separate user environment (the JOS term for a process), but it
+could be made part of the kernel with relatively small changes (mostly to the
+client interface mechanisms).
+
+\input{solution-arch.tex}
+\input{solution-impl.tex}
