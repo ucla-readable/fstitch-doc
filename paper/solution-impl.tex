@@ -13,17 +13,23 @@ warranted). provides capabilities page.
 \subsubsection{UHFS}
 \label{sec:solution:impl:uhfs}
 
-probably common for all FSes w/ an lfs interface. implements all
-routine operations. e.g. allocate a block, push to end of file when
-writing to a file. or you need to delete all blocks from a file when
-the file it freed. handles doing non-block aligned reads/writes,
-etc. (append 6 byes to the end of a file which needs to allocate a new
-block). chaining up chdescs.
+If the CFS layer is akin to C and the LFS layer to assembly, the UHFS
+(Uniform High level File System) module is a CFS to LFS interpreter. UHFS
+is intended to be the common CFS-LFS module for all file systems with an LFS
+interface, this includes josfs\_base and does not include devfs\_cfs.
+UHFS's CFS method implementations take care of non-block aligned accesses,
+lower level operations such as block allocation during write, and 
+orders inter-LFS method call chdesc dependencies.
 
-no cfs call needs to depend on a previous or future cfs call.
-
-uhfs doesn' keep state around, so it depends on cfs calls not
-depending on each other.
+uhfs\_write() provides an example of a typical UHFS method. UHFS's
+client passes an open file's fid, data to write, and where in the file
+this data belongs. uhfs\_write() looks up the fid's associated LFS
+fdesc and if the below LFS supports file sizes, looks up the file's
+current size in bytes.  uhfs\_write() then writes the data a block at
+a time to the below LFS, allocating and then appending blocks as the
+file needs enlargement. Once all data is written and if the below LFS
+supports the file size feature, uhfs\_write() updates the file size
+metadata.
 
 \subsubsection{josfs\_base}
 
@@ -35,9 +41,13 @@ up. this module implements the low level operations that UHFS requests
 
 \subsubsection{josfs\_cfs Legacy Module}
 
-not used anymore. tests the top half of kfsd server (ipc, table
-classifier) before we'd implemented the bottom stuff. this was
-relatively easy -- our modules are good!
+In the beginning of the KudOS file server's development we wanted to
+begin testing CFS modules, CFS RPC, and KPL before the LFS and BD
+layers were ready for use. The josfs\_cfs module allowed this testing
+by providing a full file system, using JOS's existing file server
+daemon as a back-end. josfs\_cfs's simplicity also served as a first
+validation that the CFS interface is flexible enough to host new and
+helpful uses.
 
 \subsubsection{Reliable File System Features}
 
@@ -103,13 +113,34 @@ and they fit right into the rest of the system like any other block device.
 \subsubsection{Online Configuration}
 \label{sec:solution:impl:online}
 
+The modman component is central to most online configuration and
+introspection, providing existence, usage, configuration, and status
+information for CFS, LFS, and BD module instances. Each module instance
+registers/unregisters itself with modman at creation/destruction time
+and registers/unregisters module instance usage, modman stores this
+information to respond to others' queries.
 
-important to mount filesystesmw hile the fs is running (cdrom,
-nfs). mount and unount take ocmmon cases of what you want to do and
-make them easy to use. some of what they need is to get names of
-existing modules or find and existing module (like table classifier)
-to perform ops. rpc fxns.
+KFS RPC is implemented in a similar manner as CFS RPC, a serialized
+KFS is used to communicate between KFS server and clients via KudOS
+IPC message passing. Each kfs method is re-implemented as an rpc stub,
+allowing an object file to be linked to either the KFS IPC Client or
+Server library. Client programs are thus able to reconfigure the kfsd
+environment using the same methods that would be used within kfsd.
 
-kfsgraph uses modman to find out which modules exists, which use each
-other, and their status. uses this to describe a grph of the current
-module configuration. output can be fed to dot, or plain text output.
+The program kfsgraph uses KFS RPC to construct a module usage graph,
+showing module instance existence, which instances use which others,
+and instances' configuration and status. kfsgraph can output this
+graph to text or to AT\&T's graphviz dot
+format. Section~\ref{sec:eval} shows examples of kfsgraph's output.
+
+The programs mount and umount, named for their similarity to the
+Unix tools of the same names, provide a general case, easy to use
+configuration interface. Given a BD type of ide, nbd, loop, or an existing
+BD and a mount point, mount constructs the given base BD, caches and block
+resizers as appropriate, a josfs\_base or wholedisk as appropriate, uhfs,
+and connects these to the table classifier at the given mount point. mount
+optionally allows specification of whether journaling is to be used or not
+(and where to journal to), whether to fsck the filesystem, how large a cache
+to use, and whether to use a write back or write through cache. umount takes
+a mount point and destructs all modules down the chain that are no longer
+in use.
