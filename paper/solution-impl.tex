@@ -117,7 +117,8 @@ already been written, writing it again will not cause any problems. Once the
 journal has been recovered to the disk, the commit record will be erased and the
 filesystem will once again be in a consistent state.
 
-To effect this behavior, we use two modules: a journal LFS module, and a journalqueue BD module. The function of the journal queue BD module is to hold disk
+To effect this behavior, we use two modules: a journal LFS module, and a journal
+queue BD module. The function of the journal queue BD module is to hold disk
 blocks that would otherwise have been written to the disk in a queue until asked
 to release them. It is typically placed below the base LFS module (as its BD).
 The journal LFS module is placed above the base LFS module, and it knows how to
