@@ -33,11 +33,11 @@ uhfs\_write() updates the file size metadata.
 \subsubsection{josfs\_base}
 
 The josfs\_base module provides low-level operations to the JOS File System.
-Its purpose as a base LFS module is to encapsulate all knowledge specific to
-the file system. As such, only josfs\_base knows about the free block bitmap
-and files with indirect blocks. No other module in the system needs to know the
+Its purpose as a base LFS module is to encapsulate all knowledge specific to the
+file system. As such, only josfs\_base knows about the free block bitmap and
+files with indirect blocks. No other module in the system needs to know the
 details of how a JOS File System is laid out on disk. LFS modules such as
-josfs\_base only knows how to perform micro-ops like allocating a block,
+josfs\_base only know how to perform micro-ops like allocating a block,
 appending a block, and writing a block. For each operation, josfs\_base will
 make appropriate changes to the underlying block device, so the structures on
 disk correctly reflect the semantics of the operation.
@@ -51,17 +51,18 @@ exception to this is directory size. When adding a directory entry requires
 josfs\_base to allocate a new block, josfs\_base will increase the directory
 size, since UHFS is not aware of this.
 
-To support reliability features like soft-updates and journaling, josfs\_base
-orders all writes to the underlying block device in a safe manner consistant
-with soft-updates. Additionally, josfs\_base generates change descriptors,
-chained in the right dependency order, for use by other modules in the system.
+To support reliability features like soft updates \cite{ganger00soft} and
+journalling, josfs\_base orders all writes to the underlying block device in a
+safe manner consistant with soft-updates. Additionally, josfs\_base generates
+change descriptors, chained in the right dependency order, for use by other
+modules in the system.
 
 The josfs\_base module started from JOS's fs.c, but quickly evolved on its own.
 It is one of the biggest modules in the system and it took many iterations to
 get right. This is partly do to the number of calls a LFS module has to support.
 Most of the calls needed to implement some logic and only a few were simple
 pass-throughs to the underlying layer. Also, because much of KudOS was a design
-in progress, it was not always completely clear how some aspects of LFS will
+in progress, it was not always completely clear how some aspects of LFS would
 interact with the rest of the system. Several times, design changes were not
 apparent until after implementation.
 
@@ -76,18 +77,58 @@ enough to host new and helpful uses.
 
 \subsubsection{Reliable File System Features}
 
-soft updates is more pervasive. because of this, we cna't just have a
-moduel to do it. we need clues (a must happen beofre b). josfs base
-and uhfs cooperate to give us the hints/clues (actually dependencies)
-to hookup the chdecs into a graph that would comply w/ soft
-updates. (wb cache make sure this is honored).
+We implemented two types of reliable file system features: soft updates and
+journalling. Both use change descriptors to ensure that some disk writes will
+occur before others, but what writes exactly they are and how they depend on one
+another are completely different.
 
-diagram that shows journal format. full data only. uses Q to intercept
-things. unlike ext3 we have a bandwidth limitation which we could (?)
-work around. very similar to ext3. fs doesn't know ti's being
-journaled. it's a xaction layer on top of BD. guaranatess sets fo
-writes are atomic. each high level cfs op is atomic now. maybe sets
-clumped together, but a cfs call is never broken apart.
+In journalling, changes to the disk are written to a journal before being
+written to the disk itself. After being written to the journal, a single disk
+sector (the ``commit record'') is written in the journal that commits the whole
+sequence of writes atomically. Afterward, the data is written to the disk, and
+once all the data has been written, the commit record is cleared. Should the
+system crash before the commit record is written, none of the writes will be
+made to the disk, and the filesystem will be in the consistent state it was in
+before whatever operation triggered the writes. Should it crash after the commit
+record is written, then the journal will be ``replayed'' in order to write all
+the information in the journal to the disk. Even if some or all of it had
+already been written, writing it again will not cause any problems. Once the
+journal has been recovered to the disk, the commit record will be erased and the
+filesystem will once again be in a consistent state.
+
+To effect this behavior, we use two modules: a journal LFS module, and a journal
+queue BD module. The function of the journal queue BD module is to hold disk
+blocks that would otherwise have been written to the disk in a queue until asked
+to release them, and it is placed below the base LFS module (as its BD). The
+journal LFS module is placed above the base LFS module, and it knows how to
+construct, write, and recover the journal. Ordinarily, it keeps the journal
+queue BD in a hold state, so that all filesystem changes are queued up. Every so
+often (the ``commit interval''), it asks the journal queue BD for all the blocks
+in the queue, writes them to the journal, sets up dependencies so that the
+journal will be written before the disk blocks themselves, and releases the
+queued blocks. This process is always guaranteed to occur at times when the
+filesystem is in a consistent state.
+
+FIXME we should put a diagram here
+
+Soft updates is somewhat more pervasive, because unlike full journalling, it
+needs to have some information about what a filesystem is and what it means for
+it to be ``consistent.'' Briefly, soft updates needs to guarantee that
+structures on the disk are always initialized and marked as in use before they
+are pointed to, and that all pointers to structures are cleared before the
+structures are marked as free or reused. To accomplish this, we need the base
+LFS module to help us out a little bit, by giving us ``hints'' (really, change
+descriptor dependency information) as to what needs to happen before what for
+each of its micro-ops, and we need those small hints to be composed into larger
+hints by UHFS. These are relatively small changes to both of these modules, and
+they are relatively simple to make because of how much the work is divided up
+into individual LFS operations.
+
+The write-back cache, described below, then makes sure that the changes are
+written in a safe order, just as it does for journalling above. This is one of
+the big advantages of generalizing the write ordering requirements of soft
+updates and journalling: they can share a good deal of the more complicated
+code.
 
 \subsubsection{wb\_cache}
 
@@ -122,12 +163,11 @@ utilities).
 \label{sec:solution:impl:loop}
 
 The loop device provides a BD interface to an LFS file. Through change
-descriptors and the LFS interface, the loop device is able to easily
-pass change descriptors to the underlying filesystem, preserving
-softupdates and journaling dependencies. To write or sync a block, the
-loop device sets the block's BD pointer and block number for use by
-the LFS's underlying BD, makes the appropriate LFS call, reverts the
-block's changes, and returns.
+descriptors and the LFS interface, the loop device is able to easily pass
+dependency information to the underlying filesystem, preserving soft updates and
+journalling dependencies. To write or sync a block, the loop device sets the
+block's BD pointer and block number for use by the LFS's underlying BD, makes
+the appropriate LFS call, reverts its changes to the block, and returns.
 
 \subsubsection{Network Block Device}
 
@@ -167,7 +207,7 @@ Given a BD type of IDE, nbd, loop, or an existing BD and a mount point, mount
 constructs the given base BD, caches and block resizers as appropriate, a
 josfs\_base or wholedisk as appropriate, UHFS, and connects these to the table
 classifier at the given mount point. mount optionally allows specification of
-whether journaling is to be used or not (and where to journal to), whether to
+whether journalling is to be used or not (and where to journal to), whether to
 fsck the filesystem, how large a cache to use, and whether to use a write back
 or write through cache. umount takes a mount point and destructs all modules
 down the chain that are no longer in use.
