@@ -19,6 +19,11 @@ DVI2TTY_OPTS=-w120
 
 .PHONY: default clean dist-clean tex-clean
 
+%.pdf : %.dot
+	dot -Tps2 $< | epstopdf -f > $@
+
+%.eps : %.dot
+	dot -Tps $< -o $@
 
 define convert-to-epdf # args: source filename, dest filename, convert opts
 	convert ${3} ${1} epdf:${2}
@@ -79,7 +84,6 @@ endef
 
 %.pdf : %.eps
 	epstopdf $<
-
 
 define latex-generic # args: latex cmd, latex opts, input_file basename
 	${1} ${2} ${3}.tex
