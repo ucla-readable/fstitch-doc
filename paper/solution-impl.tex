@@ -51,7 +51,7 @@ exception to this is directory size. When adding a directory entry requires
 josfs\_base to allocate a new block, josfs\_base will increase the directory
 size, since UHFS is not aware of this.
 
-To support reliability features like soft updates \cite{ganger00soft} and
+To support reliability features like soft updates~\cite{ganger00soft} and
 journalling, josfs\_base orders all writes to the underlying block device in a
 safe manner consistant with soft-updates. Additionally, josfs\_base generates
 change descriptors, chained in the right dependency order, for use by other

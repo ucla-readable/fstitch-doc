@@ -4,14 +4,14 @@
 \subsection{Linux JFS and ext3}
 
 In Linux, journalling in the ext3 filesystem is implemented as two distinct
-modules that cooperate: JFS and ext3. The JFS module does not know anything
-about filesystems, and the ext3 module does not know anything about journalling.
-What the JFS module does is to provide transaction support for block devices.
-That is, it provides the facility to tell the block device what writes will be
-part of what transaction, and when transactions are to be committed, and it
-makes sure that either the whole transaction is committed, or none of it. It
-does this by keeping a journal, but this is not part of the interface
-specification.
+modules that cooperate: JFS and ext3~\cite{tweedie98journaling}. The JFS module
+does not know anything about filesystems, and the ext3 module does not know
+anything about journalling. What the JFS module does is to provide transaction
+support for block devices. That is, it provides the facility to tell the block
+device what writes will be part of what transaction, and when transactions are
+to be committed, and it makes sure that either the whole transaction is
+committed, or none of it. It does this by keeping a journal, but this is not
+part of the interface specification.
 
 The ext3 module uses transactions to accomplish its safety properties. It groups
 changes to the filesystem into transactions that guarantee the disk will always
@@ -37,6 +37,7 @@ implementation time.
 
 \subsection{BSD Soft Updates}
 
+\cite{ganger00soft}
 we made soft updates, we did it at a lower level w/ chdescs refering to
 data, not with references to higher level primatives. we are the
 taking the idea of rolling back block changes. theirs is more closely
@@ -47,6 +48,7 @@ we are more general -- journalling is part of our system.
 
 \subsection{Stackable File Systems}
 
+\cite{zadok00fist}, \cite{heidemann93stack}
 we can do similar things at either the cfs or lfs layer. we allow a
 lot more flexibility and we have a larger scope than just stacking
 stuff.
@@ -58,8 +60,9 @@ modules w/ state. problem for cfs moduels and some lfs ones. even bd
 modules have some state (point to other bd modules). we have what we
 think is important (raid thingy).
 
-\subsection{Flux OSkit}
+\subsection{Flux OSKit}
 
+\cite{ford97oskit}
 we replaced parts. but smaller, more manageable than they provided. we
 did some things lke they did -- wrapped up the original josfs like
 flux wrapped up drivers.
