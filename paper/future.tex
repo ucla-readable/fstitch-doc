@@ -2,10 +2,40 @@
 \label{sec:future}
 
 \subsection{Increased Efficiency}
-speed problems, async I/O (now not clear when you'll clear the
-chdesc), memory mapping
 
-interleve stuff w/ writing the journal out.
+We would like to increase both the internal efficiency of the file
+server and the efficiency of programs that use the file server.
+
+One efficiency problem we have right now is slow speed. This is likely
+due to many factors including: context switches because of IPC,
+redundancy in our module implementations, the lack of DMA disk access,
+and the long round trip times involved in accessing a network block
+device. We have considered ways to speed all of these up
+
+To speed up IPC, we could send messages over a pipe or batch requests.
+
+The problem of redundancy has in our modules has been fixed to a
+certain degree. For example, the old implementation of
+truncate_block() would have to call read_block() to return a block
+descriptor. This meant that deleting a file would have to read the
+entire file. Fixing this massively improved the performance of
+deleting files. There are probably more opportunities for optimization
+in this area.
+
+Adding DMA disk access would probably speed all disk accesses.
+
+We've noticed that a typical read command takes much longer than a
+write command to a network block device. This is likely due to the
+long round trip time of the network. To help speed this up, we have
+considered batching reads to do automatic pre-fetching.
+
+Journaling is also a performance problem for us. Right now, when a
+journal is being written out, the file server is blocking and thus
+hangs when requests come in. We would like to interleave requests with
+writing of the journal.
+
+Also, user programs may be able to be more efficient if we supported
+memory mapped files.
 
 \subsection{Increased Flexibility}
 
