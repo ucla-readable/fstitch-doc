@@ -63,10 +63,35 @@ like journalling.
 
 \subsection{Stackable File Systems}
 
-\cite{zadok00fist}, \cite{heidemann93stack}
-we can do similar things at either the cfs or lfs layer. we allow a
-lot more flexibility and we have a larger scope than just stacking
-stuff.
+Stackable File Systems \cite{heidemann93stack} attempts to make file system
+development easier by providing an extensible file system interface. With such
+an interface, developers can add features to existing file systems. These new
+features can then be used together by stacking them on top of each other.
+Existing stackable file systems implementations, such as FiST
+\cite{zadok00fist}, start with a ``basefs'' module that interfaces with the
+pre-existing file system and exposes an extensible interface for use with
+stacking modules. This base file system needs to be ported to every operating
+system it runs on. For FiST, they included a description language for writing
+stackable modules, so that modules written in the FiST language can easily
+generate code for different platforms.
+
+While Stackable File Systems promise faster development time with smaller code
+size, there seem to be limitations to what a Stackable File System can do.
+Due to the fact that modules can only be added in the space between basefs and
+the VFS layer, Stackable File Systems does not have the same level of
+flexibility as a fully componentized file system. From the examples in FiST, it
+appears trivial to add encryption or ACL to an existing file system, but it is
+not clear how a system such as FiST can implement more sophisticated features
+like journaling or soft updates.
+
+With the KudOS File System, we applied the idea of stacking to all interface
+layers. By having modules that use the same interface on both ends, it is easy
+to attach modules together. Many KudOS modules can be arbitrarily arrange, and
+have little dependencies on other modules. The lack of complex dependencies also
+make individual components easy to write. In comparison, KudOS has a much larger
+scope that ranges from the userspace interface to the block devices, compared to
+Stackable File Systems which are confined to a small area between VFS and the
+underlying file system.
 
 \subsection{BSD GEOM}
 \label{sec:related:geom}
