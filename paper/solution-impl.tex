@@ -210,7 +210,7 @@ rather than having this cache write it.
 
 Once a change has been written to the lower level, it is marked as satisfied and
 removed from the graph of changes that need to be written to the disk. The
-wbcache then finds the next chdesc furthest from the root change descriptor and
+cache then finds the next chdesc furthest from the root change descriptor and
 writes it to disk in the same way, and so on. Once all changes have been
 written to disk, the block we wish to evict will be fully written to disk.
 
