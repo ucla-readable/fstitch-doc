@@ -25,12 +25,12 @@ deleting a file would have to read the entire file. Fixing this massively
 improved the performance of deleting files. There are probably several more
 opportunities for optimization in this area.
 
-Adding DMA disk access would probably speed all disk accesses.
+Adding IDE DMA support will probably speed up all disk accesses.
 
-We've noticed that a typical read command takes much longer than a write command
-to a network block device. This is likely due to the long round trip time of the
-network. To help speed this up, we have considered batching reads to do
-automatic pre-fetching.
+We have noticed that a typical read command takes much longer than a write
+command to a network block device. This is likely due to the long round trip
+time of the network. To help speed this up, we have considered batching reads to
+do automatic pre-fetching.
 
 Journaling is also a performance problem for us. Right now, when a journal is
 being written out, the file server is blocking and thus hangs when requests come

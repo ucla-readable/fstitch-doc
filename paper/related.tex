@@ -24,9 +24,9 @@ journaling is broken into two separate pieces.
 Full journaling is actually not very difficult to implement. It is what we have
 implemented in the KudOS file server. In full journaling, everything that will
 be written to the disk is written to the journal first, as part of some
-transaction. Obviously this is much less efficient than we'd like, which is why
-there is another technique for doing journaling: metadata-only journaling. In
-metadata-only journaling, only changes to the filesystem metadata (like
+transaction. Obviously this is much less efficient than we would like, which is
+why there is another technique for doing journaling: metadata-only journaling.
+In metadata-only journaling, only changes to the filesystem metadata (like
 directory structure, file names, sizes, and link counts) are grouped into
 transactions and written to the journal. File data changes are written directly,
 since they do not contribute to the validity of the filesystem and do not need
