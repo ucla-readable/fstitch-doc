@@ -60,10 +60,11 @@ programmers the ability to easily implement filesystem changes, also
 has some drawbacks. One drawback is that the vnode layer can only
 operate on fixed blocks of data in files. As such, it can modify file
 data but not the size of the data, which makes a compression system
-impossible. Also, it cannot affect the order of lower level
-operations, making a soft updates layer impossible. It is best for
-simply adding extra metadata or simple semantics to an existing
-filesystem.
+impossible. (This restriction was later lifted by Fast
+Indexing\cite{zadokfast} in a way that could be applied to our
+system.)  Also, it cannot affect the order of lower level operations,
+making a soft updates layer impossible. It is best for simply adding
+extra metadata or simple semantics to an existing filesystem.
 
 Another related work, a precursor to FiST, is File System Development
 with Stackable Layers~\cite{heidemann93stack}. It describes a similar
