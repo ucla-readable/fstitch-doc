@@ -11,7 +11,7 @@ The main goal of a filesystem is to reliably store data. Filesystems
 must keep track of everything using bookkeeping information called
 metadata. The metadata must remain consistent or the filesystem will
 get confused about where it stored data. Early filesystems like FFS
-writes data out in a specific order using synchronous writes to
+write data out in a specific order using synchronous writes to
 guarantee consistency. However, synchronous writes are slow and the
 filesystem becomes a performance bottleneck. Two solutions to this
 problem are journaling and soft updates. Both techniques attempt to
@@ -25,10 +25,10 @@ between different operations. As such, when writes occur, soft updates
 will examine the dependencies and do appropriate rollbacks so that the
 writes to the disk will never destroy filesystem consistency. If the
 system crashes, the disk will still be consistent. However, soft
-updates does not guarantee all free resources are accounted for. In
-this way, soft updates has a looser definition of 'consistency'. Soft
-update can recover instantly and work in the background to recount the
-free resources.
+updates do not guarantee all free resources are accounted for. In this
+way, soft updates has a looser definition of `consistency.' Soft
+updates can recover instantly and work in the background to recount
+the free resources.
 
 Journaling maintains filesystem integrity by keeping a log of
 operations that will occur, and checking them off after the operations
