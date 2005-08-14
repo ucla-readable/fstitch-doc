@@ -1,0 +1,92 @@
+Descriptions of, notes on, and hashing outs of journaling
+
+
+* Non-intra-BD Cycles
+
+** Problem
+
+In developing the remove_inter_ddesc_deps algorithm, this problem came up: Say
+you have BDs B1 (a journal_bd) and B2 (an external BD) and chdescs with deps
+C1@B1 -> C3@B2 -> C2@B1. Since journaling will commit all its chdescs in one
+journal transaction (really: it will commit them one at a time, in the event
+of a crash an entire transaction will be replayed). We can replace C1 and C2
+with the commit record for their transaction: CR -> C3 -> CR, but this creates
+a cycle. Horrors!
+
+Can this scenario actually happen in practice? Chris can see a raid over loop
+over journaled fses example.
+
+** Solutions
+
+A solution is to not change C1 and C2 to their CR. This means recovery may not
+correctly recover as far as inter-BDs are concerned, but intra-BD consistency
+will be maintained and no cycles will exist at runtime. We could write a tool
+to detect such configurations and warn the user. Eddie suggests this route.
+
+If multiple BDs were journaled together, we could solve this problem.  This
+would make journal's on-disk format and recovery more complicated.
+
+If we were to ensure C1 and C2 were in separate transactions this cycle could
+not occur. However, our current idea of journaling does not allow intra-CFS
+call transaction segmentation. For example, separating a block alloc and block
+ptr creation would mean that the allocated block could be lost if there was a
+crash inbetween the two transactions. Softupdates does allow this, but it must
+scan the disk for such inconsistencies, whereas traditional journaling does
+not have this problem.
+
+
+* The bdesc and chdesc graph
+
+journal_graph.dia: a transactions' bdesc and chdesc graph.
+
+
+* How to produce the graph
+
+From when journaling included journal_lfs and journal_queue_bd:
+(if you've not yet looked at the journal graph, it might be helpful for this)
+
+- remove intra-bd, inter-ddesc deps from fsdata chdescs
+  (see "** remove_inter_ddesc_deps algorithm")
+- revision_tail_prepare (now leave rolled back chdescs alone)
+- create extern noop and move inter-bd and rolled-back intra-bd deps
+  from fsdata chdescs to extern
+- copy fsdata blocks to journal data blocks. make the noop jdata depend on
+  the head of each journal data block. each journal data tail has no 
+  dependencies.
+- write the block nos
+- create CR:
+  - create extern_and_jdata noop depend on extern and jdata
+  - make cr, tail depends on extern_and_jdata
+- make fsdata chdescs dep on CR head
+  - initial way: make all their chdescs dep on CR head.
+  (optimiation: if there exists A->B on some block, we need only make A dep
+   on CR head)
+
+** remove_inter_ddesc_deps algorithm
+
+Ask Chris to checkin. (Why it's not checked in yet: it was being
+written when "Non-intra-BD Cycles" was thought of.)
+
+
+* Journaling could allow cycles above it
+
+Thinking about "Non-intra-BD Cycles", it seems we might be able to allow
+dependency cycles on top of a journaled fs. We do not allow cyclic
+dependencies because we can atomically commit but a single block. However,
+journaling could allow cyclic dependencies above it
+
+Might there be any interesting uses for cycles? This would probably allow for
+more flexibility, since transactions could then not be restricted to a
+sequence of chdescs (eg you could build two separate transactions during
+overlapping periods). I think finding uses inside kfsd would be helpful, but
+outside of kfsd, perhaps applications could take advantage of this so that
+they would not have to implement their own transaction support. This could
+also help remove their dependence on a particular block size.
+
+
+* Known artificial flavor bugs to fix in corn syrup
+
+- On disk transaction format needs inter-transaction deps.
+  It is seems reasonable to simply give each transaction a monotonic id
+  and replay in order.
+- Was there a second bug?
