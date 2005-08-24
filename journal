@@ -41,26 +41,44 @@ journal_graph.dia: a transactions' bdesc and chdesc graph.
 
 
 * How to produce the graph
+Divided into journal_bd's state struct and methods:
 
-From when journaling included journal_lfs and journal_queue_bd:
-(if you've not yet looked at the journal graph, it might be helpful for this)
+journal_state:
+* bd and journalBd
+* chdesc CR
+* chdesc CRInvalidate
+* map "blockMap" blockno->list(chdescs)
+* set externDeps of chdescs
+* chdescs externDeps, journalDataDeps, externDepsAndJounalDataDeps, fsDataDeps
 
+write_block(block):
 - remove intra-bd, inter-ddesc deps from fsdata chdescs
   (see "** remove_inter_ddesc_deps algorithm")
-- revision_tail_prepare (now leave rolled back chdescs alone)
-- create extern noop and move inter-bd and rolled-back intra-bd deps
-  from fsdata chdescs to extern
-- copy fsdata blocks to journal data blocks. make the noop jdata depend on
-  the head of each journal data block. each journal data tail has no 
-  dependencies.
-- write the block nos
-- create CR:
-  - create extern_and_jdata noop depend on extern and jdata
-  - make cr, tail depends on extern_and_jdata
-- make fsdata chdescs dep on CR head
-  - initial way: make all their chdescs dep on CR head.
-  (optimiation: if there exists A->B on some block, we need only make A dep
-   on CR head)
+  [not necessary. we can do this later for possible optimization]
+- if blockno not yet in blockMap, add it
+- for each chdescs in block on this bd:
+  - add them to this blockno's blockMap list
+  - add a dependency on CR
+  - add a dependent on fsDataDeps
+- write_block() to below bd
+
+transaction_stop():
+- for each list in blockMap:
+  - synth_read() the journal data block  
+  - for each chdesc in list:
+    - move external deps (inter-bd and "rolled-back intra-bd") from chdesc to externDeps
+    - copy chdesc to the journal data block
+    - make journalDataDeps depend on the copied chdesc
+      (optimiation: if there exists A->B on some block, we need only make A dep
+       on CR head)
+- write "block nos", the journal data blocks, and CRInvalidate to journalBd
+
+transaction_start():
+- create externDeps and journalDataDeps chdescs
+- create externDepsAndJounalDataDeps chdesc, depend on externDeps and jDD
+- create fsDataDeps
+- create CR, depend on fsDataDeps
+
 
 ** remove_inter_ddesc_deps algorithm
 
