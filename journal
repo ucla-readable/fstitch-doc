@@ -72,6 +72,8 @@ transaction_stop():
       (optimiation: if there exists A->B on some block, we need only make A dep
        on CR head)
 - write "block nos", the journal data blocks, and CRInvalidate to journalBd
+  - "block nos" could include an iterator (for correct inter-transaction 
+     replay) as the first/last entry. simple and seems to cover the needs.
 
 transaction_start():
 - create externDeps and journalDataDeps chdescs
