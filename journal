@@ -107,6 +107,9 @@ outside of kfsd, perhaps applications could take advantage of this so that
 they would not have to implement their own transaction support. This could
 also help remove their dependence on a particular block size.
 
+It should be noted that most of the graph traversal algorithms we currently
+use depend on acyclic chdesc graphs in order to avoid infinite loops...
+
 
 * Known artificial flavor bugs to fix in corn syrup
 
