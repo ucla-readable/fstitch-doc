@@ -80,6 +80,10 @@ transaction_start():
 - create externDepsAndJounalDataDeps chdesc, depend on externDeps and jDD
 - create fsDataDeps
 - create CR, depend on fsDataDeps
+  - to ensure inter-transaction dependencies are preserved (note: no cycles
+    are allowed to exist), we could make CR_{i+1} depend on CR_{i}. to give
+    scheduling more freedom we could look through the inter-trans deps and
+    create inter-CR deps on for those trans that have deps.
 
 
 ** remove_inter_ddesc_deps algorithm
