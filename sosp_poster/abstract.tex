@@ -1,0 +1,37 @@
+\documentclass[10pt]{article}
+\usepackage{fullpage}
+
+% A list of stuff not to hyphenate
+\hyphenation{KudOS}
+
+\renewcommand{\topfraction}{.8}
+\renewcommand{\bottomfraction}{.8}
+
+\usepackage{url, hyperref, ifpdf}
+\ifpdf
+  \usepackage[pdftex]{graphicx}
+  \usepackage[monochrome]{color}
+  \DeclareGraphicsExtensions{.jpg,.pdf,.mps,.png}
+  \pdfinfo
+  { 
+    /Title (The KudOS File Server)
+    /Author (Andrew de los Reyes, Chris Frost, Mike Mammarella, Lei Zhang, {adlr,frost,mikem,leiz}@cs.ucla.edu)
+  }
+  \pdfcompresslevel=9
+\else
+  \usepackage{graphicx}
+  \DeclareGraphicsExtensions{.eps,.jpg,.mps,.png}
+\fi
+
+\title{The KudOS File Server}
+\author{Andrew de los Reyes, Chris Frost, Mike Mammarella, Lei Zhang\\ \{adlr,frost,mikem,leiz\}@cs.ucla.edu}
+
+\begin{document}
+\maketitle
+
+The content goes here.
+
+\bibliography{abstract}
+\bibliographystyle{plain}
+
+\end{document}
