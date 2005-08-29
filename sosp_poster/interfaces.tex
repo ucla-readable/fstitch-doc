@@ -29,7 +29,6 @@ Uniform High-level File System (UHFS), which converts CFS-level
 operations to the LFS-level. UHFS implements common filesystem
 functionality such as file write, read, append, and truncate in a
 filesystem-agnostic way. Thus it is LFS that defines what is treated
-as filesystem representation specific, and as
-Section~\ref{sec:examples} illustrates, is a key player in the
-increased modularity that supports new flexibility and simplifies
-traditional features.
+as filesystem representation specific and allows the simplification of
+filesystem implementation by splitting a filesystem into the
+filesystem-layout specific module and the UHFS module.
