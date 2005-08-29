@@ -11,7 +11,7 @@ a dependency graph to be created describing which changes ``depend'' on which
 other changes (i.e. which changes must be written after which other changes).
 
 The ability to revert and re-apply chdescs is inspired by the ``soft updates''
-system in BSD's FFS, but it is much more generalized. A chdesc can describe a
+system in BSD's FFS~\cite{ganger00soft}, but it is much more generalized. A chdesc can describe a
 change as small as a single bit, or as large as a whole disk block. Block data
 is almost secondary to the chdescs from the point of view of the file system
 server --- chdescs are what really move around in the system. This concept turns
