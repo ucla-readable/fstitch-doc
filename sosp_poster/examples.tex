@@ -1,2 +1,15 @@
 \section{Examples}
 \label{sec:examples}
+
+A few examples will help to illustrate the flexibility gained by using this
+module system and change descriptors:
+
+\begin{itemize}
+
+\item \itemvspace{} {\bf Reliable Loopback Filesystem}: A journalled filesystem
+  can be mounted on a loopback device connected to a file in a non-journalled
+  filesystem, and chdescs forwarded through the loop device keep the journalled
+  filesystem safe even though the ``host'' filesystem is not journalled.
+
+\end{itemize}
+\postlistspacing{}
