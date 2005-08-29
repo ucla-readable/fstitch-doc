@@ -4,18 +4,18 @@
 Traditional filesystem software involves two interfaces, the
 filesystem (VFS) and the block device. With current filesystem
 implementations ranging from tens of thousands to millions of lines of
-code and many operating systems containing implementations of multiple
+code and many operating systems containing support for multiple
 filesystems, we have focused on modularizing the filesystem layer into
 smaller components to increase reusability, flexibility, and
 understandability. Our research studies dividing filesystem software
 interfaces into three types:
 
 \begin{itemize}
-\item \itemvspace{} {\bf Common Filesystem} (CFS): Resembles Unix's
+\item \itemvspace{} {\bf Common File System} (CFS): Resembles Unix's
   VFS or the stackable filesystem semantics supported by
-  FiST~\cite{fist}. Provide methods to manipulate files and arrays of
-  bytes within files.
-\item \itemvspace{} {\bf Low-level Filesystem} (LFS): Abstract the
+  FiST~\cite{zadok00fist}. Provide methods to manipulate files and
+  arrays of bytes within files.
+\item \itemvspace{} {\bf Low-level File System} (LFS): Abstract the
   on-disk representations of blocks, provide methods to allocate
   blocks, append blocks to files, allocate file names, retrieve amount
   of free disk space, and similar operations.
@@ -25,7 +25,7 @@ interfaces into three types:
 \postlistspacing{}
 
 Using these interfaces one is able to create components such as the
-Uniform High-level File System (UHFS), which translates CFS-level
+Uniform High-level File System (UHFS), which converts CFS-level
 operations to the LFS-level. UHFS implements common filesystem
 functionality such as file write, read, append, and truncate in a
 filesystem-agnostic way. Thus it is LFS that defines what is treated
