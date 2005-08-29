@@ -8,18 +8,19 @@ changed), we do not allow any changes to exist without a corresponding ``change
 descriptor'' that describes what was changed. Change descriptors (``chdescs''
 for short) allow individual changes to be undone and redone, as well as allowing
 a dependency graph to be created describing which changes ``depend'' on which
-other changes (i.e. which changes must be written after which other changes).
+other changes (i.e. which changes must be written to disk after which other
+changes).
 
 The ability to revert and re-apply chdescs is inspired by the ``soft updates''
-system in BSD's FFS~\cite{ganger00soft}, but it is much more generalized. A chdesc can describe a
-change as small as a single bit, or as large as a whole disk block. Block data
-is almost secondary to the chdescs from the point of view of the file system
-server --- chdescs are what really move around in the system. This concept turns
-out to be very powerful, and it allows some interesting configurations of
-modules as well as very simple implementations of traditionally complicated
-features. For instance, journalling is implemented as a single BD module, and it
-can automatically add journalling (even metadata-only journalling) to {\it any}
-LFS filesystem.
+system in BSD's FFS~\cite{ganger00soft}, but it is much more generalized. A
+chdesc can describe a change as small as a single bit, or as large as a whole
+disk block. Block data is almost secondary to the chdescs from the point of view
+of the file system server --- chdescs are what really move around in the system.
+This concept turns out to be very powerful, and it allows some interesting
+configurations of modules as well as very simple implementations of
+traditionally complicated features. For instance, journalling is implemented as
+a single BD module, and it can automatically add journalling (even metadata-only
+journalling) to {\it any} LFS filesystem.
 
 For many complex operations, like RAID or journalling, the chdesc graph is
 changed in specific ways which can be broken down into sequences of simple graph
