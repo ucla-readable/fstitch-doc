@@ -7,6 +7,11 @@
 \renewcommand{\topfraction}{.8}
 \renewcommand{\bottomfraction}{.8}
 
+\usepackage{titlesec} % {pre,post}-[sub]section spacing adjustments
+% how dare we use inches!
+\titlespacing{\section}    {0pt} {0.04in} {0.03in}
+\titlespacing{\subsection} {0pt} {0.10in} {0.03in}
+
 \usepackage{url, hyperref, ifpdf}
 \ifpdf
   \usepackage[pdftex]{graphicx}
