@@ -4,12 +4,12 @@
 In contrast with traditional systems, where changes to filesystem data are
 accomplished by changing in-memory copies of the disk blocks and then marking
 the block as needing to be written to disk (thus losing all record of what was
-changed), we do not allow any changes to exist without a corresponding ``change
-descriptor'' that describes what was changed. Change descriptors (``chdescs''
-for short) allow individual changes to be undone and redone, as well as allowing
-a dependency graph to be created describing which changes ``depend'' on which
-other changes (i.e. which changes must be written to disk after which other
-changes).
+changed), every change to filesystem data in the KudOS file server effects a
+corresponding ``change descriptor'' that describes what was changed. Change
+descriptors (``chdescs'' for short) allow individual changes to be undone and
+redone, as well as allowing a dependency graph to be created describing which
+changes ``depend'' on which other changes (i.e. which changes must be written to
+disk after which other changes).
 
 The ability to revert and re-apply chdescs is inspired by the ``soft updates''
 system in BSD's FFS~\cite{ganger00soft}, but it is much more generalized. A
@@ -19,8 +19,12 @@ of the file system server --- chdescs are what really move around in the system.
 This concept turns out to be very powerful, and it allows some interesting
 configurations of modules as well as very simple implementations of
 traditionally complicated features. For instance, journalling is implemented as
-a single BD module, and it can automatically add journalling (even metadata-only
-journalling) to {\it any} LFS filesystem.
+a single BD module, and it can automatically add journalling --- even
+metadata-only journalling --- to {\it any} LFS filesystem. Other block device
+layering systems, like GEOM~\cite{geom}, need special hooks into filesystem code
+in order to get the necessary hints (i.e. what is metadata and what is not) to
+do metadata-only journalling. Change descriptors and the LFS/CFS division allow
+us to do this automatically.
 
 For many complex operations, like RAID or journalling, the chdesc graph is
 changed in specific ways which can be broken down into sequences of simple graph

@@ -1,16 +1,16 @@
 \section{Filesystem Module Interfaces}
 \label{sec:interfaces}
 
-Traditional filesystem software involves two interfaces, the abstract filesystem
-and the block device. With current filesystem implementations ranging from tens
-of thousands to millions of lines of code and many operating systems containing
-support for multiple filesystems, one of our aims has been to modularize the
-filesystem layer into smaller components to increase reusability, flexibility,
-and understandability. We keep block devices (BD) and the high-level filesystem
-(``Common File System'', CFS), but we add an additional interface between these
-two that helps to divide filesystem implementations into common (i.e. reusable)
-code and filesystem-specific code. We call this intermediate interface the
-``Low-level File System'' (LFS).
+Traditional filesystem software involves two interfaces: the ``abstract
+filesystem'' (like VFS), and the block device. With current filesystem
+implementations ranging from tens of thousands to millions of lines of code and
+many operating systems containing support for multiple filesystems, one of our
+aims has been to modularize the filesystem code into smaller components to
+increase reusability, flexibility, and understandability. We keep block devices
+(BD) and the high-level filesystem (``Common File System'', CFS), but we add an
+additional interface between these two that helps to divide filesystem
+implementations into common (i.e. reusable) code and filesystem-specific code.
+We call this intermediate interface the ``Low-level File System'' (LFS).
 
 The LFS interface has functions to allocate blocks, add blocks to files,
 allocate file names, and other filesystem micro-ops. The idea is that a module
@@ -27,4 +27,5 @@ simplification of filesystem implementation by splitting a filesystem into the
 filesystem-layout specific module and the UHFS module.
 
 All three types of modules can be stacked to add functionality incrementally,
-similar to the semantics provided by FiST~\cite{zadok00fist}.
+similar to the semantics provided by the ``stackable filesystems'' in
+FiST~\cite{zadok00fist}.
