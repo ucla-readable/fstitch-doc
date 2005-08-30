@@ -10,7 +10,7 @@ OUTPUT_FILES = abstract.dvi abstract.pdf abstract.txt $(TMP_DVI_IMAGES)
 TMP_FILES = $(TMP_PDF_IMAGES)
 
 abstract.dvi abstract.pdf abstract.txt: \
-	abstract.tex interfaces.tex chdescs.tex examples.tex abstract.bib
+	abstract.tex intro.tex interfaces.tex chdescs.tex examples.tex abstract.bib
 
 abstract.dvi: $(DVI_IMAGES)
 abstract.pdf: $(PDF_IMAGES)

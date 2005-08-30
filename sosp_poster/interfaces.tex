@@ -1,34 +1,30 @@
 \section{Filesystem Module Interfaces}
 \label{sec:interfaces}
 
-Traditional filesystem software involves two interfaces, the
-filesystem (eg VFS) and the block device. With current filesystem
-implementations ranging from tens of thousands to millions of lines of
-code and many operating systems containing support for multiple
-filesystems, we have focused on modularizing the filesystem layer into
-smaller components to increase reusability, flexibility, and
-understandability. Our research studies dividing filesystem software
-interfaces into three types:
+Traditional filesystem software involves two interfaces, the abstract filesystem
+and the block device. With current filesystem implementations ranging from tens
+of thousands to millions of lines of code and many operating systems containing
+support for multiple filesystems, one of our aims has been to modularize the
+filesystem layer into smaller components to increase reusability, flexibility,
+and understandability. We keep block devices (BD) and the high-level filesystem
+(``Common File System'', CFS), but we add an additional interface between these
+two that helps to divide filesystem implementations into common (i.e. reusable)
+code and filesystem-specific code. We call this intermediate interface the
+``Low-level File System'' (LFS).
 
-\begin{itemize}
-\item \itemvspace{} {\bf Common File System} (CFS): Resembles Unix's
-  VFS or the stackable filesystem semantics supported by
-  FiST~\cite{zadok00fist}. Provide methods to manipulate files and
-  arrays of bytes within files.
-\item \itemvspace{} {\bf Low-level File System} (LFS): Abstract the
-  on-disk representations of blocks, provide methods to allocate
-  blocks, append blocks to files, allocate file names, retrieve amount
-  of free disk space, and similar operations.
-\item \itemvspace{} {\bf Block Device} (BD): Resembles Unix's block
-  layer. Provide methods to manipulate an array of blocks.
-\end{itemize}
-\postlistspacing{}
+The LFS interface has functions to allocate blocks, add blocks to files,
+allocate file names, and other filesystem micro-ops. The idea is that a module
+implementing the LFS interface should define how bits are laid out on the disk,
+but not have to actually know how to combine the micro-ops into larger, more
+familiar filesystem operations.
 
-Using these interfaces one is able to create components such as the
-Uniform High-level File System (UHFS), which converts CFS-level
-operations to the LFS-level. UHFS implements common filesystem
-functionality such as file write, read, append, and truncate in a
-filesystem-agnostic way. Thus it is LFS that defines what is treated
-as filesystem representation specific and allows the simplification of
-filesystem implementation by splitting a filesystem into the
+Using these interfaces one is able to create components such as the Uniform
+High-level File System (UHFS), which converts CFS-level operations to the
+LFS-level. UHFS implements common filesystem functionality such as file write,
+read, append, and truncate in a filesystem-agnostic way. Thus it is LFS that
+defines what is treated as filesystem representation specific and allows the
+simplification of filesystem implementation by splitting a filesystem into the
 filesystem-layout specific module and the UHFS module.
+
+All three types of modules can be stacked to add functionality incrementally,
+similar to the semantics provided by FiST~\cite{zadok00fist}.
