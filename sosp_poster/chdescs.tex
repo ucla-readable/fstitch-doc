@@ -23,7 +23,7 @@ a single BD module, and it can automatically add journalling -- even
 metadata-only journalling -- to {\it any} LFS filesystem. Other block device
 layering systems, like GEOM~\cite{geom}, need special hooks into filesystem code
 in order to get the necessary hints (i.e. what is metadata and what is not) to
-do metadata-only journalling. Change descriptors and the LFS/CFS division allow
+do metadata-only journalling\footnote{Check this claim}. Change descriptors and the LFS/CFS division allow
 us to do this automatically.
 
 For many complex operations, like RAID or journalling, the chdesc graph is
