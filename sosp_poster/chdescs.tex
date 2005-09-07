@@ -6,10 +6,12 @@ accomplished by changing in-memory copies of the disk blocks and then marking
 the block as needing to be written to disk (thus losing all record of what was
 changed), every change to filesystem data in the KudOS file server effects a
 corresponding ``change descriptor'' that describes what was changed. Change
-descriptors (``chdescs'' for short) allow individual changes to be undone and
-redone, as well as allowing a dependency graph to be created describing which
-changes ``depend'' on which other changes (i.e. which changes must be written to
-disk after which other changes).
+descriptors (``chdescs'' for short) allow a dependency graph to be created
+describing which changes ``depend'' on which other changes (i.e. which changes
+must be written to disk after which other changes), as well as allowing
+individual changes to be undone and redone. These two capabilities allow any
+module in the system to inspect and even modify the changes that other modules
+are making.
 
 The ability to revert and re-apply chdescs is inspired by the ``soft updates''
 system in BSD's FFS~\cite{ganger00soft}, but it is much more generalized. A
