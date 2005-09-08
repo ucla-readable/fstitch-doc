@@ -1,0 +1,10 @@
+\preparagraphspacing{}
+\paragraph{Future Work}
+\label{sec:future}
+
+One promising direction we would like to move in is to eventually extend the
+change descriptor APIs into userspace, so that applications like database
+servers can specify exactly what they need written before what, rather than
+using fsync() or similar calls to force a full sync before writing
+order-sensitive data. This could improve both the performance and correctness
+of applications requiring complicated consistency semantics.
