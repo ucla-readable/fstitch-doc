@@ -103,12 +103,13 @@ beginfig(3);
   boxjoin();
 
   uhfsb.s - josfsa.n = josfsa.s - journal.n
-  = josfsb.s - wbcache.n = wbcache.s - resizer.n = resizer.s - ide.n
+  = uhfsa.s - josfsb.n = josfsb.s - wbcache.n = wbcache.s - resizer.n
+  = resizer.s - ide.n
   = (0,20);
-  loopd.w - loopj.e = (15,0);
-  uhfsb.w - uhfsa.e = (30,0);
-  xpart josfsb.n = xpart classifier.n; ypart(loopj.s - josfsb.n) = ypart(loopd.s - josfsb.n) = 30;
-  journal.s - .5[loopj.n,loopd.n] = (0,25);
+  loopd.w - loopj.e = (10,0);
+  uhfsb.w - uhfsa.e = (60,0);
+  ypart(loopj.n - resizer.n) = ypart(loopd.n - resizer.n) = 0;
+  journal.s - .5[loopj.n,loopd.n] = (0,15);
   classifier.s - .5[uhfsa.n,uhfsb.n] = (0,25);
 
   fixelement (resizer,ide,wbcache,josfsa,josfsb,uhfsa,uhfsb,journal,loopj,loopd,classifier);
@@ -118,8 +119,10 @@ beginfig(3);
   drawconnect(josfsa,0,0,journal);
   drawconnect(journal,0,0,loopj);
   drawconnect(journal,1,0,loopd);
-  drawconnect(loopj,0,0,josfsb) dashed evenly;
-  drawconnect(loopd,0,0,josfsb) dashed evenly;
+%  drawconnarrow loopj.out[1]{down} .. josfsa.nw - (10,0) .. josfsa.sw - (10,0) .. {down}jqueue.in[0] withcolor 0.7white;
+% These loop -> josfs connection arraows are crazy
+%  drawconnect(loopj,0,0,josfsb) dashed evenly;
+%  drawconnect(loopd,0,0,josfsb) dashed evenly;
   drawconnect(josfsb,0,0,wbcache);
   drawconnect(wbcache,0,0,resizer);
   drawconnect(resizer,0,0,ide);
@@ -127,6 +130,14 @@ beginfig(3);
   drawconnect(classifier,0,0,uhfsa) dashed evenly scaled 0.5;
   drawconnect(classifier,1,0,uhfsb) dashed evenly scaled 0.5;
   label.top(btex application etex, classifier.in[0]+(0,15));
+% Slightly better loop -> josfs connections
+  drawconnarrow loopj.out[0] -- loopj.out[0] - (0,20) dashed evenly scaled 0.5;
+  drawconnarrow loopd.out[0] -- loopd.out[0] - (0,20) dashed evenly scaled 0.5;
+  label.top(btex \textit{josfs-1} etex, loopj.out[0]-(0,35)); 
+  label.top(btex \textit{josfs-1} etex, loopd.out[0]-(0,35)); 
+  drawconnarrow josfsb.in[0] + (65,0) -- josfsb.in[0] + (65,10) -- josfsb.in[0] dashed evenly scaled 0.5;
+  label.top(btex \textit{josfs-1} etex, josfsb.in[0]+(65,0)-(0,15)); 
+
 
   label.urt(btex VFS etex scaled 0.5, classifier.in[0]);
   label.lrt(btex VFS etex scaled 0.5, classifier.out[0]);
