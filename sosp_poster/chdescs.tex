@@ -34,6 +34,7 @@ For many complex operations, like RAID or journalling, the chdesc graph is
 changed in specific ways which can be broken down into sequences of simple graph
 transformations. For example, in the (mirroring) RAID module it is necessary to
 duplicate a change descriptor, including all its dependents and dependencies. We
-expect that after implementing a relatively small number of more complex
-modules, we will have seen similarities in many of the transformations and will
-have built up a fairly complete library of common transformation functions.
+expect that after implementing a relatively small number of more complex modules
+(we have only implemented the two mentioned), we will have seen similarities in
+many of the transformations and will have built up a fairly complete library of
+common transformation functions.
