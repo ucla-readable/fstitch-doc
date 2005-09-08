@@ -12,20 +12,15 @@ additional interface between these two that helps to divide filesystem
 implementations into common (i.e. reusable) code and filesystem-specific code.
 We call this intermediate interface the ``Low-level File System'' (LFS).
 
-The LFS interface has functions to allocate blocks, add blocks to files,
-allocate file names, and other filesystem micro-ops. The idea is that a module
-implementing the LFS interface should define how bits are laid out on the disk,
-but not have to actually know how to combine the micro-ops into larger, more
-familiar filesystem operations.
-
-Using these interfaces one is able to create components such as the Uniform
-High-level File System (UHFS), which converts CFS-level operations to the
-LFS-level. UHFS implements common filesystem functionality such as file write,
-read, append, and truncate in a filesystem-agnostic way. Thus it is LFS that
-defines what is treated as filesystem representation specific and allows the
-simplification of filesystem implementation by splitting a filesystem into the
-filesystem-layout specific module and the UHFS module.
+The LFS interface has functions to allocate blocks, add blocks to
+files, allocate file names, and other filesystem micro-ops. The idea
+is that a module implementing the LFS interface should define how bits
+are laid out on the disk, but not have to actually know how to combine
+the micro-ops into larger, more familiar filesystem operations. We
+have implemented a generic CFS to LFS module that decomposes these
+larger file write, read, append, and other such operations into LFS
+micro-ops.
 
 All three types of modules can be stacked to add functionality incrementally,
 similar to the semantics provided by the ``stackable filesystems'' in
-FiST~\cite{zadok00fist}.
+FiST~\cite{zadok00fist}.\todo{Does this underplay LFS by comparing it to FiST?}
