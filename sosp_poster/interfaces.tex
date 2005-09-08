@@ -18,4 +18,5 @@ implementing the LFS interface should define how bits are laid out on the
 disk, but not have to actually know how to combine the micro-ops into larger,
 more familiar filesystem operations. We have implemented a generic VFS to LFS
 module that decomposes the larger file write, read, append, and other standard
-operations into LFS micro-ops.
+operations into LFS micro-ops. This one module can be used with many different
+LFS modules implementing different filesystems.
