@@ -127,29 +127,10 @@ endef
 ## MetaPost figures
 # after making the figure, run perl to fix Computer Modern font names to
 # uppercase
-fig/%_1.ps fig/%_2.ps fig/%_3.ps fig/%_4.ps fig/%_5.ps fig/%_6.ps fig/%_7.ps fig/%_8.ps: fig/%.mp fig/elements.mp fig/elemfig.sty
+fig/%_1.eps fig/%_2.eps fig/%_3.eps fig/%_4.eps fig/%_5.eps fig/%_6.eps fig/%_7.eps fig/%_8.eps: fig/%.mp fig/elements.mp fig/elemfig.sty
 	cd fig; TEX=$(LATEX) $(METAPOST) $(METAPOST_OPTS) $(subst fig/,,$<)
-	sh -c 'for out in fig/$*.?; do mv -f $$out `echo $$out | tr . _`.ps; done'
-	perl -pi -e 'next if $$x; $$x = 1 if /%%EndProlog/; s=/([a-z][a-z0-9]+) def=/\U$$1\E def= if !/^%%/; s=\b([a-z][a-z0-9]+)\b=\U$$1\E=g if /^%%DocumentFonts/ || /^%%\+/;' $(subst .mp,,$<)_[0-9]*.ps
-
-%.1.pdf: %.1
-	epstopdf --outfile="$@" $<
-
-%.2.pdf: %.2
-	epstopdf --outfile="$@" $<
-
-%.3.pdf: %.3
-	epstopdf --outfile="$@" $<
-
-%.4.pdf: %.4
-	epstopdf --outfile="$@" $<
-
-%.5.pdf: %.5
-	epstopdf --outfile="$@" $<
-
-%.6.pdf: %.6
-	epstopdf --outfile="$@" $<
-
+	sh -c 'for out in fig/$*.?; do mv -f $$out `echo $$out | tr . _`.eps; done'
+	perl -pi -e 'next if $$x; $$x = 1 if /%%EndProlog/; s=/([a-z][a-z0-9]+) def=/\U$$1\E def= if !/^%%/; s=\b([a-z][a-z0-9]+)\b=\U$$1\E=g if /^%%DocumentFonts/ || /^%%\+/;' $(subst .mp,,$<)_[0-9]*.eps
 
 tex-clean::
 	rm -f *.aux *.log *.out *.bbl *.blg *.lof *.toc
