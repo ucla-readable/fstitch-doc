@@ -3,8 +3,8 @@
 \label{sec:chdescs}
 
 In contrast with traditional systems, where changes to filesystem data are
-accomplished by changing in-memory copies of the disk blocks and then marking
-the block as needing to be written to disk (thus losing all record of what was
+accomplished by changing in-memory copies of the disk blocks and marking the
+block as needing to be written to disk (thus losing all record of what was
 changed), every change to filesystem data in the KudOS file server effects a
 corresponding ``change descriptor'' that describes what was changed. Change
 descriptors (``chdescs'' for short) allow a dependency graph to be created
