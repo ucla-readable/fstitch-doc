@@ -20,15 +20,15 @@ as a single bit, or as large as a whole disk block. Soft updates, journalling,
 and many application-specific consistency models all correspond to different
 change descriptor arrangements. Block data is almost secondary to the chdescs
 from the point of view of the file system server -- chdescs are what really move
-around in the system. This concept turns out to be very powerful, and it allows
-some interesting configurations of modules as well as very simple
-implementations of traditionally complicated features\todo{Say what we mean by ``powerful [concept]'' and ``interesting configurations''?}. For instance, journalling
-is implemented as a single BD module, and it can automatically add journalling
--- even metadata-only journalling -- to {\it any} LFS filesystem. Other block
-device layering systems, like GEOM~\cite{geom}, need special hooks into
-filesystem code in order to get the necessary hints (i.e. what is metadata and
-what is not) to do metadata-only journalling\todo{Check this claim}. Change
-descriptors and the LFS/CFS division allow us to do this automatically.
+around in the system. This concept allows some interesting configurations of
+modules as well as very simple implementations of traditionally complicated
+features. For instance, journalling is implemented as a single BD module, and it
+can automatically add journalling -- even metadata-only journalling -- to {\it
+any} LFS filesystem. Other block device layering systems, like GEOM~\cite{geom},
+need special hooks into filesystem code in order to get the necessary hints
+(i.e. what is metadata and what is not) to do metadata-only journalling.
+\todo{Check this claim} Change descriptors and the LFS/CFS division allow us to
+do this automatically.
 
 For many complex operations, like RAID or journalling, the chdesc graph is
 changed in specific ways which can be broken down into sequences of simple graph
