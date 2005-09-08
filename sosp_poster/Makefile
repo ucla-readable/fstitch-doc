@@ -1,8 +1,8 @@
 default: abstract.pdf
 
-TMP_DVI_IMAGES = fig/whatevs_3.eps
+TMP_DVI_IMAGES = fig/whatevs_1.eps
 DVI_IMAGES = $(TMP_DVI_IMAGES)
-TMP_PDF_IMAGES = fig/whatevs_3.pdf
+TMP_PDF_IMAGES = fig/whatevs_1.pdf
 PDF_IMAGES = $(TMP_PDF_IMAGES) 
 
 OUTPUT_FILES = abstract.dvi abstract.pdf abstract.txt $(TMP_DVI_IMAGES)

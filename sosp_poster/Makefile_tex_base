@@ -133,7 +133,7 @@ fig/%_1.eps fig/%_2.eps fig/%_3.eps fig/%_4.eps fig/%_5.eps fig/%_6.eps fig/%_7.
 	perl -pi -e 'next if $$x; $$x = 1 if /%%EndProlog/; s=/([a-z][a-z0-9]+) def=/\U$$1\E def= if !/^%%/; s=\b([a-z][a-z0-9]+)\b=\U$$1\E=g if /^%%DocumentFonts/ || /^%%\+/;' $(subst .mp,,$<)_[0-9]*.eps
 
 tex-clean::
-	rm -f *.aux *.log *.out *.bbl *.blg *.lof *.toc
+	rm -f *.aux *.log *.out *.bbl *.blg *.lof *.toc fig/*.log fig/*.mpx
 
 # TMP_FILES and OUTPUT_FILES need be supplied by the parent makefile
 dist-clean: tex-clean
