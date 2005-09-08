@@ -1,10 +1,10 @@
 The KudOS File Server Architecture is an experiment in increasing the
 flexibility, breaking many of the existing limitations, and increasing
-the understandability of file system software\footnote{We want to
+the understandability of file system software\todo{We want to
   improve/scrap this first sentence}.  The KFS architecture's two most
 fundamental changes are the addition of an interface layer between the
 virtual file system and block device layers that operates on files at
-the block level\footnote{What we think is important is separating out the disk-format code from the format-independent code, not the how of files at the block level} and the use of disk change descriptions and
+the block level\todo{What we think is important is separating out the disk-format code from the format-independent code, not the how of files at the block level} and the use of disk change descriptions and
 dependencies. These two changes are responsible for componentizing and
 simplfying common filesystem features, such as transparent journaling,
 and supporting interesting new interactions, such as RAID over
