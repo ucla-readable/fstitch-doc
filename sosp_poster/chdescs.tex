@@ -26,10 +26,10 @@ modules as well as very simple implementations of traditionally complicated
 features. For instance, journalling is implemented as a single block device
 module, and it can automatically add journalling -- even metadata-only
 journalling -- to {\it any} LFS filesystem. Other block device layering systems,
-like GEOM~\cite{geom}, need special hooks into filesystem code in order to get
-the necessary hints (i.e. what is metadata and what is not) to do metadata-only
-journalling. \todo{Check this claim} Change descriptors and the LFS/VFS
-division allow us to do this automatically.
+like GEOM~\cite{geom}, would need special hooks into filesystem code in order to
+get the necessary hints (i.e. what is metadata and what is not) to do
+metadata-only journalling. Change descriptors and the LFS interface division
+allow us to do this automatically.
 
 For many complex operations, like RAID or journalling, the chdesc graph is
 changed in specific ways which can be broken down into sequences of simple graph
