@@ -7,6 +7,9 @@ PDFLATEX_OPTS=
 BIBTEX=bibtex
 BIBTEX_OPTS=
 
+METAPOST=mpost
+METAPOST_OPTS=
+
 DVIPS=dvips
 DVIPS_OPTS=
 
@@ -118,6 +121,33 @@ endef
 	$(DVI2TTY) $(DVI2TTY_OPTS) -o $@ $<
 
 # perhaps add %.html target
+
+
+
+## MetaPost figures
+# after making the figure, run perl to fix Computer Modern font names to
+# uppercase
+fig/%.1 fig/%.2 fig/%.3 fig/%.4 fig/%.5 fig/%.6 fig/%.7 fig/%.8: fig/%.mp fig/elements.mp fig/elemfig.sty
+	cd fig; TEX=$(LATEX) $(METAPOST) $(METAPOST_OPTS) $(subst fig/,,$<)
+	perl -pi -e 'next if $$x; $$x = 1 if /%%EndProlog/; s=/([a-z][a-z0-9]+) def=/\U$$1\E def= if !/^%%/; s=\b([a-z][a-z0-9]+)\b=\U$$1\E=g if /^%%DocumentFonts/ || /^%%\+/;' $(subst .mp,,$<).[0-9]*
+
+%.1.pdf: %.1
+	epstopdf --outfile="$@" $<
+
+%.2.pdf: %.2
+	epstopdf --outfile="$@" $<
+
+%.3.pdf: %.3
+	epstopdf --outfile="$@" $<
+
+%.4.pdf: %.4
+	epstopdf --outfile="$@" $<
+
+%.5.pdf: %.5
+	epstopdf --outfile="$@" $<
+
+%.6.pdf: %.6
+	epstopdf --outfile="$@" $<
 
 
 tex-clean::
