@@ -11,7 +11,7 @@ METAPOST=mpost
 METAPOST_OPTS=
 
 DVIPS=dvips
-DVIPS_OPTS=
+DVIPS_OPTS=-t letter -P cmz
 
 DVI2TTY=dvi2tty
 DVI2TTY_OPTS=-w120
