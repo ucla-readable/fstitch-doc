@@ -1,10 +1,26 @@
 \documentclass[10pt,twocolumn]{article}
 \usepackage[9pt]{sigmin}
-\usepackage{graphicx,url,amsmath,amssymb,alltt,comment}
+\usepackage{amsmath,amssymb,alltt,comment}
 \usepackage[square,comma,numbers,sort&compress]{natbib}
 \usepackage{multirow}
 \usepackage{times,mathrmletter}
 \frenchspacing
+
+\usepackage{url,hyperref,ifpdf}
+\ifpdf
+  \usepackage[pdftex]{graphicx}
+  \usepackage[monochrome]{color}
+  \DeclareGraphicsExtensions{.jpg,.pdf,.mps,.png}
+  \pdfinfo
+  { 
+    /Title (The KudOS File Server Architecture)
+    /Author (Andrew de los Reyes, Chris Frost, Mike Mammarella, Lei Zhang, {adlr,frost,mikem,leiz}@cs.ucla.edu)
+  }
+  \pdfcompresslevel=9
+\else
+  \usepackage{graphicx}
+  \DeclareGraphicsExtensions{.eps,.jpg,.mps,.png}
+\fi
 
 % A list of stuff not to hyphenate
 \hyphenation{KudOS}
@@ -29,22 +45,6 @@
 % how dare we use inches!
 %\titlespacing{\section}    {0pt} {0.04in} {0.03in}
 %\titlespacing{\subsection} {0pt} {0.10in} {0.03in}
-
-\usepackage{url, hyperref, ifpdf}
-\ifpdf
-  \usepackage[pdftex]{graphicx}
-  \usepackage[monochrome]{color}
-  \DeclareGraphicsExtensions{.jpg,.pdf,.mps,.png}
-  \pdfinfo
-  { 
-    /Title (The KudOS File Server Architecture)
-    /Author (Andrew de los Reyes, Chris Frost, Mike Mammarella, Lei Zhang, {adlr,frost,mikem,leiz}@cs.ucla.edu)
-  }
-  \pdfcompresslevel=9
-\else
-  \usepackage{graphicx}
-  \DeclareGraphicsExtensions{.eps,.jpg,.mps,.png}
-\fi
 
 \newcommand{\todo}[1]{\footnote{\textbf{TODO}: #1}}
 
