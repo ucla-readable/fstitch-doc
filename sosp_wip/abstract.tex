@@ -1,4 +1,4 @@
-\documentclass[twocolumn,10pt]{article}
+\documentclass{sigplan-proc}
 
 % A list of stuff not to hyphenate
 \hyphenation{KudOS}
@@ -7,23 +7,20 @@
 
 \pagestyle{empty}
 
-\usepackage{geometry}
-\geometry{top=0.35in, bottom=0.35in, left=0.60in, right=0.60in} 
-
-\renewcommand{\topfraction}{.8}
-\renewcommand{\bottomfraction}{.8}
+%\renewcommand{\topfraction}{.8}
+%\renewcommand{\bottomfraction}{.8}
 
 % reduce enumeration spacing in a hacky way;
-\newcommand{\itemvspace}{\vspace{-2mm}}
-\newcommand{\postlistspacing}{\vspace{-0.08in}}
+\newcommand{\itemvspace}{}%\vspace{-2mm}}
+\newcommand{\postlistspacing}{}%\vspace{-0.08in}}
 
 % reduce pre-pargraph spacing in a hacky way
-\newcommand{\preparagraphspacing}{\vspace{-0.15in}}
+\newcommand{\preparagraphspacing}{}%\vspace{-0.15in}}
 
-\usepackage{titlesec} % {pre,post}-[sub]section spacing adjustments
+%\usepackage{titlesec} % {pre,post}-[sub]section spacing adjustments
 % how dare we use inches!
-\titlespacing{\section}    {0pt} {0.04in} {0.03in}
-\titlespacing{\subsection} {0pt} {0.10in} {0.03in}
+%\titlespacing{\section}    {0pt} {0.04in} {0.03in}
+%\titlespacing{\subsection} {0pt} {0.10in} {0.03in}
 
 \usepackage{url, hyperref, ifpdf}
 \ifpdf
