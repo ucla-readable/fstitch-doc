@@ -12,6 +12,10 @@ TMP_FILES = $(TMP_PDF_IMAGES)
 abstract.dvi abstract.pdf abstract.txt: \
 	abstract.tex intro.tex interfaces.tex chdescs.tex kfsgraph.tex future.tex abstract.bib sigplan-proc.cls
 
+bib:
+	latex abstract
+	bibtex -min-crossrefs=100 abstract
+
 abstract.dvi: $(DVI_IMAGES)
 abstract.pdf: $(PDF_IMAGES)
 

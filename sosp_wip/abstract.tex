@@ -1,9 +1,17 @@
-\documentclass{sigplan-proc}
+\documentclass[10pt,twocolumn]{article}
+\usepackage[9pt]{sigmin}
+\usepackage{graphicx,url,amsmath,amssymb,alltt,comment}
+\usepackage[square,comma,numbers,sort&compress]{natbib}
+\usepackage{multirow}
+\usepackage{times,mathrmletter}
+\frenchspacing
 
 % A list of stuff not to hyphenate
 \hyphenation{KudOS}
 
-\usepackage{times}
+\renewcommand{\dbltopfraction}{1.00}
+\renewcommand{\topfraction}{1.00}
+\renewcommand{\textfraction}{0.10}
 
 \pagestyle{empty}
 
@@ -42,6 +50,23 @@
 
 \begin{document}
 
+\title{\sffamily\textbf{Sympathy for the Sensor Network Debugger}}
+%\title{A Debugging System for Sensor Networks}
+
+
+\author{\sffamily Nithya Ramanathan, Kevin Chang, Rahul Kapur, Lewis Girod,
+Eddie Kohler, and Deborah Estrin \\
+\noalign{\vskip2pt}
+\sffamily{\fontsize{10pt}{10pt}\selectfont UCLA Center for Embedded Network
+Sensing} \\
+\noalign{\vskip2pt}
+\sffamily{\{nithya, kchang, rkapur, girod, kohler, destrin\}@cs.ucla.edu} \\
+\noalign{\vskip-.25in}
+\null}
+\date{}
+\maketitle
+
+\begin{comment}
 % this takes less space than \maketitle:
 \begin{center}
 {\LARGE The KudOS File Server Architecture}\\
@@ -50,6 +75,12 @@
 {\large \{adlr,frost,kohler,mikem,leiz\}@cs.ucla.edu }\\
 ($^*$: students, $^+$: attending conference)
 \end{center}
+\end{comment}
+
+\normalsize
+\conferenceinfo{SenSys'05,} {November 2--4, 2005, San Diego, California, USA.}
+\CopyrightYear{2005}
+\crdata{1-59593-054-X/05/0011}
 
 \input{intro.tex}
 \input{interfaces.tex}
