@@ -34,8 +34,8 @@ beginfig(1);
   = (0,20);
   loopd.w - loopj.e = (10,0);
   uhfsb.w - uhfsa.e = (60,0);
-  ypart(loopj.n - resizer.n) = ypart(loopd.n - resizer.n) = 0;
-  journal.s - .5[loopj.n,loopd.n] = (0,15);
+  %ypart(loopj.n - resizer.n) = ypart(loopd.n - resizer.n) = 0;
+  journal.s - .5[loopj.n,loopd.n] = (0,20);
   classifier.s - .5[uhfsa.n,uhfsb.n] = (0,25);
 
   fixelement (resizer,ide,wbcache,josfsa,josfsb,uhfsa,uhfsb,journal,loopj,loopd,classifier);
@@ -57,12 +57,17 @@ beginfig(1);
   drawconnect(classifier,1,0,uhfsb) dashed evenly scaled 0.5;
   label.top(btex application etex, classifier.in[0]+(0,15));
 % Slightly better loop -> josfs connections
-  drawconnarrow loopj.out[0] -- loopj.out[0] - (0,20) dashed evenly scaled 0.5;
-  drawconnarrow loopd.out[0] -- loopd.out[0] - (0,20) dashed evenly scaled 0.5;
-  label.top(btex {\it josfs-0} etex, loopj.out[0]-(0,35)); 
-  label.top(btex {\it josfs-0} etex, loopd.out[0]-(0,35)); 
-  drawconnarrow josfsb.in[0] + (65,0) -- josfsb.in[0] + (65,10) -- josfsb.in[0] dashed evenly scaled 0.5;
-  label.top(btex {\it josfs-0} etex, josfsb.in[0]+(65,0)-(0,15)); 
+  drawconnarrowna loopj.out[0] {down}
+  .. loopj.out[0] - (24,15) {left}
+  .. .5[loopj.sw,resizer.se] {up}
+  .. (xpart .5[loopj.w,resizer.e], ypart josfsb.n) {up}
+  .. .5[uhfsa.ne,josfsb.s] {left}
+  .. {down}josfsb.in[0]
+  dashed evenly;
+  drawconnarrowna loopd.out[0] {down}
+  .. loopd.out[0] - (24,15) {left}
+  .. {left} loopj.out[0] - (17,15)
+  dashed evenly;
 
 
   label.urt(btex VFS etex scaled 0.5, classifier.in[0]);
@@ -73,13 +78,13 @@ beginfig(1);
   label.llft(btex LFS etex scaled 0.5, uhfsa.out[0]);
   label.lrt(btex LFS etex scaled 0.5, uhfsb.out[0]);
   label.urt(btex BD etex scaled 0.5, journal.in[0]);
-  label.llft(btex BD etex scaled 0.5, journal.out[0]);
-  label.lrt(btex BD etex scaled 0.5, journal.out[1]);
+  label.lrt(btex BD etex scaled 0.5, journal.out[0]);
+  label.llft(btex BD etex scaled 0.5, journal.out[1]);
   label.urt(btex LFS etex scaled 0.5, josfsa.in[0]);
   label.lrt(btex BD etex scaled 0.5, josfsa.out[0]);
-  label.urt(btex LFS etex scaled 0.5, josfsb.in[0]);
+  label.ulft(btex LFS etex scaled 0.5, josfsb.in[0]);
   label.lrt(btex BD etex scaled 0.5, josfsb.out[0]);
-  label.urt(btex BD etex scaled 0.5, loopj.in[0]);
+  label.ulft(btex BD etex scaled 0.5, loopj.in[0]);
   label.lrt(btex LFS etex scaled 0.5, loopj.out[0]);
   label.urt(btex BD etex scaled 0.5, loopd.in[0]);
   label.lrt(btex LFS etex scaled 0.5, loopd.out[0]);
