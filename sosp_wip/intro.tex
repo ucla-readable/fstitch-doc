@@ -2,7 +2,7 @@
 \label{sec:intro}
 
 Despite the recent proliferation of advanced filesystem consistency features,
-like journalling and soft updates\cite{ganger00soft}, the software which
+like journalling and soft updates~\cite{ganger00soft}, the software which
 implements these features remains largely inflexible and difficult to reason
 about. It is generally tied to a particular filesystem, and can neither be
 reused in another filesystem nor adapted to allow even slightly different
@@ -10,29 +10,18 @@ semantics without significant engineering effort. To address this problem, we
 propose a new system called the KudOS File Server Architecture which introduces
 two significant changes to traditional designs. First, we introduce a mechanism
 for explicitly representing changes to disk blocks, and the dependencies among
-those changes necessary to implement various consistency semantics.
+those changes necessary to implement various consistency semantics. Second, we
+decompose the filesystem software into small modules and add a new interface
+type between the block device interface and the abstract filesystem interface.
+This interface separates the low-level specification of a filesystem's on-disk
+layout from higher-level filesystem-independent code which operates only
+abstractly on disk structures.
 
-Second, we add a new interface between the virtual file system and block device
-layers that separates the specification of a filesystem's on-disk layout from
-filesystem-independent code that operates more abstractly on disk structures to
-implement a complete filesystem driver.
-
-These two changes are responsible for componentizing and simplfying common
-filesystem features, such as transparent journaling, and supporting interesting
-new interactions, such as RAID over loopback devices and userspace specified
-change dependencies.
-
-\section*{Crappy old introduction}
-The KudOS File Server Architecture is an experiment in increasing the
-modularity, flexibility, and understandability of file system software. The KFS
-architecture introduces two significant changes. First, we add a new interface
-between the virtual file system and block device layers that separates the
-specification of a filesystem's on-disk layout from filesystem-independent code
-that operates more abstractly on disk structures to implement a complete
-filesystem driver. Second, we introduce a mechanism for tracking changes to disk
-blocks, and the dependencies among those changes necessary to implement various
-consistency semantics (as dictated by the modules in the system). These two
-changes are responsible for componentizing and simplfying common filesystem
-features, such as transparent journaling, and supporting interesting new
-interactions, such as RAID over loopback devices and userspace specified change
-dependencies.
+We have implemented a mostly-complete, functional prototype of the KFS
+Architecture. In our prototype, these two changes greatly increase the
+flexibility of standard consistency features, allowing our journalling module to
+automatically add journalling to any filesystem. They also support the
+implementation of many other possible definitions of filesystem consistency,
+which in the future we hope will be userspace-specified. Finally, the module
+system combined with the dependency tracking mechanism allows some interesting
+new interactions, such as correct consistency on RAID over loopback devices.
