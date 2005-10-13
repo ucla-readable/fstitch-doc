@@ -1,21 +1,24 @@
 \section*{Introduction}
 \label{sec:intro}
 
-Despite the recent proliferation of advanced filesystem consistency features,
-such as journalling and soft updates~\cite{ganger00soft}, the software which
-implements these features remains largely inflexible and difficult to reason
-about. It is generally tied to a particular filesystem, and can neither be
-reused in another filesystem nor adapted to allow even slightly different
-semantics without significant engineering effort. To address this problem, we
-propose a new system called the KudOS File Server Architecture which introduces
-two significant changes to traditional designs. First, we introduce a mechanism
-for explicitly representing changes to disk blocks, and the dependencies among
-those changes necessary to implement various consistency semantics. Second, we
-decompose the filesystem software into small modules and add a new interface
-type between the block device interface and the abstract filesystem interface.
-This interface separates the low-level specification of a filesystem's on-disk
-layout from higher-level filesystem-independent code which operates only
-abstractly on disk structures.
+Despite the recent proliferation of advanced filesystem consistency
+features, such as journalling and soft updates~\cite{ganger00soft},
+the software which implements these features remains largely
+inflexible and difficult to reason about. It is generally tied to a
+particular filesystem, and can neither be reused in another filesystem
+nor adapted to allow even slightly different semantics without
+significant engineering effort. To address this problem, we propose a
+new system called the KudOS File Server Architecture which introduces
+two significant changes to traditional designs. First, we introduce a
+mechanism for explicitly representing changes to disk blocks, and the
+dependencies among those changes necessary to implement various
+consistency semantics, including soft updates and journaling. Second,
+we decompose the filesystem software into small modules and add a new
+interface type between the block device interface and the abstract
+filesystem interface.  This interface separates the low-level
+specification of a filesystem's on-disk layout from higher-level
+filesystem-independent code which operates only abstractly on disk
+structures.
 
 We have implemented a mostly-complete, functional prototype of the KFS
 Architecture. In our prototype, these two changes greatly increase the
