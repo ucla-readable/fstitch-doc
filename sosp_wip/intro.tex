@@ -2,7 +2,7 @@
 \label{sec:intro}
 
 Despite the recent proliferation of advanced filesystem consistency features,
-like journalling and soft updates~\cite{ganger00soft}, the software which
+such as journalling and soft updates~\cite{ganger00soft}, the software which
 implements these features remains largely inflexible and difficult to reason
 about. It is generally tied to a particular filesystem, and can neither be
 reused in another filesystem nor adapted to allow even slightly different
@@ -19,9 +19,10 @@ abstractly on disk structures.
 
 We have implemented a mostly-complete, functional prototype of the KFS
 Architecture. In our prototype, these two changes greatly increase the
-flexibility of standard consistency features, allowing our journalling module to
-automatically add journalling to any filesystem. They also support the
-implementation of many other possible definitions of filesystem consistency,
-which in the future we hope will be userspace-specified. Finally, the module
-system combined with the dependency tracking mechanism allows some interesting
-new interactions, such as correct consistency on RAID over loopback devices.
+flexibility of standard consistency features, e.g.~allowing our journalling
+module to automatically add journalling to any filesystem. They also support
+the implementation of many other possible definitions of filesystem
+consistency, which in the future we hope will allow for userspace
+specification. Finally, the module system combined with the dependency
+tracking mechanism allows interesting new interactions, such as correct
+consistency on RAID over loopback devices.
