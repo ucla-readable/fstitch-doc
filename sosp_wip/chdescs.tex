@@ -40,3 +40,30 @@ expect that after implementing a relatively small number of more complex modules
 (we have only implemented the two mentioned), we will have seen similarities in
 many of the transformations and will have built up a fairly complete library of
 common transformation functions.
+
+\begin{figure}
+\begin{verbatim}
+struct chdesc {
+    BD_t * owner;
+    bdesc_t * block;
+    enum {BIT, BYTE, NOOP} type;
+    union {
+        struct {
+            uint16_t offset;
+            uint32_t xor;
+        } bit;
+        struct {
+            uint16_t offset, length;
+            uint8_t * data;
+        } byte;
+    };
+    chmetadesc_t * dependencies;
+};
+
+struct chmetadesc {
+    chdesc_t * desc;
+    chmetadesc_t * next;
+};
+\end{verbatim}
+\caption{\label{fig:chdesc} Change descriptor structure}
+\end{figure}
