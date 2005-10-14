@@ -3,8 +3,8 @@
 \section*{Introduction}
 \label{sec:intro}
 
-For robustness, stability, and reboot speed, file system implementations
-must ensure that the file system's stored image is kept consistent
+For robustness, stability, and reboot speed, filesystem implementations
+must ensure that the filesystem's stored image is kept consistent
 or easy to return to consistency.
 %
 Advanced consistency mechanisms such as soft updates~\cite{ganger00soft}
@@ -18,13 +18,13 @@ Furthermore, interfaces like \verb+fsync()+ give user code coarse control
 over consistency.
 %
 Applications with custom consistency and performance requirements get
-little help from conventional file systems, which either impose high
+little help from conventional filesystems, which either impose high
 overhead (data journalling) or don't guarantee data consistency (soft
 updates, for example, provides metadata consistency).
 
 
 
-We propose a new file system implementation architecture called
+We propose a new filesystem implementation architecture called
 \emph{KudOS}.
 %
 KudOS \emph{change descriptor} structures represent any and all changes to
@@ -37,8 +37,8 @@ Each change descriptor stores the old state of the block and the change's
 \emph{dependencies}---other change descriptors that must be committed before
 it is safe to commit this change.
 %
-Explicit dependencies let KudOS modules preserve necessary file system
-invariants without understanding the file system itself; the old state
+Explicit dependencies let KudOS modules preserve necessary filesystem
+invariants without understanding the filesystem itself; the old state
 lets KudOS roll back changes when necessary to break cyclic dependencies.
 %
 Change descriptors can implement many ways of achieving
@@ -62,7 +62,7 @@ system, and combinations of simple modules can support, for example,
 correct consistency on RAID over loopback devices.
 %
 Eventually, we plan for KudOS to support user-defined dependencies,
-allowing applications to define consistency protocols that the file system
+allowing applications to define consistency protocols that the filesystem
 will follow.
 
 %
