@@ -2,11 +2,16 @@
 \section*{Change Descriptors}
 \label{sec:chdescs}
 
+To represent the changes to disk blocks and the write-ordering requirements of
+the changes, we use a structure called a change descriptor. A change descriptor
+stores the information necessary to apply it or roll it back, and a list of
+other changes which must be written before it.
+
 What they are
 What they're for, abstractly (short)
 History, better than GEOM, JBD
 How to generate the correct chdescs
-What they contain
+What they contain (code)
 How they move around
 How we use them (transformations, applications)
 Relationship to consistency models
