@@ -10,12 +10,14 @@ change descriptors could improve both the performance and correctness
 of applications requiring complicated consistency semantics, though
 there are many issues to consider when extending change descriptors
 outside of file server. For instance, we need to prevent misbehaving
-or malicious applications from setting up dependencies such that
-certain change descriptors stay in the system indefinitely. We also
-plan to study the performance and memory overhead implications of
-change descriptors. While we believe these changes will not be
-substantive, given the speed differences between memory and disk,
-we will like to better evaluate our implementation to minimize the
-impact of change descriptors on system performance. In addition, we
-plan to implement an ext3-like filesystem and a transactional file
-system to demonstrate the utility of change descriptors in KudOS.
+or malicious applications from creating excessive numbers of change
+descriptors, or setting up dependencies such that certain change
+descriptors stay in the system indefinitely.
+
+We also plan to study the performance and memory overhead implications
+of change descriptors. While we believe the differences will not be
+substantial, given the speed differences between memory and disks, we
+would like to better evaluate our implementation to minimize the impact
+of change descriptors on system performance. In addition, we plan to
+implement an ext3-like filesystem and a transactional file system to
+demonstrate the utility of change descriptors and modules in KudOS.

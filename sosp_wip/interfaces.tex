@@ -10,13 +10,6 @@ implementations into common (i.e. reusable) code and filesystem-specific code.
 We call this intermediate interface the ``Low-level File System'' (LFS). This
 new interface is a substantial departure from other stackable module systems,
 like FiST~\cite{zadok00fist}, which stack higher-level operations.
-%
-Figure~\ref{fig:kfs-graph} shows a contrived example taking advantage
-of the LFS interface and change descriptors. In this example a
-filesystem image is mounted with journalling from the root filesystem
-with soft updates. The image filesystem's ordering requirements are
-sent through the loop device to the root filesystem. Despite being
-transformed by the loop device, all ordering requirements are respected.
 
 The LFS interface has functions to allocate blocks, add blocks to
 files, allocate file names, and other filesystem micro-ops. A module
@@ -27,3 +20,10 @@ a generic VFS to LFS module that decomposes the larger file write,
 read, append, and other standard operations into LFS micro-ops. This
 one module can be used with many different LFS modules implementing
 different filesystems.
+
+Figure~\ref{fig:kfs-graph} shows a contrived example taking advantage of the LFS
+interface and change descriptors. In this example a filesystem image is mounted
+with an external journal, both of which are loop devices on the root filesystem
+which uses soft updates. The journalled filesystem's ordering requirements are
+sent through the loop device as change descriptors. Despite being transformed
+by the loop device, all ordering requirements are still respected.
