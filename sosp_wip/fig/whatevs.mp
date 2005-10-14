@@ -106,17 +106,17 @@ beginfig(2);
   boxjoin(a.width = b.width; a.height = b.height);
   elementit.crc(btex CRC etex, 0, 0, pull);
   elementit.crcn(btex etex, 0, 0, pull);
-  elementit.a(btex A etex, 0, 0, pull);
-  elementit.b(btex B etex, 0, 0, pull);
-  elementit.c(btex C etex, 0, 0, pull);
-  elementit.d(btex D etex, 0, 0, pull);
+  elementit.a(btex ZB etex, 0, 0, pull);
+  elementit.b(btex AB etex, 0, 0, pull);
+  elementit.c(btex BP etex, 0, 0, pull);
+  elementit.d(btex US etex, 0, 0, pull);
   elementit.fn(btex etex, 0, 0, pull);
   elementit.cr(btex CR etex, 0, 0, pull);
   elementit.crn(btex etex, 0, 0, pull);
-  elementit.aj(btex A$_J$ etex, 0, 0, pull);
-  elementit.bj(btex B$_J$ etex, 0, 0, pull);
-  elementit.cj(btex C$_J$ etex, 0, 0, pull);
-  elementit.dj(btex D$_J$ etex, 0, 0, pull);
+  elementit.aj(btex ZB$_J$ etex, 0, 0, pull);
+  elementit.bj(btex AB$_J$ etex, 0, 0, pull);
+  elementit.cj(btex BP$_J$ etex, 0, 0, pull);
+  elementit.dj(btex US$_J$ etex, 0, 0, pull);
   crc.width = crc.height;
 
   a.s - b.n = aj.s - bj.n = cj.s - dj.n = (0,5);
@@ -165,10 +165,10 @@ beginfig(2);
 endfig;
 
 beginfig(3);
-  elementit.a(btex A etex, 0, 0, pull);
-  elementit.b(btex B etex, 0, 0, pull);
-  elementit.c(btex C etex, 0, 0, pull);
-  elementit.d(btex D etex, 0, 0, pull);
+  elementit.a(btex ZB etex, 0, 0, pull);
+  elementit.b(btex AB etex, 0, 0, pull);
+  elementit.c(btex BP etex, 0, 0, pull);
+  elementit.d(btex US etex, 0, 0, pull);
   a.width = a.height
   = b.width = b.height
   = c.width = c.height
