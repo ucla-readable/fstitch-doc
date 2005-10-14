@@ -4,7 +4,7 @@
 \label{sec:intro}
 
 For robustness, stability, and reboot speed, file system implementations
-must ensure that the file system's stored image is kept either consistent
+must ensure that the file system's stored image is kept consistent
 or easy to return to consistency.
 %
 Advanced consistency mechanisms such as soft updates~\cite{ganger00soft}
@@ -14,13 +14,13 @@ consistency mechanisms are generally tied to a particular filesystem, and
 can neither be ported nor adapted without significant engineering
 effort.
 %
-Furthermore, interfaces like \verb+fsync()+ give user code only coarse control
+Furthermore, interfaces like \verb+fsync()+ give user code coarse control
 over consistency.
 %
-Applications with both performance and custom consistency requirements get
-little help from conventional file systems, which either impose high overhead
-(data journalling) or don't guarantee data consistency (soft updates, for
-example, provides metadata consistency).
+Applications with custom consistency and performance requirements get
+little help from conventional file systems, which either impose high
+overhead (data journalling) or don't guarantee data consistency (soft
+updates, for example, provides metadata consistency).
 
 
 
@@ -30,15 +30,15 @@ We propose a new file system implementation architecture called
 KudOS \emph{change descriptor} structures represent any and all changes to
 stable storage.
 %
-File system implementations generate change descriptors when blocks are
-written and send them to block devices for eventual commit.
+File systems generate change descriptors for all writes, then
+send them to block devices for eventual commit.
 %
-Each change descriptor stores the old state of the block and its
-\emph{dependencies}: other change descriptors that must be committed before
+Each change descriptor stores the old state of the block and the change's
+\emph{dependencies}---other change descriptors that must be committed before
 it is safe to commit this change.
 %
 Explicit dependencies let KudOS modules preserve necessary file system
-invariants, without understanding the file system itself; the old state
+invariants without understanding the file system itself; the old state
 lets KudOS roll back changes when necessary to break cyclic dependencies.
 %
 Change descriptors can implement many ways of achieving
@@ -50,20 +50,27 @@ KudOS is entirely decomposed into fine-grained modules which generate,
 consume, forward, and manipulate change descriptors.
 %
 A particular innovation of KudOS's module design is the separation of the
-low-level specification of a filesystem's on-disk layout from higher-level
-filesystem-independent code, which operates only abstractly on disk
+low-level specification of on-disk layout from higher-level
+filesystem-independent code, which operates on abstract disk
 structures.
 
-We have implemented a mostly-complete, functional prototype of the KFS
-architecture.  Even this prototype greatly increases the
-flexibility of standard consistency features, allowing our journalling
-module to automatically add journalling to any file system. 
+We have implemented a functional prototype of the KudOS
+architecture.
+%
+Our journalling module could automatically add journalling to any file
+system, and combinations of simple modules can support, for example,
+correct consistency on RAID over loopback devices.
+%
+Eventually, we plan for KudOS to support user-defined dependencies,
+allowing applications to define consistency protocols that the file system
+will follow.
+
 %
 %% They also support
 %% the implementation of many other possible definitions of filesystem
 %% consistency, which in the future we hope will allow for userspace
 %% specification. 
 %
-Besides eventually supporting user-defined dependency structures, the
-current module system already allows interesting new interactions, such as
-correct consistency on RAID over loopback devices.
+%% Besides eventually supporting user-defined dependency structures, the
+%% current module system already allows interesting new interactions, such as
+%% correct consistency on RAID over loopback devices.
