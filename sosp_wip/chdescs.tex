@@ -48,19 +48,6 @@ When a block must be evicted, it makes sure to send change descriptors toward
 the disk in an order consistent with the change descriptor dependency
 information.
 
-Soft updates, journalling, and many application-specific consistency models all
-correspond to different change descriptor arrangements, so these features can be
-added to the system (and to any filesystem) as modules which appropriately
-connect or reconnect the change descriptors. For example, we have implemented
-journalling as a single block device module, to which any filesystem module can
-be attached. Even metadata-only journalling is possible with this design, though
-our module does not yet have this feature. Other block device layering systems,
-like GEOM~\cite{geom} or JBD in Linux, would or do need special hooks into
-filesystem code in order to get the necessary hints (i.e. what is metadata and
-what is not) to do metadata-only journalling. Change descriptors (and the LFS
-interface division described in the next section) allow us to do this
-automatically.
-
 \begin{figure}[b]
   \centering
   \includegraphics[width=92pt]{fig/whatevs_3}%
@@ -71,6 +58,17 @@ automatically.
   Updating the size of the inode (Size) depends on writing the block
   pointer.}
 \end{figure}
+
+Soft updates, journalling, and many application-specific consistency models all
+correspond to different change descriptor arrangements, so these features can be
+added to the system (and to any filesystem) as modules which appropriately
+connect or reconnect the change descriptors. Figure~\ref{fig:softupdates} shows
+a set of change descriptors which corresponds to adding a newly allocated block
+to an inode, using soft updates consistency semantics. Figure~\ref{fig:journal}
+shows the same change descriptors, but as a journal transaction. We have
+implemented journalling as a single module (to which any filesystem module can
+be attached) that transforms input change descriptors graphs like that in
+Figure~\ref{fig:softupdates} to output graphs like Figure~\ref{fig:journal}.
 
 \begin{figure}
   \centering
@@ -83,13 +81,19 @@ automatically.
   descriptors with no associated block data.  }
 \end{figure}
 
+Even metadata-only journalling is possible with this design, though our journal
+module does not yet have this feature. Other block device layering systems, like
+GEOM~\cite{geom} or JBD in Linux, would or do need special hooks into filesystem
+code in order to get the necessary hints (i.e. what is metadata and what is not)
+to do metadata-only journalling. Change descriptors (and the LFS interface
+division described in the next section) allow us to do this automatically.
+
 For many complex operations, like RAID or journalling, the chdesc graph is
 changed in specific ways which can be broken down into sequences of simple graph
 transformations. For example, in the (mirroring) RAID module it is necessary to
 duplicate a change descriptor, including all its dependents and dependencies.
 Functions to perform these simple transformations are useful to help build more
 complicated transformations.
-
 
 %\begin{figure}
 %  \centering
