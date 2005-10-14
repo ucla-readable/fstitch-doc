@@ -9,10 +9,28 @@ particular filesystem, and can neither be reused in another filesystem
 nor adapted to allow even slightly different semantics without
 significant engineering effort. To address this problem, we propose a
 new system called the KudOS File Server Architecture which introduces
-two significant changes to traditional designs. First, we introduce a
-mechanism for explicitly representing changes to disk blocks, and the
-dependencies among those changes necessary to implement various
-consistency semantics, including soft updates and journaling. Second,
+two significant changes to traditional designs. 
+%
+First, \emph{change descriptor} structures represent any and all changes to
+stable storage.
+%
+File system implementations generate change descriptors when blocks are
+written and forward them to block devices for eventual commit.
+%
+Each change descriptor stores the old state of the block and a set of
+\emph{dependencies}: a set of other change descriptors that must be
+committed before it is safe to commit this change.
+%
+Explicit dependencies let KudOS components preserve necessary file system
+invariants, without understanding the file system itself; the old state
+lets KudOS roll back changes when necessary to break cycles.
+%
+Change descriptors are general enough to implement many ways of achieving
+consistency, including soft updates and journaling.  
+%
+%
+%
+Second,
 we decompose the filesystem software into small modules and add a new
 interface type between the block device interface and the abstract
 filesystem interface.  This interface separates the low-level
