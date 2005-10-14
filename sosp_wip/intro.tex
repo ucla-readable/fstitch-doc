@@ -60,11 +60,15 @@ file system-independent code, which operates only abstractly on disk
 structures.
 
 We have implemented a mostly-complete, functional prototype of the KFS
-architecture. In our prototype, these two changes greatly increase the
+architecture.  Even this prototype greatly increases the
 flexibility of standard consistency features, allowing our journalling
-module to automatically add journalling to any filesystem. They also support
-the implementation of many other possible definitions of filesystem
-consistency, which in the future we hope will allow for userspace
-specification. Finally, the module system combined with the dependency
-tracking mechanism allows interesting new interactions, such as correct
-consistency on RAID over loopback devices.
+module to automatically add journalling to any file system. 
+%
+%% They also support
+%% the implementation of many other possible definitions of filesystem
+%% consistency, which in the future we hope will allow for userspace
+%% specification. 
+%
+Besides eventually supporting user-defined dependency structures, the
+current module system already allows interesting new interactions, such as
+correct consistency on RAID over loopback devices.
