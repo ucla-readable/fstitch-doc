@@ -11,11 +11,12 @@ We call this intermediate interface the ``Low-level File System'' (LFS). This
 new interface is a substantial departure from other stackable module systems,
 like FiST~\cite{zadok00fist}, which stack higher-level operations.
 
-The LFS interface has functions to allocate blocks, add blocks to files,
-allocate file names, and other filesystem micro-ops. The idea is that a module
-implementing the LFS interface should define how bits are laid out on the disk,
-but not have to actually know how to combine the micro-ops into larger, more
-familiar filesystem operations. We have implemented a generic VFS to LFS module
-that decomposes the larger file write, read, append, and other standard
-operations into LFS micro-ops. This one module can be used with many different
-LFS modules implementing different filesystems.
+The LFS interface has functions to allocate blocks, add blocks to
+files, allocate file names, and other filesystem micro-ops. A module
+implementing the LFS interface should define how bits are laid out on
+the disk, but not have to actually know how to combine the micro-ops
+into larger, more familiar filesystem operations. We have implemented
+a generic VFS to LFS module that decomposes the larger file write,
+read, append, and other standard operations into LFS micro-ops. This
+one module can be used with many different LFS modules implementing
+different filesystems.
