@@ -8,7 +8,8 @@ specify data dependencies rather than using fsync() or similar calls
 to force full syncs before writing order-sensitive data. Userspace
 change descriptors could improve both the performance and correctness
 of applications requiring complicated consistency semantics. We also
-plan to study change descriptors' performance and memory overhead
-implications. While we believe these changes will not be substantive,
-given the speed differences between memory and disk, issues such as
-quadratic memory use for file deletion are future work.
+plan to study the performance and memory overhead implications of
+change descriptors. While we believe these changes will not be substantive,
+given the speed differences between memory and disk, we will like to
+better evaluate our implementation to minimalize the impact of change
+descriptors on system performance.
