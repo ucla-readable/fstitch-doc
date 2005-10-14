@@ -164,5 +164,32 @@ beginfig(2);
   label.bot(btex Journal data\strut etex, dj.s - (0,12));
 endfig;
 
+beginfig(3);
+  elementit.a(btex A etex, 0, 0, pull);
+  elementit.b(btex B etex, 0, 0, pull);
+  elementit.c(btex C etex, 0, 0, pull);
+  elementit.d(btex D etex, 0, 0, pull);
+  a.width = a.height
+  = b.width = b.height
+  = c.width = c.height
+  = d.width = d.height;
+
+  a.w - c.e = (12, 1.2*a.height);
+  c.w - d.e = b.w - c.e = (12, 0);
+
+  forsuffixes $ = a, b, c, d:
+    pproc_.$ := "thecirc_";
+  endfor;
+
+  drawelement(a,b,c,d);
+
+  vardef ffff(suffix a,b) =
+    drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
+  enddef;
+
+  ffff(c,a);
+  ffff(c,b);
+  ffff(d,c);
+endfig;
 
 end
