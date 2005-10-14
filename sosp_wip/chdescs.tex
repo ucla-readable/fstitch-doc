@@ -3,10 +3,17 @@
 \section*{Change Descriptors}
 \label{sec:chdescs}
 
-The ability to revert and re-apply change descriptors is inspired by the soft
-updates system in BSD's FFS~\cite{ganger00soft}, but it is generalized so that
-it is not specific to any particular filesystem. A simplified version of the
-change descriptor structure is shown in Figure~\ref{fig:chdesc}.
+In KudOS we use change descriptors to represent the in-memory
+representation of changes to disk blocks. A simplified version of the
+change descriptor structure is shown in
+Figure~\ref{fig:chdesc}. `device' and `block' represent the block
+device and disk block that a change is on. Depending on `type,' the
+`bit' or `byte' structs hold the old data that is being
+overwritten. `dependencies' are the chdescs that must be written to
+stable storage before the chdesc itself. The ability to revert and
+re-apply change descriptors is inspired by the soft updates system in
+BSD's FFS~\cite{ganger00soft}, but it is generalized so that it is not
+specific to any particular filesystem.
 
 \begin{figure}
 {\footnotesize
