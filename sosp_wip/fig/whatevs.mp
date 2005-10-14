@@ -101,4 +101,60 @@ beginfig(1);
   label.top(btex \texttt{/fs.img\strut} etex scaled 0.5, loopd.out[0] + (0,2));
 endfig;
 
+
+beginfig(2);
+  boxjoin(a.width = b.width; a.height = b.height);
+  elementit.crc(btex CRC etex, 0, 0, pull);
+  elementit.crcn(btex etex, 0, 0, pull);
+  elementit.a(btex A etex, 0, 0, pull);
+  elementit.b(btex B etex, 0, 0, pull);
+  elementit.c(btex C etex, 0, 0, pull);
+  elementit.fn(btex etex, 0, 0, pull);
+  elementit.cr(btex CR etex, 0, 0, pull);
+  elementit.crn(btex etex, 0, 0, pull);
+  elementit.aj(btex A$_J$ etex, 0, 0, pull);
+  elementit.bj(btex B$_J$ etex, 0, 0, pull);
+  elementit.cj(btex C$_J$ etex, 0, 0, pull);
+  crc.width = crc.height;
+
+  a.s - b.n = b.s - c.n = aj.s - bj.n = bj.s - cj.n = (0, 15);
+  bj.w - crn.e = fn.w - b.e = b.w - crcn.e = (25, 0);
+  crn.w - cr.e = cr.w - fn.e = crcn.w - crc.e = (12, 0);
+
+  forsuffixes $ = crc, crcn, a, b, c, fn, cr, crn, aj, bj, cj:
+    pproc_.$ := "thecirc_";
+  endfor;
+
+  drawelement(aj,crc,crcn,a,b,c,fn,cr,crn,bj,cj);
+
+  vardef ffff(suffix a,b) =
+    drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
+  enddef;
+
+  forsuffixes $ = crcn, fn, crn:
+    draw (.2[$.sw,$.se] -- .8[$.nw,$.ne]) cutafter bpath.$ cutbefore bpath.$;
+  endfor;
+
+  ffff(crc,crcn);
+  ffff(crcn,a);
+  ffff(crcn,b);
+  ffff(crcn,c);
+  ffff(a,fn);
+  ffff(b,fn);
+  ffff(c,fn);
+  ffff(fn,cr);
+  ffff(cr,crn);
+  ffff(crn,aj);
+  ffff(crn,bj);
+  ffff(crn,cj);
+
+  linecap := butt;
+  draw a.nw + (-10,10) -- a.ne + (10,10) -- c.se + (10,-10) -- c.sw + (-10,-10) -- cycle withpen pencircle scaled 2 dashed evenly;
+  draw aj.nw + (-10,10) -- aj.ne + (10,10) -- cj.se + (10,-10) -- cj.sw + (-10,-10) -- cycle withpen pencircle scaled 2 dashed evenly;
+
+  label.bot(btex FS data\strut etex, c.s - (0,12));
+  label.bot(btex Journal data\strut etex, cj.s - (0,12));
+endfig;
+
+
 end
