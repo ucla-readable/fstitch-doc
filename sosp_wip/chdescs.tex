@@ -7,16 +7,16 @@ the changes, we use a structure called a change descriptor. A change descriptor
 stores the information necessary to apply it or roll it back, and a list of
 other changes which must be written before it.
 
-What they are
-What they're for, abstractly (short)
-History, better than GEOM, JBD
-How to generate the correct chdescs
-What they contain (code)
-How they move around
-How we use them (transformations, applications)
-Relationship to consistency models
-User-level chdescs
-Chdesc challenges - memory pressure, time, circularity
+% What they are
+% What they're for, abstractly (short)
+% History, better than GEOM, JBD
+% How to generate the correct chdescs
+% What they contain (code)
+% How they move around
+% How we use them (transformations, applications)
+% Relationship to consistency models
+% User-level chdescs
+% Chdesc challenges - memory pressure, time, circularity
 
 In contrast with traditional systems, where changes to filesystem data are
 accomplished by changing in-memory copies of the disk blocks and marking the
