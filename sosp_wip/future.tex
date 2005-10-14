@@ -7,7 +7,7 @@ userspace, allowing applications like database servers to exactly
 specify data dependencies rather than using fsync() or similar calls
 to force full syncs before writing order-sensitive data. Userspace
 change descriptors could improve both the performance and correctness
-of applications requiring complicated consistency semantics. Though
+of applications requiring complicated consistency semantics, though
 there are many issues to consider when extending change descriptors
 outside of file server. For instance, we need to prevent misbehaving
 or malicious applications from setting up dependencies such that
