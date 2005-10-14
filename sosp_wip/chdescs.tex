@@ -33,35 +33,33 @@ struct chdesc {
 \caption{\label{fig:chdesc} Change descriptor structure.}
 \end{figure}
 
-A KudOS module first generates change descriptors specifying order
-requirements similar to soft updates'. For example,
-Figure~\ref{fig:softupdates} depicts change descriptors that allocate
-and add an additional block to an inode.
+When a KudOS module first generates change descriptors to write to the disk, it
+specifies write ordering requirements similar to those of soft updates. For
+example, Figure~\ref{fig:softupdates} depicts change descriptors that allocate
+and add a new block to an inode.
 %
-The module passes these change descriptors to another module in the
-direction of the disk, which can inspect and even modify them before
-passing them on.
+The module passes these change descriptors to another module in the direction of
+the disk, which can inspect, delay, and even modify them before passing them on.
 %
-For example, the write-back cache module holds onto blocks and their
-change descriptors.
+For example, the write-back cache module holds onto blocks and their change
+descriptors instead of passing them on immediately.
 %
-When a block must be evicted, it makes sure to pass change descriptors
-toward the disk in an order consistent with the change descriptor
-dependency information.
+When a block must be evicted, it makes sure to send change descriptors toward
+the disk in an order consistent with the change descriptor dependency
+information.
 
-Soft updates, journalling, and many application-specific consistency
-models all correspond to different change descriptor arrangements, so
-these features can be added to the system (and to any filesystem) as
-modules which appropriately connect or reconnect the change
-descriptors. For example, we have implemented journalling as a single
-block device module, to which any filesystem module can be
-attached. Even metadata-only journalling is possible with this design,
-though our module does not yet have this feature.  Other block device
-layering systems, like GEOM~\cite{geom} or JBD in Linux, would or do
-need special hooks into filesystem code in order to get the necessary
-hints (i.e. what is metadata and what is not) to do metadata-only
-journalling. Change descriptors (and the LFS interface division
-described in the next section) allow us to do this automatically.
+Soft updates, journalling, and many application-specific consistency models all
+correspond to different change descriptor arrangements, so these features can be
+added to the system (and to any filesystem) as modules which appropriately
+connect or reconnect the change descriptors. For example, we have implemented
+journalling as a single block device module, to which any filesystem module can
+be attached. Even metadata-only journalling is possible with this design, though
+our module does not yet have this feature. Other block device layering systems,
+like GEOM~\cite{geom} or JBD in Linux, would or do need special hooks into
+filesystem code in order to get the necessary hints (i.e. what is metadata and
+what is not) to do metadata-only journalling. Change descriptors (and the LFS
+interface division described in the next section) allow us to do this
+automatically.
 
 \begin{figure}[b]
   \centering
@@ -89,7 +87,8 @@ For many complex operations, like RAID or journalling, the chdesc graph is
 changed in specific ways which can be broken down into sequences of simple graph
 transformations. For example, in the (mirroring) RAID module it is necessary to
 duplicate a change descriptor, including all its dependents and dependencies.
-
+Functions to perform these simple transformations are useful to help build more
+complicated transformations.
 
 
 \begin{figure}
