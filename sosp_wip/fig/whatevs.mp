@@ -40,7 +40,7 @@ beginfig(1);
 
   fixelement (resizer,ide,wbcache,josfsa,josfsb,uhfsa,uhfsb,journal,loopj,loopd,classifier);
   drawelement(resizer,ide,wbcache,josfsa,josfsb,uhfsa,uhfsb,journal,loopj,loopd,classifier);
-  drawconnarrow uhfsa.out[0]{down} .. loopj.nw - (15,0) .. loopj.sw - (15,0) .. {down}josfsb.in[0] dashed evenly;
+  drawconnect(uhfsa,0,0,josfsb) dashed evenly;
   drawconnect(uhfsb,0,0,josfsa) dashed evenly;
   drawconnect(josfsa,0,0,journal);
   drawconnect(journal,0,0,loopj);
