@@ -30,7 +30,7 @@ We propose a new filesystem implementation architecture called
 KudOS \emph{change descriptor} structures represent any and all changes to
 stable storage.
 %
-File systems generate change descriptors for all writes, then
+Filesystems generate change descriptors for all writes, then
 send them to block devices for eventual commit.
 %
 Each change descriptor stores the old state of the block and the change's
@@ -43,15 +43,11 @@ lets KudOS roll back changes when necessary to break cyclic block dependencies.
 %
 Change descriptors can implement many ways of achieving
 consistency, including soft updates and journalling.
-%
-%
-%
-KudOS is entirely decomposed into fine-grained modules which generate,
-consume, forward, and manipulate change descriptors.
-%
-A particular innovation of KudOS's module design is the separation of the
-low-level specification of on-disk layout from higher-level
-filesystem-independent code, which operates on abstract disk
+
+KudOS is entirely decomposed into fine-grained modules which generate, consume,
+forward, and manipulate change descriptors. A particular innovation of the KudOS
+module design is the separation of the low-level specification of on-disk layout
+from higher-level filesystem-independent code, which operates on abstract disk
 structures.
 
 We have implemented a functional prototype of the KudOS
