@@ -67,15 +67,25 @@ get the necessary hints (i.e. what is metadata and what is not) to do
 metadata-only journalling. Change descriptors and the LFS interface division
 allow us to do this automatically.
 
+\begin{figure}[b]
+  \centering
+  \includegraphics[width=80pt]{fig/whatevs_3}
+  \caption{\label{fig:softupdates} Modeling a soft updates operation using
+  change descriptors. For a block allocation, writing the new block pointer to
+  an inode ($B$) depends on initializing the block ($A$) and updating the free
+  space map. ($C$)}
+\end{figure}
+
 \begin{figure}
   \centering
   \includegraphics[width=\columnwidth]{fig/whatevs_2}
-  \caption{\label{fig:journal} Journal change descriptor graph.}{Original FS
-  data change descriptors ($A$, $B$, $C$, and $D$) depend on a journal commit
-  record, which depends on copies ($A_j$, $B_j$, $C_j$, and $D_j$) of the
-  original change descriptors being written to the journal. A commit record
-  cancellation depends on the original change descriptors. The empty circles are
-  ``NOOP'' change descriptors which have no associated block data.}
+  \caption{\label{fig:journal} Journal change descriptor graph.}{The same four
+  original FS data change descriptors from \ref{fig:softupdates} are made to
+  depend on a journal commit record, which depends on copies ($A_j$, $B_j$,
+  $C_j$, and $D_j$) of the original change descriptors being written to the
+  journal. A commit record cancellation depends on the original change
+  descriptors. The empty circles are ``NOOP'' change descriptors which have no
+  associated block data.}
 \end{figure}
 
 For many complex operations, like RAID or journalling, the chdesc graph is
@@ -95,13 +105,4 @@ common transformation functions.
   block level which require some change descriptors to be rolled back in order
   to write the blocks. Here the squares are blocks, and dotted circles are
   rolled back change descriptors.}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=80pt]{fig/whatevs_3}
-  \caption{\label{fig:softupdates} Modeling a soft updates operation using
-  change descriptors. For a block allocation, writing the new block pointer to
-  an inode ($B$) depends on initializing the block ($A$) and updating the free
-  space map. ($C$)}
 \end{figure}
