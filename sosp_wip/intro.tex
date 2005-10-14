@@ -17,7 +17,7 @@ stable storage.
 File system implementations generate change descriptors when blocks are
 written and forward them to block devices for eventual commit.
 %
-Each change descriptor stores the old state of the block and a set of
+Each change descriptor stores the old state of the block and its
 \emph{dependencies}: a set of other change descriptors that must be
 committed before it is safe to commit this change.
 %
@@ -40,7 +40,7 @@ structures.
 
 We have implemented a mostly-complete, functional prototype of the KFS
 Architecture. In our prototype, these two changes greatly increase the
-flexibility of standard consistency features, e.g.~allowing our journalling
+flexibility of standard consistency features, allowing our journalling
 module to automatically add journalling to any filesystem. They also support
 the implementation of many other possible definitions of filesystem
 consistency, which in the future we hope will allow for userspace

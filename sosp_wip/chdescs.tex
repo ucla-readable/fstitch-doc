@@ -78,11 +78,11 @@ allow us to do this automatically.
   \centering
   \includegraphics[width=80pt]{fig/whatevs_3}
   \caption{\label{fig:softupdates} Soft updates change descriptor graph.}{Four
-  change descriptors describe the dependencies for allocating a new block and
-  adding it to an inode. Writing the new block pointer to an inode ($BP$)
-  depends on initializing the block ($ZB$) and updating the free block map
-  ($AB$). Updating the size of the inode ($US$) depends on writing the block
-  pointer ($BP$).
+  change descriptors describe the dependencies for adding a newly allocated
+  block to an inode. Writing the new block pointer to an inode ($BP$) depends
+  on initializing the block ($ZB$) and updating the free block map ($AB$).
+  Updating the size of the inode ($US$) depends on writing the block pointer
+  ($BP$).
 }
 \end{figure}
 
