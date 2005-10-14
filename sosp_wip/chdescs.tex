@@ -15,9 +15,10 @@
 
 The ability to revert and re-apply change descriptors is inspired by the soft
 updates system in BSD's FFS~\cite{ganger00soft}, but it is generalized so that
-it is not specific to any particular filesystem. Change descriptors allow any
-module in the system to inspect and even modify the changes that other modules
-are making.
+it is not specific to any particular filesystem. A slightly simplified version
+of the change descriptor structure is shown in Figure~\ref{fig:chdesc}. Change
+descriptors also allow any module in the system to inspect and even modify the
+changes that other modules are making.
 
 \begin{figure}
 \begin{verbatim}
@@ -43,11 +44,13 @@ struct chdesc {
 \end{figure}
 
 
-Soft updates, journalling,
-and many application-specific consistency models all correspond to different
-change descriptor arrangements. Block data is almost secondary to the chdescs
-from the point of view of the file system server -- chdescs are what really move
-around in the system. This concept allows some interesting configurations of
+Soft updates, journalling, and many application-specific consistency models all
+correspond to different change descriptor arrangements.
+%
+Block data is almost secondary to the chdescs from the point of view of the file
+system server -- chdescs are what really move around in the system.
+%
+This concept allows some interesting configurations of
 modules as well as very simple implementations of traditionally complicated
 features. For instance, journalling is implemented as a single block device
 module, and it can automatically add journalling -- even metadata-only
