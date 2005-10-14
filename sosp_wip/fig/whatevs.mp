@@ -1,7 +1,7 @@
 input elements;
 verbatimtex %&latex
 \documentclass[12pt]{article}
-\usepackage{elemfig}
+\usepackage{elemfig,amsmath}
 \begin{document}
 etex;
 picture emptyqueue; emptyqueue := btex \phantom{\elementlabel{Queue}} etex;
@@ -104,20 +104,20 @@ endfig;
 
 beginfig(2);
   boxjoin(a.width = b.width; a.height = b.height);
-  elementit.crc(btex CRC etex, 0, 0, pull);
+  elementit.crc(btex Complete etex scaled 0.8, 0, 0, pull);
   elementit.crcn(btex etex, 0, 0, pull);
-  elementit.a(btex ZB etex, 0, 0, pull);
-  elementit.b(btex AB etex, 0, 0, pull);
-  elementit.c(btex BP etex, 0, 0, pull);
-  elementit.d(btex US etex, 0, 0, pull);
+  elementit.a(btex Clear etex scaled 0.8, 0, 0, pull);
+  elementit.b(btex Alloc etex scaled 0.8, 0, 0, pull);
+  elementit.c(btex Attach etex scaled 0.8, 0, 0, pull);
+  elementit.d(btex Size etex scaled 0.8, 0, 0, pull);
   elementit.fn(btex etex, 0, 0, pull);
-  elementit.cr(btex CR etex, 0, 0, pull);
+  elementit.cr(btex Commit etex scaled 0.8, 0, 0, pull);
   elementit.crn(btex etex, 0, 0, pull);
-  elementit.aj(btex ZB$_J$ etex, 0, 0, pull);
-  elementit.bj(btex AB$_J$ etex, 0, 0, pull);
-  elementit.cj(btex BP$_J$ etex, 0, 0, pull);
-  elementit.dj(btex US$_J$ etex, 0, 0, pull);
-  crc.width = crc.height;
+  elementit.aj(btex Clear$_\text{J}$ etex scaled 0.8, 0, 0, pull);
+  elementit.bj(btex Alloc$_\text{J}$ etex scaled 0.8, 0, 0, pull);
+  elementit.cj(btex Attach$_\text{J}$ etex scaled 0.8, 0, 0, pull);
+  elementit.dj(btex Size$_\text{J}$ etex scaled 0.8, 0, 0, pull);
+  crc.width = 1.2crc.height;
 
   a.s - b.n = aj.s - bj.n = cj.s - dj.n = (0,5);
   b.s - c.n = bj.s - cj.n = c.s - d.n = (0,5);
@@ -128,15 +128,16 @@ beginfig(2);
     pproc_.$ := "thecirc_";
   endfor;
 
-  drawelement(aj,crc,crcn,a,b,c,d,fn,cr,crn,bj,cj,dj);
+  crc.dx = 2;
+  drawelement(crc,cr,aj,crcn,a,b,c,d,fn,crn,bj,cj,dj);
 
   vardef ffff(suffix a,b) =
     drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
   enddef;
 
-  forsuffixes $ = crcn, fn, crn:
-    draw (.2[$.sw,$.se] -- .8[$.nw,$.ne]) cutafter bpath.$ cutbefore bpath.$;
-  endfor;
+  %forsuffixes $ = crcn, fn, crn:
+  %  draw (.2[$.sw,$.se] -- .8[$.nw,$.ne]) cutafter bpath.$ cutbefore bpath.$;
+  %endfor;
 
   ffff(crc,crcn);
   ffff(crcn,a);
@@ -165,14 +166,12 @@ beginfig(2);
 endfig;
 
 beginfig(3);
-  elementit.a(btex ZB etex, 0, 0, pull);
-  elementit.b(btex AB etex, 0, 0, pull);
-  elementit.c(btex BP etex, 0, 0, pull);
-  elementit.d(btex US etex, 0, 0, pull);
-  a.width = a.height
-  = b.width = b.height
-  = c.width = c.height
-  = d.width = d.height;
+  boxjoin(a.width = b.width; a.height = b.height);
+  elementit.a(btex Clear etex scaled 0.8, 0, 0, pull);
+  elementit.b(btex Alloc etex scaled 0.8, 0, 0, pull);
+  elementit.c(btex Attach etex scaled 0.8, 0, 0, pull);
+  elementit.d(btex Size etex scaled 0.8, 0, 0, pull);
+  a.width = 1.2a.height;
 
   a.w - c.e = (12, 1.2*a.height);
   c.w - d.e = b.w - c.e = (12, 0);
