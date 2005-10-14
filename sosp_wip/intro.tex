@@ -19,8 +19,8 @@ consistency mechanisms are generally tied to a particular filesystem, and
 can neither be ported nor adapted without significant engineering
 effort.
 %
-Furthermore, \verb+fsync+ gives user code only coarse control over
-consistency.
+Furthermore, interfaces like \verb+fsync()+ give user code only coarse control
+over consistency.
 %
 Applications with both performance and application-specific consistency
 requirements get little help from conventional file systems, which either
@@ -36,7 +36,7 @@ KudOS \emph{change descriptor} structures represent any and all changes to
 stable storage.
 %
 File system implementations generate change descriptors when blocks are
-written and forward them to block devices for eventual commit.
+written and send them to block devices for eventual commit.
 %
 Each change descriptor stores the old state of the block and its
 \emph{dependencies}: other change descriptors that must be committed before
@@ -47,7 +47,7 @@ invariants, without understanding the file system itself; the old state
 lets KudOS roll back changes when necessary to break cyclic dependencies.
 %
 Change descriptors can implement many ways of achieving
-consistency, including soft updates and journaling.
+consistency, including soft updates and journalling.
 %
 %
 %
@@ -56,7 +56,7 @@ consume, forward, and manipulate change descriptors.
 %
 A particular innovation of KudOS's module design is the separation of the
 low-level specification of a filesystem's on-disk layout from higher-level
-file system-independent code, which operates only abstractly on disk
+filesystem-independent code, which operates only abstractly on disk
 structures.
 
 We have implemented a mostly-complete, functional prototype of the KFS
