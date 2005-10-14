@@ -40,19 +40,28 @@ and add an additional block to an inode.
 %
 The module passes these change descriptors to another module in the
 direction of the disk, which can inspect and even modify them before
-passing them on. Soft updates, journalling, and many application-specific
-consistency models all correspond to different change descriptor arrangements,
-so these features can be added to the system (and to any filesystem) as modules
-which appropriately connect or reconnect the change descriptors.
+passing them on.
+%
+For example, the write-back cache module holds onto blocks and their
+change descriptors.
+%
+When a block must be evicted, it makes sure to pass change descriptors
+toward the disk in an order consistent with the change descriptor
+dependency information.
 
-For example, we have implemented journalling as a single block device module, to
-which any filesystem module can be attached. Even metadata-only journalling is
-possible with this design, though our module does not yet have this feature.
-Other block device layering systems, like GEOM~\cite{geom} or JBD in Linux,
-would or do need special hooks into filesystem code in order to get the
-necessary hints (i.e. what is metadata and what is not) to do metadata-only
-journalling. Change descriptors (and the LFS interface division described in the
-next section) allow us to do this automatically.
+Soft updates, journalling, and many application-specific consistency
+models all correspond to different change descriptor arrangements, so
+these features can be added to the system (and to any filesystem) as
+modules which appropriately connect or reconnect the change
+descriptors. For example, we have implemented journalling as a single
+block device module, to which any filesystem module can be
+attached. Even metadata-only journalling is possible with this design,
+though our module does not yet have this feature.  Other block device
+layering systems, like GEOM~\cite{geom} or JBD in Linux, would or do
+need special hooks into filesystem code in order to get the necessary
+hints (i.e. what is metadata and what is not) to do metadata-only
+journalling. Change descriptors (and the LFS interface division
+described in the next section) allow us to do this automatically.
 
 \begin{figure}[b]
   \centering
@@ -79,11 +88,7 @@ next section) allow us to do this automatically.
 For many complex operations, like RAID or journalling, the chdesc graph is
 changed in specific ways which can be broken down into sequences of simple graph
 transformations. For example, in the (mirroring) RAID module it is necessary to
-duplicate a change descriptor, including all its dependents and dependencies. We
-expect that after implementing a relatively small number of more complex modules
-(we have only implemented the two mentioned), we will have seen similarities in
-many of the transformations and will have built up a fairly complete library of
-common transformation functions.
+duplicate a change descriptor, including all its dependents and dependencies.
 
 
 
