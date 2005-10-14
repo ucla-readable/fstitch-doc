@@ -1,3 +1,4 @@
+% -*- mode: latex; tex-main-file: "abstract.tex" -*-
 \preparagraphspacing{}
 \section*{Change Descriptors}
 \label{sec:chdescs}
@@ -23,8 +24,8 @@ changes that other modules are making.
 \begin{figure}
 \begin{verbatim}
 struct chdesc {
-    BD_t * owner;
-    bdesc_t * block;
+    BD_t *owner;
+    bdesc_t *block;
     enum {BIT, BYTE, NOOP} type;
     union {
         struct {
@@ -33,10 +34,10 @@ struct chdesc {
         } bit;
         struct {
             uint16_t offset, length;
-            uint8_t * data;
+            uint8_t *data;
         } byte;
     };
-    struct chdesc * dependencies[];
+    struct chdesc *dependencies[];
 };
 \end{verbatim}
 \vspace{-12pt}
