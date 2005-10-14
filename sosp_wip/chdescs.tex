@@ -66,12 +66,12 @@ struct chdesc {
 \begin{figure}
   \centering
   \includegraphics[width=\columnwidth]{fig/whatevs_2}
-  \caption{\label{fig:journal} Journal change descriptor graph.}{Original FS data
-  change descriptors ($A$, $B$, $C$, and $D$) depend on a journal commit record,
-  which depends on copies of the original change descriptors ($A_j$, $B_j$,
-  $C_j$, and $D_j$) being written to the journal. A commit record cancellation
-  depends on the FS change descriptors. The empty circles
-  are ``NOOP'' change descriptors which do not have associated block data.}
+  \caption{\label{fig:journal} Journal change descriptor graph.}{Original FS
+  data change descriptors ($A$, $B$, $C$, and $D$) depend on a journal commit
+  record, which depends on copies ($A_j$, $B_j$, $C_j$, and $D_j$) of the
+  original change descriptors being written to the journal. A commit record
+  cancellation depends on the original change descriptors. The empty circles are
+  ``NOOP'' change descriptors which have no associated block data.}
 \end{figure}
 
 \begin{figure}
