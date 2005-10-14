@@ -160,7 +160,7 @@ beginfig(2);
   draw aj.nw + (-10,10) -- aj.ne + (10,10)
   -- dj.se + (10,-10) -- dj.sw + (-10,-10) -- cycle withpen pencircle scaled 2 dashed evenly;
 
-  label.bot(btex FS data\strut etex, d.s - (0,12));
+  label.bot(btex Original FS data\strut etex, d.s - (0,12));
   label.bot(btex Journal data\strut etex, dj.s - (0,12));
 endfig;
 
