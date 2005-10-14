@@ -2,14 +2,17 @@
 \section*{Future Work}
 \label{sec:future}
 
-We would ultimately like to extend the change descriptor APIs into
-userspace, allowing applications like database servers to exactly
-specify data dependencies rather than using fsync() or similar calls
-to force full syncs before writing order-sensitive data. Userspace
-change descriptors could improve both the performance and correctness
-of applications requiring complicated consistency semantics. We also
-plan to study the performance and memory overhead implications of
-change descriptors. While we believe these changes will not be substantive,
-given the speed differences between memory and disk, we will like to
-better evaluate our implementation to minimalize the impact of change
+We would ultimately like to extend the change descriptor APIs into userspace,
+allowing applications like database servers to exactly specify data dependencies
+rather than using \verb+fsync()+ or similar calls to force full syncs before
+writing order-sensitive data. Userspace change descriptors could improve both
+the performance and correctness of applications requiring complicated
+consistency semantics. We also plan to study the performance and memory overhead
+implications of change descriptors. While we believe these changes will not be
+substantive, given the speed differences between memory and disk, we will like
+to better evaluate our implementation to minimalize the impact of change
 descriptors on system performance.
+
+Problems with user-level chdescs - evil users, etc.
+
+Other filesystems, like ext2/3 or a transactional FS
