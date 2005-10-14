@@ -15,8 +15,8 @@ Figure~\ref{fig:kfs-graph} shows a contrived example taking advantage
 of the LFS interface and change descriptors. In this example a
 filesystem image is mounted with journalling from the root filesystem
 with soft updates. The image filesystem's ordering requirements are
-sent through the loop device to the root filesystem, all ordering
-requirements are respected.
+sent through the loop device to the root filesystem. Despite being
+transformed by the loop device, all ordering requirements are respected.
 
 The LFS interface has functions to allocate blocks, add blocks to
 files, allocate file names, and other filesystem micro-ops. A module
