@@ -9,6 +9,7 @@ it is not specific to any particular filesystem. A simplified version of the
 change descriptor structure is shown in Figure~\ref{fig:chdesc}.
 
 \begin{figure}
+{\footnotesize
 \begin{verbatim}
 struct chdesc {
     BD_t *owner;
@@ -27,7 +28,8 @@ struct chdesc {
     struct chdesc *dependencies[];
 };
 \end{verbatim}
-\vspace{-12pt}
+}
+\vspace{-14pt}
 \caption{\label{fig:chdesc} Change descriptor structure}
 \end{figure}
 
