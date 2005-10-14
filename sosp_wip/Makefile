@@ -1,8 +1,9 @@
 default: abstract.pdf
 
 TMP_DVI_IMAGES = fig/whatevs_1.eps fig/whatevs_2.eps
-DVI_IMAGES = $(TMP_DVI_IMAGES) rollback_sequence.eps
-TMP_PDF_IMAGES = fig/whatevs_1.pdf fig/whatevs_2.pdf rollback_sequence.pdf
+DVI_IMAGES = $(TMP_DVI_IMAGES) rollback_sequence.eps softupdates.eps
+TMP_PDF_IMAGES = fig/whatevs_1.pdf fig/whatevs_2.pdf rollback_sequence.pdf \
+	softupdates.pdf
 PDF_IMAGES = $(TMP_PDF_IMAGES) 
 
 OUTPUT_FILES = abstract.dvi abstract.pdf abstract.txt $(TMP_DVI_IMAGES)

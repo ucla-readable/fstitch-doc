@@ -85,3 +85,13 @@ struct chdesc {
   to write the blocks. Here the squares are blocks, and dotted circles are
   rolled back change descriptors.}
 \end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=2cm]{softupdates}
+  \caption{\label{fig:softupdates} Modeling a soft updates operation using
+  change descriptors. For a block allocation, writing the new block pointer to
+  an inode ($B$) depends on initializing the block ($A$) and updating the free
+  space map. ($C$)}
+\end{figure}
+
