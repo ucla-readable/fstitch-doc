@@ -109,23 +109,26 @@ beginfig(2);
   elementit.a(btex A etex, 0, 0, pull);
   elementit.b(btex B etex, 0, 0, pull);
   elementit.c(btex C etex, 0, 0, pull);
+  elementit.d(btex D etex, 0, 0, pull);
   elementit.fn(btex etex, 0, 0, pull);
   elementit.cr(btex CR etex, 0, 0, pull);
   elementit.crn(btex etex, 0, 0, pull);
   elementit.aj(btex A$_J$ etex, 0, 0, pull);
   elementit.bj(btex B$_J$ etex, 0, 0, pull);
   elementit.cj(btex C$_J$ etex, 0, 0, pull);
+  elementit.dj(btex D$_J$ etex, 0, 0, pull);
   crc.width = crc.height;
 
-  a.s - b.n = b.s - c.n = aj.s - bj.n = bj.s - cj.n = (0, 15);
-  bj.w - crn.e = fn.w - b.e = b.w - crcn.e = (25, 0);
+  a.s - b.n = aj.s - bj.n = cj.s - dj.n = (0,5);
+  b.s - c.n = bj.s - cj.n = c.s - d.n = (0,5);
+  .5[bj.w,cj.w] - crn.e = fn.w - .5[b.e,c.e] = .5[b.w,c.w] - crcn.e = (25, 0);
   crn.w - cr.e = cr.w - fn.e = crcn.w - crc.e = (12, 0);
 
-  forsuffixes $ = crc, crcn, a, b, c, fn, cr, crn, aj, bj, cj:
+  forsuffixes $ = crc, crcn, a, b, c, fn, cr, crn, aj, bj, cj, d, dj:
     pproc_.$ := "thecirc_";
   endfor;
 
-  drawelement(aj,crc,crcn,a,b,c,fn,cr,crn,bj,cj);
+  drawelement(aj,crc,crcn,a,b,c,d,fn,cr,crn,bj,cj,dj);
 
   vardef ffff(suffix a,b) =
     drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
@@ -139,21 +142,26 @@ beginfig(2);
   ffff(crcn,a);
   ffff(crcn,b);
   ffff(crcn,c);
+  ffff(crcn,d);
   ffff(a,fn);
   ffff(b,fn);
   ffff(c,fn);
+  ffff(d,fn);
   ffff(fn,cr);
   ffff(cr,crn);
   ffff(crn,aj);
   ffff(crn,bj);
   ffff(crn,cj);
+  ffff(crn,dj);
 
   linecap := butt;
-  draw a.nw + (-10,10) -- a.ne + (10,10) -- c.se + (10,-10) -- c.sw + (-10,-10) -- cycle withpen pencircle scaled 2 dashed evenly;
-  draw aj.nw + (-10,10) -- aj.ne + (10,10) -- cj.se + (10,-10) -- cj.sw + (-10,-10) -- cycle withpen pencircle scaled 2 dashed evenly;
+  draw a.nw + (-10,10) -- a.ne + (10,10)
+  -- d.se + (10,-10) -- d.sw + (-10,-10) -- cycle withpen pencircle scaled 2 dashed evenly;
+  draw aj.nw + (-10,10) -- aj.ne + (10,10)
+  -- dj.se + (10,-10) -- dj.sw + (-10,-10) -- cycle withpen pencircle scaled 2 dashed evenly;
 
-  label.bot(btex FS data\strut etex, c.s - (0,12));
-  label.bot(btex Journal data\strut etex, cj.s - (0,12));
+  label.bot(btex FS data\strut etex, d.s - (0,12));
+  label.bot(btex Journal data\strut etex, dj.s - (0,12));
 endfig;
 
 
