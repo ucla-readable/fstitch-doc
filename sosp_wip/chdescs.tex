@@ -3,17 +3,6 @@
 \section*{Change Descriptors}
 \label{sec:chdescs}
 
-% What they are
-% What they're for, abstractly (short)
-% History, better than GEOM, JBD
-% How to generate the correct chdescs
-% What they contain (code)
-% How they move around
-% How we use them (transformations, applications)
-% Relationship to consistency models
-% User-level chdescs
-% Chdesc challenges - memory pressure, time, circularity
-
 The ability to revert and re-apply change descriptors is inspired by the soft
 updates system in BSD's FFS~\cite{ganger00soft}, but it is generalized so that
 it is not specific to any particular filesystem. A simplified version of the
@@ -42,10 +31,13 @@ struct chdesc {
 \caption{\label{fig:chdesc} Change descriptor structure}
 \end{figure}
 
-When a KudOS module first generates change descriptors in order to write changes
-to the disk, it connects them together to express its write ordering
-requirements. Then it passes the change descriptors to another module in the
-direction of the disk, which can then inspect and even modify them before
+A KudOS module first generates change descriptors specifying order
+requirements similar to soft updates'. For example,
+Figure~\ref{fig:softupdates} depicts change descriptors that allocate
+and add an additional block to an inode.
+%
+The module passes these change descriptors to another module in the
+direction of the disk, which can inspect and even modify them before
 passing them on. Soft updates, journalling, and many application-specific
 consistency models all correspond to different change descriptor arrangements,
 so these features can be added to the system (and to any filesystem) as modules
@@ -90,6 +82,8 @@ expect that after implementing a relatively small number of more complex modules
 (we have only implemented the two mentioned), we will have seen similarities in
 many of the transformations and will have built up a fairly complete library of
 common transformation functions.
+
+
 
 \begin{figure}
   \centering
