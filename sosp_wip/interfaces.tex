@@ -2,15 +2,12 @@
 \section*{Filesystem Module Interfaces}
 \label{sec:interfaces}
 
-Traditional filesystem software involves two interfaces: the ``abstract
-filesystem'' (like VFS), and the block device. With current filesystem
-implementations ranging from tens of thousands to millions of lines of code
-and many operating systems containing support for multiple filesystems, one of
-our aims has been to modularize the filesystem code into smaller, stackable
-components to increase reusability. To this end, we add an additional
-interface that helps to divide filesystem implementations into common (i.e.
-reusable) code and filesystem-specific code. We call this intermediate
-interface the ``Low-level File System'' (LFS).
+The KudOS file system is composed of various modules. By breaking
+filesystem code into small, stackable modules, we are able to
+significantly increase code reuse. To this end, we add an additional
+interface that helps to divide filesystem implementations into common
+(i.e.  reusable) code and filesystem-specific code. We call this
+intermediate interface the ``Low-level File System'' (LFS).
 
 The LFS interface has functions to allocate blocks, add blocks to files,
 allocate file names, and other filesystem micro-ops. The idea is that a module
