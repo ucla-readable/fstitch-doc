@@ -4,16 +4,18 @@
 
 {\bf This section refers to LFS before it is defined.}
 
-In contrast with traditional systems, where changes to filesystem data are
-accomplished by changing in-memory copies of the disk blocks and marking the
-block as needing to be written to disk (thus losing all record of what was
-changed), every change to filesystem data in the KudOS file server effects a
-corresponding ``change descriptor'' that describes what was changed. Change
-descriptors (``chdescs'' for short) allow a dependency graph to be created
-describing which changes depend on which other changes already being written to
-disk, as well as allowing individual changes to be undone and redone. These two
-capabilities allow any module in the system to inspect and even modify the
-changes that other modules are making.
+In contrast with traditional systems, where changes to filesystem data
+are accomplished by changing in-memory copies of the disk blocks and
+marking the block as needing to be written to disk (thus losing all
+record of what was changed), every change to filesystem data in the
+KudOS file server effects a corresponding ``change descriptor'' that
+describes what was changed. Change descriptors (``chdescs'' for short)
+allow individual changed to be undone and redone (``rolled back'' and
+``rolled forward''), as well as allowing a dependency graph to be
+created describing which changes depend on which other changes already
+being written to disk. XXX(These two capabilities allow any module in
+the system to inspect and even modify the changes that other modules
+are making.)
 
 The ability to revert and re-apply chdescs is inspired by the ``soft updates''
 system in BSD's FFS~\cite{ganger00soft}, but it is generalized so that it is not
