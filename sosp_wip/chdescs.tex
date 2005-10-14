@@ -71,9 +71,12 @@ allow us to do this automatically.
   \centering
   \includegraphics[width=80pt]{fig/whatevs_3}
   \caption{\label{fig:softupdates} Modeling a soft updates operation using
-  change descriptors. For a block allocation, writing the new block pointer to
-  an inode ($B$) depends on initializing the block ($A$) and updating the free
-  space map. ($C$)}
+  change descriptors.}{Four change descriptors can describe the dependencies
+  for allocating a new indirect block and attaching it to file. Writing the
+  new block pointer to an inode ($C$) depends on initializing the block ($A$)
+  and updating the free block map. ($B$) Attaching the indirect block ($D$)
+  depends on its allocation ($C$).
+}
 \end{figure}
 
 \begin{figure}
