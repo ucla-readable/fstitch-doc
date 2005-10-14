@@ -44,9 +44,9 @@ struct chdesc {
 
 When a KudOS module first generates change descriptors in order to write changes
 to the disk, it connects them together to express its write ordering
-requirements. Then it sends the change descriptors to the module ``below'' it in
-the system, which can then inspect and even modify them before sending them
-further down. Soft updates, journalling, and many application-specific
+requirements. Then it passes the change descriptors to another module in the
+direction of the disk, which can then inspect and even modify them before
+passing them on. Soft updates, journalling, and many application-specific
 consistency models all correspond to different change descriptor arrangements,
 so these features can be added to the system (and to any filesystem) as modules
 which appropriately connect or reconnect the change descriptors.
