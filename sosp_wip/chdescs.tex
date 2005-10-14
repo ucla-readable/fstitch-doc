@@ -57,12 +57,7 @@ struct chdesc {
             uint8_t * data;
         } byte;
     };
-    chmetadesc_t * dependencies;
-};
-
-struct chmetadesc {
-    chdesc_t * desc;
-    chmetadesc_t * next;
+    struct chdesc * dependencies[];
 };
 \end{verbatim}
 \caption{\label{fig:chdesc} Change descriptor structure}
