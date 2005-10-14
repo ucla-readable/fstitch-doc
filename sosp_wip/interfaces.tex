@@ -2,14 +2,29 @@
 \section*{Filesystem Module Interfaces}
 \label{sec:interfaces}
 
-A complete KudOS configuration is composed of many modules (an example module
-graph is shown in Figure~\ref{fig:kfs-graph}). By breaking filesystem code into
+A complete KudOS configuration is composed of many modules. 
+
+contrived
+loop can pass on
+requirements respected
+
+an example module
+graph is shown in 
+
+By breaking filesystem code into
 small, stackable modules, we are able to significantly increase code reuse. To
 further this end, we add an additional interface that helps to divide filesystem
 implementations into common (i.e. reusable) code and filesystem-specific code.
 We call this intermediate interface the ``Low-level File System'' (LFS). This
 new interface is a substantial departure from other stackable module systems,
 like FiST~\cite{zadok00fist}, which stack higher-level operations.
+%
+Figure~\ref{fig:kfs-graph} shows a contrived example taking advantage
+of the LFS interface and change descriptors. In this example a
+filesystem image is mounted with journalling from the root filesystem
+with soft updates. The image filesystem's ordering requirements are
+sent through the loop device to the root filesystem, all ordering
+requirements are respected.
 
 The LFS interface has functions to allocate blocks, add blocks to
 files, allocate file names, and other filesystem micro-ops. A module
