@@ -21,12 +21,12 @@ Each change descriptor stores the old state of the block and its
 \emph{dependencies}: a set of other change descriptors that must be
 committed before it is safe to commit this change.
 %
-Explicit dependencies let KudOS components preserve necessary file system
+Explicit dependencies let KudOS modules preserve necessary file system
 invariants, without understanding the file system itself; the old state
 lets KudOS roll back changes when necessary to break cycles.
 %
 Change descriptors are general enough to implement many ways of achieving
-consistency, including soft updates and journaling.  
+consistency, including soft updates and journaling.
 %
 %
 %
