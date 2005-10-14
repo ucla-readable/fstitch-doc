@@ -12,7 +12,7 @@ change descriptor structure is shown in Figure~\ref{fig:chdesc}.
 {\footnotesize
 \begin{verbatim}
 struct chdesc {
-    BD_t *owner;
+    BD_t *device;
     bdesc_t *block;
     enum {BIT, BYTE, NOOP} type;
     union {
