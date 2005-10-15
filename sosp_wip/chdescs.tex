@@ -3,14 +3,11 @@
 \section*{Change Descriptors}
 \label{sec:chdescs}
 
-In KudOS we use change descriptors to represent the in-memory
-representation of changes to disk blocks. A simplified version of the
-change descriptor structure is shown in
-Figure~\ref{fig:chdesc}. `device' and `block' represent the block
-device and disk block that a change is on. Depending on `type,' the
-`bit' or `byte' structs hold the old data that is being
-overwritten. `dependencies' are the chdescs that must be written to
-stable storage before the chdesc itself. The ability to revert and
+In KudOS change descriptors to represent the in-memory changes to disk
+blocks. For example, a change to a bitmap would contain a block,
+offset, and bitmask. A change of many bytes is stored as a block,
+offset, length, and pointer to new data. Figure~\ref{fig:chdesc} gives
+a simplified version of the structure. The ability to revert and
 re-apply change descriptors is inspired by the soft updates system in
 BSD's FFS~\cite{ganger00soft}, but it is generalized so that it is not
 specific to any particular filesystem.
