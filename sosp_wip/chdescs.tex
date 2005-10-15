@@ -12,7 +12,7 @@ bitmap---contains an offset and mask, while larger changes contain an
 offset, a length, and the new data.
 %
 The change descriptor's dependencies point to other change descriptors that
-must precede this descriptor to stable storage.
+must precede it to stable storage.
 %
 A change descriptor can be applied or reverted to switch the cached block's
 state between old and new as necessary.
@@ -59,7 +59,7 @@ example, Figure~\ref{fig:softupdates} depicts change descriptors that allocate
 and add a new block to an inode.
 %
 The module passes these change descriptors to another module closer to
-the disk.  This module can inspect, delay, and even modify them before
+the disk.  This second module can inspect, delay, and even modify them before
 passing them on further.
 %
 For instance, the write-back cache module holds on to blocks and their change
@@ -80,25 +80,28 @@ information.
   pointer.}
 \end{figure}
 
-% FIXME Suck content out of the caption to fig:softupdates
 Soft updates, journalling, and many application-specific consistency models all
 correspond to different change descriptor arrangements, so these features can be
 added to the system as modules which appropriately connect or reconnect the
-change descriptors. For example, Figure~\ref{fig:journal} shows the change
-descriptors of Figure~\ref{fig:softupdates}, transformed by our journalling
-module into a journal transaction. This single module can attach to any file
-system module; the transformations are performed incrementally as the change
-descriptors are generated.
+change descriptors.
+%
+For example, the change descriptors in Figure~\ref{fig:softupdates} can be
+transformed to provide journalling semantics. The original four change
+descriptors are modified to depend on a journal commit record, which
+depends on blocks journalling the changes. Once the actual changes are
+committed, the journal record is marked as completed.
+Figure~\ref{fig:journal} shows these transformed change descriptors.
+%
+This single journalling module can attach to any file system module;
+it performs transformations incrementally as the change descriptors
+are generated.
 
 \begin{figure}
   \centering
   \includegraphics[width=\hsize]{fig/whatevs_2}%
   \caption{\label{fig:journal} Journal change descriptor graph for the
-  change in Figure~\ref{fig:softupdates}.  The original four change
-  descriptors depend on a journal commit record, which depends on blocks
-  being written to the journal.  Once the actual changes are committed, the
-  journal record is marked as completed.  Empty circles are ``NOOP'' change
-  descriptors with no associated block data.  }
+    change in Figure~\ref{fig:softupdates}. Empty circles are
+    ``NOOP'' change descriptors with no associated block data.}
 \end{figure}
 
 % FIXME Shorten this
