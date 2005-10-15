@@ -104,14 +104,14 @@ are generated.
     ``NOOP'' change descriptors with no associated block data.}
 \end{figure}
 
-% FIXME Shorten this
-Further, by changing our journal module to include only change descriptors which
-modify file system metadata in its transformation, we could even obtain
-metadata-only journalling. Which change descriptors represent metadata is
-already known because of the LFS interface division (described in the next
-section), so this is not difficult---the only challenge is in making sure that
-the non-metadata change descriptors do not overwrite newly freed blocks before
-the transactions freeing them are committed. Other block device layering
+Further, by changing our journal module to include in the journal only
+change descriptors which modify file system metadata and to add
+additional dependencies to prevent premature reuse of blocks, we could
+even obtain metadata-only journalling. The journal module can
+distinguish metadata change descriptrs because of the LFS interface
+division (described in the next section).
+%
+Other block device layering
 systems, like GEOM~\cite{geom} or JBD in Linux, would or do need special hooks
 into file system code in order to get the necessary hints (i.e.  what is
 metadata and what is not) to do metadata-only journalling. Change descriptors
