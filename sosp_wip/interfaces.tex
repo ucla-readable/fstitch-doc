@@ -21,6 +21,7 @@ read, append, and other standard operations into LFS micro-ops. This
 one module can be used with many different LFS modules implementing
 different file systems.
 
+% FIXME Describe what problems won't happen with this graph
 Figure~\ref{fig:kfs-graph} shows a contrived example taking advantage of the LFS
 interface and change descriptors.  A file system image is mounted
 with an external journal, both of which are loop devices on the root file system,
