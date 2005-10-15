@@ -116,13 +116,3 @@ systems, like GEOM~\cite{geom} or JBD in Linux, would or do need special hooks
 into file system code in order to get the necessary hints (i.e.  what is
 metadata and what is not) to do metadata-only journalling. Change descriptors
 and the LFS interface allow us to do this automatically.
-
-% FIXME Shorten this?
-Change descriptors also allow dependency information to be maintained across
-boundaries that might otherwise lose that information, like loopback devices or
-RAID. The consistency requirements of file systems mounted using loopback
-devices can easily be respected even if the file system containing the image
-doesn't use any consistency features, because the change descriptors
-convey these requirements across the loopback device. Similarly, when using
-RAID, the change descriptors are modified so that as they move toward different
-disks, maintaining their write-ordering requirements.
