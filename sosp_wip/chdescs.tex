@@ -3,10 +3,23 @@
 \section*{Change Descriptors}
 \label{sec:chdescs}
 
-In KudOS, change descriptors represent the in-memory modifications to
-disk blocks. For example, a change to a bitmap would contain a block,
-offset, and bitmask. A change of many bytes is stored as a block,
-offset, length, and pointer to new data. Figure~\ref{fig:chdesc} gives
+Any in-memory modification to a cached disk block has an associated change
+descriptor.
+%
+Different change types correspond to different forms of change descriptor;
+the change descriptor for a flipped bit---such as in a free-block
+bitmap---contains an offset and mask, while larger changes contain an
+offset, a length, and the new data.
+%
+The change descriptor's dependencies point to other change descriptors that
+must precede this descriptor to stable storage.
+%
+A change descriptor can be applied or reverted to switch the cached block's
+state between old to new as necessary.
+%
+Each change descriptor applies to exactly one block.
+%
+Figure~\ref{fig:chdesc} gives
 a simplified version of the structure. The ability to revert and
 re-apply change descriptors is inspired by the soft updates system in
 BSD's FFS~\cite{ganger00soft}, but generalized so that it is not
