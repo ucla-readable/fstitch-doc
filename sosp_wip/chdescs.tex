@@ -3,10 +3,10 @@
 \section*{Change Descriptors}
 \label{sec:chdescs}
 
-Any in-memory modification to a cached disk block has an associated change
-descriptor.
+Each in-memory modification to a cached disk block in KudOS has an associated
+change descriptor.
 %
-Different change types correspond to different forms of change descriptor;
+Different change types correspond to different forms of change descriptors;
 the change descriptor for a flipped bit---such as in a free-block
 bitmap---contains an offset and mask, while larger changes contain an
 offset, a length, and the new data.
@@ -84,10 +84,10 @@ Soft updates, journalling, and many application-specific consistency models all
 correspond to different change descriptor arrangements, so these features can be
 added to the system as modules which appropriately connect or reconnect the
 change descriptors. For example, Figure~\ref{fig:journal} shows the change
-descriptors of Figure~\ref{fig:softupdates}, transformed by the journalling
-module into a journal transaction. This single module can attach to any
-file system module; transformations
-are performed incrementally as the change descriptors are generated.
+descriptors of Figure~\ref{fig:softupdates}, transformed by our journalling
+module into a journal transaction. This single module can attach to any file
+system module; the transformations are performed incrementally as the change
+descriptors are generated.
 
 \begin{figure}
   \centering
@@ -100,12 +100,17 @@ are performed incrementally as the change descriptors are generated.
   descriptors with no associated block data.  }
 \end{figure}
 
-Even metadata-only journalling is possible with this design, though our journal
-module does not yet have this feature. Other block device layering systems, like
-GEOM~\cite{geom} or JBD in Linux, would or do need special hooks into file system
-code in order to get the necessary hints (i.e. what is metadata and what is not)
-to do metadata-only journalling. Change descriptors (and the LFS interface
-division described in the next section) allow us to do this automatically.
+Further, by changing our journal module to include only change descriptors which
+modify file system metadata in its transformation, we could even obtain
+metadata-only journalling. Which change descriptors represent metadata is
+already known because of the LFS interface division (described in the next
+section), so this is not difficult -- the only challenge is in making sure that
+the non-journalled change descriptors do not overwrite newly freed blocks before
+the transactions freeing them are committed. Other block device layering
+systems, like GEOM~\cite{geom} or JBD in Linux, would or do need special hooks
+into file system code in order to get the necessary hints (i.e.  what is
+metadata and what is not) to do metadata-only journalling. Change descriptors
+and the LFS interface allow us to do this automatically.
 
 With change descriptors,
 dependency information can be maintained even across boundaries that might
