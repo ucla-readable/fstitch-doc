@@ -10,7 +10,7 @@ offset, length, and pointer to new data. Figure~\ref{fig:chdesc} gives
 a simplified version of the structure. The ability to revert and
 re-apply change descriptors is inspired by the soft updates system in
 BSD's FFS~\cite{ganger00soft}, but it is generalized so that it is not
-specific to any particular filesystem.
+specific to any particular file system.
 
 \begin{figure}
 {\footnotesize
@@ -70,7 +70,7 @@ change descriptors. Figure~\ref{fig:softupdates} shows a set of change
 descriptors which corresponds to adding a newly allocated block to an inode,
 using soft updates consistency semantics. Figure~\ref{fig:journal} shows the
 same change descriptors, transformed into a journal transaction. We have
-implemented journalling as a single module (to which any filesystem module
+implemented journalling as a single module (to which any file system module
 can be attached) that performs this transformation. These transformations
 are performed incrementally as the change descriptors are generated.
 
@@ -87,7 +87,7 @@ are performed incrementally as the change descriptors are generated.
 
 Even metadata-only journalling is possible with this design, though our journal
 module does not yet have this feature. Other block device layering systems, like
-GEOM~\cite{geom} or JBD in Linux, would or do need special hooks into filesystem
+GEOM~\cite{geom} or JBD in Linux, would or do need special hooks into file system
 code in order to get the necessary hints (i.e. what is metadata and what is not)
 to do metadata-only journalling. Change descriptors (and the LFS interface
 division described in the next section) allow us to do this automatically.
@@ -95,8 +95,8 @@ division described in the next section) allow us to do this automatically.
 Another advantage of passing change descriptors around like this is that
 dependency information can be maintained even across boundaries that might
 otherwise lose that information, like loopback devices or RAID. With KudOS,
-consistency requirements of filesystems mounted using loopback devices can
-easily be respected even though the filesystem containing the loopback image
+consistency requirements of file systems mounted using loopback devices can
+easily be respected even though the file system containing the loopback image
 file may not itself use any consistency features. Similarly, when using RAID,
 the change descriptors can be modified so that as they part ways in the RAID
 module toward different disks, their write-ordering requirements are still

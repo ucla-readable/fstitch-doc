@@ -3,14 +3,14 @@
 \section*{Introduction}
 \label{sec:intro}
 
-For robustness, stability, and reboot speed, filesystem implementations
-must ensure that the filesystem's stored image is kept consistent
+For robustness, stability, and reboot speed, file system implementations
+must ensure that the file system's stored image is kept consistent
 or easy to return to consistency.
 %
 Advanced consistency mechanisms such as soft updates~\cite{ganger00soft}
 and journalling make this possible; unfortunately,
 %
-consistency mechanisms are generally tied to a particular filesystem, and
+consistency mechanisms are generally tied to a particular file system, and
 can neither be ported nor adapted without significant engineering
 effort.
 %
@@ -18,27 +18,27 @@ Furthermore, interfaces like \verb+fsync()+ give user code coarse control
 over consistency.
 %
 Applications with custom consistency and performance requirements get
-little help from conventional filesystems, which either impose high
+little help from conventional file systems, which either impose high
 overhead (data journalling) or don't guarantee data consistency (soft
 updates, for example, provides metadata consistency).
 
 
 
-We propose a new filesystem implementation architecture called
+We propose a new file system implementation architecture called
 \emph{KudOS}.
 %
 KudOS \emph{change descriptor} structures represent any and all changes to
 stable storage.
 %
-Filesystems generate change descriptors for all writes, then
+File systems generate change descriptors for all writes, then
 send them to block devices for eventual commit.
 %
 Each change descriptor stores the old state of the block and the change's
 \emph{dependencies}---other change descriptors that must be committed before
 it is safe to commit this change.
 %
-Explicit dependencies let KudOS modules preserve necessary filesystem
-invariants without understanding the filesystem itself; the old state
+Explicit dependencies let KudOS modules preserve necessary file system
+invariants without understanding the file system itself; the old state
 lets KudOS roll back changes when necessary to break cyclic block dependencies.
 %
 Change descriptors can implement many ways of achieving
@@ -47,7 +47,7 @@ consistency, including soft updates and journalling.
 KudOS is entirely decomposed into fine-grained modules which generate, consume,
 forward, and manipulate change descriptors. A particular innovation of the KudOS
 module design is the separation of the low-level specification of on-disk layout
-from higher-level filesystem-independent code, which operates on abstract disk
+from higher-level file system-independent code, which operates on abstract disk
 structures.
 
 We have implemented a functional prototype of the KudOS
@@ -58,12 +58,12 @@ system, and combinations of simple modules can support, for example,
 correct consistency on RAID over loopback devices.
 %
 Eventually, we plan for KudOS to support user-defined dependencies,
-allowing applications to define consistency protocols that the filesystem
+allowing applications to define consistency protocols that the file system
 will follow.
 
 %
 %% They also support
-%% the implementation of many other possible definitions of filesystem
+%% the implementation of many other possible definitions of file system
 %% consistency, which in the future we hope will allow for userspace
 %% specification. 
 %
