@@ -14,8 +14,8 @@ they are generally tied to a particular file system, and
 can't be ported or adapted without significant engineering
 effort.
 %
-Furthermore, interfaces like \verb+fsync()+ give user code coarse control
-over consistency.
+Furthermore, interfaces like \verb+fsync()+ give user code only coarse
+control over consistency.
 %
 Applications with custom consistency and performance requirements get
 little help from conventional file systems, which either impose high
@@ -24,8 +24,8 @@ updates, for example, ensures metadata consistency only).
 
 
 
-We propose a new file system implementation architecture called
-\emph{KudOS}
+We propose a new file system implementation architecture, called
+\emph{KudOS},
 %
 where \emph{change descriptor} structures represent any and all changes to
 stable storage.

@@ -88,13 +88,13 @@ change descriptors.
 For example, the change descriptors in Figure~\ref{fig:softupdates} can be
 transformed to provide journalling semantics. The original four change
 descriptors are modified to depend on a journal commit record, which
-depends on blocks journalling the changes. Once the actual changes are
-committed, the journal record is marked as completed.
+depends on blocks journalling the changes. Once the actual changes
+commit, the journal record is marked as completed.
 Figure~\ref{fig:journal} shows these transformed change descriptors.
 %
 This single journalling module can attach to any file system module;
-it performs transformations incrementally as the change descriptors
-are generated.
+it performs transformations incrementally as change descriptors
+arrive.
 
 \begin{figure}
   \centering
@@ -104,15 +104,15 @@ are generated.
     ``NOOP'' change descriptors with no associated block data.}
 \end{figure}
 
-Further, by changing our journal module to include in the journal only
-change descriptors which modify file system metadata and to add
-additional dependencies to prevent premature reuse of blocks, we could
+Further, by changing our journal module to journal only
+change descriptors that modify file system metadata---and by adding
+additional dependencies to prevent premature reuse of blocks---we could
 even obtain metadata-only journalling. The journal module can
 distinguish metadata change descriptors because of the LFS interface
-division (described in the next section).
+described below.
 %
 Other block device layering
 systems, like GEOM~\cite{geom} or JBD in Linux, would or do need special hooks
-into file system code in order to get the necessary hints (i.e.  what is
-metadata and what is not) to do metadata-only journalling. Change descriptors
+into file system code to determine what disk changes represent  metadata
+in order to do metadata-only journalling. Change descriptors
 and the LFS interface allow us to do this automatically.
