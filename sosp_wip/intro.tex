@@ -50,20 +50,20 @@ module design is the separation of the low-level specification of on-disk layout
 from higher-level file system-independent code, which operates on abstract disk
 structures.
 
-We have implemented a functional prototype of the KudOS
-architecture in the context of a new operating system.
+We have implemented a prototype of the KudOS
+architecture as part of a new operating system.
 %
 Although results are premature and performance has not been measured,
-change descriptors have facilitated our construction of consistent file
-systems.
+change descriptors have helped us construct of consistent file
+system structures.
 %
 Our journalling module should automatically add journalling to any file
 system, and combinations of simple modules can support, for example,
 correct consistency on RAID over loopback devices.
 %
-Eventually, we plan for KudOS to support user-defined dependencies,
-allowing applications to define consistency protocols that the file system
-will follow.
+Eventually, we plan to support user-defined dependencies,
+allowing applications to define consistency protocols for the file system
+to follow.
 
 
 %

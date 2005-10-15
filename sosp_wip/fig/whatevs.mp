@@ -2,6 +2,7 @@ input elements;
 verbatimtex %&latex
 \documentclass[12pt]{article}
 \usepackage{elemfig,amsmath}
+\def\subj{\setbox0\hbox{$_{\mbox{J}}$}\dp0=0pt\box0}
 \begin{document}
 etex;
 picture emptyqueue; emptyqueue := btex \phantom{\elementlabel{Queue}} etex;
@@ -113,10 +114,10 @@ beginfig(2);
   elementit.fn(btex etex, 0, 0, pull);
   elementit.cr(btex Commit etex scaled 0.8, 0, 0, pull);
   elementit.crn(btex etex, 0, 0, pull);
-  elementit.aj(btex Clear$_\text{J}$ etex scaled 0.8, 0, 0, pull);
-  elementit.bj(btex Alloc$_\text{J}$ etex scaled 0.8, 0, 0, pull);
-  elementit.cj(btex Attach$_\text{J}$ etex scaled 0.8, 0, 0, pull);
-  elementit.dj(btex Size$_\text{J}$ etex scaled 0.8, 0, 0, pull);
+  elementit.aj(btex Clear\subj etex scaled 0.8, 0, 0, pull);
+  elementit.bj(btex Alloc\subj etex scaled 0.8, 0, 0, pull);
+  elementit.cj(btex Attach\subj etex scaled 0.8, 0, 0, pull);
+  elementit.dj(btex Size\subj etex scaled 0.8, 0, 0, pull);
   crc.width = 1.2crc.height;
 
   a.s - b.n = aj.s - bj.n = cj.s - dj.n = (0,5);
