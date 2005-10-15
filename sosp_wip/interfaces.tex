@@ -28,5 +28,6 @@ which uses soft updates. The journalled file system's ordering requirements are
 sent through the loop device as change descriptors. Despite being transformed
 by the loop device, all ordering requirements are still respected.
 %
-BSD, without LFS and change descriptors, is not able to express soft updates'
-consistency requirements through loop devices.
+BSD, without change descriptors and the ability to forward change
+descriptors through loop devices, is not able to express soft updates'
+consistency requirements through loop back filesystems.
