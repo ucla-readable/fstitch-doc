@@ -4,26 +4,26 @@
 
 A complete KudOS configuration is composed of many modules.
 By breaking file system code into
-small, stackable modules, we are able to significantly increase code reuse. To
-further this end, we add an additional interface that helps to divide file system
+small, stackable modules, we are able to significantly increase code reuse.
+We add an additional interface that helps to divide file system
 implementations into common (i.e. reusable) code and file system-specific code.
 We call this intermediate interface the ``Low-level File System'' (LFS). This
-new interface is a substantial departure from other stackable module systems,
+new interface is a departure from other stackable module systems,
 like FiST~\cite{zadok00fist}, which stack higher-level operations.
 
 The LFS interface has functions to allocate blocks, add blocks to
 files, allocate file names, and other file system micro-ops. A module
 implementing the LFS interface should define how bits are laid out on
 the disk, but not have to actually know how to combine the micro-ops
-into larger, more familiar file system operations. We have implemented
-a generic VFS to LFS module that decomposes the larger file write,
+into larger, more familiar file system operations. 
+A generic VFS-to-LFS module decomposes the larger file write,
 read, append, and other standard operations into LFS micro-ops. This
 one module can be used with many different LFS modules implementing
 different file systems.
 
 Figure~\ref{fig:kfs-graph} shows a contrived example taking advantage of the LFS
-interface and change descriptors. In this example a file system image is mounted
-with an external journal, both of which are loop devices on the root file system
+interface and change descriptors.  A file system image is mounted
+with an external journal, both of which are loop devices on the root file system,
 which uses soft updates. The journalled file system's ordering requirements are
 sent through the loop device as change descriptors. Despite being transformed
 by the loop device, all ordering requirements are still respected.
