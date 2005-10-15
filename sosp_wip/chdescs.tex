@@ -72,10 +72,10 @@ added to the system as modules which appropriately connect or reconnect the
 change descriptors. Figure~\ref{fig:softupdates} shows a set of change
 descriptors which corresponds to adding a newly allocated block to an inode,
 using soft updates consistency semantics. Figure~\ref{fig:journal} shows the
-same change descriptors, but as a journal transaction. We have implemented
-journalling as a single module (to which any filesystem module can be attached)
-that transforms input change descriptor graphs like that in
-Figure~\ref{fig:softupdates} to output graphs like Figure~\ref{fig:journal}.
+same change descriptors, transformed into a journal transaction. We have
+implemented journalling as a single module (to which any filesystem module
+can be attached) that performs this transformation. These transformations
+performed incrementally as the change descriptors are generated.
 
 \begin{figure}
   \centering
