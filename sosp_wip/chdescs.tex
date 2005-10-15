@@ -3,8 +3,8 @@
 \section*{Change Descriptors}
 \label{sec:chdescs}
 
-In KudOS change descriptors to represent the in-memory changes to disk
-blocks. For example, a change to a bitmap would contain a block,
+In KudOS change descriptors represent the in-memory modifications to
+disk blocks. For example, a change to a bitmap would contain a block,
 offset, and bitmask. A change of many bytes is stored as a block,
 offset, length, and pointer to new data. Figure~\ref{fig:chdesc} gives
 a simplified version of the structure. The ability to revert and
