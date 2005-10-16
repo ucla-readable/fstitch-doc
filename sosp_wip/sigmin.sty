@@ -133,10 +133,9 @@
 \def\maketitle{\par
  \begingroup
    \def\thefootnote{\fnsymbol{footnote}}
-   \def\@makefnmark{\hbox
-       to 0pt{\hss$^{\@thefnmark}$}}
-     \twocolumn[\@maketitle]
-\@thanks
+   \def\@makefnmark{$^{\@thefnmark}$}
+   \twocolumn[\@maketitle]
+   \@thanks
  \endgroup
  \setcounter{footnote}{0}
  \let\maketitle\relax
