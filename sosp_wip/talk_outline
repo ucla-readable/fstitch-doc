@@ -18,7 +18,7 @@ current and future work
 		async io
 		elevator scheduler
 	userspace
-		ex: userspace db vs fsync()
+		example: userspace db vs fsync()
 	ext2 and ffs
 	production system for direct comparison (eg linux)
 
