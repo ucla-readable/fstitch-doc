@@ -1,0 +1,25 @@
+motiviation
+	consistency important; failures happen
+	protectect filesystem and data
+	don't have formal ways of representing consistency info
+	...
+intro
+	kudos arch for fses
+	main feature: change descriptors
+	ex: raid0 and deps
+change descriptors
+	semantics: su, journalling
+		exs: su vs journalling
+	how can transform
+"what we have done.. believe we can do"
+current and future work
+	metadata-only journalling
+	performance
+		async io
+		elevator scheduler
+	userspace
+		ex: userspace db vs fsync()
+	ext2 and ffs
+	production system for direct comparison (eg linux)
+
+candy to throw to audience?
