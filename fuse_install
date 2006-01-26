@@ -1,0 +1,11 @@
+How to install fuse to use unix-user kfsd:
+
+1. Use linux 2.6.15+ with the FUSE kernel module.
+   2.6.14+ comes with the FUSE module, but 2.6.15+ has features others do not.
+   FUSE also comes with modules for older 2.6, linux 2.4.x, and freebsd.
+
+2. Install the FUSE library, version 2.5.
+   http://fuse.sourceforge.net/
+
+3. Run kfsd! You can run it from kudos/obj/unixuser/kfsd/kfsd or use
+   kudos/uukfsd.sh which will umount the fs when kfsd crashes.
