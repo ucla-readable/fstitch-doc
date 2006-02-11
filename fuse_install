@@ -4,8 +4,16 @@ How to install fuse to use unix-user kfsd:
    2.6.14+ comes with the FUSE module, but 2.6.15+ has features others do not.
    FUSE also comes with modules for older 2.6, linux 2.4.x, and freebsd.
 
+   NOTE: 2.6.15 introduced an unmount bug that we touch. You can get the
+   one line patch from Al Viro's tree:
+   http://www.kernel.org/git/?p=linux/kernel/git/viro/bird.git;a=commitdiff;h=c3d2f2c6b7cb20ec69a9770c5244804540be077
+
 2. Install the FUSE library, version 2.5.
    http://fuse.sourceforge.net/
 
-3. Run kfsd! You can run it from kudos/obj/unixuser/kfsd/kfsd or use
-   kudos/uukfsd.sh which will umount the fs when kfsd crashes.
+3. Copy kudos/conf/fuse.conf to /etc/fuse.conf; this allows kfsd to allow
+   root to see inside kfsd filesystems.
+
+4. Run kfsd! You can run it using kudos/uukfsd.sh (a script that umounts the
+   filesystem if kfsd crashes) or run kfsd directly from
+   kudos/obj/unixuser/kfsd/kfsd.
