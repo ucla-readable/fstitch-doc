@@ -11,6 +11,9 @@ How to install fuse to use unix-user kfsd:
 2. Install the FUSE library, version 2.5.
    http://fuse.sourceforge.net/
 
-3. Run kfsd! You can run it using kudos/uukfsd.sh (a script that umounts the
+3. Copy kudos/conf/fuse.conf to /etc/fuse.conf; this allows kfsd to allow
+   root to see inside kfsd filesystems.
+
+4. Run kfsd! You can run it using kudos/uukfsd.sh (a script that umounts the
    filesystem if kfsd crashes) or run kfsd directly from
    kudos/obj/unixuser/kfsd/kfsd.
