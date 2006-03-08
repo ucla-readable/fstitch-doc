@@ -1,0 +1,9 @@
+body {
+	background: #99c;
+}
+
+#leftcontent {
+	background: #fff;
+	border-right: solid #000;
+	border-bottom: solid #000;
+}

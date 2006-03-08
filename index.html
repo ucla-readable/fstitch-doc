@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Language" content="en" />
+
+	<title>KudOS</title>
+
+	<link rel="stylesheet" type="text/css" href="css/color.css" />
+	<link rel="stylesheet" type="text/css" href="css/format.css" />
+	<link rel="stylesheet" type="text/css" href="css/layout.css" />
+</head>
+<body>
+
+
+<div id="master">
+
+	<div id="leftcontent">
+
+	<h1>KudOS</h1>
+
+	<h2>Ingredients</h2> <!-- What is it //-->
+
+	<p>
+	We propose a new file system implementation architecture,
+	called KudOS, where change descriptor structures represent
+	any and all changes to stable storage. File systems generate
+	change descriptors for all writes, then send them to block
+	devices for eventual commit. Each change descriptor stores
+	the old state of the block and the change's
+	dependencies---other change descriptors that must be
+	committed before it is safe to commit this change. Explicit
+	dependencies let KudOS modules preserve necessary file system
+	invariants without understanding the file system itself; the
+	old state lets KudOS roll back changes when necessary to
+	break cyclic block dependencies. Change descriptors can
+	implement many consistency mechanisms, including soft
+	updates and journalling.
+	</p>
+
+	<h2>Nutrition Info</h2> <!-- Publications //-->
+
+	<ul>
+		<li>
+		<em>The KudOS Architecture for File Systems</em><br />
+		Andrew de los Reyes, Christopher Frost, Eddie Kohler, Mike Mammarella, and Lei Zhang<br />
+		SOSP 2005 WIP<br />
+		Brighton, United Kingdom, October 2005 [ <a href="kudos-sosp_wip.pdf">PDF</a> ]<br />
+		</li>
+	</ul>
+
+	<h2>Manufacturers</h2> <!-- Who made it //-->
+
+	<ul>
+		<li>Andrew</li>
+		<li>Chris</li>
+		<li>Eddie</li>
+		<li>Lei</li>
+		<li>Mike</li>
+	</ul>
+
+	<h2>Product Locator</h2> <!-- Get it //-->
+
+	<p>
+	Coming soon!
+	</p>
+
+	<h2>Contact Us</h2> <!-- Duh //-->
+
+	<p>
+	&nbsp;
+	</p>
+
+	</div>
+
+	<div id="rightcontent">
+	&nbsp;
+	</div>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+body {
+	padding: 0px;
+	margin: 0px;
+}
+
+#leftcontent {
+	float: left;
+	width: 67%;
+	border-right: 2px;
+	border-bottom: 2px;
+	margin-right: 15px;
+	padding-bottom: 20px;
+}
