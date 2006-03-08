@@ -1,3 +1,15 @@
 body {
 	font:	Verdana, Arial, Helvetica, sans-serif;
 }
+
+a {
+	text-decoration:none;
+}
+
+li.student {
+	list-style-type: disc;
+}
+
+li.professor {
+	list-style-type: circle;
+}
