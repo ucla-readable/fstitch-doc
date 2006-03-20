@@ -1,0 +1,64 @@
+\documentclass[10pt,twocolumn,letterpaper]{article}
+\usepackage{usenix}
+\usepackage{amsmath,amssymb,alltt,comment}
+\usepackage[square,comma,numbers,sort&compress]{natbib}
+\usepackage{multirow}
+\frenchspacing
+
+\usepackage{url,hyperref,ifpdf}
+\ifpdf
+  \usepackage[pdftex]{graphicx}
+  \usepackage[monochrome]{color}
+  \DeclareGraphicsExtensions{.jpg,.pdf,.mps,.png}
+  \pdfinfo
+  { 
+    /Title (On The Key Advantages Of Modular File Systems Over Wedding Cakes)
+    /Author (Andrew de los Reyes, Chris Frost, Mike Mammarella, Lei Zhang, {adlr,frost,mikem,leiz}@cs.ucla.edu)
+  }
+  \pdfcompresslevel=9
+\else
+  \usepackage{graphicx}
+  \DeclareGraphicsExtensions{.eps,.jpg,.mps,.png}
+\fi
+
+% A list of stuff not to hyphenate
+\hyphenation{KudOS}
+
+%\renewcommand{\dbltopfraction}{1.00}
+%\renewcommand{\topfraction}{1.00}
+%\renewcommand{\textfraction}{0.10}
+
+\pagestyle{empty}
+
+%\renewcommand{\topfraction}{.8}
+%\renewcommand{\bottomfraction}{.8}
+
+\newcommand{\todo}[1]{\footnote{\textbf{TODO}: #1}}
+
+\begin{document}
+
+\normalsize
+
+\title{\sffamily\textbf{On The Key Advantages Of Modular File Systems Over Wedding Cakes}}
+
+
+\author{\sffamily Andrew de los Reyes, Chris Frost, Eddie Kohler, Mike
+Mammarella, and Lei Zhang \\
+\noalign{\vskip2pt}
+\sffamily{\fontsize{10pt}{10pt}\selectfont University of California, Los Angeles} \\
+\noalign{\vskip2pt}
+\sffamily{\{adlr,frost,kohler,mikem,leiz\}@cs.ucla.edu} \\
+\noalign{\vskip-.25in}
+\null}
+\date{}
+\maketitle
+
+\def\assast{\raise.2ex\hbox{$^\ast$}}
+
+\input{abstract.tex}
+\todo{Perhaps follow usenix's suggested \texttt{template.la}.}
+
+\bibliography{paper}
+\bibliographystyle{plain}
+
+\end{document}

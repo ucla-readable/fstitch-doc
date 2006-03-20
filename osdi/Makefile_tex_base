@@ -1,0 +1,142 @@
+LATEX=latex
+LATEX_OPTS=
+
+PDFLATEX=pdflatex
+PDFLATEX_OPTS=
+
+BIBTEX=bibtex
+BIBTEX_OPTS=
+
+METAPOST=mpost
+METAPOST_OPTS=
+
+DVIPS=dvips
+DVIPS_OPTS=-t letter -P cmz
+
+DVI2TTY=dvi2tty
+DVI2TTY_OPTS=-w120
+
+
+.PHONY: default clean dist-clean tex-clean
+
+%.pdf : %.dot
+	dot -Tps2 $< | epstopdf -f > $@
+
+%.eps : %.dot
+	dot -Tps $< -o $@
+
+define convert-to-epdf # args: source filename, dest filename, convert opts
+	convert ${3} ${1} epdf:${2}
+endef
+define convert-to-eps  # args: source filename, dest filename, convert opts
+	convert ${3} ${1} eps2:${2}
+endef
+
+%.eps : %.png
+	$(call convert-to-eps,$<,$@,)
+%.pdf : %.png
+	$(call convert-to-epdf,$<,$@,)
+
+%.eps : %.jpeg
+	$(call convert-to-eps,$<,$@,)
+%.pdf : %.jpeg
+	$(call convert-to-epdf,$<,$@,)
+
+%.eps : %.xcf
+	$(call convert-to-eps,$<,$@,-flatten)
+%.pdf : %.xcf
+	$(call convert-to-epdf,$<,$@,-flatten)
+
+%.eps : %.ppm
+	$(call convert-to-eps,$<,$@)
+%.pdf : %.ppm
+	$(call convert-to-epdf,$<,$@)
+
+%.pdf : %.ps
+	$(call convert-to-epdf,$<,$@)
+
+#%.pdf : %.eps
+#	$(call convert-to-epdf,$<,$@)
+
+
+# Not a robust program at all
+#%.eps : %.ps
+#	ps2epsi $< $@
+
+%.ps : %.neato
+	neato -Tps $< > $@
+
+%.eps : %.dia
+	dia --nosplash --export=$@ $<
+
+#
+# Could use these rather than the above, but imagemagick has more options
+# which might be useful down the road:
+
+#%.pnm : %.png
+#	pngtopnm $< > $@
+
+#%.pnm : %.jpg
+#	jpegtopnm $< > $@
+
+#%.eps : %.pnm
+#	pnmtops -noturn $< > $@
+
+%.pdf : %.eps
+	epstopdf $<
+
+define latex-generic # args: latex cmd, latex opts, input_file basename
+	${1} ${2} ${3}.tex
+	if grep Citation ${3}.log > /dev/null; then \
+		$(BIBTEX) $(BIBTEX_OPTS) ${3}; \
+		${1} ${2} ${3}.tex; \
+	fi
+	if grep Rerun ${3}.log > /dev/null; then \
+		${1} ${2} ${3}.tex; \
+	fi
+	if grep Rerun ${3}.log > /dev/null; then \
+		${1} ${2} ${3}.tex; \
+	fi
+endef
+
+%.dvi: %.tex %.bbl
+	$(call latex-generic,$(LATEX),$(LATEX_OPTS),$*)
+
+%.dvi: %.tex
+	$(call latex-generic,$(LATEX),$(LATEX_OPTS),$*)
+
+%.bbl: %.bib
+	$(BIBTEX) $(BIBTEX_OPTS) $*
+
+%.ps: %.dvi
+	$(DVIPS) $(DVIPS_OPTS) -o $@ $<
+
+%.pdf: %.tex %.bbl
+	$(call latex-generic,$(PDFLATEX),$(PDFLATEX_OPTS),$*)
+
+%.pdf: %.tex
+	$(call latex-generic,$(PDFLATEX),$(PDFLATEX_OPTS),$*)
+
+%.txt: %.dvi
+	$(DVI2TTY) $(DVI2TTY_OPTS) -o $@ $<
+
+# perhaps add %.html target
+
+
+
+## MetaPost figures
+# after making the figure, run perl to fix Computer Modern font names to
+# uppercase
+fig/%_1.eps fig/%_2.eps fig/%_3.eps fig/%_4.eps fig/%_5.eps fig/%_6.eps fig/%_7.eps fig/%_8.eps: fig/%.mp fig/elements.mp fig/elemfig.sty
+	cd fig; TEX=$(LATEX) $(METAPOST) $(METAPOST_OPTS) $(subst fig/,,$<)
+	sh -c 'for out in fig/$*.?; do mv -f $$out `echo $$out | tr . _`.eps; done'
+	perl -pi -e 'next if $$x; $$x = 1 if /%%EndProlog/; s=/([a-z][a-z0-9]+) def=/\U$$1\E def= if !/^%%/; s=\b([a-z][a-z0-9]+)\b=\U$$1\E=g if /^%%DocumentFonts/ || /^%%\+/;' $(subst .mp,,$<)_[0-9]*.eps
+
+tex-clean::
+	rm -f *.aux *.log *.out *.bbl *.blg *.lof *.toc fig/*.log fig/*.mpx
+
+# TMP_FILES and OUTPUT_FILES need be supplied by the parent makefile
+dist-clean: tex-clean
+	rm -f ${TMP_FILES} ${OUTPUT_FILES}
+
+clean: dist-clean
