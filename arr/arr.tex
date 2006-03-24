@@ -1,0 +1,112 @@
+\documentclass[12pt]{article}
+\usepackage{geometry}
+\usepackage{times}
+
+\usepackage{url,hyperref,ifpdf}
+\ifpdf
+  \usepackage[pdftex]{graphicx}
+  \usepackage[monochrome]{color}
+  \DeclareGraphicsExtensions{.jpg,.pdf,.mps,.png}
+  \pdfinfo
+  { 
+    /Title (The KudOS Architecture for File Systems)
+    /Author (Andrew de los Reyes, Chris Frost, Mike Mammarella, Lei Zhang, {adlr,frost,mikem,leiz}@cs.ucla.edu)
+  }
+  \pdfcompresslevel=9
+\else
+  \usepackage{graphicx}
+  \DeclareGraphicsExtensions{.eps,.jpg,.mps,.png}
+\fi
+
+% A list of stuff not to hyphenate
+\hyphenation{KudOS}
+
+\geometry{top=1in,bottom=1in,left=1in,right=1in}
+
+\pagestyle{empty}
+
+% reduce pre-pargraph spacing in a hacky way
+\newcommand{\preparagraphspacing}{\vspace{-0.2in}}
+
+\begin{document}
+
+\noindent\textbf{THE KUDOS ARCHITECTURE FOR FILE SYSTEMS}
+
+\noindent{Andrew de los Reyes, Chris Frost, Eddie Kohler, Mike Mammarella, and Lei Zhang}
+
+\noindent \{adlr,frost,kohler,mikem,leiz\}@cs.ucla.edu
+
+\noindent{Computer Science Department, University of California, Los Angeles}
+
+\preparagraphspacing
+\paragraph{Introduction:}
+
+Our research aims to make file systems support more flexible and efficient ways
+for applications to implement custom stable storage consistency policies:
+guaranteed orderings of disk writes containing the application's data.
+Additionally, we are working to make file system software itself more modular,
+adaptable, and extensible.
+
+\preparagraphspacing
+\paragraph{Methods and Results:}
+
+In the KudOS system, \emph{change descriptor} structures represent any and all
+changes to stable storage. They are inspired by the soft updates system in BSD's
+FFS, but generalized so that they are not specific to any particular file
+system. Each change descriptor stores the old state of a disk block and the
+change's \emph{dependencies} -- other change descriptors that must be committed
+before it is safe to commit this change. The file system software is decomposed
+into many fine-grained modules which generate, consume, forward, and manipulate
+change descriptors. Change descriptors can be arranged to implement many
+consistency policies, including soft updates and journaling: merely by
+rearranging the change descriptors, our journaling module can automatically add
+journalling to any file system.
+
+The ability to work with change descriptors is also extended outside the file
+system software in the kernel, so that applications can set up their own
+user-defined dependencies -- allowing them to define consistency protocols for
+the file system to follow. In contrast, existing systems offer little help to
+applications with custom consistency and performance requirements, imposing
+either high overhead (data journaling) or not guaranteeing data consistency
+(soft updates, for example, ensures metadata consistency only).
+
+By using user-defined change descriptors, applications can specify minimal and
+precise data dependencies for order-sensitive data. This could improve the
+performance and correctness of applications requiring specific consistency
+semantics. For instance, a mail server could ensure that a message is not lost
+when it is moved from one folder to another by creating a change descriptor
+dependency that tells the file system not to remove the message from its
+original folder until it has been added to the new one.
+
+%\begin{figure}[htb]
+%\begin{center}
+%\includegraphics[width=5in]{blah}
+%\caption{Example ridiculously large change descriptor graph}
+%\label{fig}
+%\end{center}
+%\end{figure}
+
+KudOS modules can be relatively independent from one another, because change
+descriptors help to isolate the logic of all the modules, while still allowing
+them to communicate important data ordering constraints. For instance, the
+journaling module's ordering requirements can be set up without understanding
+the file system that is being journaled, since the file system's changes to the
+disk are represented as change descriptors. The resulting modified change
+descriptors could then be sent through a loop device, allowing dependency
+information to be maintained across a boundary that would otherwise lose that
+information. 
+
+\preparagraphspacing
+\paragraph{Conclusion:}
+
+... Put some introductory conclusion sentences here. ...
+
+Extending change descriptors into userspace allows very flexible management of
+disk write orderings by applications, which we hope will allow simpler and more
+efficient application-level consistency policies. There are many issues to
+consider when allowing applications this kind of control, however. For instance,
+we must prevent misbehaving or malicious applications from creating excessive
+numbers of change descriptors, or setting up dependencies such that certain
+change descriptors stay in the system indefinitely.
+
+\end{document}
