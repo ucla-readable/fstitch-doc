@@ -26,7 +26,7 @@
 \pagestyle{empty}
 
 % reduce pre-pargraph spacing in a hacky way
-\newcommand{\preparagraphspacing}{\vspace{-0.2in}}
+\newcommand{\preparagraphspacing}{}%\vspace{-0.2in}}
 
 \begin{document}
 
@@ -42,7 +42,7 @@
 \paragraph{Introduction:}
 
 Our research aims to make file system software more flexible, modular,
-and extensible. A key contribution of our new design is the ability
+and \mbox{extensible}. A key contribution of our new design is the ability
 for applications to specify minimal and precise write ordering
 constraints for order-sensitive data. By doing so, they can implement
 their own stable storage consistency policies.
@@ -52,7 +52,7 @@ their own stable storage consistency policies.
 
 In the KudOS system, \emph{change descriptor} structures represent any and all
 changes to stable storage. They are inspired by the soft updates system in BSD's
-FFS, but generalized so that they are not specific to any particular file
+FFS, but are generalized so that they are not specific to any particular file
 system. Each change descriptor stores the old state of a disk block and the
 change's \emph{dependencies} -- other change descriptors that must be committed
 before it is safe to commit this change. The file system software is decomposed
@@ -62,8 +62,8 @@ consistency policies, including soft updates and journaling: merely by
 rearranging the change descriptors, our journaling module can automatically add
 journaling to any file system.
 
-The ability to work with change descriptors is also extended outside the file
-system software in the kernel, so that applications can set up their own
+The ability to work with change descriptors is also extended outside the
+kernel file system software, so that applications can set up their own
 user-defined dependencies -- allowing them to define consistency protocols for
 the file system to follow. In contrast, existing systems offer little help to
 applications with custom consistency and performance requirements, imposing
@@ -95,9 +95,9 @@ them to communicate important data ordering constraints. For instance, the
 journaling module's ordering requirements can be set up without understanding
 the file system that is being journaled, since the file system's changes to the
 disk are represented as change descriptors. The resulting modified change
-descriptors could then be sent through a loop device, allowing dependency
-information to be maintained across a boundary that would otherwise lose that
-information. 
+descriptors can then be sent through the rest of the system, allowing
+this important dependency information to be maintained across boundaries
+that might otherwise lose that information.
 
 \preparagraphspacing
 \paragraph{Conclusion:}
@@ -105,7 +105,7 @@ information.
 The KudOS system simplifies many aspects of file system software design by
 representing all changes to disk data as change descriptors. Additionally,
 extending change descriptors into userspace allows very flexible management of
-disk write orderings by applications, which we hope will allow simpler and more
-efficient application-level consistency policies.
+disk write orderings by applications, which we believe will allow simpler
+and more efficient application-level consistency policies.
 
 \end{document}
