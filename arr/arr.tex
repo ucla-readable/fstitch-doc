@@ -10,7 +10,7 @@
   \pdfinfo
   { 
     /Title (The KudOS Architecture for File Systems)
-    /Author (Andrew de los Reyes, Chris Frost, Mike Mammarella, Lei Zhang, {adlr,frost,mikem,leiz}@cs.ucla.edu)
+    /Author (Andrew de los Reyes, Chris Frost, Mike Mammarella, Lei Zhang, kudos@lists.ucla.edu)
   }
   \pdfcompresslevel=9
 \else
@@ -34,21 +34,21 @@
 
 \noindent{Andrew de los Reyes, Chris Frost, Eddie Kohler, Mike Mammarella, and Lei Zhang}
 
-\noindent \{adlr,frost,kohler,mikem,leiz\}@cs.ucla.edu
-
 \noindent{Computer Science Department, University of California, Los Angeles}
+
+\noindent{kudos@lists.ucla.edu}
 
 \preparagraphspacing
 \paragraph{Introduction:}
 
-Our research aims to make file systems support more flexible and efficient ways
-for applications to implement custom stable storage consistency policies:
-guaranteed orderings of disk writes containing the application's data.
-Additionally, we are working to make file system software itself more modular,
-adaptable, and extensible.
+Our research aims to make file system software more flexible, modular,
+and extensible. A key contribution of our new design is the ability
+for applications to specify minimal and precise write ordering
+constraints for order-sensitive data. By doing so, they can implement
+their own stable storage consistency policies.
 
 \preparagraphspacing
-\paragraph{Methods and Results:}
+\paragraph{Methods:}
 
 In the KudOS system, \emph{change descriptor} structures represent any and all
 changes to stable storage. They are inspired by the soft updates system in BSD's
@@ -60,7 +60,7 @@ into many fine-grained modules which generate, consume, forward, and manipulate
 change descriptors. Change descriptors can be arranged to implement many
 consistency policies, including soft updates and journaling: merely by
 rearranging the change descriptors, our journaling module can automatically add
-journalling to any file system.
+journaling to any file system.
 
 The ability to work with change descriptors is also extended outside the file
 system software in the kernel, so that applications can set up their own
@@ -69,6 +69,9 @@ the file system to follow. In contrast, existing systems offer little help to
 applications with custom consistency and performance requirements, imposing
 either high overhead (data journaling) or not guaranteeing data consistency
 (soft updates, for example, ensures metadata consistency only).
+
+\preparagraphspacing
+\paragraph{Results:}
 
 By using user-defined change descriptors, applications can specify minimal and
 precise data dependencies for order-sensitive data. This could improve the
@@ -99,14 +102,10 @@ information.
 \preparagraphspacing
 \paragraph{Conclusion:}
 
-... Put some introductory conclusion sentences here. ...
-
-Extending change descriptors into userspace allows very flexible management of
+The KudOS system simplifies many aspects of file system software design by
+representing all changes to disk data as change descriptors. Additionally,
+extending change descriptors into userspace allows very flexible management of
 disk write orderings by applications, which we hope will allow simpler and more
-efficient application-level consistency policies. There are many issues to
-consider when allowing applications this kind of control, however. For instance,
-we must prevent misbehaving or malicious applications from creating excessive
-numbers of change descriptors, or setting up dependencies such that certain
-change descriptors stay in the system indefinitely.
+efficient application-level consistency policies.
 
 \end{document}
