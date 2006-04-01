@@ -1,6 +1,6 @@
 \documentclass[10pt,twocolumn,letterpaper]{article}
-\usepackage{usenix}
-\usepackage{amsmath,amssymb,alltt,comment}
+\usepackage[nocopyright]{sigmin}
+\usepackage{amsmath,amssymb,alltt,comment,times,mathptmx}
 \usepackage[square,comma,numbers,sort&compress]{natbib}
 \usepackage{multirow}
 \frenchspacing
@@ -55,8 +55,22 @@ Mammarella, and Lei Zhang \\
 
 \def\assast{\raise.2ex\hbox{$^\ast$}}
 
-\input{abstract.tex}
-\todo{Perhaps follow usenix's suggested \texttt{template.la}.}
+\input{abstract}
+
+\section{Nuggets}
+
+\begin{itemize}
+\item soft updates related work
+\item UHFS, LFS, CFS
+\item chdesc patterns
+\item write-back cache
+\item RAID: low-level chdescs
+\item cross-fs dependencies (cross-mount deps)
+\item journal module
+\item user-level chdesc iface (how we chose, guarantees)
+\item UFS implementation
+\item linux integration
+\end{itemize}
 
 \bibliography{paper}
 \bibliographystyle{plain}
