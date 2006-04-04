@@ -1,0 +1,53 @@
+\section{User-level Change Descriptors}
+\begin{itemize}
+\item Goal: Allow applications to specify ordering so that
+  applications can implement custom consistency semantics and make
+  custom performance requirements tradeoffs. It is desirable for the
+  interface to fit in with existing calls naturally (eg write()) and
+  the file system must be able to ensure userspace can not ``harm the
+  system'' (eg non-satisfiable requirements).
+\item interface
+  \begin{itemize}
+  \item Explain how we think applications might make use of opgroups
+  \item We want to prevent apps from being able to screw the system up
+    (grab huge amounts of memory that can't be released, stop other
+    processes' data from going to disk, etc)
+  \item Explain the ``core differences'' between chdescs and
+    opgroups
+  \item File systems operate at the block level whereas user-level
+    programs (generally) operate at the file and file-offset level.
+    So expose a higher level of change descritors. Also expose a
+    higher level so that apps do not deal with file system
+    implementation specifics; allows opgroups to better fit in with
+    existing file system interactions (eg still use write(), don't
+    create chdescs, create byte/bit differences, add deps). These are
+    the reasons why why we chose to deal with groups of changes
+    instead of individual changes.
+  \item Opgroups are simpler than chdescs. Retaining not possible (app
+    waits tomake write) and destruction not an issue (unless a
+    transaction). Apply/rollback and dependency removal aren't seen as
+    helpful since apps are not doing transformations, just specifying
+    ordering requirements. (We should improve this reasoning.)
+  \item We want to prevent cycles from complicating the standard fs
+    calls; eg we don't want to apps to have to worry about write()
+    causing a cycle and thus canceling the write (how would the app
+    recover). Cycles from user data would are bad to have to worry
+    about, cycles from internal-fs changes are horrible to have to
+    worry about. Explain how we prevent cycles through cycle detection
+    and allowed state transitions.
+  \item Opgroups are designed to support different consistency
+    requirements. ordering ``most fundamental'' (?). Also support
+    atomic; more in the works.
+  \item Explain why create and engage are distinct. Why disengage,
+    release, and abandon are distinct. (Cycle prevention and for
+    atomic/trancactional opgroups.) Give transitions for opgroups and
+    atomic opgroups, or perhaps just a sampling, and the reasoning
+    behind these.
+  \end{itemize}
+\item kernel-side implementation
+  \begin{itemize}
+  \item cycle detection
+  \item chdesc implementation
+  \item scopes and opgroups across forks (multithreaded todos?)
+  \end{itemize}
+\end{itemize}

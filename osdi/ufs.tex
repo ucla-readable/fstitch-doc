@@ -1,0 +1,39 @@
+\section{UFS implementation}
+\begin{itemize}
+\item Motivation: Show Kudos is capable of accommodating soft updates
+  sematics by writing an implementation of UFS.
+\item What is UFS / soft updates.
+  \begin{itemize}
+  \item UFS is the modern incarnation of the classic FFS used in BSD.
+    The general concepts for UFS are well understood and implementations
+    exist for many UNIX-like operating systems.
+  \item Soft updates for UFS is one of the biggest innovations in file
+    systems in terms of lowering the overhead required to provide file
+    system consistency. By carefully ordering writes to disk, soft updates
+    avoid the need for synchronous writes or duplicate writes to a journal.
+  \end{itemize}
+\item Kudos UFS Implementation
+  \begin{itemize}
+  \item The LFS interface naturally divides the implementation into a set
+    of simpler tasks. With an understanding of the UFS on-disk format and
+    soft updates requirements, we added functionality to our UFS module
+    in a progressive manner.
+  \item Using change descriptors, we can control the ordering for writes
+    to disk. This allow us to express the dependencies between different
+    writes and achieve soft updates consistency.
+  \item Applying our modularity philosophy to UFS, we refactored the file
+    system module and separated many functions into sub-modules internal
+    to UFS. Modularity makes it easy to exchange one piece of code for
+    another. For example, we can change the inode allocation policy or
+    the behavior when updating the superblock by swapping in different
+    sub-module.
+  \end{itemize}
+\item Shortcomings
+  \begin{itemize}
+  \item Our UFS code is mostly complete, but some features are missing:
+    i.e. handling triple indirect blocks and sparse files.
+  \item Modularity means there exists places where we are less efficient
+    than a more integrated implementation. These trouble spots presents
+    an opportunity for improvement.
+  \end{itemize}
+\end{itemize}
