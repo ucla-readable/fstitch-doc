@@ -10,7 +10,7 @@ OUTPUT_FILES = paper.dvi paper.ps paper.pdf paper.txt $(TMP_DVI_IMAGES)
 TMP_FILES = $(TMP_PDF_IMAGES)
 
 paper.dvi paper.pdf paper.txt: \
-	paper.tex abstract.tex opgroups.tex wbcache.tex ufs.tex paper.bib
+	paper.tex abstract.tex opgroups.tex wbcache.tex ufs.tex journal.tex linux.tex paper.bib
 
 bib:
 	latex paper
