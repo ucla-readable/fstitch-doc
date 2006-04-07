@@ -1,0 +1,5 @@
+Technical work we might take on after the initial submission but by the
+final paper:
+- metadata-only journaling
+- cache syncing that does not also flush
+- more efficient cycle detection
