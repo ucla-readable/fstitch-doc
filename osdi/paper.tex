@@ -59,21 +59,31 @@ Mammarella, and Lei Zhang \\
 
 \section{Nuggets}
 
+We need to settle on some naming conventions. For instance, do we call the whole
+system KudOS, KFS, or something else? Do we call block devices, LFS, and CFS
+instances modules, components, elements, or objects? Do we call opgroups
+user-level change descriptors everywhere, or just introduce them as that? Do we
+abbreviate change descriptor as chdesc anywhere, or do we always write it out?
+Also, we should have a better title.
+
 \begin{itemize}
-\item soft updates related work
+\item (intro to) change descriptors *
+\item soft updates related work *
 \item UHFS, LFS, CFS
 \item chdesc patterns
-\item write-back cache, revisioned blocks
+\item write-back cache, revisioned blocks *
 \item RAID: low-level chdescs
 \item cross-fs dependencies (cross-mount deps)
-\item journal module
-\item user-level chdesc iface (how we chose, guarantees)
-\item UFS implementation
-\item linux integration
+\item user-level chdesc iface (how we chose, guarantees) *
+\item UFS implementation *
+\item journal module *
+\item linux integration *
 \end{itemize}
 
-\input{opgroups}
+\input{chdescs}
+\input{softupdate}
 \input{wbcache}
+\input{opgroups}
 \input{ufs}
 \input{journal}
 \input{linux}

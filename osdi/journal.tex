@@ -20,6 +20,14 @@ of them to write to the journal. When the transaction is over, it can create a
 commit record, set all the change descriptors in the transaction to depend on
 it, and satisfy the managed NO-OP change descriptor.
 
+\begin{figure}
+  \centering
+  \includegraphics[width=\hsize]{fig/figures_2}
+  \caption{\label{fig:journal} Journal change descriptor graph for the
+    change in Figure~\ref{fig:softupdate}. Empty circles are ``NO-OP''
+    change descriptors with no associated block data.}
+\end{figure}
+
 A particularly nice property of this arrangement is that the journal component
 is completely independent of any specific file system. It is a block device
 component that automatically journals whatever file system is stored on it. Even

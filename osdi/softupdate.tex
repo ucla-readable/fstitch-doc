@@ -1,0 +1,15 @@
+\section {Soft Updates}
+\label{sec:softupdate}
+
+Simple section showing how change descriptors basically already do soft updates.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=92pt]{fig/figures_3}
+  \caption{\label{fig:softupdate} Soft updates change descriptor graph,
+  including the dependencies for adding a newly allocated block to an
+  inode. Writing the new block pointer to an inode (Attach) depends on
+  initializing the block (Clear) and updating the free block map (Alloc).
+  Updating the size of the inode (Size) depends on writing the block
+  pointer.}
+\end{figure}

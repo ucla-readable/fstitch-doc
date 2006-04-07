@@ -1,0 +1,78 @@
+\section {Change Descriptors}
+\label{sec:chdescs}
+
+Each in-memory modification to a cached disk block in the KFS system has an
+associated change descriptor. Different change types correspond to different
+forms of change descriptors; the change descriptor for a flipped bit -- such as
+in a free-block bitmap -- contains an offset and mask, while larger changes
+contain an offset, a length, and the new data. The change descriptor's
+dependencies point to other change descriptors that must precede it to stable
+storage. A change descriptor can be applied or reverted to switch the cached
+block's state between old and new as necessary. Each change descriptor applies
+to exactly one block.
+
+Figure~\ref{fig:chdesc} gives a simplified version of the structure. The ability
+to revert and re-apply change descriptors is inspired by the soft updates system
+in BSD's FFS~\cite{ganger00soft}, but generalized so that it is not specific to
+any particular file system.
+
+\begin{figure}
+\vskip-14pt
+\begin{tabular}{@{\hskip0.58in}p{2in}@{}}
+\begin{scriptsize}
+\begin{verbatim}
+struct chdesc {
+    BD_t *device;
+    bdesc_t *block;
+    enum {BIT, BYTE, NOOP} type;
+    union {
+        struct {
+            uint16_t offset;
+            uint32_t xor;
+        } bit;
+        struct {
+            uint16_t offset, length;
+            uint8_t *data;
+        } byte;
+    };
+    struct chdesc *dependencies[];
+/* ... */ };
+\end{verbatim}
+\end{scriptsize}
+\end{tabular}
+\vspace{-10pt}
+\caption{\label{fig:chdesc} Partial change descriptor structure.}
+\end{figure}
+
+When a KFS component first generates change descriptors to write to the disk, it
+specifies write ordering requirements similar to those of soft updates. For
+example, Figure~\ref{fig:softupdate} depicts change descriptors that allocate
+and add a new block to an inode. The component passes these change descriptors
+to another component closer to the disk. This second component can inspect,
+delay, and even modify them before passing them on further. For instance, the
+write-back cache component (\S\ref{sec:wbcache}) holds on to blocks and their
+change descriptors instead of forwarding them immediately. When evicting a block
+and associated change descriptors, the write-back cache enforces an order
+consistent with the change descriptor dependency information.
+
+Soft updates, journaling, and many application-specific consistency models all
+correspond to different change descriptor arrangements, so these features can be
+added to the system as components which appropriately connect or reconnect the
+change descriptors. For example, the change descriptors in
+Figure~\ref{fig:softupdate} can be transformed to provide journaling semantics.
+The original four change descriptors are modified to depend on a journal commit
+record, which depends on blocks journaling the changes. Once the actual changes
+commit, the journal record is marked as completed. Figure~\ref{fig:journal}
+shows these transformed change descriptors. This single journaling component
+(see section \ref{sec:journal}) can attach to any file system component; it
+performs transformations incrementally as change descriptors arrive.
+
+Further, by changing our journal component to journal only change descriptors
+that modify file system metadata -- and by adding additional dependencies to
+prevent premature reuse of blocks -- we could even obtain metadata-only
+journaling. The journal component can distinguish metadata change descriptors
+because of the LFS interface described elsewhere. Other block device layering
+systems, like GEOM~\cite{geom} or JBD in Linux, would or do need special hooks
+into file system code to determine what disk changes represent metadata in order
+to do metadata-only journaling. Change descriptors and the LFS interface allow
+us to do this automatically.
