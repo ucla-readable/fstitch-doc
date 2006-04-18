@@ -2,7 +2,7 @@
 \label{sec:ufs}
 
 \begin{itemize}
-\item Motivation: Show Kudos is capable of accommodating soft updates
+\item Motivation: Show KFS is capable of accommodating soft updates
   sematics by writing an implementation of UFS.
 \item What is UFS / soft updates.
   \begin{itemize}
@@ -14,7 +14,7 @@
     system consistency. By carefully ordering writes to disk, soft updates
     avoid the need for synchronous writes or duplicate writes to a journal.
   \end{itemize}
-\item Kudos UFS Implementation
+\item KFS UFS Implementation
   \begin{itemize}
   \item The LFS interface naturally divides the implementation into a set
     of simpler tasks. With an understanding of the UFS on-disk format and
@@ -35,7 +35,7 @@
   \item Our UFS code is mostly complete, but some features are missing:
     i.e. handling triple indirect blocks and sparse files.
   \item Modularity means there exists places where we are less efficient
-    than a more integrated implementation. These trouble spots presents
+    than a more integrated implementation. These trouble spots present
     an opportunity for improvement.
   \end{itemize}
 \end{itemize}

@@ -1,0 +1,39 @@
+\section {Module Interfaces}
+\label{sec:interfaces}
+
+A complete KFS configuration is composed of many components. By breaking file
+system code into small, stackable components, we are able to significantly
+increase code reuse. Between block devices and high-level file system
+operations, we add an additional interface that helps to divide file system
+implementations into common (reusable) code and file system-specific code. We
+call this intermediate interface the ``Low-level File System'' (LFS). This new
+interface is a departure from other stackable component systems, like
+FiST~\cite{zadok00fist}, which stack higher-level operations.
+
+The LFS interface has functions to allocate blocks, add blocks to files,
+allocate file names, and other file system micro-ops. A component implementing
+the LFS interface should define how bits are laid out on the disk, but doesn't
+have to know how to combine the micro-ops into larger, more familiar file system
+operations. A generic VFS-to-LFS component decomposes the larger file write,
+read, append, and other standard operations into LFS micro-ops. This one
+component can be used with many different LFS components implementing different
+file systems.
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[height=3in]{fig/figures_1}
+  \caption{A running KFS configuration. {\it/} is a soft updated
+    file system on an IDE drive; {\it/loop} is an externally journaled
+    file system on loop devices.}
+  \label{fig:kfs-graph}
+\end{figure}
+
+Figure~\ref{fig:kfs-graph} shows a contrived example taking advantage of the LFS
+interface and change descriptors. A file system image is mounted with an
+external journal, both of which are loop devices on the root file system, which
+uses soft updates. The journaled file system's ordering requirements are sent
+through the loop device as change descriptors, allowing dependency information
+to be maintained across boundaries that might otherwise lose that information.
+In contrast, without change descriptors and the ability to forward change
+descriptors through loop devices, BSD cannot express soft updates' consistency
+requirements through loop-back file systems.

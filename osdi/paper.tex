@@ -12,7 +12,7 @@
   \DeclareGraphicsExtensions{.jpg,.pdf,.mps,.png}
   \pdfinfo
   { 
-    /Title (On The Key Advantages Of Modular File Systems Over Wedding Cakes)
+    /Title (The KudOS File Server Architecture)
     /Author (Andrew de los Reyes, Chris Frost, Mike Mammarella, Lei Zhang, {adlr,frost,mikem,leiz}@cs.ucla.edu)
   }
   \pdfcompresslevel=9
@@ -39,7 +39,7 @@
 
 \normalsize
 
-\title{\sffamily\textbf{On The Key Advantages Of Modular File Systems Over Wedding Cakes}}
+\title{\sffamily\textbf{The KudOS File Server Architecture}}
 
 
 \author{\sffamily Andrew de los Reyes, Chris Frost, Eddie Kohler, Mike
@@ -69,7 +69,7 @@ Also, we should have a better title.
 \begin{itemize}
 \item (intro to) change descriptors *
 \item soft updates related work *
-\item UHFS, LFS, CFS
+\item UHFS, LFS, CFS *
 \item chdesc patterns
 \item write-back cache, revisioned blocks *
 \item RAID: low-level chdescs
@@ -82,11 +82,13 @@ Also, we should have a better title.
 
 \input{chdescs}
 \input{softupdate}
+\input{interfaces}
 \input{wbcache}
 \input{opgroups}
 \input{ufs}
 \input{journal}
 \input{linux}
+\input{future}
 
 \bibliography{paper}
 \bibliographystyle{plain}

@@ -1,6 +1,7 @@
 \section {Change Descriptors}
 \label{sec:chdescs}
 
+\subsection {Overview}
 Each in-memory modification to a cached disk block in the KFS system has an
 associated change descriptor. Different change types correspond to different
 forms of change descriptors; the change descriptor for a flipped bit -- such as
@@ -35,7 +36,7 @@ struct chdesc {
             uint8_t *data;
         } byte;
     };
-    struct chdesc *dependencies[];
+    struct chdesc_queue *dependencies;
 /* ... */ };
 \end{verbatim}
 \end{scriptsize}
@@ -55,6 +56,53 @@ change descriptors instead of forwarding them immediately. When evicting a block
 and associated change descriptors, the write-back cache enforces an order
 consistent with the change descriptor dependency information.
 
+\subsection {Optimizations}
+Many of the operations that components like the write-back cache need to do
+involve quickly discovering the set of change descriptors that satisfy some
+property, and often even some ordering of those change descriptors. In early
+prototypes, these sets were often calculated by doing graph traversals of the
+dependency graph of change descriptors. However, these traversals are in
+practice extremely expensive, and many optimizations were necessary in order to
+improve the performance of the KFS system.
+
+For instance, consider the structure of a change descriptor itself. The list of
+dependencies is often changing as a change descriptor moves through the system.
+Even when no components are explicitly ``rewiring'' the change descriptors,
+dependencies on a change descriptor must be removed when that change descriptor
+is destroyed as a result of having been written to disk. Simple singly linked
+lists originally stored the lists of dependencies, and it turned out that a lot
+of time was being spent traversing those lists in order to destroy each change
+descriptor. It turned out that almost always, the element being removed from the
+list was at the end of the list -- because it had been added longest ago, and
+often changes were being written to disk in an order similar to the order in
+which they had been made. The solution was to convert the linked list into a
+queue, so that elements would be added to one end of the list and removed from
+the other. This converted a linear time search into one which would usually
+execute in constant time.
+
+Another example is that when examining a block and deciding which change
+descriptors must be ``rolled back'' in order for the block's data to be safe to
+write to the disk, the dependency graph between the various changes on that
+block must be taken into account so that changes which depend on one another are
+rolled back in proper dependency order. Originally, a traversal of the change
+descriptor graph rooted at the block's NO-OP change descriptor (which depends on
+all the changes on that block) was used to calculate the correct ordering. This
+was very computationally intensive when more than a tiny number of change
+descriptors were involved. The algorithm was changed to examine only those
+change descriptors actually on the block, and still it was not as good as we had
+hoped. Finally, we discovered that we were examining the change descriptors in
+almost exactly the opposite order as the order they should be rolled back in --
+for the same reason as the previous example. By simply changing the direction of
+the loop, we were able to improve the loop from quadratic time to linear time.
+
+We believe that there are still many places change descriptor operations can be
+optimized to improve the performance of the KFS system. Many of these places
+likely will have the same flavor as the two examples here: information we
+already have can be used in order to determine the answers we need, without
+needing to directly calculate those answers. Even as it is, however, the KFS
+system does not run dramatically slower than a standard Linux 2.6 kernel.
+
+\subsection {Applications}
 Soft updates, journaling, and many application-specific consistency models all
 correspond to different change descriptor arrangements, so these features can be
 added to the system as components which appropriately connect or reconnect the
@@ -71,8 +119,8 @@ Further, by changing our journal component to journal only change descriptors
 that modify file system metadata -- and by adding additional dependencies to
 prevent premature reuse of blocks -- we could even obtain metadata-only
 journaling. The journal component can distinguish metadata change descriptors
-because of the LFS interface described elsewhere. Other block device layering
-systems, like GEOM~\cite{geom} or JBD in Linux, would or do need special hooks
-into file system code to determine what disk changes represent metadata in order
-to do metadata-only journaling. Change descriptors and the LFS interface allow
-us to do this automatically.
+because of the LFS interface described in \S\ref{sec:interfaces}. Other block
+device layering systems, like GEOM~\cite{geom} or JBD in Linux, would or do need
+special hooks into file system code to determine what disk changes represent
+metadata in order to do metadata-only journaling. Change descriptors and the LFS
+interface allow us to do this automatically.
