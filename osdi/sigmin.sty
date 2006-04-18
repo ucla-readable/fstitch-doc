@@ -1,24 +1,50 @@
 \makeatletter
-\newif\if@sigmin@ninept \@sigmin@ninepttrue
-\newif\ifcopyrightspace\copyrightspacetrue
-\DeclareOption{10pt}{\@sigmin@nineptfalse}
+\newif\if@sigmin@ninept   \@sigmin@nineptfalse
+\newif\if@sigmin@tenpt    \@sigmin@tenptfalse
+\newif\if@sigmin@elevenpt \@sigmin@elevenptfalse
+\newif\ifcopyrightspace   \copyrightspacetrue
+\newif\if@sigmin@oneinmar \@sigmin@oneinmarfalse
+\DeclareOption{11pt}{\@sigmin@elevenpttrue}
+\DeclareOption{10pt}{\@sigmin@tenpttrue}
 \DeclareOption{9pt}{\@sigmin@ninepttrue}
 \DeclareOption{nocopyright}{\copyrightspacefalse}
-\ExecuteOptions{9pt}
+\DeclareOption{inchmargins}{\@sigmin@oneinmartrue}
 \ProcessOptions
 
-\oddsidemargin 4.5pc
-\evensidemargin 4.5pc
+{\def\SizeError{\PackageError{sigmin}{Specify exactly one of `9pt', `10pt', and `11pt'}\@ehc}%
+\if@sigmin@ninept \if@sigmin@tenpt \SizeError    \fi\fi
+\if@sigmin@ninept \if@sigmin@elevenpt \SizeError \fi\fi
+\if@sigmin@tenpt  \if@sigmin@elevenpt \SizeError \fi\fi
+\if@sigmin@ninept\else\if@sigmin@tenpt\else\if@sigmin@elevenpt\else
+\SizeError \fi\fi\fi
+}%
+
+\if@sigmin@oneinmar
+\oddsidemargin 1in
+\evensidemargin 1in
+\topmargin 1in
+\textheight 9in
+\textwidth 6.5in
+\columnsep 0.25in
+\else
+\oddsidemargin 0.75in
+\evensidemargin 0.75in
+\topmargin 0.75in               % Nominal distance from top of page to top of
+                                % box containing running head.
+\textheight 9.25in              % 9 1/4 column height (1 in margin on bottom)
+\textwidth 7in                  % Width of text line.
+                                % For two-column mode:
+\columnsep 2pc                  %    Space between columns (1/3 in)
+\fi
+
 \advance\oddsidemargin by -1in  % Correct for LaTeX gratuitousness
 \advance\evensidemargin by -1in % Correct for LaTeX gratuitousness
+\advance\topmargin by -1in      % Correct for LaTeX gratuitousness
+
 \marginparwidth 0pt             % Margin pars are not allowed.
 \marginparsep 11pt              % Horizontal space between outer margin and
                                 % marginal note
 
-                                % Top of page:
-\topmargin 4.5pc                % Nominal distance from top of page to top of
-                                % box containing running head.
-\advance\topmargin by -1in      % Correct for LaTeX gratuitousness
 \headheight 0pt                 % Height of box containing running head.
 \headsep 0pt                    % Space between running head and text.
                                 % Bottom of page:
@@ -34,10 +60,6 @@
 \headheight 12pt                % Height of box containing running head.
 \headsep 25pt                   % Space between running head and text.
 
-\textheight 666pt       % 9 1/4 column height
-\textwidth 42pc         % Width of text line.
-                        % For two-column mode:
-\columnsep 2pc          %    Space between columns
 \columnseprule 0pt      %    Width of rule between columns.
 \hfuzz 1pt              % Allow some variation in column width, otherwise it's
                         % too hard to typeset in narrow columns.
@@ -251,8 +273,8 @@ redistribute to lists, requires prior specific permission and/or a fee.}
 \newtoks\copyrightetc 
 \global\copyrightetc{Copyright \the\copyrtyr\ ACM \the\acmcopyr\ \dots\$5.00}
 
-\toappear{\the\boilerplate\par
-{\confname{\the\conf}} \the\confinfo\par \the\copyrightetc.}
+%\toappear{\the\boilerplate\par
+%{\confname{\the\conf}} \the\confinfo\par \the\copyrightetc.}
 
 
 \global\def\section{\@startsection {section}{1}{\z@}%
