@@ -1,57 +1,90 @@
 \section{User-level Change Descriptors}
-\label{opgroup}
+\label{sec:opgroup}
 
-FIXME: UW-IMAP?
+Many file systems strive to maintain internal file system consistency
+across system and hardware failures; change descriptors can express
+such write ordering requirements. But file systems are by no means the
+sole players to benefit from robustness to system and hardware
+failures. User applications often manipulate persistent data in
+manners subject to data corruption or loss. Applications often protect
+user data using interfaces like Unix's \texttt{sync()} and
+\texttt{fsync()} system calls in combination with write ordering.
+User-level change descriptors provide finer grained and less
+restrictive write ordering control so that applications can implement
+custom consistency semantics and make custom performance requirement
+tradeoffs. In this section we present the user-level change descriptor
+interface and implementation and a case study of user-level change
+descriptors in the UW-IMAP server.
+
+Add?: It is desirable for the interface to fit in with existing calls
+naturally (eg write()) and the file system must be able to ensure
+userspace can not ``harm the system'' (eg non-satisfiable
+requirements).
+
+\subsection{Interface}
 
 \begin{itemize}
-\item Goal: Allow applications to specify ordering so that
-  applications can implement custom consistency semantics and make
-  custom performance requirements tradeoffs. It is desirable for the
-  interface to fit in with existing calls naturally (eg write()) and
-  the file system must be able to ensure userspace can not ``harm the
-  system'' (eg non-satisfiable requirements).
-\item interface
-  \begin{itemize}
-  \item Explain how we think applications might make use of opgroups
-  \item We want to prevent apps from being able to screw the system up
-    (grab huge amounts of memory that can't be released, stop other
-    processes' data from going to disk, etc)
-  \item Explain the ``core differences'' between chdescs and
-    opgroups
-  \item File systems operate at the block level whereas user-level
-    programs (generally) operate at the file and file-offset level.
-    So expose a higher level of change descritors. Also expose a
-    higher level so that apps do not deal with file system
-    implementation specifics; allows opgroups to better fit in with
-    existing file system interactions (eg still use write(), don't
-    create chdescs, create byte/bit differences, add deps). These are
-    the reasons why why we chose to deal with groups of changes
-    instead of individual changes.
-  \item Opgroups are simpler than chdescs. Retaining not possible (app
-    waits tomake write) and destruction not an issue (unless a
-    transaction). Apply/rollback and dependency removal aren't seen as
-    helpful since apps are not doing transformations, just specifying
-    ordering requirements. (We should improve this reasoning.)
-  \item We want to prevent cycles from complicating the standard fs
-    calls; eg we don't want to apps to have to worry about write()
-    causing a cycle and thus canceling the write (how would the app
-    recover). Cycles from user data would are bad to have to worry
-    about, cycles from internal-fs changes are horrible to have to
-    worry about. Explain how we prevent cycles through cycle detection
-    and allowed state transitions.
-  \item Opgroups are designed to support different consistency
-    requirements. ordering ``most fundamental'' (?). Also support
-    atomic; more in the works.
-  \item Explain why create and engage are distinct. Why disengage,
-    release, and abandon are distinct. (Cycle prevention and for
-    atomic/trancactional opgroups.) Give transitions for opgroups and
-    atomic opgroups, or perhaps just a sampling, and the reasoning
-    behind these.
-  \end{itemize}
-\item kernel-side implementation
-  \begin{itemize}
-  \item cycle detection
-  \item chdesc implementation
-  \item scopes and opgroups across forks (multithreaded todos?)
-  \end{itemize}
+\item Explain how we think applications might make use of opgroups
+\item We want to prevent apps from being able to screw the system up
+  (grab huge amounts of memory that can't be released, stop other
+  processes' data from going to disk, etc)
+\item Explain the ``core differences'' between chdescs and
+  opgroups
+\item File systems operate at the block level whereas user-level
+  programs (generally) operate at the file and file-offset level.
+  So expose a higher level of change descritors. Also expose a
+  higher level so that apps do not deal with file system
+  implementation specifics; allows opgroups to better fit in with
+  existing file system interactions (eg still use write(), don't
+  create chdescs, create byte/bit differences, add deps). These are
+  the reasons why why we chose to deal with groups of changes
+  instead of individual changes.
+\item Opgroups are simpler than chdescs. Retaining not possible (app
+  waits tomake write) and destruction not an issue (unless a
+  transaction). Apply/rollback and dependency removal aren't seen as
+  helpful since apps are not doing transformations, just specifying
+  ordering requirements. (We should improve this reasoning.)
+\item We want to prevent cycles from complicating the standard fs
+  calls; eg we don't want to apps to have to worry about write()
+  causing a cycle and thus canceling the write (how would the app
+  recover). Cycles from user data would are bad to have to worry
+  about, cycles from internal-fs changes are horrible to have to
+  worry about. Explain how we prevent cycles through cycle detection
+  and allowed state transitions.
+\item Opgroups are designed to support different consistency
+  requirements. ordering ``most fundamental'' (?). Also support
+  atomic; more in the works.
+\item Explain why create and engage are distinct. Why disengage,
+  release, and abandon are distinct. (Cycle prevention and for
+  atomic/trancactional opgroups.) Give transitions for opgroups and
+  atomic opgroups, or perhaps just a sampling, and the reasoning
+  behind these.
 \end{itemize}
+
+\begin{figure}[htb]
+\begin{small}
+\texttt{opgroup\_id\_t opgroup\_create(int flags);}\\
+\texttt{int opgroup\_sync(opgroup\_id\_t opgroup);}\\
+\texttt{int opgroup\_add\_depend(opgroup\_id\_t dependent, opgroup\_id\_t dependency);}\\
+\texttt{int opgroup\_engage(opgroup\_id\_t opgroup);}\\
+\texttt{int opgroup\_disengage(opgroup\_id\_t opgroup);}\\
+\texttt{int opgroup\_release(opgroup\_id\_t opgroup);}\\
+\texttt{int opgroup\_abandon(opgroup\_id\_t opgroup);}
+\end{small}
+\caption{\label{fig:opgroup-interface} Opgroup Interface}
+\end{figure}
+
+\subsection{Implementation}
+\begin{itemize}
+\item cycle detection
+\item chdesc implementation
+\item scopes and opgroups across forks (multithreaded todos?)
+\end{itemize}
+
+\subsection{UW-IMAP Case Study}
+\begin{itemize}
+\item changes
+\item benefits: simplicity and efficency
+\end{itemize}
+
+Simple example, ``\texttt{compute < in > out \&\& rm in}''.
