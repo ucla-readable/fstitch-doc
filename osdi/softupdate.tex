@@ -1,7 +1,35 @@
 \section {Soft Updates}
 \label{sec:softupdate}
 
-Simple section showing how change descriptors basically already do soft updates.
+Generally, a file system image is consistent if a program like \emph{fsck}
+would report no errors -- that is, all the structures are in a completely
+correct organization. It is not generally possible to maintain this invariant,
+so in the ``soft updates''~\cite{ganger00soft} system this definition is
+relaxed slightly by allowing some structures (like inodes or disk blocks) to be
+marked as allocated even though there are no references to them. The key
+observation is that this will not cause any harm beyond making the structures
+unusable until they are discovered and reclaimed, which can be done safely in
+the background while the file system is in use.
+
+This relaxed consistency invariant can be implemented by carefully ordering the
+writes to the disk. A simple set of rules governing the order for writes,
+mostly consisting of the idea that a structure should never be marked free
+while a reference to a structure still exists on the disk, accomplishes this
+easily. In the FFS implementation of soft updates, each file system operation
+is represented by a structure in memory which encapsulates the different
+structural changes to the disk image necessary to implement that operation.
+
+In the KFS system, change descriptors are used to store all changes to the
+disk. So, rather than a single structure which represents the whole file system
+operation, several change descriptors are created -- one for each range of
+bytes on the disk which must be changed. Then, these change descriptors can be
+connected to one another to specify the order in which they must be written to
+disk. For instance, when a block is removed from a file, we create (at least)
+two change descriptors in most file systems: one that clears out the reference
+to that block number in the file's list of blocks, and one that marks the block
+as free.  By hooking up the second change descriptor to depend upon the first,
+we can implement the soft updates semantic straightforwardly. Another example
+is depicted in Figure~\ref{fig:softupdate}.
 
 \begin{figure}[htb]
   \centering
@@ -13,3 +41,13 @@ Simple section showing how change descriptors basically already do soft updates.
   Updating the size of the inode (Size) depends on writing the block
   pointer.}
 \end{figure}
+
+The difference between soft updates and the KFS system is that soft updates
+tracks these updates to the disk image at the level of file system operations,
+which are specific to the file system in use (which, in practice, is FFS), while
+the KFS system represents the changes in a file system independent way. The KFS
+approach allows the enforcement of the dependency information to be separated
+from the specification, and it also allows the dependency structure to be
+examined and modified by other components of the system that may not have any
+idea what the changes are actually implementing in terms of the file system
+structures they are changing.
