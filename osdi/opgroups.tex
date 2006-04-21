@@ -1,63 +1,60 @@
 \section{User-level Change Descriptors}
 \label{sec:opgroup}
-
-% FIXME: use \opgroup, \chdesc, \module, etc.
-
 Many file systems strive to maintain internal file system consistency
-across system and hardware failures; change descriptors can express
-such write ordering requirements. But file systems are by no means the
-sole players to benefit from robustness to system and hardware
-failures. User applications often manipulate persistent data in
-manners subject to data corruption or loss. Applications often protect
-user data using interfaces like Unix's \texttt{sync()} and
-\texttt{fsync()} system calls in combination with write ordering.
-User-level change descriptors provide finer grained and less
-restrictive write ordering control so that applications can implement
-custom consistency semantics and make custom performance requirement
-tradeoffs. In this section we present the user-level change descriptor
-interface and implementation and a case study of user-level change
-descriptors in the UW-IMAP server.
-
-Add?: It is desirable for the interface to fit in with existing calls
-naturally (eg write()) and the file system must be able to ensure
-userspace can not ``harm the system'' (eg non-satisfiable
-requirements).
+across system and hardware failures; \chdescs\ can express such write
+ordering requirements. But file systems are by no means the sole
+players to benefit from robustness to system and hardware failures.
+User applications often manipulate persistent data in manners subject
+to data corruption or loss. Applications often protect user data using
+interfaces like Unix's \texttt{sync()} and \texttt{fsync()} system
+calls in combination with write ordering.  \Opgroups\ provide finer
+grained and less restrictive write ordering control so that
+applications can implement custom consistency semantics and make
+custom performance requirement tradeoffs. In this section we present
+the \opgroup\ interface and implementation and a case study of
+\opgroups\ in the UW-IMAP server.
 
 \subsection{Interface}
-
+\label{sec:opgroup:interface}
 Just as file systems use consistency protocols to ensure internal
-consistency some (but not many!) applications define consistency
+consistency, some (but not many!) applications define consistency
 protocols to balance data loss avoidance and their desired level of
-performance. Here we describe the user-level change descriptor
-interface and the basis behind its design decisions.
+performance. Here we describe the \opgroup\ interface and the basis
+behind its design decisions.
 
-Both user-level and KFS change descriptors express storage update
-ordering dependencies. However, applications and file system modules
-differ in bestowed trust and stable storage interface. These are the
-two core reasons for user-level's and KFS's change descriptor
-differences.
+Both \opgroups\ and \chdescs\ express storage update ordering
+dependencies. However, applications and file system \modules\ differ
+in bestowed trust and stable storage interface. These are the two core
+reasons for \opgroup{}'s and \chdesc{}'s differences.
 
-Production file system modules are trusted to not ``harm the system;''
-however, user processes could harm the system given the chance to
-specify illegal pointer values, create cyclic dependencies, exhaust
-system resources, or prevent user data from going to disk.
+Production file system \modules\ are trusted to not ``harm the
+system;'' however, user processes could cause harm given the
+opportunity to create cyclic dependencies, exhaust system resources
+through non-satisfiable requirements, or prevent user data from going
+to disk or modify other user's data.
+
+In contrast to \Kudos{}'s low-level file system and block device
+interfaces which manipulate file and disk blocks, user programs
+manipulate stable storage data using an interface concerned with files
+and file positions.
+%
+Related, while significant intra-file system interface changes affect
+only a small group contained software, user file system interface
+changes affect applications everywhere. The \opgroup\ interface allows
+existing applications to implement new, user consistency protocols
+with no changes to existing file interface functions and even allows
+updated applications to effect existing applications.
+
+
+Q: Why use an engaged set rather than passing an opgroup with syscalls?\\
+A: Effect non-\opgroup{}-aware software. Other code in the same program
+and across exec.
 
 \begin{itemize}
-\item trust: apps untrusted; kernel modules are (cycles, bad pointers, resource usage, manipulate other process' data/prevent going to disk)
-\item update interface: VFS vs LFS/BD (and file system internals)
-\item simplicity? granularity?
-\end{itemize}
-
-\begin{itemize}
-\item Explain how we think applications might make use of opgroups
-\item We want to prevent apps from being able to screw the system up
-  (grab huge amounts of memory that can't be released, stop other
-  processes' data from going to disk, etc)
-\item Explain the ``core differences'' between chdescs and
-  opgroups
+\item Mention simplicity using opgroups vs fsync? Mention minimal changes?
 \item File systems operate at the block level whereas user-level
   programs (generally) operate at the file and file-offset level.
-  So expose a higher level of change descritors. Also expose a
+  So expose a higher level of \chdescs. Also expose a
   higher level so that apps do not deal with file system
   implementation specifics; allows opgroups to better fit in with
   existing file system interactions (eg still use write(), don't
@@ -98,24 +95,26 @@ system resources, or prevent user data from going to disk.
 \texttt{int opgroup\_release(opgroup\_id\_t opgroup);}\\
 \texttt{int opgroup\_abandon(opgroup\_id\_t opgroup);}
 \end{small}
-\caption{\label{fig:opgroup-interface} Opgroup Interface}
+\caption{\label{fig:opgroup-interface} \Opgroup\ Interface}
 \end{figure}
 
 \subsection{Implementation}
+\label{sec:opgroup:implementation}
 \begin{itemize}
 \item cycle detection
 \item chdesc implementation
   \begin{itemize}
-  \item chdesc structure; Figure~\ref{fig:opgroup-chdescs}
+  \item \chdesc\ structure; Figure~\ref{fig:opgroup-chdescs}
   \item opgroup\_lfs for head chdesc
   \end{itemize}
 \item scopes and opgroups across forks (multithreaded todos?)
 \end{itemize}
 
 \begin{figure}[htb]
-\caption{\label{fig:opgroup-chdescs} Opgroup Change Descriptors}
+\caption{\label{fig:opgroup-chdescs} \Opgroup\ \Chdescs}
 \end{figure}
 \subsection{UW-IMAP Case Study}
+\label{sec:opgroup:uwimap}
 \begin{itemize}
 \item changes
 \item benefits: simplicity and efficency
