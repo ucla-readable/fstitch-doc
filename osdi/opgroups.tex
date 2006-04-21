@@ -23,6 +23,29 @@ requirements).
 
 \subsection{Interface}
 
+Just as file systems use consistency protocols to ensure internal
+consistency some (but not many!) applications define consistency
+protocols to balance data loss avoidance and their desired level of
+performance. Here we describe the user-level change descriptor
+interface and the basis behind its design decisions.
+
+Both user-level and KFS change descriptors express storage update
+ordering dependencies. However, applications and file system modules
+differ in bestowed trust and stable storage interface. These are the
+two core reasons for user-level's and KFS's change descriptor
+differences.
+
+Production file system modules are trusted to not ``harm the system;''
+however, user processes could harm the system given the chance to
+specify illegal pointer values, create cyclic dependencies, exhaust
+system resources, or prevent user data from going to disk.
+
+\begin{itemize}
+\item trust: apps untrusted; kernel modules are (cycles, bad pointers, resource usage, manipulate other process' data/prevent going to disk)
+\item update interface: VFS vs LFS/BD (and file system internals)
+\item simplicity? granularity?
+\end{itemize}
+
 \begin{itemize}
 \item Explain how we think applications might make use of opgroups
 \item We want to prevent apps from being able to screw the system up
@@ -38,7 +61,8 @@ requirements).
   existing file system interactions (eg still use write(), don't
   create chdescs, create byte/bit differences, add deps). These are
   the reasons why why we chose to deal with groups of changes
-  instead of individual changes.
+  instead of individual changes. LFS's head argument similar to
+  opgroups.
 \item Opgroups are simpler than chdescs. Retaining not possible (app
   waits tomake write) and destruction not an issue (unless a
   transaction). Apply/rollback and dependency removal aren't seen as
@@ -51,6 +75,7 @@ requirements).
   about, cycles from internal-fs changes are horrible to have to
   worry about. Explain how we prevent cycles through cycle detection
   and allowed state transitions.
+
 \item Opgroups are designed to support different consistency
   requirements. ordering ``most fundamental'' (?). Also support
   atomic; more in the works.
@@ -65,7 +90,7 @@ requirements).
 \begin{small}
 \texttt{opgroup\_id\_t opgroup\_create(int flags);}\\
 \texttt{int opgroup\_sync(opgroup\_id\_t opgroup);}\\
-\texttt{int opgroup\_add\_depend(opgroup\_id\_t dependent, opgroup\_id\_t dependency);}\\
+\texttt{int opgroup\_add\_depend(opgroup\_id\_t depender, opgroup\_id\_t dependee);}\\
 \texttt{int opgroup\_engage(opgroup\_id\_t opgroup);}\\
 \texttt{int opgroup\_disengage(opgroup\_id\_t opgroup);}\\
 \texttt{int opgroup\_release(opgroup\_id\_t opgroup);}\\
@@ -78,9 +103,16 @@ requirements).
 \begin{itemize}
 \item cycle detection
 \item chdesc implementation
+  \begin{itemize}
+  \item chdesc structure; Figure~\ref{fig:opgroup-chdescs}
+  \item opgroup\_lfs for head chdesc
+  \end{itemize}
 \item scopes and opgroups across forks (multithreaded todos?)
 \end{itemize}
 
+\begin{figure}[htb]
+\caption{\label{fig:opgroup-chdescs} Opgroup Change Descriptors}
+\end{figure}
 \subsection{UW-IMAP Case Study}
 \begin{itemize}
 \item changes
