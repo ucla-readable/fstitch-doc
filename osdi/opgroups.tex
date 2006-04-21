@@ -43,11 +43,11 @@ only a small group contained software, user file system interface
 changes affect applications everywhere. The \opgroup\ interface allows
 existing applications to implement new, user consistency protocols
 with no changes to existing file interface functions and even allows
-updated applications to effect existing applications.
+updated applications to affect existing applications.
 
 
 Q: Why use an engaged set rather than passing an opgroup with syscalls?\\
-A: Effect non-\opgroup{}-aware software. Other code in the same program
+A: Affect non-\opgroup{}-aware software. Other code in the same program
 and across exec.
 
 \begin{itemize}
@@ -100,6 +100,15 @@ and across exec.
 
 \subsection{Implementation}
 \label{sec:opgroup:implementation}
+
+% This section would really benefit from knowing what figures we will have.
+
+\Opgroups\ are implemented using an arrangement of NO-OP \chdescs\ (see
+Figure~\ref{fig:opgroup-chdescs}) which allows the \opgroup\ to be connected to
+other \opgroups\ using ordinary \chdesc\ dependencies. An LFS \module\ in the
+\module\ graph is responsible for connecting all operations performed while a
+given \opgroup\ is \engaged\ to that \opgroup.
+
 \begin{itemize}
 \item cycle detection
 \item chdesc implementation
@@ -113,6 +122,7 @@ and across exec.
 \begin{figure}[htb]
 \caption{\label{fig:opgroup-chdescs} \Opgroup\ \Chdescs}
 \end{figure}
+
 \subsection{UW-IMAP Case Study}
 \label{sec:opgroup:uwimap}
 \begin{itemize}
