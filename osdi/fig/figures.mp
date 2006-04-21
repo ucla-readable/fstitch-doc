@@ -24,9 +24,9 @@ beginfig(1);
   velementit.loopd(btex \raise0.8ex\hbox{loop\strut}\strut etex, 1, 1, push);
   velementit.ufsb(btex UFS-0\strut etex, 1, 1, 7);
   ufsb.outpers[0] := push;
-  velementit.wbcache(btex wb\_cache\strut etex, 1, 1, push);
-  velementit.resizer(btex block\_resizer\strut etex, 1, 1, push);
-  velementit.ide(btex IDE\_hda\strut etex, 1, 0, push);
+  velementit.wbcache(btex wb cache\strut etex, 1, 1, push);
+  velementit.resizer(btex block resizer\strut etex, 1, 1, push);
+  velementit.ide(btex IDE hda\strut etex, 1, 0, push);
   boxjoin();
 
   uhfsb.s - ufsa.n = ufsa.s - journal.n

@@ -48,3 +48,15 @@ yet. KFS provides a revisioning system for blocks which can automatically ``roll
 back'' the change descriptors which have not yet reached a particular component,
 and then roll them forward again after that component is done using the previous
 version of the block's data (e.g. to write it to disk).
+
+\subsection{Cross-device dependencies}
+
+The write-back cache has one other property that makes it useful in the KFS
+system: it respects dependencies between one cache and another, so that (for
+instance) dependencies between the changes on a file system and its external
+journal are properly respected. This is actually not a special case, nor does it
+require any extra code -- it is a property that just falls out of the way change
+descriptor graphs are processed in order to determine which change descriptors
+are ready to move towards the disk. This property of write-back caches also
+extends to user-level change descriptors, which are explained in
+\S\ref{sec:opgroup}.
