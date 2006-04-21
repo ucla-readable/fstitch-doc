@@ -1,39 +1,39 @@
 \section{Journaling}
 \label{sec:journal}
 
-Although change descriptors might initially seem to be specifically designed to
+Although \chdescs\ might initially seem to be specifically designed to
 implement soft updates-like consistency semantics, they are in fact much more
 flexible and can be used to implement journaling as well. What distinguishes
-journaling from soft updates (from the point of view of change descriptors and
-the write-back cache) is that with soft updates, change descriptors can always
+journaling from soft updates (from the point of view of \chdescs\ and
+the write-back cache) is that with soft updates, \chdescs\ can always
 be written to the disk to empty the cache, while journals can ``lock'' changes
 into the cache while the transaction is in progress.
 
-To allow this, it is possible to create a ``managed'' NO-OP change descriptor
-that cannot be written at all, and other changes can be made to depend on it to
-prevent them from being written. The component in the KFS system that created
-the managed change descriptor can then later explicitly satisfy it, allowing all
-the other change descriptors to be written. This is how the journal module can
-set up dependencies to implement journaling: it makes all change descriptors
-passing through it depend on a managed NO-OP change descriptor, and makes copies
-of them to write to the journal. When the transaction is over, it can create a
-commit record, set all the change descriptors in the transaction to depend on
-it, and satisfy the managed NO-OP change descriptor.
+To allow this, it is possible to create a ``managed'' NO-OP \chdesc\ that
+cannot be written at all, and other changes can be made to depend on it to
+prevent them from being written. The \module\ in \Kudos\ that created the
+managed \chdesc\ can then later explicitly satisfy it, allowing all the other
+\chdescs\ to be written. This is how the journal \module\ can set up
+dependencies to implement journaling: it makes all \chdescs\ passing through it
+depend on a managed NO-OP \chdesc, and makes copies of them to write to the
+journal. When the transaction is over, it can create a commit record, set all
+the \chdescs\ in the transaction to depend on it, and satisfy the managed NO-OP
+\chdesc.
 
 \begin{figure}
   \centering
   \includegraphics[width=\hsize]{fig/figures_2}
-  \caption{\label{fig:journal} Journal change descriptor graph for the
-    change in Figure~\ref{fig:softupdate}. Empty circles are ``NO-OP''
-    change descriptors with no associated block data.}
+  \caption{\label{fig:journal} Journal \chdesc\ graph for the
+    change in Figure~\ref{fig:softupdate}. Empty circles are
+    ``NO-OP'' \chdescs\ with no associated block data.}
 \end{figure}
 
-A particularly nice property of this arrangement is that the journal component
+A particularly nice property of this arrangement is that the journal \module\
 is completely independent of any specific file system. It is a block device
-component that automatically journals whatever file system is stored on it. Even
+\module\ that automatically journals whatever file system is stored on it. Even
 metadata-only journaling (as opposed to the full data journaling described
 above) is possible, though we have not yet implemented it. The key to doing it
-is to know which change descriptors are user data, and which are file system
-metadata. This is already provided by the rest of the KFS system, and in
-particular by the UHFS component, so the remaining work would be to allow user
-data change descriptors to pass through the journal without being changed.
+is to know which \chdescs\ are user data, and which are file system metadata.
+This is already provided by the rest of \Kudos, and in particular by the UHFS
+\module, so the remaining work would be to allow user data \chdescs\ to pass
+through the journal without being changed.

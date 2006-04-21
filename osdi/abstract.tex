@@ -14,28 +14,29 @@ help from conventional file systems, which either impose high overhead (data
 journaling) or don't guarantee data consistency (soft updates, for example,
 ensures metadata consistency only).
 
-We propose a new file system implementation architecture, called \emph{KFS},
+% The abstract will call them "change descriptors" always.
+We propose a new file system implementation architecture, called \emph{\Kudos},
 where \emph{change descriptor} structures represent any and all changes to
 stable storage. File systems generate change descriptors for all writes, then
 send them to block devices for eventual commit. Explicit dependencies between
-change descriptors let KFS components preserve necessary file system invariants
-without understanding the file system itself. Change descriptors can implement
-many consistency mechanisms, including soft updates and journaling.
+change descriptors let \Kudos\ \modules\ preserve necessary file system
+invariants without understanding the file system itself. Change descriptors can
+implement many consistency mechanisms, including soft updates and journaling.
 
-KFS is decomposed into fine-grained components which generate, consume, forward,
-and manipulate change descriptors. A particular innovation of the component
-design is the separation of the low-level specification of on-disk layout from
-higher-level file system-independent code, which operates on abstract disk
-structures. Our journaling module can automatically add journaling to any file
-system, and combinations of simple components can support, for example, correct
-consistency on RAID over loop-back devices.
+\Kudos\ is decomposed into fine-grained \modules\ which generate, consume,
+forward, and manipulate change descriptors. A particular innovation of the
+\module\ design is the separation of the low-level specification of on-disk
+layout from higher-level file system-independent code, which operates on
+abstract disk structures. Our journaling \module\ can automatically add
+journaling to any file system, and combinations of simple \modules\ can support,
+for example, correct consistency on RAID over loop-back devices.
 
-Finally, a new interface between KFS and user applications allows them to have
-some direct control over change descriptors. We have used this interface to
+Finally, a new interface between \Kudos\ and user applications allows them to
+have some direct control over change descriptors. We have used this interface to
 improve the UW-IMAP server, removing inefficient and unnecessary calls to
 \texttt{fsync()} while preserving the integrity of mail messages.
 
-We have implemented KFS as both a Linux kernel module and a FUSE userspace file
-system server. INSERT BRIEF PERFORMANCE MEASUREMENTS HERE.
+We have implemented \Kudos\ as both a Linux kernel module and a FUSE userspace
+file system server. INSERT BRIEF PERFORMANCE MEASUREMENTS HERE.
 
 \end{abstract}

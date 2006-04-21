@@ -19,22 +19,21 @@ easily. In the FFS implementation of soft updates, each file system operation
 is represented by a structure in memory which encapsulates the different
 structural changes to the disk image necessary to implement that operation.
 
-In the KFS system, change descriptors are used to store all changes to the
-disk. So, rather than a single structure which represents the whole file system
-operation, several change descriptors are created -- one for each range of
-bytes on the disk which must be changed. Then, these change descriptors can be
-connected to one another to specify the order in which they must be written to
-disk. For instance, when a block is removed from a file, we create (at least)
-two change descriptors in most file systems: one that clears out the reference
-to that block number in the file's list of blocks, and one that marks the block
-as free.  By hooking up the second change descriptor to depend upon the first,
-we can implement the soft updates semantic straightforwardly. Another example
-is depicted in Figure~\ref{fig:softupdate}.
+In \Kudos, \chdescs\ are used to store all changes to the disk. So, rather than
+a single structure which represents the whole file system operation, several
+\chdescs\ are created -- one for each range of bytes on the disk which must be
+changed. Then, these \chdescs\ can be connected to one another to specify the
+order in which they must be written to disk. For instance, when a block is
+removed from a file, we create (at least) two \chdescs\ in most file systems:
+one that clears out the reference to that block number in the file's list of
+blocks, and one that marks the block as free. By hooking up the second \chdesc\
+to depend upon the first, we can implement the soft updates semantic
+straightforwardly. Another example is depicted in Figure~\ref{fig:softupdate}.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=92pt]{fig/figures_3}
-  \caption{\label{fig:softupdate} Soft updates change descriptor graph,
+  \caption{\label{fig:softupdate} Soft updates \chdesc\ graph,
   including the dependencies for adding a newly allocated block to an
   inode. Writing the new block pointer to an inode (Attach) depends on
   initializing the block (Clear) and updating the free block map (Alloc).
@@ -42,12 +41,12 @@ is depicted in Figure~\ref{fig:softupdate}.
   pointer.}
 \end{figure}
 
-The difference between soft updates and the KFS system is that soft updates
-tracks these updates to the disk image at the level of file system operations,
-which are specific to the file system in use (which, in practice, is FFS), while
-the KFS system represents the changes in a file system independent way. The KFS
+The difference between soft updates and \Kudos\ is that soft updates tracks
+these updates to the disk image at the level of file system operations, which
+are specific to the file system in use (which, in practice, is FFS), while
+\Kudos\ represents the changes in a file system independent way. The \Kudos\
 approach allows the enforcement of the dependency information to be separated
 from the specification, and it also allows the dependency structure to be
-examined and modified by other components of the system that may not have any
+examined and modified by other \modules\ of the system that may not have any
 idea what the changes are actually implementing in terms of the file system
 structures they are changing.

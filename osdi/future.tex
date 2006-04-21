@@ -2,26 +2,26 @@
 \label{sec:future}
 
 There are several areas in which we would like to expand our work. The obvious
-first area we would like to work on is the performance of the KFS system. We
-have already improved the performance by literally several orders of magnitude,
-since we only recently began examining performance in addition to correctness,
-but the system is not as fast as it could be -- and not quite as fast as it
-needs to be to be a viable option for most computer systems.
+first area we would like to work on is the performance of \Kudos. We have
+already improved the performance by literally several orders of magnitude, since
+we only recently began examining performance in addition to correctness, but the
+system is not as fast as it could be -- and not quite as fast as it needs to be
+to be a viable option for most computer systems.
 
 There are several ways in which the performance can be improved. First, we
-create a very large number of change descriptors, and the sheer number of them
-can cause problems for any of our algorithms which needs to traverse parts of
-the change descriptor dependency graph. We can attack this problem from two
-sides: we can reduce the number of change descriptors by intelligently merging
-them when we determine that having separate change descriptors is not necessary,
-or we can improve the efficiency of the traversal algorithms to need to examine
-fewer change descriptors. We have worked on both of these approaches, especially
-the second, but we believe further improvements can be made.
+create a very large number of \chdescs, and the sheer number of them can cause
+problems for any of our algorithms which needs to traverse parts of the \chdesc\
+dependency graph. We can attack this problem from two sides: we can reduce the
+number of \chdescs\ by intelligently merging them when we determine that having
+separate \chdescs\ is not necessary, or we can improve the efficiency of the
+traversal algorithms to need to examine fewer \chdescs. We have worked on both
+of these approaches, especially the second, but we believe further improvements
+can be made.
 
-Another item we would like to add is an ext2 file system component. Currently,
-we have written only a UFS component, aside from a component for a very simple
-prototype file system called JOSFS. Once we have an ext2 component, we could use
-our journal module to get ``ext3b''. Implementing an ext2 component would also
+Another item we would like to add is an ext2 file system \module. Currently,
+we have written only a UFS \module, aside from a \module\ for a very simple
+prototype file system called JOSFS. Once we have an ext2 \module, we could use
+our journal module to get ``ext3b''. Implementing an ext2 \module\ would also
 help us to identify more opportunities for sharing code between file system
 implementations, and ways in which our interfaces might accomodate different
 file systems more neutrally.
@@ -29,8 +29,8 @@ file systems more neutrally.
 \begin{itemize}
 \item Fast cycle checking
 \item Better cache eviction algorithm
-\item Transactional user-level change descriptors
-\item More flexible rules for user-level change descriptors
+\item Transactional user-level \chdescs
+\item More flexible rules for user-level \chdescs
 \item Metadata-only journaling
 \item More references
 \end{itemize}

@@ -2,7 +2,7 @@
 \label{sec:ufs}
 
 \begin{itemize}
-\item Motivation: Show KFS is capable of accommodating soft updates
+\item Motivation: Show \Kudos\ is capable of accommodating soft updates
   sematics by writing an implementation of UFS. (See \S\ref{sec:softupdate}.)
 \item What is UFS / soft updates.
   \begin{itemize}
@@ -18,17 +18,17 @@
   \begin{itemize}
   \item The LFS interface naturally divides the implementation into a set
     of simpler tasks. With an understanding of the UFS on-disk format and
-    soft updates requirements, we added functionality to our UFS module
+    soft updates requirements, we added functionality to our UFS \module\
     in a progressive manner.
-  \item Using change descriptors, we can control the ordering for writes
+  \item Using \chdescs, we can control the ordering for writes
     to disk. This allow us to express the dependencies between different
     writes and achieve soft updates consistency.
   \item Applying our modularity philosophy to UFS, we refactored the file
-    system module and separated many functions into sub-modules internal
+    system \module\ and separated many functions into sub-\modules\ internal
     to UFS. Modularity makes it easy to exchange one piece of code for
     another. For example, we can change the inode allocation policy or
     the behavior when updating the superblock by swapping in different
-    sub-module.
+    sub-\module.
   \end{itemize}
 \item Shortcomings
   \begin{itemize}

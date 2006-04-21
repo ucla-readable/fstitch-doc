@@ -1,41 +1,41 @@
 \section{Linux Kernel Module}
 \label{sec:linux}
 
-The KFS system was originally implemented as a stand-alone file system server
-daemon for a small operating system called KudOS, but now runs as either a
+\Kudos\ was originally implemented as a stand-alone file system server daemon
+for a small operating system called ``KudOS,'' but now runs as either a
 FUSE~\cite{fuse} file system server under Linux or BSD, or as a Linux kernel
 module. The former is particularly useful for profiling and debugging, while the
 latter is best for real-world performance testing and actual use. Additionally,
-it supports user-level change descriptors (``opgroups'') which are not supported
-by the FUSE version due to the IPC that would be required to implement it.
+it supports \opgroups\ which are not supported by the FUSE version due to the
+IPC that would be required to implement them.
 
-The KFS Linux kernel module looks like a VFS file system to Linux, but unlike
-traditional file system modules which are connected directly to block devices,
-it is merely a front end to a KFS component graph. The KFS server starts up a
-kernel thread which performs all the initialization to get the component graph
-set up, and components then can make file systems available to mount though the
-VFS front end. Each file system is given a name which can be used to mount it
-using the standard Linux \texttt{mount} program, using a command like
-\mbox{\texttt{mount kfs:\textit{name} /mnt/point -t kfs}}.
+The \Kudos\ Linux kernel module looks like a VFS file system to Linux, but
+unlike traditional file system modules which are connected directly to block
+devices, it is merely a front end to a \Kudos\ \module\ graph. The \Kudos\
+server starts up a kernel thread which performs all the initialization to get
+the \module\ graph set up, and \modules\ then can make file systems available to
+mount though the VFS front end. Each file system is given a name which can be
+used to mount it using the standard Linux \texttt{mount} program, using a
+command like \mbox{\texttt{mount kfs:\textit{name} /mnt/point -t kfs}}.
 
-At the other end of the KFS component graph, the terminal block device
-components are wrappers for Linux's normal block devices, instead of the actual
-device drivers that were in the original stand-alone KudOS version of the KFS
-system. (In the FUSE version, they are wrappers for files in a standard Linux
-file system.) These wrappers bypass the normal Linux buffer caches, because
-KFS provides its own change-descriptor aware caches (\S\ref{sec:wbcache}) in
+At the other end of the \Kudos\ \module\ graph, the terminal block device
+\modules\ are wrappers for Linux's normal block devices, instead of the actual
+device drivers that were in the original stand-alone KudOS version of the
+\Kudos\ system. (In the FUSE version, they are wrappers for files in a standard
+Linux file system.) These wrappers bypass the normal Linux buffer caches,
+because \Kudos\ provides its own \chdesc-aware caches (\S\ref{sec:wbcache}) in
 order to provide its write-ordering guarantees.
 
 There is a small change necessary to the standard Linux kernel in order to
-provide support for opgroups, however. As a kernel module, there is no way to
+provide support for \opgroups, however. As a kernel module, there is no way to
 get notifications about when processes are created, or when they terminate. This
-is necessary to clone the opgroup scope (which is a lot like a file descriptor
-table) from the parent process when the process is created, and to close all the
-opgroups when it terminates. Ordinarily, this sort of state would be kept as
-part of the Linux \texttt{task\_struct} (i.e. process) structure, but this is
-not a viable option for a dynamically loadable kernel module. Instead, the KFS
-module keeps this state internally, and it uses hooks we added to the kernel to
-be notified when processes fork or exit. The patch to add these hooks is based
-on the ``process events connector'' which was introduced in Linux 2.6.15, and is
-only about 250 lines long. Without it, KFS can still operate, but it does not
-allow opgroups.
+is necessary to clone the \opgroup\ scope (which is a lot like a file descriptor
+table) from the parent process when the process is created, and to \abandon\ all
+the \opgroups\ when it terminates. Ordinarily, this sort of state would be kept
+as part of the Linux \texttt{task\_struct} (i.e. process) structure, but this is
+not a viable option for a dynamically loadable kernel module. Instead, the
+\Kudos\ module keeps this state internally, and it uses hooks we added to the
+kernel to be notified when processes fork or exit. The patch to add these hooks
+is based on the ``process events connector'' which was introduced in Linux
+2.6.15, and is only about 250 lines long. Without it, \Kudos\ can still operate,
+but it does not allow \opgroups.

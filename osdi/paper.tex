@@ -5,6 +5,24 @@
 \usepackage{multirow}
 \frenchspacing
 
+% The names of commonly referenced things in our work which
+% we might want to give different names for the paper.
+\newcommand{\chdesc}{change descriptor}
+\newcommand{\chdescs}{change descriptors}
+\newcommand{\Chdescs}{Change descriptors}
+
+\newcommand{\module}{module}
+\newcommand{\modules}{modules}
+\newcommand{\Module}{Module}
+\newcommand{\Modules}{Modules}
+
+\newcommand{\opgroup}{user-level \chdesc}
+\newcommand{\opgroups}{user-level \chdescs}
+\newcommand{\Opgroups}{User-level \chdescs}
+
+\newcommand{\Kudos}{Kudos}
+\newcommand{\abandon}{abandon}
+
 \usepackage{url,hyperref,ifpdf}
 \ifpdf
   \usepackage[pdftex]{graphicx}
@@ -12,7 +30,7 @@
   \DeclareGraphicsExtensions{.jpg,.pdf,.mps,.png}
   \pdfinfo
   { 
-    /Title (The KudOS File Server Architecture)
+    /Title (The \Kudos\ File Server Architecture)
     /Author (Andrew de los Reyes, Chris Frost, Mike Mammarella, Lei Zhang, {adlr,frost,mikem,leiz}@cs.ucla.edu)
   }
   \pdfcompresslevel=9
@@ -22,7 +40,7 @@
 \fi
 
 % A list of stuff not to hyphenate
-\hyphenation{KudOS}
+\hyphenation{KudOS Kudos}
 
 %\renewcommand{\dbltopfraction}{1.00}
 %\renewcommand{\topfraction}{1.00}
@@ -39,7 +57,7 @@
 
 \normalsize
 
-\title{\sffamily\textbf{The KudOS File Server Architecture}}
+\title{\sffamily\textbf{The \Kudos\ File Server Architecture}}
 
 
 \author{\sffamily Andrew de los Reyes, Chris Frost, Eddie Kohler, Mike
@@ -60,13 +78,6 @@ Mammarella, and Lei Zhang \\
 \input{intro.tex}
 
 \section{Remaining Nuggets}
-
-We need to settle on some naming conventions. For instance, do we call the whole
-system KudOS, KFS, or something else? Do we call block devices, LFS, and CFS
-instances modules, components, elements, or objects? Do we call opgroups
-user-level change descriptors everywhere, or just introduce them as that? Do we
-abbreviate change descriptor as chdesc anywhere, or do we always write it out?
-Also, we should have a better title.
 
 \begin{itemize}
 \item chdesc patterns

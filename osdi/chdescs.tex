@@ -2,18 +2,19 @@
 \label{sec:chdescs}
 
 \subsection {Overview}
-Each in-memory modification to a cached disk block in the KFS system has an
-associated change descriptor. Different change types correspond to different
-forms of change descriptors; the change descriptor for a flipped bit -- such as
-in a free-block bitmap -- contains an offset and mask, while larger changes
-contain an offset, a length, and the new data. The change descriptor's
-dependencies point to other change descriptors that must precede it to stable
-storage. A change descriptor can be applied or reverted to switch the cached
-block's state between old and new as necessary. Each change descriptor applies
+% The first use of "change descriptor" is written out. All others, if not the
+% same, should be defined in parentheses here.
+Each in-memory modification to a cached disk block in \Kudos\ has an associated
+change descriptor. Different change types correspond to different forms of
+\chdescs; the \chdesc\ for a flipped bit -- such as in a free-block bitmap --
+contains an offset and mask, while larger changes contain an offset, a length,
+and the new data. The \chdesc's dependencies point to other \chdescs that must
+precede it to stable storage. A \chdesc can be applied or reverted to switch
+the cached block's state between old and new as necessary. Each \chdesc applies
 to exactly one block.
 
-Figure~\ref{fig:chdesc} gives a simplified version of the structure. The ability
-to revert and re-apply change descriptors is inspired by the soft updates system
+Figure~\ref{fig:chdesc} gives a simplified version of the structure. The
+ability to revert and re-apply \chdescs\ is inspired by the soft updates system
 in BSD's FFS~\cite{ganger00soft} (discussed in \S\ref{sec:softupdate}), but
 generalized so that it is not specific to any particular file system.
 
@@ -42,85 +43,84 @@ struct chdesc {
 \end{scriptsize}
 \end{tabular}
 \vspace{-10pt}
-\caption{\label{fig:chdesc} Partial change descriptor structure.}
+\caption{\label{fig:chdesc} Partial \chdesc\ structure.}
 \end{figure}
 
-When a KFS component first generates change descriptors to write to the disk, it
+When a \Kudos\ \module\ first generates \chdescs\ to write to the disk, it
 specifies write ordering requirements similar to those of soft updates. For
-example, Figure~\ref{fig:softupdate} depicts change descriptors that allocate
-and add a new block to an inode. The component passes these change descriptors
-to another component closer to the disk. This second component can inspect,
-delay, and even modify them before passing them on further. For instance, the
-write-back cache component (\S\ref{sec:wbcache}) holds on to blocks and their
-change descriptors instead of forwarding them immediately. When evicting a block
-and associated change descriptors, the write-back cache enforces an order
-consistent with the change descriptor dependency information.
+example, Figure~\ref{fig:softupdate} depicts \chdescs\ that allocate and add a
+new block to an inode. The \module\ passes these \chdescs\ to another \module\
+closer to the disk. This second \module\ can inspect, delay, and even modify
+them before passing them on further. For instance, the write-back cache
+\module\ (\S\ref{sec:wbcache}) holds on to blocks and their \chdescs\ instead
+of forwarding them immediately. When evicting a block and associated \chdescs,
+the write-back cache enforces an order consistent with the \chdesc\ dependency
+information.
 
 \subsection {Optimizations}
-Many of the operations that components like the write-back cache need to do
-involve quickly discovering the set of change descriptors that satisfy some
-property, and often even some ordering of those change descriptors. In early
-prototypes, these sets were often calculated by doing graph traversals of the
-dependency graph of change descriptors. However, these traversals are in
-practice extremely expensive, and many optimizations were necessary in order to
-improve the performance of the KFS system.
+Many of the operations that \modules\ like the write-back cache need to do
+involve quickly discovering the set of \chdescs\ that satisfy some property,
+and often even some ordering of those \chdescs. In early prototypes, these sets
+were often calculated by doing graph traversals of the dependency graph of
+\chdescs. However, these traversals are in practice extremely expensive, and
+many optimizations were necessary in order to improve the performance of
+\Kudos.
 
-For instance, consider the structure of a change descriptor itself. The list of
-dependencies is often changing as a change descriptor moves through the system.
-Even when no components are explicitly ``rewiring'' the change descriptors,
-dependencies on a change descriptor must be removed when that change descriptor
-is destroyed as a result of having been written to disk. Simple singly linked
-lists originally stored the lists of dependencies, and it turned out that a lot
-of time was being spent traversing those lists in order to destroy each change
-descriptor. It turned out that almost always, the element being removed from the
-list was at the end of the list -- because it had been added longest ago, and
-often changes were being written to disk in an order similar to the order in
-which they had been made. The solution was to convert the linked list into a
-queue, so that elements would be added to one end of the list and removed from
-the other. This converted a linear time search into one which would usually
-execute in constant time.
+For instance, consider the structure of a \chdesc\ itself. The list of
+dependencies is often changing as a \chdesc\ moves through the system. Even
+when no \modules\ are explicitly ``rewiring'' the \chdescs, dependencies on a
+\chdesc\ must be removed when that \chdesc\ is destroyed as a result of having
+been written to disk. Simple singly linked lists originally stored the lists of
+dependencies, and it turned out that a lot of time was being spent traversing
+those lists in order to destroy each \chdesc. It turned out that almost always,
+the element being removed from the list was at the end of the list -- because
+it had been added longest ago, and often changes were being written to disk in
+an order similar to the order in which they had been made. The solution was to
+convert the linked list into a queue, so that elements would be added to one
+end of the list and removed from the other. This converted a linear time search
+into one which would usually execute in constant time.
 
-Another example is that when examining a block and deciding which change
-descriptors must be ``rolled back'' in order for the block's data to be safe to
-write to the disk, the dependency graph between the various changes on that
-block must be taken into account so that changes which depend on one another are
-rolled back in proper dependency order. Originally, a traversal of the change
-descriptor graph rooted at the block's NO-OP change descriptor (which depends on
-all the changes on that block) was used to calculate the correct ordering. This
-was very computationally intensive when more than a tiny number of change
-descriptors were involved. The algorithm was changed to examine only those
-change descriptors actually on the block, and still it was not as good as we had
-hoped. Finally, we discovered that we were examining the change descriptors in
-almost exactly the opposite order as the order they should be rolled back in --
-for the same reason as the previous example. By simply changing the direction of
-the loop, we were able to improve the loop from quadratic time to linear time.
+Another example is that when examining a block and deciding which \chdescs\
+must be ``rolled back'' in order for the block's data to be safe to write to
+the disk, the dependency graph between the various changes on that block must
+be taken into account so that changes which depend on one another are rolled
+back in proper dependency order. Originally, a traversal of the \chdesc\ graph
+rooted at the block's NO-OP \chdesc\ (which depends on all the changes on that
+block) was used to calculate the correct ordering. This was very
+computationally intensive when more than a tiny number of \chdescs\ were
+involved. The algorithm was changed to examine only those \chdescs\ actually on
+the block, and still it was not as good as we had hoped. Finally, we discovered
+that we were examining the \chdescs\ in almost exactly the opposite order as
+the order they should be rolled back in -- for the same reason as the previous
+example. By simply changing the direction of the loop, we were able to improve
+the loop from quadratic time to linear time.
 
-We believe that there are still many places change descriptor operations can be
-optimized to improve the performance of the KFS system. Many of these places
-likely will have the same flavor as the two examples here: information we
-already have can be used in order to determine the answers we need, without
-needing to directly calculate those answers. Even as it is, however, the KFS
-system does not run dramatically slower than a standard Linux 2.6 kernel.
+We believe that there are still many places \chdesc\ operations can be
+optimized to improve the performance of \Kudos. Many of these places likely
+will have the same flavor as the two examples here: information we already have
+can be used in order to determine the answers we need, without needing to
+directly calculate those answers. Even as it is, however, \Kudos\ does not run
+dramatically slower than a standard Linux 2.6 kernel.
 
 \subsection {Applications}
 Soft updates, journaling, and many application-specific consistency models all
-correspond to different change descriptor arrangements, so these features can be
-added to the system as components which appropriately connect or reconnect the
-change descriptors. For example, the change descriptors in
-Figure~\ref{fig:softupdate} can be transformed to provide journaling semantics.
-The original four change descriptors are modified to depend on a journal commit
-record, which depends on blocks journaling the changes. Once the actual changes
-commit, the journal record is marked as completed. Figure~\ref{fig:journal}
-shows these transformed change descriptors. This single journaling component
-(see \S\ref{sec:journal}) can attach to any file system component; it performs
-transformations incrementally as change descriptors arrive.
+correspond to different \chdesc\ arrangements, so these features can be added
+to the system as \modules\ which appropriately connect or reconnect the
+\chdescs. For example, the \chdescs\ in Figure~\ref{fig:softupdate} can be
+transformed to provide journaling semantics. The original four \chdescs\ are
+modified to depend on a journal commit record, which depends on blocks
+journaling the changes. Once the actual changes commit, the journal record is
+marked as completed. Figure~\ref{fig:journal} shows these transformed \chdescs.
+This single journaling \module\ (see \S\ref{sec:journal}) can attach to any
+file system \module; it performs transformations incrementally as \chdescs\
+arrive.
 
-Further, by changing our journal component to journal only change descriptors
-that modify file system metadata -- and by adding additional dependencies to
-prevent premature reuse of blocks -- we could even obtain metadata-only
-journaling. The journal component can distinguish metadata change descriptors
-because of the LFS interface described in \S\ref{sec:interfaces}. Other block
-device layering systems, like GEOM~\cite{geom} or JBD in Linux, would or do need
-special hooks into file system code to determine what disk changes represent
-metadata in order to do metadata-only journaling. Change descriptors and the LFS
-interface allow us to do this automatically.
+Further, by changing our journal \module\ to journal only \chdescs\ that modify
+file system metadata -- and by adding additional dependencies to prevent
+premature reuse of blocks -- we could even obtain metadata-only journaling. The
+journal \module\ can distinguish metadata \chdescs\ because of the LFS
+interface described in \S\ref{sec:interfaces}. Other block device layering
+systems, like GEOM~\cite{geom} or JBD in Linux, would or do need special hooks
+into file system code to determine what disk changes represent metadata in
+order to do metadata-only journaling. \Chdescs\ and the LFS interface allow us
+to do this automatically.

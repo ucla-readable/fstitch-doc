@@ -1,62 +1,60 @@
 \section{Write-Back Cache and Block Revisioning}
 \label{sec:wbcache}
 
-The write-back cache is in some sense the component that does all the real work
-in a KFS system. There can be many write-back caches in a configuration at once,
-but each is responsible for holding on to the change descriptors sent to it by
-connected components until they can be safely sent on towards the disk. To a
-write-back cache, the complex consistency protocols that other modules want to
-enforce are nothing more than sets of dependencies among change descriptors --
-it has no idea what consistency protocol (or protocols) it is implementing, if
-any at all. Yet it is the component that ends up doing most of the work to make
-sure that change descriptors are written in an acceptable order.
+The write-back cache is in some sense the \module\ that does all the real work
+in \Kudos. There can be many write-back caches in a configuration at once, but
+each is responsible for holding on to the \chdescs\ sent to it by connected
+\modules\ until they can be safely sent on towards the disk. To a write-back
+cache, the complex consistency protocols that other \modules\ want to enforce
+are nothing more than sets of dependencies among \chdescs\ -- it has no idea
+what consistency protocol (or protocols) it is implementing, if any at all. Yet
+it is the \module\ that ends up doing most of the work to make sure that
+\chdescs\ are written in an acceptable order.
 
 Even though a write-back cache has such an important and central role in the
 system, there's not a lot to it. The current write-back cache is a simple LRU
 cache, but with an important twist: blocks can't be evicted unless all the
-change descriptors on them are ``ready'' to be sent to the next component (for
-example, the disk). So, when looking for a block to evict, the cache may not be
-able to evict any block it chooses -- but it evicts the least recently used
-block that it can.
+\chdescs\ on them are ``ready'' to be sent to the next \module\ (for example,
+the disk). So, when looking for a block to evict, the cache may not be able to
+evict any block it chooses -- but it evicts the least recently used block that
+it can.
 
 \subsection{Block Cycles}
 \label{subsec:blockcycles}
 
-Just as with soft updates~\cite{ganger00soft}, the dependencies among change
-descriptors (or just ``updates to the block'' in soft updates) can create cyclic
-dependencies among blocks, even though the change descriptors themselves do not
-form a cycle. To handle this case, some change descriptors may need to be ``held
-back'' in order to write the others, allowing such cycles to be broken.  To
-effect this behavior, the write-back cache just holds on to the change
-descriptors that cannot yet be written, but forwards the others on to the next
-component as it writes the block. It cannot evict the block yet, since it is
-still ``dirty,'' but progress has been made that can make other blocks
-evictable.
+Just as with soft updates~\cite{ganger00soft}, the dependencies among \chdescs\
+(or just ``updates to the block'' in soft updates) can create cyclic
+dependencies among blocks, even though the \chdescs\ themselves do not form a
+cycle. To handle this case, some \chdescs\ may need to be ``held back'' in order
+to write the others, allowing such cycles to be broken. To effect this behavior,
+the write-back cache just holds on to the \chdescs\ that cannot yet be written,
+but forwards the others on to the next \module\ as it writes the block. It
+cannot evict the block yet, since it is still ``dirty,'' but progress has been
+made that can make other blocks evictable.
 
 \subsection{Block Revisioning}
 
-Since many components may be stacked on top of one another in a KFS system, and
-since many of them may want to refer to the same block at the same time, only
-one copy of the data for each block is kept in memory at a time. However,
-different components may ``know about'' different sets of change descriptors.
-For example, in the case outlined in \S\ref{subsec:blockcycles}, the component
-below the write-back cache will know about some of the change descriptors on a
-block but not others (the ones which are not ``ready'' to be sent to it yet). If
-this component is the disk, it will need to be able to write a version of the
-block's data that does not include the change descriptors it does't know about
-yet. KFS provides a revisioning system for blocks which can automatically ``roll
-back'' the change descriptors which have not yet reached a particular component,
-and then roll them forward again after that component is done using the previous
-version of the block's data (e.g. to write it to disk).
+Since many \modules\ may be stacked on top of one another in \Kudos, and since
+many of them may want to refer to the same block at the same time, only one copy
+of the data for each block is kept in memory at a time. However, different
+\modules\ may ``know about'' different sets of \chdescs. For example, in the
+case outlined in \S\ref{subsec:blockcycles}, the \module\ below the write-back
+cache will know about some of the \chdescs\ on a block but not others (the ones
+which are not ``ready'' to be sent to it yet). If this \module\ is the disk, it
+will need to be able to write a version of the block's data that does not
+include the \chdescs\ it does't know about yet. \Kudos\ provides a revisioning
+system for blocks which can automatically ``roll back'' the \chdescs\ which have
+not yet reached a particular \module, and then roll them forward again after
+that \module\ is done using the previous version of the block's data (e.g. to
+write it to disk).
 
 \subsection{Cross-device dependencies}
 
-The write-back cache has one other property that makes it useful in the KFS
-system: it respects dependencies between one cache and another, so that (for
-instance) dependencies between the changes on a file system and its external
-journal are properly respected. This is actually not a special case, nor does it
-require any extra code -- it is a property that just falls out of the way change
-descriptor graphs are processed in order to determine which change descriptors
-are ready to move towards the disk. This property of write-back caches also
-extends to user-level change descriptors, which are explained in
-\S\ref{sec:opgroup}.
+The write-back cache has one other property that makes it useful in \Kudos: it
+respects dependencies between one cache and another, so that (for instance)
+dependencies between the changes on a file system and its external journal are
+properly respected. This is actually not a special case, nor does it require any
+extra code -- it is a property that just falls out of the way \chdesc\ graphs
+are processed in order to determine which \chdescs\ are ready to move towards
+the disk. This property of write-back caches also extends to \opgroups, which
+are explained in \S\ref{sec:opgroup}.
