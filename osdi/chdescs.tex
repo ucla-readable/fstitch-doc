@@ -112,8 +112,8 @@ The original four change descriptors are modified to depend on a journal commit
 record, which depends on blocks journaling the changes. Once the actual changes
 commit, the journal record is marked as completed. Figure~\ref{fig:journal}
 shows these transformed change descriptors. This single journaling component
-(see section \ref{sec:journal}) can attach to any file system component; it
-performs transformations incrementally as change descriptors arrive.
+(see \S\ref{sec:journal}) can attach to any file system component; it performs
+transformations incrementally as change descriptors arrive.
 
 Further, by changing our journal component to journal only change descriptors
 that modify file system metadata -- and by adding additional dependencies to
