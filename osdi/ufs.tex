@@ -55,17 +55,50 @@ our UFS module internally allocates a block, but returns only the first
 fragment in that block at the LFS level. The next 7 allocation calls will be
 no-ops that simply returns the subsequent fragments in the allocated block.
 
-Using \chdescs, we can control the ordering for writes to disk. This allows us
-to express the dependencies between different writes and achieve soft updates
-consistency using one unified data structure. In addition, the UFS module only
-needs to specify the dependencies. The BD subsystem will track and enforce the
-\chdescs descriptor orderings.
+Using \chdescs, the UFS module can control the ordering for writes to disk.
+This allows UFS to create sets of \chdescs\ and hooking them up in
+configurations that achieve soft updates consistency. Under normal operation,
+once the dependencies have been created, UFS no longer needs to concern itself
+with the \chdescs\ it created. The BD subsystem will track and enforce the
+change descriptor orderings. For rare error cases that occur, UFS oftentimes
+undo the operation by creating \chdescs\ that reverse the original operation.
+We hope future versions of \Kudos\ will be able to automatically detect this
+arrangement of \chdescs\ and cancel them.
 
+EXPAND ME, INSERT INTERNAL UFS SUB-MODULE FIGURE
 Applying our modularity philosophy to UFS, we refactored the file system
 \module\ and separated many functions into sub-\modules\ internal to UFS.
 Modularity makes it easy to exchange one piece of code for another. For
 example, we can change the inode allocation policy or the behavior when
 updating the superblock by swapping in different sub-\module.
+
+With regards to optimizations for our UFS implementation, we found several
+FIXME BETTER WORD: \emph{ideas} critical to good performance. First, do not
+create unnecessary dependencies between \chdescs. Doing so artificially limits
+the commit order for \chdescs, which results in bad performance for several
+reasons. Not only will unneeded dependencies force the disk do more writes and
+seeks, but \Kudos will have to scan through the change descriptor graph
+multiple times, since the dependencies prevent the \chdescs\ from being
+flushed out to disk at once. TODO PUT EXAMPLE HERE WITH ANALYSIS AND FIGURE. 
+An instance like this came up because our UFS implementation frequently writes
+the \emph{cylinder group summaries} out to disk. By simply changing the
+arrangement between three \chdescs\ created in a single function, UFS got a
+33\% increase for several common file operations.
+A corollary of this observation is to create \chdescs\ of the minimal size
+to avoid accidental overlaps, which in turn, creates unnecessary dependencies.
+With \chdescs, they can represent changes to regions as small as one byte, and
+as large as an entire block. Many times, it can be inefficient for developers
+to calculate exactly what has been modified in a large data structure and needs
+to be written to disk. As such, this will result in the creation of \chdescs\ 
+for the entire data structure. Doing this can be detrimental to performance,
+as shown here. INSERT FIGURE WITH EXAMPLE. This issue came up for inodes, where
+we modified only a field with the inode, but ended up creating a change
+descriptor for the entire inode. The solution to this problem is a utility
+function called chdesc\_create\_diff(), which compares a modified copy of the
+data structure to the original, and creates a minimal set of \chdescs\ 
+accordingly. Do to the frequent use of inodes, one simple use of
+chdesc\_create\_diff() in the UFS inode functions reduced \chdescs graph
+traversal time significantly.
 
 Our UFS code is mostly complete, but some features are missing:
 i.e. handling triple indirect blocks and sparse files.
