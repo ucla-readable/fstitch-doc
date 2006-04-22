@@ -192,4 +192,35 @@ beginfig(3);
   ffff(d,c);
 endfig;
 
+beginfig(4);
+  boxjoin();
+  elementit.a(btex Base etex scaled 1.2, 0, 0, pull);
+  boxjoin(a.width = b.width; a.height = b.height);
+  elementit.b(btex Alloc etex scaled 0.8, 0, 0, pull);
+  elementit.c(btex DirEnt etex scaled 0.8, 0, 0, pull);
+  elementit.d(btex CylGrp etex scaled 0.8, 0, 0, pull);
+  elementit.e(btex Super etex scaled 0.8, 0, 0, pull);
+  a.width = 1.2a.height;
+
+  a.w - b.e = (12, -1.2*b.height);
+  a.w - c.e = (12, 1.2*b.height);
+  a.e - d.w = (-12, -1.2*b.height);
+  a.e - e.w = (-12, 1.2*b.height);
+
+  forsuffixes $ = a, b, c, d, e:
+    pproc_.$ := "thecirc_";
+  endfor;
+
+  drawelement(a,b,c,d,e);
+
+  vardef ffff(suffix a,b) =
+    drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
+  enddef;
+
+  ffff(b,a);
+  ffff(c,a);
+  ffff(d,a);
+  ffff(e,a);
+endfig;
+
 end

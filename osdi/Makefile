@@ -1,8 +1,10 @@
 default: paper.pdf
 
-TMP_DVI_IMAGES = fig/figures_1.eps fig/figures_2.eps fig/figures_3.eps
+TMP_DVI_IMAGES = fig/figures_1.eps fig/figures_2.eps fig/figures_3.eps \
+				 fig/figures_4.eps
 DVI_IMAGES = $(TMP_DVI_IMAGES)
-TMP_PDF_IMAGES = fig/figures_1.pdf fig/figures_2.pdf fig/figures_3.pdf
+TMP_PDF_IMAGES = fig/figures_1.pdf fig/figures_2.pdf fig/figures_3.pdf \
+				 fig/figures_4.pdf
 PDF_IMAGES = $(TMP_PDF_IMAGES)
 
 OUTPUT_FILES = paper.dvi paper.ps paper.pdf paper.txt $(TMP_DVI_IMAGES)
