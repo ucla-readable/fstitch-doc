@@ -119,10 +119,12 @@ performs transformations incrementally as \chdescs\ arrive.
 
 Further, by changing our journal \module\ to journal only \chdescs\ that modify
 file system metadata -- and by adding additional dependencies to prevent
-premature reuse of blocks -- we could even obtain metadata-only journaling. The
-journal \module\ can distinguish metadata \chdescs\ because of the LFS
-interface described in \S\ref{sec:interfaces}. Other block device layering
-systems, like GEOM~\cite{geom} or JBD in Linux, would or do need special hooks
-into file system code to determine what disk changes represent metadata in
-order to do metadata-only journaling. \Chdescs\ and the LFS interface allow us
-to do this automatically.
+premature reuse of blocks -- we could even obtain metadata-only journaling.
+(These extra \chdesc\ dependencies would serve the same purpose as the extra
+hooks corner cases surrounding reuse of blocks discussed in
+\cite{tweedie00ext3}.) The journal \module\ can distinguish metadata \chdescs\
+because of the LFS interface described in \S\ref{sec:interfaces}. Other block
+device layering systems, like GEOM~\cite{geom} or JBD in Linux, would or do need
+special hooks into file system code to determine what disk changes represent
+metadata in order to do metadata-only journaling. \Chdescs\ and the LFS
+interface allow us to do this automatically.

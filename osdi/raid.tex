@@ -1,20 +1,18 @@
 \section{RAID}
 \label{sec:raid}
 
-We implemented a RAID mirroring \module. The code is actually very
-straightforward, and not very complicated. It attaches to two block
-devices and presents a single block device. Either of the two
-subordinate block devices can fail without the RAID \module\ reporting
-error. Read requests are passed to both devices, alternating based on
-the stride size. Write and sync requests are passed ideally to both
-devices, but maybe to only one subordinate device if the other is
-down.
+We have implemented a RAID mirroring \module. The code is actually very
+straightforward, and not very complicated. It attaches to two block devices and
+presents a single block device. Either of the two subordinate block devices can
+fail without the RAID \module\ reporting error. Read requests are passed to both
+devices, alternating based on the stride size. Write and sync requests are
+passed ideally to both devices, but maybe to only one subordinate device if the
+other is down.
 
-The RAID \module\ also has the ability to attach a subordinate block
-device and sync its contents so that it mirrors the existing
-subordinate block device. In this way, RAID can be used to hot-swap
-disks: start out with a RAID \module\ and only one subordinate block
-device, attach a second subordinate disk, wait for synchronization to
-complete, remove the original subordinate block device. A userspace
-tool provides the ability to force a subordinate device to go into
+The RAID \module\ also has the ability to attach a subordinate block device and
+sync its contents so that it mirrors the existing subordinate block device. In
+this way, RAID can be used to hot-swap disks: start out with a RAID \module\ and
+only one subordinate block device, attach a second subordinate disk, wait for
+synchronization to complete, remove the original subordinate block device. A
+userspace tool provides the ability to force a subordinate device to go into
 failed mode.
