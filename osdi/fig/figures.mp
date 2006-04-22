@@ -224,13 +224,16 @@ beginfig(4);
 endfig;
 
 beginfig(5);
+  label.top(btex Chdesc A etex, (15,25));
   boxjoin(a.width = b.width; a.height = b.height; a.s - b.n = (0,20));
-  elementit.a(btex \quad Inode \quad etex, 0, 0, pull);
-  elementit.b(btex \quad Inode \quad etex, 0, 0, pull);
+  elementit.a(btex \quad Inode 7 \quad etex, 0, 0, pull);
+  elementit.b(btex \quad Inode 7 \quad etex, 0, 0, pull);
+  label.bot(btex Chdesc B etex, (50,-55));
 
   fixelement(a,b);
 
   fill a.nw -- .2[a.nw,a.ne] -- .2[a.sw,a.se] -- a.sw -- cycle withcolor .8white;
+  fill b.ne -- .2[b.ne,b.nw] -- .2[b.se,b.sw] -- b.se -- cycle withcolor .8white;
 
   drawelement(a,b);
 endfig;

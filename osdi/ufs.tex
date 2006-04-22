@@ -78,9 +78,9 @@ arrangement of \chdescs\ and cancel them.
   superblock, can be easily exchanged.}
 \end{figure}
 
-Previously, \Kudos used a minimal file system called JOSFS. Even though JOSFS
-is extremely simple, at the time it was the largest \module\ in \Kudos in terms
-of LOC. With a real file system like UFS, a monolithic version will easily be
+Previously, \Kudos\ used a minimal file system called JOSFS. Even though JOSFS
+is extremely simple, at the time it was the largest \module\ in \Kudos\ in
+terms of LOC. With a real file system like UFS, a monolithic version will easily be
 3 to 4 times bigger than JOSFS. In earlier version of the \Kudos UFS
 implementation, having one monolithic \module\ made it difficult to change the
 algorithms and policies for particular parts of UFS. The code also got more
@@ -93,7 +93,7 @@ problem.
 
 Applying our modularity philosophy to UFS, we refactored the file system
 \module\ and separated many logical parts into sub-\modules\ internal to UFS,
-as shown in Figure~\ref{fig:ufsmodules}
+as shown in Figure~\ref{fig:ufsmodules}.
 Within the UFS \module, the \emph{base} module cotains the core code for the
 file system. Using object-orientation techniques, we encapsulated the code
 for data structures in the file system, like the superblock and the cylinder
@@ -101,7 +101,9 @@ groups. We also recognized two locations where we can apply different
 search algorithms. One is with respect to the allocation functions for blocks,
 fragments, and inodes. The other is for searching and writing directory
 entries. In addition to making the code easier to manage, having a modular
-file system means it is easy to try out new algorithms.
+file system means it is easy to try out new algorithms. Currently we have
+two allocator modules as a proof of concept for modularity. In the future,
+we hope to improve UFS with more sophisticated allocation algorithms.
 
 With regards to optimizations for our UFS implementation, we found several
 FIXME BETTER WORD: \emph{ideas} critical to good performance. First, do not
@@ -120,17 +122,30 @@ A corollary of this observation is to create \chdescs\ of the minimal size
 to avoid accidental overlaps, which in turn, creates unnecessary dependencies.
 With \chdescs, they can represent changes to regions as small as one byte, and
 as large as an entire block. Many times, it can be inefficient for developers
-to calculate exactly what has been modified in a large data structure and needs
-to be written to disk. As such, this will result in the creation of \chdescs\ 
-for the entire data structure. Doing this can be detrimental to performance,
-as shown here. INSERT FIGURE WITH EXAMPLE. This issue came up for inodes, where
-we modified only a field with the inode, but ended up creating a \chdesc\ 
-for the entire inode. The solution to this problem is a utility
+to calculate exactly what parts in a large data structure has been modified and
+needs to be written to disk. As such, laziness will result in the creation of
+\chdescs\ for the entire data structure. Doing this can be detrimental to
+performance, as shown in Figure~\ref{fig:overlap}. This issue came up for
+inodes, where we modified several fields within the inode. In principle, the
+\chdescs\ created are independent of one another. However, because we did not
+take the time to calculate the exact offsets and lengths for the fields that
+changes, we just created a \chdesc\ for the entire inode every time we modified
+any part of the inode. Thereby all changes to any given inode overlapped,
+causing unnecessary dependencies. The solution to this problem is a utility
 function called chdesc\_create\_diff(), which compares a modified copy of the
 data structure to the original, and creates a minimal set of \chdescs\ 
 accordingly. Do to the frequent use of inodes, one simple use of
 chdesc\_create\_diff() in the UFS inode functions reduced \chdescs graph
 traversal time significantly.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=92pt]{fig/figures_5}
+  \caption{\label{fig:overlap} For inode 7, \chdesc\ A and \chdesc\ B are
+  independent changes to separate fields that do not overlap. Making \chdescs\ 
+  for the entire inode data structure will, in turn, make \chdesc\ B depend
+  on \chdesc\ A because they overlap.}
+\end{figure}
 
 Our UFS code is mostly complete, but some features are missing:
 i.e. handling triple indirect blocks and sparse files.
