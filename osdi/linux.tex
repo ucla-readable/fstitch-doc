@@ -18,6 +18,20 @@ mount though the VFS front end. Each file system is given a name which can be
 used to mount it using the standard Linux \texttt{mount} program, using a
 command like \mbox{\texttt{mount kfs:\textit{name} /mnt/point -t kfs}}.
 
+There is a small change necessary to the standard Linux kernel in order to
+provide support for \opgroups, however. As a kernel module, there is no way to
+get notifications about when processes are created, or when they terminate. This
+is necessary to clone the \opgroup\ scope (which is a lot like a file descriptor
+table) from the parent process when the process is created, and to \abandon\ all
+the \opgroups\ when it terminates. Ordinarily, this sort of state would be kept
+as part of the Linux \texttt{task\_struct} (i.e. process) structure, but this is
+not a viable option for a dynamically loadable kernel module. Instead, the
+\Kudos\ module keeps this state internally, and it uses hooks we added to the
+kernel to be notified when processes fork or exit. The patch to add these hooks
+is based on the ``process events connector'' which was introduced in Linux
+2.6.15, and is only about 250 lines long. Without it, \Kudos\ can still operate,
+but it does not allow \opgroups.
+
 At the other end of the \Kudos\ \module\ graph, the terminal block
 device \modules\ are wrappers for Linux's normal block devices. By
 using Linux's generic block layer, \Kudos\ can interface with any
@@ -52,16 +66,3 @@ requests will be satisfied only after all the pending writes are
 completed, but a better queue design would allow reads to ``cut the
 line,'' since they are more urgent.
 
-There is a small change necessary to the standard Linux kernel in order to
-provide support for \opgroups, however. As a kernel module, there is no way to
-get notifications about when processes are created, or when they terminate. This
-is necessary to clone the \opgroup\ scope (which is a lot like a file descriptor
-table) from the parent process when the process is created, and to \abandon\ all
-the \opgroups\ when it terminates. Ordinarily, this sort of state would be kept
-as part of the Linux \texttt{task\_struct} (i.e. process) structure, but this is
-not a viable option for a dynamically loadable kernel module. Instead, the
-\Kudos\ module keeps this state internally, and it uses hooks we added to the
-kernel to be notified when processes fork or exit. The patch to add these hooks
-is based on the ``process events connector'' which was introduced in Linux
-2.6.15, and is only about 250 lines long. Without it, \Kudos\ can still operate,
-but it does not allow \opgroups.
