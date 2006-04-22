@@ -1,5 +1,14 @@
 \section{User-level Change Descriptors}
 \label{sec:opgroup}
+
+\newcommand{\opgroupCreate}{\texttt{opgroup\_create()}}
+\newcommand{\opgroupSync}{\texttt{opgroup\_sync()}}
+\newcommand{\opgroupAddDepend}{\texttt{opgroup\_add\_depend()}}
+\newcommand{\opgroupEngage}{\texttt{opgroup\_engage()}}
+\newcommand{\opgroupDisengage}{\texttt{opgroup\_disengage()}}
+\newcommand{\opgroupRelease}{\texttt{opgroup\_release()}}
+\newcommand{\opgroupAbandon}{\texttt{opgroup\_abandon()}}
+
 Many file systems strive to maintain internal file system consistency
 across system and hardware failures; \chdescs\ can express such write
 ordering requirements. But file systems are by no means the sole
@@ -7,12 +16,13 @@ players to benefit from robustness to system and hardware failures.
 User applications often manipulate persistent data in manners subject
 to data corruption or loss. Applications often protect user data using
 interfaces like Unix's \texttt{sync()} and \texttt{fsync()} system
-calls in combination with write ordering.  \Opgroups\ provide finer
+calls in combination with write ordering. \Opgroups\ provide finer
 grained and less restrictive write ordering control so that
-applications can implement custom consistency semantics and make
-custom performance requirement tradeoffs. In this section we present
-the \opgroup\ interface and implementation and a case study of
-\opgroups\ in the UW-IMAP server.
+applications can express \textit{minimal} ordering requirements to
+implement custom consistency semantics and make custom performance
+requirement tradeoffs. In this section we present the \opgroup\
+interface and implementation and a case study of \opgroups\ in the
+UW-IMAP server.
 
 \subsection{Interface}
 \label{sec:opgroup:interface}
@@ -24,14 +34,14 @@ behind its design decisions.
 
 Both \opgroups\ and \chdescs\ express storage update ordering
 dependencies. However, applications and file system \modules\ differ
-in bestowed trust and stable storage interface. These are the two core
+in bestowed trust and stable storage interface. These are the core
 reasons for \opgroup{}'s and \chdesc{}'s differences.
 
 Production file system \modules\ are trusted to not ``harm the
 system;'' however, user processes could cause harm given the
 opportunity to create cyclic dependencies, exhaust system resources
-through non-satisfiable requirements, or prevent user data from going
-to disk or modify other user's data.
+through non-satisfiable requirements, or prevent other users' data
+from going to disk or modify other users' data.
 
 In contrast to \Kudos{}'s low-level file system and block device
 interfaces which manipulate file and disk blocks, user programs
@@ -41,27 +51,60 @@ and file positions.
 Related, while significant intra-file system interface changes affect
 only a small group contained software, user file system interface
 changes affect applications everywhere. The \opgroup\ interface allows
-existing applications to implement new, user consistency protocols
+existing applications to implement new user consistency protocols
 with no changes to existing file interface functions and even allows
 updated applications to affect existing applications.
 
+Whereas \chdescs\ are referenced explicitly when manipulating block
+data inside \Kudos\, user programs implicitly reference \opgroups\
+when manipulating file data and metadata. \Opgroups\ are referenced
+implicitly using a per-process engaged \opgroup\ set,
+%
+(1) so that existing file manipulation calls, such as \verb+write()+
+and \verb+unlink()+ remain unmodified, and,
+%
+(2) because we believe applications will find \opgroups\ most useful
+at a coarser grain than \Kudos\ \modules\ do for \chdescs. For
+example, a set of deletes may depend on creating the final output's
+creation. In this case \Kudos\ \modules\ are concerned with each
+block's dependencies. With \Kudos\ \modules\ already ensuring internal
+file system consistency, user programs are only concerned that the
+deletes do not occur before the output is created. This level of
+granulatity also allows updated applications to affect
+non-\opgroup{}-aware applications. For example,
+\texttt{depend ''summarize < source > sum \&\& rm source''}. In this case
+\texttt{depend} creates an opgroup for each of the commands and makes
+\texttt{rm}'s \opgroup\ depend on \texttt{summarize}'s.
 
-Q: Why use an engaged set rather than passing an opgroup with syscalls?\\
-A: Affect non-\opgroup{}-aware software. Other code in the same program
-and across exec.
+Figure~\ref{fig:opgroup-interface} shows the \opgroup\ interface functions.
+\opgroupCreate\ returns a fresh \opgroup\ identifier. While
+\opgroups\ that express ordering constraints are the most fundamental,
+we plan to other types, such as transactional \opgroups; the
+\texttt{flags} argument specified the \opgroup\ type.
+\opgroupAddDepend\ makes the depender depend on the dependee \opgroup.
+\opgroupEngage\ and \opgroupDisengage\ add/remove the \opgroup\ to/from
+the set of engaged \opgroups\. \opgroupRelease\ allows an \opgroup\ to go
+to disk. \opgroupSync\ sends \anopgroup\ to disk, preserving
+the \opgroup{}'s ordering contraints. \opgroupAbandon\ informs \Kudos\
+that this process is done referencing the \opgroup.
+
+\begin{figure}[htb]
+\centering{
+\begin{tabular}{l l}
+States & Transition\\ \hline
+all & add dependents\\
+all & release\\
+all & abandon (ends)\\
+no dependents & engage\\
+engaged & disengage\\
+not released & add dependencies
+\end{tabular}
+}
+\caption{\label{fig:opgroup-transitions} User-level Change Descriptor State Transitions}
+\end{figure}
 
 \begin{itemize}
-\item Mention simplicity using opgroups vs fsync? Mention minimal changes?
-\item File systems operate at the block level whereas user-level
-  programs (generally) operate at the file and file-offset level.
-  So expose a higher level of \chdescs. Also expose a
-  higher level so that apps do not deal with file system
-  implementation specifics; allows opgroups to better fit in with
-  existing file system interactions (eg still use write(), don't
-  create chdescs, create byte/bit differences, add deps). These are
-  the reasons why why we chose to deal with groups of changes
-  instead of individual changes. LFS's head argument similar to
-  opgroups.
+\item Mention simplicity using opgroups vs fsync?
 \item Opgroups are simpler than chdescs. Retaining not possible (app
   waits tomake write) and destruction not an issue (unless a
   transaction). Apply/rollback and dependency removal aren't seen as
@@ -74,10 +117,6 @@ and across exec.
   about, cycles from internal-fs changes are horrible to have to
   worry about. Explain how we prevent cycles through cycle detection
   and allowed state transitions.
-
-\item Opgroups are designed to support different consistency
-  requirements. ordering ``most fundamental'' (?). Also support
-  atomic; more in the works.
 \item Explain why create and engage are distinct. Why disengage,
   release, and abandon are distinct. (Cycle prevention and for
   atomic/trancactional opgroups.) Give transitions for opgroups and
@@ -86,7 +125,7 @@ and across exec.
 \end{itemize}
 
 \begin{figure}[htb]
-\begin{small}
+\begin{scriptsize}
 \texttt{opgroup\_id\_t opgroup\_create(int flags);}\\
 \texttt{int opgroup\_sync(opgroup\_id\_t opgroup);}\\
 \texttt{int opgroup\_add\_depend(opgroup\_id\_t depender, opgroup\_id\_t dependee);}\\
@@ -94,8 +133,8 @@ and across exec.
 \texttt{int opgroup\_disengage(opgroup\_id\_t opgroup);}\\
 \texttt{int opgroup\_release(opgroup\_id\_t opgroup);}\\
 \texttt{int opgroup\_abandon(opgroup\_id\_t opgroup);}
-\end{small}
-\caption{\label{fig:opgroup-interface} \Opgroup\ Interface}
+\end{scriptsize}
+\caption{\label{fig:opgroup-interface} User-level Change Descriptor Interface}
 \end{figure}
 
 \subsection{Implementation}
@@ -129,5 +168,3 @@ given \opgroup\ is \engaged\ to that \opgroup.
 \item changes
 \item benefits: simplicity and efficency
 \end{itemize}
-
-Simple example, ``\texttt{compute < in > out \&\& rm in}''.
