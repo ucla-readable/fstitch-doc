@@ -102,6 +102,9 @@ can be used in order to determine the answers we need, without needing to
 directly calculate those answers. Even as it is, however, \Kudos\ does not run
 dramatically slower than a standard Linux 2.6 kernel.
 
+\subsection {Transformations}
+Mention change descriptor pattern transformations here?
+
 \subsection {Applications}
 Soft updates, journaling, and many application-specific consistency models all
 correspond to different \chdesc\ arrangements, so these features can be added
@@ -124,3 +127,5 @@ systems, like GEOM~\cite{geom} or JBD in Linux, would or do need special hooks
 into file system code to determine what disk changes represent metadata in
 order to do metadata-only journaling. \Chdescs\ and the LFS interface allow us
 to do this automatically.
+
+FIXME: Maybe mention RAID here?
