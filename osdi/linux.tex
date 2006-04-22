@@ -60,9 +60,9 @@ there are a couple subtle problems that we would like to solve in a
 future version. First of all, while we can be sure that writes to a
 single block device are delivered in our exact order, we cannot be
 sure that writes we make to multiple block devices are made in the
-correct order. Also, we would like to be able to insert read and write
-requests to different sides of the i/o queue. Right now a read
-requests will be satisfied only after all the pending writes are
-completed, but a better queue design would allow reads to ``cut the
-line,'' since they are more urgent.
+correct order relative to each other. Also, we would like to be able
+to insert read and write requests to different sides of the i/o
+queue. Right now a read requests will be satisfied only after all the
+pending writes are completed, but a better queue design would allow
+reads to ``cut the line,'' since they are more urgent.
 
