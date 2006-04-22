@@ -8,9 +8,9 @@ Each in-memory modification to a cached disk block in \Kudos\ has an associated
 change descriptor. Different change types correspond to different forms of
 \chdescs; the \chdesc\ for a flipped bit -- such as in a free-block bitmap --
 contains an offset and mask, while larger changes contain an offset, a length,
-and the new data. The \chdesc's dependencies point to other \chdescs that must
-precede it to stable storage. A \chdesc can be applied or reverted to switch
-the cached block's state between old and new as necessary. Each \chdesc applies
+and the new data. The \chdesc's dependencies point to other \chdescs\ that must
+precede it to stable storage. A \chdesc\ can be applied or reverted to switch
+the cached block's state between old and new as necessary. Each \chdesc\ applies
 to exactly one block.
 
 Figure~\ref{fig:chdesc} gives a simplified version of the structure. The
