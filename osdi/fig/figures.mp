@@ -223,4 +223,16 @@ beginfig(4);
   ffff(e,a);
 endfig;
 
+beginfig(5);
+  boxjoin(a.width = b.width; a.height = b.height; a.s - b.n = (0,20));
+  elementit.a(btex \quad Inode \quad etex, 0, 0, pull);
+  elementit.b(btex \quad Inode \quad etex, 0, 0, pull);
+
+  fixelement(a,b);
+
+  fill a.nw -- .2[a.nw,a.ne] -- .2[a.sw,a.se] -- a.sw -- cycle withcolor .8white;
+
+  drawelement(a,b);
+endfig;
+
 end
