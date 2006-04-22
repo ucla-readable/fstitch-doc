@@ -85,7 +85,7 @@ must be ``rolled back'' in order for the block's data to be safe to write to
 the disk, the dependency graph between the various changes on that block must
 be taken into account so that changes which depend on one another are rolled
 back in proper dependency order. Originally, a traversal of the \chdesc\ graph
-rooted at the block's NO-OP \chdesc\ (which depends on all the changes on that
+rooted at the block's \noop\ \chdesc\ (which depends on all the changes on that
 block) was used to calculate the correct ordering. This was very
 computationally intensive when more than a tiny number of \chdescs\ were
 involved. The algorithm was changed to examine only those \chdescs\ actually on
@@ -107,16 +107,15 @@ Mention change descriptor pattern transformations here?
 
 \subsection {Applications}
 Soft updates, journaling, and many application-specific consistency models all
-correspond to different \chdesc\ arrangements, so these features can be added
-to the system as \modules\ which appropriately connect or reconnect the
-\chdescs. For example, the \chdescs\ in Figure~\ref{fig:softupdate} can be
-transformed to provide journaling semantics. The original four \chdescs\ are
-modified to depend on a journal commit record, which depends on blocks
-journaling the changes. Once the actual changes commit, the journal record is
-marked as completed. Figure~\ref{fig:journal} shows these transformed \chdescs.
-This single journaling \module\ (see \S\ref{sec:journal}) can attach to any
-file system \module; it performs transformations incrementally as \chdescs\
-arrive.
+correspond to different \chdesc\ arrangements, so these features can be added to
+the system as \modules\ which appropriately connect or reconnect the \chdescs.
+For example, the \chdescs\ in Figure~\ref{fig:softupdate} can be transformed to
+provide journaling semantics. The original four \chdescs\ are modified to depend
+on a journal commit record, which depends on blocks journaling the changes. Once
+the actual changes commit, the journal record is marked as completed.
+Figure~\ref{fig:journal} shows these transformed \chdescs. Our journaling
+\module\ (see \S\ref{sec:journal}) can attach to any file system \module; it
+performs transformations incrementally as \chdescs\ arrive.
 
 Further, by changing our journal \module\ to journal only \chdescs\ that modify
 file system metadata -- and by adding additional dependencies to prevent

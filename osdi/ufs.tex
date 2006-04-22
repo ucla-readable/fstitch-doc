@@ -53,7 +53,7 @@ allocation policy and starts allocating blocks for speed. To implement this
 property of UFS, we used fragments as the basic block size. For large files,
 our UFS module internally allocates a block, but returns only the first
 fragment in that block at the LFS level. The next 7 allocation calls will be
-no-ops that simply returns the subsequent fragments in the allocated block.
+no-ops that simply return the subsequent fragments in the allocated block.
 
 Using \chdescs, the UFS module can control the ordering for writes to disk.
 This allows UFS to create sets of \chdescs\ and hooking them up in

@@ -9,15 +9,15 @@ the write-back cache) is that with soft updates, \chdescs\ can always
 be written to the disk to empty the cache, while journals can ``lock'' changes
 into the cache while the transaction is in progress.
 
-To allow this, it is possible to create a ``managed'' NO-OP \chdesc\ that
+To allow this, it is possible to create a ``managed'' \noop\ \chdesc\ that
 cannot be written at all, and other changes can be made to depend on it to
 prevent them from being written. The \module\ in \Kudos\ that created the
 managed \chdesc\ can then later explicitly satisfy it, allowing all the other
 \chdescs\ to be written. This is how the journal \module\ can set up
 dependencies to implement journaling: it makes all \chdescs\ passing through it
-depend on a managed NO-OP \chdesc, and makes copies of them to write to the
+depend on a managed \noop\ \chdesc, and makes copies of them to write to the
 journal. When the transaction is over, it can create a commit record, set all
-the \chdescs\ in the transaction to depend on it, and satisfy the managed NO-OP
+the \chdescs\ in the transaction to depend on it, and satisfy the managed \noop\
 \chdesc.
 
 \begin{figure}
@@ -25,7 +25,7 @@ the \chdescs\ in the transaction to depend on it, and satisfy the managed NO-OP
   \includegraphics[width=\hsize]{fig/figures_2}
   \caption{\label{fig:journal} Journal \chdesc\ graph for the
     change in Figure~\ref{fig:softupdate}. Empty circles are
-    ``NO-OP'' \chdescs\ with no associated block data.}
+    ``\noop'' \chdescs\ with no associated block data.}
 \end{figure}
 
 A particularly nice property of this arrangement is that the journal \module\
