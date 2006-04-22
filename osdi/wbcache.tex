@@ -20,7 +20,7 @@ evict any block it chooses -- but it evicts the least recently used block that
 it can.
 
 \subsection{Block Cycles}
-\label{subsec:blockcycles}
+\label{sec:wbcache:cycles}
 
 Just as with soft updates~\cite{ganger00soft}, the dependencies among \chdescs\
 (or just ``updates to the block'' in soft updates) can create cyclic
@@ -38,7 +38,7 @@ Since many \modules\ may be stacked on top of one another in \Kudos, and since
 many of them may want to refer to the same block at the same time, only one copy
 of the data for each block is kept in memory at a time. However, different
 \modules\ may ``know about'' different sets of \chdescs. For example, in the
-case outlined in \S\ref{subsec:blockcycles}, the \module\ below the write-back
+case outlined in \S\ref{sec:wbcache:cycles}, the \module\ below the write-back
 cache will know about some of the \chdescs\ on a block but not others (the ones
 which are not ``ready'' to be sent to it yet). If this \module\ is the disk, it
 will need to be able to write a version of the block's data that does not
