@@ -142,11 +142,29 @@ not released & add dependencies
 
 % This section would really benefit from knowing what figures we will have.
 
-\Opgroups\ are implemented using an arrangement of NO-OP \chdescs\ (see
-Figure~\ref{fig:opgroup-chdescs}) which allows the \opgroup\ to be connected to
-other \opgroups\ using ordinary \chdesc\ dependencies. An LFS \module\ in the
-\module\ graph is responsible for connecting all operations performed while a
-given \opgroup\ is \engaged\ to that \opgroup.
+\Opgroups\ are implemented using an arrangement of NO-OP \chdescs\ which allows
+the \opgroup\ to be connected to other \opgroups\ using ordinary \chdesc\
+dependencies.  Figure~\ref{fig:opgroup-chdescs} shows this arrangement: a
+``head'' \chdesc\ depends upon a ``tail'' \chdesc\ and a ``head keep'' \chdesc,
+while the tail \chdesc\ depends on a ``tail keep'' \chdesc. The purpose of the
+``keep'' \chdescs\ is to prevent the head and tail \chdescs\ from being
+satisfied should all their other dependencies be satisfied (for instance, by
+being written to disk). An LFS \module\ in the \module\ graph is responsible for
+connecting all operations performed while \anopgroup\ is \engaged\ to its head
+and tail \chdescs, so that an entire \opgroup\ can be made to depend on another
+\opgroup\ by adding a dependency from the depender's tail to the dependee's
+head.
+
+\Opgroups\ are created and managed almost exactly like file descriptors. Handles
+to them are copied across \texttt{fork()}, preserved across \texttt{exec()}, and
+closed upon \texttt{exit()}. Whether \anopgroup\ is \engaged\ or not is a
+property local to the process, like the ``close-on-exec'' flag of file
+descriptors. These properties allow existing programs to use \opgroups\ without
+knowing it, in the same way that they don't have to know anything about pipes
+for the shell to connect them in a pipeline -- the parent process creates and
+\engages\ the \opgroups\ before calling \texttt{exec()}, and then the process
+does its file system operations without knowing or needing to know that they are
+being hooked up to \anopgroup.
 
 \begin{itemize}
 \item cycle detection
