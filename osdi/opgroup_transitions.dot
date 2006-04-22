@@ -1,0 +1,22 @@
+digraph opgrouptransitions
+{
+	rankdir=LR
+	"start" [label="start"]
+	"a" [label=""]
+	"b" [label="write"]
+	"c" [label=""]
+	"d" [label=""]
+	"e" [label=""]
+	"start" -> "start" [label="C"]
+	"start" -> "a" [label="R"]
+	"start" -> "d" [label="T"]
+	"a" -> "b" [label="E"]
+	"a" -> "e" [label="T"]
+	"b" -> "c" [label="D"]
+	"c" -> "b" [label="E"]
+	"c" -> "e" [label="T"]
+	"d" -> "d" [label="C"]
+	"d" -> "d" [label="T"]
+	"d" -> "e" [label="R"]
+	"e" -> "e" [label="T"]
+}

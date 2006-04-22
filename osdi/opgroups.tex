@@ -76,29 +76,53 @@ non-\opgroup{}-aware applications. For example,
 \texttt{depend} creates an opgroup for each of the commands and makes
 \texttt{rm}'s \opgroup\ depend on \texttt{summarize}'s.
 
+\begin{figure}[htb]
+\begin{scriptsize}
+\texttt{opgroup\_id\_t opgroup\_create(int flags);}\\
+\texttt{int opgroup\_sync(opgroup\_id\_t opgroup);}\\
+\texttt{int opgroup\_add\_depend(opgroup\_id\_t depender, opgroup\_id\_t dependee);}\\
+\texttt{int opgroup\_engage(opgroup\_id\_t opgroup);}\\
+\texttt{int opgroup\_disengage(opgroup\_id\_t opgroup);}\\
+\texttt{int opgroup\_release(opgroup\_id\_t opgroup);}\\
+\texttt{int opgroup\_abandon(opgroup\_id\_t opgroup);}
+\end{scriptsize}
+\caption{\label{fig:opgroup-interface} User-level Change Descriptor Interface}
+\end{figure}
+
 Figure~\ref{fig:opgroup-interface} shows the \opgroup\ interface functions.
 \opgroupCreate\ returns a fresh \opgroup\ identifier. While
 \opgroups\ that express ordering constraints are the most fundamental,
-we plan to other types, such as transactional \opgroups; the
+we plan other types, such as transactional \opgroups; the
 \texttt{flags} argument specified the \opgroup\ type.
 \opgroupAddDepend\ makes the depender depend on the dependee \opgroup.
 \opgroupEngage\ and \opgroupDisengage\ add/remove the \opgroup\ to/from
-the set of engaged \opgroups\. \opgroupRelease\ allows an \opgroup\ to go
+the set of engaged \opgroups. \opgroupRelease\ allows an \opgroup\ to go
 to disk. \opgroupSync\ sends \anopgroup\ to disk, preserving
 the \opgroup{}'s ordering contraints. \opgroupAbandon\ informs \Kudos\
 that this process is done referencing the \opgroup.
 
+Just as important as not changing existing file system syscall
+parameters is not adding error conditions. Existing software is not
+prepared to recover from a \texttt{write()} error due to a cyclic
+dependency. \Opgroup{}-aware applications would require more complex
+error logic to handle such errors. For these reasons the \opgroup\
+interface is designed to catch all \opgroup{}-related errors in the
+\opgroup\ functions. The allowed transitions are shown in
+Figure~\ref{fig:opgroup-transitions}.
+
 \begin{figure}[htb]
 \centering{
 \begin{tabular}{l l}
-States & Transition\\ \hline
-all & add dependents\\
-all & release\\
-all & abandon (ends)\\
-no dependents & engage\\
-engaged & disengage\\
-not released & add dependencies
+State Requirement & State Change\\ \hline
+none & released\\
+none & abandoned (end)\\
+no dependents & engaged\\
+engaged & disengaged\\
+not released & has dependencies\\
+has not been engaged & has dependents
 \end{tabular}
+% TODO: decide which approach to use (table vs diagram)
+\includegraphics[width=\columnwidth]{opgroup_transitions}
 }
 \caption{\label{fig:opgroup-transitions} User-level Change Descriptor State Transitions}
 \end{figure}
@@ -123,19 +147,6 @@ not released & add dependencies
   atomic opgroups, or perhaps just a sampling, and the reasoning
   behind these.
 \end{itemize}
-
-\begin{figure}[htb]
-\begin{scriptsize}
-\texttt{opgroup\_id\_t opgroup\_create(int flags);}\\
-\texttt{int opgroup\_sync(opgroup\_id\_t opgroup);}\\
-\texttt{int opgroup\_add\_depend(opgroup\_id\_t depender, opgroup\_id\_t dependee);}\\
-\texttt{int opgroup\_engage(opgroup\_id\_t opgroup);}\\
-\texttt{int opgroup\_disengage(opgroup\_id\_t opgroup);}\\
-\texttt{int opgroup\_release(opgroup\_id\_t opgroup);}\\
-\texttt{int opgroup\_abandon(opgroup\_id\_t opgroup);}
-\end{scriptsize}
-\caption{\label{fig:opgroup-interface} User-level Change Descriptor Interface}
-\end{figure}
 
 \subsection{Implementation}
 \label{sec:opgroup:implementation}
