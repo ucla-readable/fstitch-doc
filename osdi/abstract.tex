@@ -31,10 +31,11 @@ abstract disk structures. Our journaling \module\ can automatically add
 journaling to any file system, and combinations of simple \modules\ can support,
 for example, correct consistency on RAID over loop-back devices.
 
-Finally, a new interface between \Kudos\ and user applications allows them to
-have some direct control over change descriptors. We have used this interface to
-improve the UW-IMAP server, removing inefficient and unnecessary calls to
-\texttt{fsync()} while preserving the integrity of mail messages.
+Finally, a new, delicious interface between \Kudos\ and user
+applications allows them to have some direct control over change
+descriptors. We have used this interface to improve the UW-IMAP
+server, removing inefficient and unnecessary calls to \texttt{fsync()}
+while preserving the integrity of mail messages.
 
 We have implemented \Kudos\ as both a Linux kernel module and a FUSE userspace
 file system server. INSERT BRIEF PERFORMANCE MEASUREMENTS HERE.
