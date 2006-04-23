@@ -57,9 +57,9 @@ created.
 Furthermore, this level of granulatity even allows updated
 applications to affect non-\opgroup{}-aware applications (or updated
 portions of an applications to affect other portions). For example, a
-\texttt{''depend''} program that runs each argument as a shell command
+\texttt{"depend"} program that runs each argument as a shell command
 can ensure the source file is not removed before the output file is on
-disk: \texttt{depend ''summarize < source > sum'' ''rm source''}.
+disk: \texttt{depend "summarize < source > sum" "rm source"}.
 
 For these reasons of trust, continued simplicity of file system
 syscalls, and existing file system syscall compatibility \opgroups\
