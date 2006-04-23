@@ -115,7 +115,27 @@ write-back cache enforces an order consistent with the \chdesc\ dependency
 information.
 
 \subsubsection{\Noop\ Change Descriptors}
-Add section about \noop\ \chdescs\ here.
+\label{sec:design:chdescs:noop}
+An important type of \chdesc\ is actually one that doesn't change the disk at
+all: the \noop\ \chdesc. \Noop\ \chdescs\ can have dependencies, like any other
+\chdesc, but they are trivially satisfied when all of their dependencies are
+satisfied. Thus, they can be used to ``stand for'' entire sets of other changes.
+This capability is extremely useful, and is used by most operations on disk
+structures so that a single \chdesc\ can be returned that depends on the whole
+change. Likewise, a \noop\ \chdesc\ can be passed in as a parameter to that
+operation, to make the whole operation depend on something else. \Noop\
+\chdescs\ are the ``glue'' that makes this possible without a quadratic number
+of dependency edges in the \chdesc\ graph, and without having to pass around
+arrays of \chdescs that together implement some change to a file system.
+
+\Noop\ \chdescs\ can also be used in a special way to prevent other \chdescs\
+from being written until some \module\ decides it is allowable. By making a
+\chdesc\ depend on a \noop\ \chdesc\ which itself has no dependencies (called a
+``managed'' \noop\ \chdesc), that \chdesc\ will always have an unsatisfied
+dependency until the \module\ that created the managed \noop\ \chdesc\
+explicitly satisfies it. This is used, for instance, by the journal \module\
+(\S\ref{sec:consistency:journal}) in order to prevent \chdescs\ in a transaction
+from being written before the commit record.
 
 \subsubsection{Block Revisioning}
 % FIXME maybe make an analogy to packets flowing through a network? -LZ

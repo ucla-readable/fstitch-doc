@@ -12,16 +12,11 @@ the write-back cache) is that with soft updates, \chdescs\ can always
 be written to the disk in order to empty the cache, while journals can
 ``lock'' changes into the cache when transactions are in progress.
 
-To allow this, it is possible to create a ``managed'' \noop\ \chdesc\ that
-cannot be written at all, and other changes can be made to depend on it to
-prevent them from being written. The \module\ in \Kudos\ that created the
-managed \chdesc\ can then later explicitly satisfy it, allowing all the other
-\chdescs\ to be written. This is how the journal \module\ can set up
-dependencies to implement journaling: it makes all \chdescs\ passing through it
-depend on a managed \noop\ \chdesc, and makes copies of them to write to the
-journal. When the transaction is over, it can create a commit record, set all
-the \chdescs\ in the transaction to depend on it, and satisfy the managed \noop\
-\chdesc.
+To accomplish this, journal \module\ makes all \chdescs\ passing through it
+depend on a managed \noop\ \chdesc (\S\ref{sec:design:chdescs:noop}), and makes
+copies of them to write to the journal. When the transaction is over, it creates
+a commit record, sets all the \chdescs\ in the transaction to depend on it, and
+satisfies the managed \noop\ \chdesc.
 
 \begin{figure}
   \centering
