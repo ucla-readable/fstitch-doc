@@ -1,5 +1,5 @@
-\section{Write-Back Cache and Block Revisioning}
-\label{sec:wbcache}
+\subsection{Write-Back Cache and Block Revisioning}
+\label{sec:modules:wbcache}
 
 The write-back cache is in some sense the \module\ that does all the real work
 in \Kudos. There can be many write-back caches in a configuration at once, but
@@ -19,8 +19,8 @@ the disk). So, when looking for a block to evict, the cache may not be able to
 evict any block it chooses -- but it evicts the least recently used block that
 it can.
 
-\subsection{Block Cycles}
-\label{sec:wbcache:cycles}
+\subsubsection{Block Cycles}
+\label{sec:modules:wbcache:cycles}
 
 Just as with soft updates~\cite{ganger00soft}, the dependencies among \chdescs\
 (or just ``updates to the block'' in soft updates) can create cyclic
@@ -32,23 +32,25 @@ but forwards the others on to the next \module\ as it writes the block. It
 cannot evict the block yet, since it is still ``dirty,'' but progress has been
 made that can make other blocks evictable.
 
-\subsection{Block Revisioning}
+\subsubsection{Block Revisioning}
 
-Since many \modules\ may be stacked on top of one another in \Kudos, and since
-many of them may want to refer to the same block at the same time, only one copy
-of the data for each block is kept in memory at a time. However, different
-\modules\ may ``know about'' different sets of \chdescs. For example, in the
-case outlined in \S\ref{sec:wbcache:cycles}, the \module\ below the write-back
-cache will know about some of the \chdescs\ on a block but not others (the ones
-which are not ``ready'' to be sent to it yet). If this \module\ is the disk, it
-will need to be able to write a version of the block's data that does not
-include the \chdescs\ it does't know about yet. \Kudos\ provides a revisioning
-system for blocks which can automatically ``roll back'' the \chdescs\ which have
-not yet reached a particular \module, and then roll them forward again after
-that \module\ is done using the previous version of the block's data (e.g. to
-write it to disk).
+Since many \modules\ may be stacked on top of one another in \Kudos,
+and since many of them may want to refer to the same block at the same
+time, only one copy of the data for each block is kept in memory at a
+time. However, different \modules\ may ``know about'' different sets
+of \chdescs. For example, in the case outlined in
+\S\ref{sec:modules:wbcache:cycles}, the \module\ below the write-back
+cache will know about some of the \chdescs\ on a block but not others
+(the ones which are not ``ready'' to be sent to it yet). If this
+\module\ is the disk, it will need to be able to write a version of
+the block's data that does not include the \chdescs\ it does't know
+about yet. \Kudos\ provides a revisioning system for blocks which can
+automatically ``roll back'' the \chdescs\ which have not yet reached a
+particular \module, and then roll them forward again after that
+\module\ is done using the previous version of the block's data
+(e.g. to write it to disk).
 
-\subsection{Cross-device dependencies}
+\subsubsection{Cross-device dependencies}
 
 The write-back cache has one other property that makes it useful in \Kudos: it
 respects dependencies between one cache and another, so that (for instance)

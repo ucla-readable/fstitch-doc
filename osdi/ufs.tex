@@ -1,5 +1,5 @@
-\section{UFS implementation}
-\label{sec:ufs}
+\subsection{UFS implementation}
+\label{sec:modules:ufs}
 
 UFS is the modern incarnation of the classic Berkeley Fast File System
 ~\cite{mckusick84fast} used in 4.2 BSD. The general concepts for UFS, such as
@@ -14,21 +14,21 @@ many ways. In particular, it is the only file system that has been extended
 with both soft updates and journaling. We chose UFS1 over UFS2, as UFS1 is
 well establish and more widely supported.
 
-Soft updates for UFS is one of the biggest innovations in file systems in
-terms of lowering the overhead required to provide file system consistency.
-By carefully ordering writes to disk, soft updates avoid the need for
-synchronous writes to disk or duplicate writes to a journal. Soft updates also
-guarantees consistency after a crash, so the system can avoid time-consuming
-file system consistency checks. \S\ref{sec:softupdate} explains soft updates
-in greater detail.
-Another approach to protecting the integrity of the file system is to write
-upcoming operations to a journal first. The content and the layout of the
-journal varies per implementation, but in all cases, the system can use the
-journal to play out or rollback the operations that did not complete as a
-result of a crash. Thereby \emph{fsck} can be avoided. \S\ref{sec:journal}
-explains journaling with \chdescs.
-For a comparison of journaling versus soft updates for UFS, see
-~\cite{seltzer00journaling}.
+Soft updates for UFS is one of the biggest innovations in file systems
+in terms of lowering the overhead required to provide file system
+consistency.  By carefully ordering writes to disk, soft updates avoid
+the need for synchronous writes to disk or duplicate writes to a
+journal. Soft updates also guarantees consistency after a crash, so
+the system can avoid time-consuming file system consistency
+checks. \S\ref{sec:consistency:softupdate} explains soft updates in
+greater detail.  Another approach to protecting the integrity of the
+file system is to write upcoming operations to a journal first. The
+content and the layout of the journal varies per implementation, but
+in all cases, the system can use the journal to play out or rollback
+the operations that did not complete as a result of a crash. Thereby
+\emph{fsck} can be avoided. \S\ref{sec:consistency:journal} explains
+journaling with \chdescs.  For a comparison of journaling versus soft
+updates for UFS, see ~\cite{seltzer00journaling}.
 
 The LFS interface naturally divides the implementation into a set of simpler
 tasks. By breaking down CFS calls into smaller LFS calls, we come up with a

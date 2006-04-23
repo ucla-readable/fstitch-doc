@@ -1,7 +1,7 @@
-\section {Change Descriptors}
-\label{sec:chdescs}
+\subsection {Change Descriptors}
+\label{sec:design:chdescs}
 
-\subsection {Overview}
+\subsubsection {Overview}
 % The first use of "change descriptor" is written out. All others, if not the
 % same, should be defined in parentheses here.
 Each in-memory modification to a cached disk block in \Kudos\ has an associated
@@ -13,10 +13,11 @@ precede it to stable storage. A \chdesc\ can be applied or reverted to switch
 the cached block's state between old and new as necessary. Each \chdesc\ applies
 to exactly one block.
 
-Figure~\ref{fig:chdesc} gives a simplified version of the structure. The
-ability to revert and re-apply \chdescs\ is inspired by the soft updates system
-in BSD's FFS~\cite{ganger00soft} (discussed in \S\ref{sec:softupdate}), but
-generalized so that it is not specific to any particular file system.
+Figure~\ref{fig:chdesc} gives a simplified version of the
+structure. The ability to revert and re-apply \chdescs\ is inspired by
+the soft updates system in BSD's FFS~\cite{ganger00soft} (discussed in
+\S\ref{sec:consistency:softupdate}), but generalized so that it is not
+specific to any particular file system.
 
 \begin{figure}
 \vskip-14pt
@@ -46,18 +47,19 @@ struct chdesc {
 \caption{\label{fig:chdesc} Partial \chdesc\ structure.}
 \end{figure}
 
-When a \Kudos\ \module\ first generates \chdescs\ to write to the disk, it
-specifies write ordering requirements similar to those of soft updates. For
-example, Figure~\ref{fig:softupdate} depicts \chdescs\ that allocate and add a
-new block to an inode. The \module\ passes these \chdescs\ to another \module\
-closer to the disk. This second \module\ can inspect, delay, and even modify
-them before passing them on further. For instance, the write-back cache
-\module\ (\S\ref{sec:wbcache}) holds on to blocks and their \chdescs\ instead
-of forwarding them immediately. When evicting a block and associated \chdescs,
-the write-back cache enforces an order consistent with the \chdesc\ dependency
-information.
+When a \Kudos\ \module\ first generates \chdescs\ to write to the
+disk, it specifies write ordering requirements similar to those of
+soft updates. For example, Figure~\ref{fig:softupdate} depicts
+\chdescs\ that allocate and add a new block to an inode. The \module\
+passes these \chdescs\ to another \module\ closer to the disk. This
+second \module\ can inspect, delay, and even modify them before
+passing them on further. For instance, the write-back cache \module\
+(\S\ref{sec:modules:wbcache}) holds on to blocks and their \chdescs\
+instead of forwarding them immediately. When evicting a block and
+associated \chdescs, the write-back cache enforces an order consistent
+with the \chdesc\ dependency information.
 
-\subsection {Optimizations}
+\subsubsection {Optimizations}
 Many of the operations that \modules\ like the write-back cache need to do
 involve quickly discovering the set of \chdescs\ that satisfy some property,
 and often even some ordering of those \chdescs. In early prototypes, these sets
@@ -102,29 +104,34 @@ can be used in order to determine the answers we need, without needing to
 directly calculate those answers. Even as it is, however, \Kudos\ does not run
 dramatically slower than a standard Linux 2.6 kernel.
 
-\subsection {Transformations}
+\subsubsection {Transformations}
 Mention change descriptor pattern transformations here?
 
-\subsection {Applications}
-Soft updates, journaling, and many application-specific consistency models all
-correspond to different \chdesc\ arrangements, so these features can be added to
-the system as \modules\ which appropriately connect or reconnect the \chdescs.
-For example, the \chdescs\ in Figure~\ref{fig:softupdate} can be transformed to
-provide journaling semantics. The original four \chdescs\ are modified to depend
-on a journal commit record, which depends on blocks journaling the changes. Once
-the actual changes commit, the journal record is marked as completed.
-Figure~\ref{fig:journal} shows these transformed \chdescs. Our journaling
-\module\ (see \S\ref{sec:journal}) can attach to any file system \module; it
-performs transformations incrementally as \chdescs\ arrive.
+\subsubsection {Applications}
+Soft updates, journaling, and many application-specific consistency
+models all correspond to different \chdesc\ arrangements, so these
+features can be added to the system as \modules\ which appropriately
+connect or reconnect the \chdescs.  For example, the \chdescs\ in
+Figure~\ref{fig:softupdate} can be transformed to provide journaling
+semantics. The original four \chdescs\ are modified to depend on a
+journal commit record, which depends on blocks journaling the
+changes. Once the actual changes commit, the journal record is marked
+as completed.  Figure~\ref{fig:journal} shows these transformed
+\chdescs. Our journaling \module\ (see
+\S\ref{sec:consistency:journal}) can attach to any file system
+\module; it performs transformations incrementally as \chdescs\
+arrive.
 
-Further, by changing our journal \module\ to journal only \chdescs\ that modify
-file system metadata -- and by adding additional dependencies to prevent
-premature reuse of blocks -- we could even obtain metadata-only journaling.
-(These extra \chdesc\ dependencies would serve the same purpose as the extra
-hooks corner cases surrounding reuse of blocks discussed in
-\cite{tweedie00ext3}.) The journal \module\ can distinguish metadata \chdescs\
-because of the LFS interface described in \S\ref{sec:interfaces}. Other block
-device layering systems, like GEOM~\cite{geom} or JBD in Linux, would or do need
-special hooks into file system code to determine what disk changes represent
-metadata in order to do metadata-only journaling. \Chdescs\ and the LFS
-interface allow us to do this automatically.
+Further, by changing our journal \module\ to journal only \chdescs\
+that modify file system metadata -- and by adding additional
+dependencies to prevent premature reuse of blocks -- we could even
+obtain metadata-only journaling.  (These extra \chdesc\ dependencies
+would serve the same purpose as the extra hooks corner cases
+surrounding reuse of blocks discussed in \cite{tweedie00ext3}.) The
+journal \module\ can distinguish metadata \chdescs\ because of the LFS
+interface described in \S\ref{sec:design:interfaces}. Other block
+device layering systems, like GEOM~\cite{geom} or JBD in Linux, would
+or do need special hooks into file system code to determine what disk
+changes represent metadata in order to do metadata-only
+journaling. \Chdescs\ and the LFS interface allow us to do this
+automatically.

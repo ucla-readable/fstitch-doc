@@ -1,5 +1,5 @@
-\section {\Module\ Interfaces}
-\label{sec:interfaces}
+\subsection {\Module\ Interfaces}
+\label{sec:design:interfaces}
 
 A complete \Kudos\ configuration is composed of many \modules. By breaking file
 system code into small, stackable \modules, we are able to significantly
@@ -44,7 +44,7 @@ read, append, and other standard operations into LFS micro-ops. This one
 \module\ can be used with many different LFS \modules\ implementing different
 file systems. (There is also a generic VFS-to-CFS layer, which has two
 implementations: one for the Linux kernel module, and one for the
-FUSE~\cite{fuse} version. See \S\ref{sec:linux} for details.)
+FUSE~\cite{fuse} version. See \S\ref{sec:implementation} for details.)
 
 \begin{figure}[tb]
   \centering

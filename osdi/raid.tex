@@ -1,5 +1,5 @@
-\section{RAID}
-\label{sec:raid}
+\subsection{RAID}
+\label{sec:modules:raid}
 
 We have implemented a RAID mirroring \module. The code is actually very
 straightforward, and not very complicated. It attaches to two block devices and
@@ -16,3 +16,9 @@ only one subordinate block device, attach a second subordinate disk, wait for
 synchronization to complete, remove the original subordinate block device. A
 userspace tool provides the ability to force a subordinate device to go into
 failed mode.
+
+Because raid works simply by transforming \chdesc s, the subordinate
+block devices do not need to be physical disks. They may just as well
+be loopback devices, memory devices, network block devices, or any
+combination.
+
