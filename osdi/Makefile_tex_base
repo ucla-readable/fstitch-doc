@@ -5,7 +5,7 @@ PDFLATEX=pdflatex
 PDFLATEX_OPTS=
 
 BIBTEX=bibtex
-BIBTEX_OPTS=
+BIBTEX_OPTS=-min-crossrefs=100
 
 METAPOST=mpost
 METAPOST_OPTS=
