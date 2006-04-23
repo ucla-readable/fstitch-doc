@@ -1,6 +1,10 @@
 \subsection {Soft Updates}
 \label{sec:consistency:softupdate}
 
+% FIXME: Be forthright about the disadvantage of our soft updates
+% implementation: memory. Also, is the FFS implementation easier for the
+% programmer to manage?
+
 Generally, a file system image is consistent if a program like \emph{fsck}
 would report no errors -- that is, all the structures are in a completely
 correct organization. It is not generally possible to maintain this invariant,

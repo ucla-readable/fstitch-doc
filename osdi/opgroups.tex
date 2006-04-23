@@ -1,6 +1,9 @@
 \section{User-level Change Descriptors}
 \label{sec:opgroup}
 
+% FIXME: A bit harder to follow than earlier sections, but on the plus
+% side, there's an actual INTERFACE DESCRIPTION!!!
+
 \newcommand{\opgroupCreate}{\texttt{opgroup\_create()}}
 \newcommand{\opgroupSync}{\texttt{opgroup\_sync()}}
 \newcommand{\opgroupAddDepend}{\texttt{opgroup\_add\_depend()}}
@@ -190,6 +193,9 @@ being hooked up to \anopgroup.
 \subsection{UW IMAP Case Study}
 \label{sec:opgroup:uwimap}
 \todo{Name this section ``IMAP Server Case Study'' or ``UW IMAP Case Study''?}
+
+% FIXME: Should definitely mention the CHECK command. The other commands,
+% select store copy etc etc, are probably less important to mention.
 
 To assess the utility of \opgroups\ in a real world application we
 updated the University of Washington's ``imapd'' mailserver to take

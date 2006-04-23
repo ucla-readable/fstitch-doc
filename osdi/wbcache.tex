@@ -1,6 +1,9 @@
 \subsection{Write-Back Cache}
 \label{sec:modules:wbcache}
 
+% FIXME: Can you describe the specific algorithm used by the WB cache?
+% How many lines of code? Probably should have a bit on the WT cache as well.
+
 The write-back cache is in some sense the \module\ that does all the real work
 in \Kudos. There can be many write-back caches in a configuration at once (for
 instance, one for each block device), but each is responsible for holding on to
@@ -39,6 +42,9 @@ are explained in \S\ref{sec:opgroup}.
 
 \subsection{Elevator Scheduler}
 \label{sec:modules:elevator}
+
+% FIXME: "rearranged subject to some constraints" -- Such as???? Does
+% the elevator scheduler actually improve our benchmarks? Lines of code?
 
 The elevator scheduler is like a simpler version of the write-back cache. Unlike
 the write-back cache, it will not hold on to \chdescs\ indefinitely until their

@@ -13,15 +13,16 @@ precede it to stable storage. A \chdesc\ can be applied or reverted to switch
 the cached block's state between old and new as necessary. Each \chdesc\ applies
 to exactly one block.
 
-Figure~\ref{fig:chdesc} gives a simplified version of the structure. The ability
+Figure~\ref{fig:chdesc} gives a simplified version of the structure, and
+Figure~\ref{fig:chdapi} shows most of the API for working with them. The ability
 to revert and re-apply \chdescs\ is inspired by the soft updates system in BSD's
 FFS~\cite{ganger00soft} (discussed in \S\ref{sec:consistency:softupdate}), but
 generalized so that it is not specific to any particular file system. Just as
 with soft updates~\cite{ganger00soft}, the dependencies among \chdescs\ (or just
 ``updates to the block'' in soft updates) can create cyclic dependencies among
 blocks, even though the \chdescs\ themselves do not form a cycle. To handle this
-case, some \chdescs\ may need to be ``held back'' in order to write the others,
-allowing such cycles to be broken.
+case, some \chdescs\ may need to be ``rolled back'' in order to write the
+others, allowing such cycles to be broken.
 
 \begin{figure}
 \vskip-14pt
@@ -51,6 +52,57 @@ struct chdesc {
 \caption{\label{fig:chdesc} Partial \chdesc\ structure.}
 \end{figure}
 
+\begin{figure}[htb]
+\vskip-14pt
+\begin{tabular}{@{\hskip0.25in}p{2in}@{}}
+\begin{scriptsize}
+\begin{verbatim}
+chdesc_t chdesc_create_noop(
+    bdesc_t *block, BD_t *owner);
+
+chdesc_t chdesc_create_bit(
+    bdesc_t *block, BD_t *owner,
+    uint16_t offset, uint32_t xor);
+
+int chdesc_create_byte(
+    bdesc_t *block, BD_t *owner,
+    uint16_t offset, uint16_t length,
+    const void *data, chdesc_t **head);
+
+int chdesc_create_diff(
+    bdesc_t *block, BD_t *owner,
+    uint16_t offset, uint16_t length,
+    const void *newdata, chdesc_t **head);
+
+int chdesc_add_depend(
+    chdesc_t *depender, chdesc_t *dependee);
+
+void chdesc_remove_depend(
+    chdesc_t *depender, chdesc_t *dependee);
+
+int chdesc_apply(chdesc_t *chdesc);
+
+int chdesc_rollback(chdesc_t *chdesc);
+
+int chdesc_satisfy(chdesc_t *chdesc);
+
+int chdesc_noop_reassign(
+    chdesc_t *noop, bdesc_t *block);
+
+int chdesc_push_down(
+    BD_t *current_bd, bdesc_t *current_block,
+    BD_t *target_bd, bdesc_t *target_block);
+
+int chdesc_move(
+    chdesc_t *chdesc, bdesc_t *destination,
+    BD_t *target_bd, uint16_t source_offset);
+\end{verbatim}
+\end{scriptsize}
+\end{tabular}
+\vspace{-10pt}
+\caption{\label{fig:chdapi} Partial \chdesc\ API.}
+\end{figure}
+
 When a \Kudos\ \module\ first generates \chdescs\ to write to the disk, it
 specifies write ordering requirements similar to those of soft updates. For
 example, Figure~\ref{fig:softupdate} depicts \chdescs\ that allocate and add a
@@ -62,24 +114,29 @@ forwarding them immediately. When evicting a block and associated \chdescs, the
 write-back cache enforces an order consistent with the \chdesc\ dependency
 information.
 
+\subsubsection{\Noop\ Change Descriptors}
+Add section about \noop\ \chdescs\ here.
+
 \subsubsection{Block Revisioning}
 % FIXME maybe make an analogy to packets flowing through a network? -LZ
 Since many \modules\ may be stacked on top of one another in \Kudos, and since
 many of them may want to refer to the same block at the same time, only one copy
-of the data for each block is kept in memory at a time. However, different
-\modules\ may ``know about'' different sets of \chdescs. For example, in the
-cycle breaking situation outlined in \S\ref{sec:modules:wbcache}, the \module\
-below the write-back cache will know about some of the \chdescs\ on a block but
-not others (the ones which are not ``ready'' to be sent to it yet). If this
-\module\ is the disk, it will need to be able to write a version of the block's
-data that does not include the \chdescs\ it doesn't know about yet. \Kudos\
-provides a revisioning system for blocks which can automatically ``roll back''
-the \chdescs\ which have not yet reached a particular \module, and then roll
-them forward again after that \module\ is done using the previous version of the
-block's data (e.g. to write it to disk).
+of the data for each block is kept in memory at a time. However, each \chdesc\
+on the block may or may not have reached a given \module\ -- for example, a
+write-back cache may choose to write some \chdescs\ on a block, while holding on
+to others because they have unsatisfied dependencies. In this case, the \module\
+below the write-back cache will know about some of the \chdescs\ on that block
+but not others (the ones with unsatisfied dependencies). If this \module\ is the
+disk, it will need to be able to write a version of the block's data that does
+not include the \chdescs\ that have not yet been sent to it. \Kudos\ provides a
+revisioning system for blocks which can automatically roll back the \chdescs\
+which have not yet reached a particular \module, and then roll them forward
+again after that \module\ is done using the previous version of the block's data
+(e.g. to write it to disk).
 
 \subsubsection {Optimizations}
 % FIXME: should this section be in the discussion section?
+% FIXME: don't beat ourselves up so much
 Many of the operations that \modules\ like the write-back cache need to do
 involve quickly discovering the set of \chdescs\ that satisfy some property,
 and often even some ordering of those \chdescs. In early prototypes, these sets
@@ -125,6 +182,7 @@ directly calculate those answers. Even as it is, however, \Kudos\ does not run
 dramatically slower than a standard Linux 2.6 kernel.
 
 \subsubsection {Manipulations and Transformations}
+% FIXME: add concrete details here
 \Chdescs\ play a central role in \Kudos, and therefore many parts of the system
 need to generate, consume, forward, and manipulate them. Obviously there are
 many operations which will need to be done frequently -- for instance, many
@@ -146,27 +204,7 @@ the same transaction. Both of these \chdesc\ transformations are handled by
 library functions, so that if other \modules\ need to do similar things, the
 functionality will already be available.
 
-\subsubsection {Applications}
-% FIXME: should this section be moved to the consistency section?
-Soft updates, journaling, and many application-specific consistency models all
-correspond to different \chdesc\ arrangements, so these features can be added to
-the system as \modules\ which appropriately connect or reconnect the \chdescs.
-For example, the \chdescs\ in Figure~\ref{fig:softupdate} can be transformed to
-provide journaling semantics. The original four \chdescs\ are modified to depend
-on a journal commit record, which depends on blocks journaling the changes. Once
-the actual changes commit, the journal record is marked as completed.
-Figure~\ref{fig:journal} shows these transformed \chdescs. Our journaling
-\module\ (see \S\ref{sec:consistency:journal}) can attach to any file system
-\module; it performs transformations incrementally as \chdescs\ arrive.
-
-Further, by changing our journal \module\ to journal only \chdescs\ that modify
-file system metadata -- and by adding additional dependencies to prevent
-premature reuse of blocks -- we could even obtain metadata-only journaling.
-(These extra \chdesc\ dependencies would serve the same purpose as the extra
-hooks corner cases surrounding reuse of blocks discussed in
-\cite{tweedie00ext3}.) The journal \module\ can distinguish metadata \chdescs\
-because of the LFS interface described in \S\ref{sec:design:interfaces}. Other
-block device layering systems, like GEOM~\cite{geom} or JBD in Linux, would or
-do need special hooks into file system code to determine what disk changes
-represent metadata in order to do metadata-only journaling. \Chdescs\ and the
-LFS interface allow us to do this automatically.
+\subsubsection {...}
+% Should end with an example -- a little diagram, perhaps
+% borrowed from soft updates -- and then perhaps discussion, with things like
+% the last paragraph of optimizations above
