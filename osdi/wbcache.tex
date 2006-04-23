@@ -1,15 +1,15 @@
-\subsection{Write-Back Cache and Block Revisioning}
+\subsection{Write-Back Cache}
 \label{sec:modules:wbcache}
 
 The write-back cache is in some sense the \module\ that does all the real work
-in \Kudos. There can be many write-back caches in a configuration at once, but
-each is responsible for holding on to the \chdescs\ sent to it by connected
-\modules\ until they can be safely sent on towards the disk. To a write-back
-cache, the complex consistency protocols that other \modules\ want to enforce
-are nothing more than sets of dependencies among \chdescs\ -- it has no idea
-what consistency protocol (or protocols) it is implementing, if any at all. Yet
-it is the \module\ that ends up doing most of the work to make sure that
-\chdescs\ are written in an acceptable order.
+in \Kudos. There can be many write-back caches in a configuration at once (for
+instance, one for each block device), but each is responsible for holding on to
+the \chdescs\ sent to it by connected \modules\ until they can be safely sent on
+towards the disk. To a write-back cache, the complex consistency protocols that
+other \modules\ want to enforce are nothing more than sets of dependencies among
+\chdescs\ -- it has no idea what consistency protocol (or protocols) it is
+implementing, if any at all. Yet it is the \module\ that ends up doing most of
+the work to make sure that \chdescs\ are written in an acceptable order.
 
 Even though a write-back cache has such an important and central role in the
 system, there's not a lot to it. The current write-back cache is a simple LRU
@@ -19,36 +19,14 @@ the disk). So, when looking for a block to evict, the cache may not be able to
 evict any block it chooses -- but it evicts the least recently used block that
 it can.
 
-\subsubsection{Block Cycles}
-\label{sec:modules:wbcache:cycles}
-
-Just as with soft updates~\cite{ganger00soft}, the dependencies among \chdescs\
-(or just ``updates to the block'' in soft updates) can create cyclic
-dependencies among blocks, even though the \chdescs\ themselves do not form a
-cycle. To handle this case, some \chdescs\ may need to be ``held back'' in order
-to write the others, allowing such cycles to be broken. To effect this behavior,
+The write-back cache may need to write a non-evictable block anyway, however.
+For instance, \chdescs\ may be arranged in a way that creates a dependency cycle
+at the level of blocks, even though the \chdesc\ dependencies themselves are
+acyclic. The same solution as soft updates uses is employed to break the cycle:
 the write-back cache just holds on to the \chdescs\ that cannot yet be written,
-but forwards the others on to the next \module\ as it writes the block. It
+and forwards the others on to the next \module\ as it writes the block. It
 cannot evict the block yet, since it is still ``dirty,'' but progress has been
 made that can make other blocks evictable.
-
-\subsubsection{Block Revisioning}
-
-Since many \modules\ may be stacked on top of one another in \Kudos, and since
-many of them may want to refer to the same block at the same time, only one copy
-of the data for each block is kept in memory at a time. However, different
-\modules\ may ``know about'' different sets of \chdescs. For example, in the
-case outlined in \S\ref{sec:modules:wbcache:cycles}, the \module\ below the
-write-back cache will know about some of the \chdescs\ on a block but not others
-(the ones which are not ``ready'' to be sent to it yet). If this \module\ is the
-disk, it will need to be able to write a version of the block's data that does
-not include the \chdescs\ it does't know about yet. \Kudos\ provides a
-revisioning system for blocks which can automatically ``roll back'' the
-\chdescs\ which have not yet reached a particular \module, and then roll them
-forward again after that \module\ is done using the previous version of the
-block's data (e.g. to write it to disk).
-
-\subsubsection{Cross-device dependencies}
 
 The write-back cache has one other property that makes it useful in \Kudos: it
 respects dependencies between one cache and another, so that (for instance)
@@ -58,3 +36,17 @@ extra code -- it is a property that just falls out of the way \chdesc\ graphs
 are processed in order to determine which \chdescs\ are ready to move towards
 the disk. This property of write-back caches also extends to \opgroups, which
 are explained in \S\ref{sec:opgroup}.
+
+\subsection{Elevator Scheduler}
+\label{sec:modules:elevator}
+
+The elevator scheduler is like a simpler version of the write-back cache. Unlike
+the write-back cache, it will not hold on to \chdescs\ indefinitely until their
+dependencies have been satisfied. Its purpose is instead to function like a
+``peephole optimizer'' on the block writes done by some other \module, while
+respecting any dependencies among the \chdescs\ on the blocks being written.
+Effectively, a sliding window of writes to the disk (or some other \module) is
+rearranged subject to some constraints. Having a separate module to do this job,
+rather than the write-back cache itself, allows us to separate the policy the
+elevator scheduler implements (in this case, elevator scheduling) from the main
+write-back cache code.

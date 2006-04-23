@@ -13,11 +13,15 @@ precede it to stable storage. A \chdesc\ can be applied or reverted to switch
 the cached block's state between old and new as necessary. Each \chdesc\ applies
 to exactly one block.
 
-Figure~\ref{fig:chdesc} gives a simplified version of the
-structure. The ability to revert and re-apply \chdescs\ is inspired by
-the soft updates system in BSD's FFS~\cite{ganger00soft} (discussed in
-\S\ref{sec:consistency:softupdate}), but generalized so that it is not
-specific to any particular file system.
+Figure~\ref{fig:chdesc} gives a simplified version of the structure. The ability
+to revert and re-apply \chdescs\ is inspired by the soft updates system in BSD's
+FFS~\cite{ganger00soft} (discussed in \S\ref{sec:consistency:softupdate}), but
+generalized so that it is not specific to any particular file system. Just as
+with soft updates~\cite{ganger00soft}, the dependencies among \chdescs\ (or just
+``updates to the block'' in soft updates) can create cyclic dependencies among
+blocks, even though the \chdescs\ themselves do not form a cycle. To handle this
+case, some \chdescs\ may need to be ``held back'' in order to write the others,
+allowing such cycles to be broken.
 
 \begin{figure}
 \vskip-14pt
@@ -47,17 +51,32 @@ struct chdesc {
 \caption{\label{fig:chdesc} Partial \chdesc\ structure.}
 \end{figure}
 
-When a \Kudos\ \module\ first generates \chdescs\ to write to the
-disk, it specifies write ordering requirements similar to those of
-soft updates. For example, Figure~\ref{fig:softupdate} depicts
-\chdescs\ that allocate and add a new block to an inode. The \module\
-passes these \chdescs\ to another \module\ closer to the disk. This
-second \module\ can inspect, delay, and even modify them before
-passing them on further. For instance, the write-back cache \module\
-(\S\ref{sec:modules:wbcache}) holds on to blocks and their \chdescs\
-instead of forwarding them immediately. When evicting a block and
-associated \chdescs, the write-back cache enforces an order consistent
-with the \chdesc\ dependency information.
+When a \Kudos\ \module\ first generates \chdescs\ to write to the disk, it
+specifies write ordering requirements similar to those of soft updates. For
+example, Figure~\ref{fig:softupdate} depicts \chdescs\ that allocate and add a
+new block to an inode. The \module\ passes these \chdescs\ to another \module\
+closer to the disk. This second \module\ can inspect, delay, and even modify
+them before passing them on further. For instance, the write-back cache \module\
+(\S\ref{sec:modules:wbcache}) holds on to blocks and their \chdescs\ instead of
+forwarding them immediately. When evicting a block and associated \chdescs, the
+write-back cache enforces an order consistent with the \chdesc\ dependency
+information.
+
+\subsubsection{Block Revisioning}
+
+Since many \modules\ may be stacked on top of one another in \Kudos, and since
+many of them may want to refer to the same block at the same time, only one copy
+of the data for each block is kept in memory at a time. However, different
+\modules\ may ``know about'' different sets of \chdescs. For example, in the
+cycle breaking situation outlined in \S\ref{sec:modules:wbcache}, the \module\
+below the write-back cache will know about some of the \chdescs\ on a block but
+not others (the ones which are not ``ready'' to be sent to it yet). If this
+\module\ is the disk, it will need to be able to write a version of the block's
+data that does not include the \chdescs\ it does't know about yet. \Kudos\
+provides a revisioning system for blocks which can automatically ``roll back''
+the \chdescs\ which have not yet reached a particular \module, and then roll
+them forward again after that \module\ is done using the previous version of the
+block's data (e.g. to write it to disk).
 
 \subsubsection {Optimizations}
 Many of the operations that \modules\ like the write-back cache need to do
