@@ -13,7 +13,7 @@ digraph opgrouptransitions
 	"a" -> "b" [label="E",style=bold]
 	"a" -> "e" [label="T"]
 	"b" -> "c" [label="D",style=bold]
-	"c" -> "b" [label="E",style=bold]
+	"c" -> "b" [label="E"]
 	"c" -> "e" [label="T",style=bold]
 	"d" -> "d" [label="C"]
 	"d" -> "d" [label="T"]
