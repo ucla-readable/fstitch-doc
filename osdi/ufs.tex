@@ -1,6 +1,7 @@
 \subsection{UFS implementation}
 \label{sec:modules:ufs}
 
+\subsubsection {Overview}
 UFS is the modern incarnation of the classic Berkeley Fast File System
 ~\cite{mckusick84fast} used in 4.2 BSD. The general concepts for UFS, such as
 inodes, cylinder groups, and indirect blocks, are well understood. UFS
@@ -30,6 +31,7 @@ the operations that did not complete as a result of a crash. Thereby
 journaling with \chdescs.  For a comparison of journaling versus soft
 updates for UFS, see ~\cite{seltzer00journaling}.
 
+\subsubsection {Implementation Design Philosophy}
 The LFS interface naturally divides the implementation into a set of simpler
 tasks. By breaking down CFS calls into smaller LFS calls, we come up with a
 set of problems that are easier to reason about. For example, the CFS write()
@@ -70,7 +72,7 @@ arrangement of \chdescs\ and cancel them.
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=92pt]{fig/figures_4}
+  \includegraphics[width=108pt]{fig/figures_4}
   \caption{\label{fig:ufsmodules} The UFS \module\ is itself composed of
   sub-\modules. The UFS base \module\ holds the core code that does not
   vary, while components that should be flexible, such as those that relate
@@ -78,10 +80,11 @@ arrangement of \chdescs\ and cancel them.
   superblock, can be easily exchanged.}
 \end{figure}
 
+\subsubsection {Modularity}
 Previously, \Kudos\ used a minimal file system called JOSFS. Even though JOSFS
 is extremely simple, at the time it was the largest \module\ in \Kudos\ in
 terms of LOC. With a real file system like UFS, a monolithic version will
-easily be 3 to 4 times bigger than JOSFS. In earlier version of the \Kudos UFS
+easily be 3 to 4 times bigger than JOSFS. In earlier version of the \Kudos\ UFS
 implementation, having one monolithic \module\ made it difficult to change the
 algorithms and policies for particular parts of UFS. The code also got more
 difficult to manage. The problem of how to generalize the subdivision within
@@ -105,14 +108,33 @@ file system means it is easy to try out new algorithms. Currently we have
 two allocator modules as a proof of concept for modularity. In the future,
 we hope to improve UFS with more sophisticated allocation algorithms.
 
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=192pt]{fig/figures_6}
+  \caption{\label{fig:chdescarrange} Change descriptor dependencies, when
+  not strictly needed, restricts the possible choices for write ordering.
+  This results in suboptimal write ordering and more scans through the
+  \chdescs\ for \Kudos. On the left, \chdescs\ C1, C2, and C3 can be written
+  in any order. Only one ordering is possible on the right.}
+\end{figure}
+
+\subsubsection {Change Descriptor Arrangements}
 With regards to optimizations for our UFS implementation, we found several
-FIXME BETTER WORD: \emph{ideas} critical to good performance. First, do not
-create unnecessary dependencies between \chdescs. Doing so artificially limits
-the commit order for \chdescs, which results in bad performance for several
-reasons. Not only will unneeded dependencies force the disk do more writes and
-seeks, but \Kudos will have to scan through the \chdesc\ graph
-multiple times, since the dependencies prevent the \chdescs\ from being
-flushed out to disk at once. TODO PUT EXAMPLE HERE WITH ANALYSIS AND FIGURE. 
+practices critical to good performance. First, do not create unnecessary
+dependencies between \chdescs. Doing so artificially limits the commit order
+for \chdescs, which results in bad performance for several reasons. Not only
+will unneeded dependencies force the disk to do more writes and seeks, but
+\Kudos\ will have to scan through the \chdesc\ graph multiple times, since the
+dependencies prevent the \chdescs\ from being flushed out to disk at once.
+In ~\ref{fig:chdescarrange}, we have two possible arrangements for three
+byte \chdescs. The noop \chdesc\ represents a root node that can reach all
+other \chdescs. In the parallel arrangement on the left, \Kudos\ has the
+freedom to write \chdescs\ $C_1$, $C_2$, and $C_3$ to disk in any order. All
+three \chdescs\ can be marked writable with one graph traversal. In the serial
+arrangement on the right, there exists only one valid write ordering. For
+\Kudos\ to write this arrangement out to disk, it will have to scan through
+the graph three times, since \chdesc $C_n$ cannot be marked as writable until
+$C_{n-1}$ has been written.
 An instance like this came up because our UFS implementation frequently writes
 the \emph{cylinder group summaries} out to disk. By simply changing the
 arrangement between three \chdescs\ created in a single function, UFS got a
@@ -135,12 +157,12 @@ causing unnecessary dependencies. The solution to this problem is a utility
 function called chdesc\_create\_diff(), which compares a modified copy of the
 data structure to the original, and creates a minimal set of \chdescs\ 
 accordingly. Do to the frequent use of inodes, one simple use of
-chdesc\_create\_diff() in the UFS inode functions reduced \chdescs graph
+chdesc\_create\_diff() in the UFS inode functions reduced \chdescs\ graph
 traversal time significantly.
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=92pt]{fig/figures_5}
+  \includegraphics[width=64pt]{fig/figures_5}
   \caption{\label{fig:overlap} On inode 17, the gray regions represent
   modified fields that do not overlap. If \chdesc\ A and \chdesc\ B are exactly
   the size of the gray regions, then there is no implicit dependency.
@@ -148,6 +170,7 @@ traversal time significantly.
   \chdesc\ B depend on \chdesc\ A because they overlap.}
 \end{figure}
 
+\subsubsection {Future Improvements}
 Our UFS code is mostly complete, but some features are missing:
 i.e. handling triple indirect blocks and sparse files.
 

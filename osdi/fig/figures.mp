@@ -238,4 +238,46 @@ beginfig(5);
   drawelement(a,b);
 endfig;
 
+beginfig(6);
+  boxjoin(a.width = b.width; a.height = b.height);
+  elementit.a(btex Noop etex scaled 0.8, 0, 0, pull);
+  elementit.b(btex C1 etex scaled 0.8, 0, 0, pull);
+  elementit.c(btex C2 etex scaled 0.8, 0, 0, pull);
+  elementit.d(btex C3 etex scaled 0.8, 0, 0, pull);
+
+  elementit.e(btex Noop etex scaled 0.8, 0, 0, pull);
+  elementit.f(btex C1 etex scaled 0.8, 0, 0, pull);
+  elementit.g(btex C2 etex scaled 0.8, 0, 0, pull);
+  elementit.h(btex C3 etex scaled 0.8, 0, 0, pull);
+  a.width = 1.2a.height;
+
+  a.s - b.n = (1.2*a.width, 0.6*a.height);
+  a.s - c.n = (0, 0.6*a.height);
+  a.s - d.n = (-1.2*a.width, 0.6*a.height);
+
+  e.s - a.s = (150, 0);
+  e.s - f.n = (1.2*a.width, 0.6*a.height);
+  e.s - g.n = (0, 0.6*a.height);
+  e.s - h.n = (-1.2*a.width, 0.6*a.height);
+
+  forsuffixes $ = a, b, c, d, e, f, g, h:
+    pproc_.$ := "thecirc_";
+  endfor;
+
+  drawelement(a,b,c,d,e,f,g,h);
+
+  vardef ffff(suffix a,b) =
+    drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
+  enddef;
+
+  ffff(a,b);
+  ffff(a,c);
+  ffff(a,d);
+
+  ffff(e,h);
+  ffff(h,g);
+  ffff(g,f);
+
+endfig;
+
 end
