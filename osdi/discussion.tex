@@ -1,4 +1,4 @@
-\section {Discussion}
+osection {Discussion}
 \label{sec:discussion}
 
 There are several areas in which we would like to expand our work. The obvious
@@ -27,8 +27,15 @@ more opportunities for sharing code between file system implementations, and
 ways in which our interfaces might accomodate different file systems more
 neutrally.
 
+To prevent the system from going into an infinite loop, it is important for
+\chdescs\ to never form cycles. Although it is never our intent, cycles can
+form as a result of implementation bugs. Currently we can do cycle checking,
+but it is slow and not scalable as the \chdesc\ graph grows in size. We want to
+delve into graph algorthms and find faster ways to check for cycles. Ideally,
+the overhead of cycle checking will be low enough that we can afford to leave
+it on all the time.
+
 \begin{itemize}
-\item Fast cycle checking
 \item Better cache eviction algorithm
 \item Transactional user-level \chdescs
 \item More flexible rules for user-level \chdescs
