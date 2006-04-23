@@ -6,8 +6,8 @@ implement soft updates-like consistency semantics, they are in fact much more
 flexible and can be used to implement journaling as well. What distinguishes
 journaling from soft updates (from the point of view of \chdescs\ and
 the write-back cache) is that with soft updates, \chdescs\ can always
-be written to the disk to empty the cache, while journals can ``lock'' changes
-into the cache while the transaction is in progress.
+be written to the disk in order to empty the cache, while journals can
+``lock'' changes into the cache when transactions are in progress.
 
 To allow this, it is possible to create a ``managed'' \noop\ \chdesc\ that
 cannot be written at all, and other changes can be made to depend on it to

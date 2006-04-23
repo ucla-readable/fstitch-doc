@@ -31,6 +31,7 @@ explains journaling with \chdescs. For a comparison of journaling versus soft
 updates for UFS, see ~\cite{seltzer00journaling}.
 
 \subsubsection {Implementation Design Philosophy}
+% FIXME biatch
 The LFS interface naturally divides the implementation into a set of simpler
 tasks. By breaking down CFS calls into smaller LFS calls, we come up with a
 set of problems that are easier to reason about. For example, the CFS write()
@@ -200,6 +201,6 @@ optimal performance.
 For rare cases when errors occur, UFS oftentimes undo the operation by
 creating \chdescs\ that reverse the original operation. We hope future
 versions of \Kudos\  will be able to automatically detect arrangement of
-\chdescs\ and coalesce them into a no-op. Another idea is to have some
-mechanism for voiding \chdescs\ the file system has already sent down to the
-BD layer.
+\chdescs\ and coalesce them into a \noop. Another idea is to have some
+mechanism for voiding \chdescs\ that the file system has already sent down to
+the BD layer.

@@ -62,7 +62,7 @@ can ensure the source file is not removed before the output file is on
 disk: \texttt{depend "summarize < source > sum" "rm source"}.
 
 For these reasons of trust, continued simplicity of file system
-syscalls, and existing file system syscall compatibility \opgroups\
+syscalls, and existing file system syscall compatibility, \opgroups\
 affect process file system operations implicitly, through a
 per-process ``active'' (engaged) \opgroup\ set.  Applications add and
 remove \opgroups\ to and from the engaged set. An \verb+unlink()+
@@ -85,9 +85,9 @@ the \opgroup{}'s ordering constraints. \opgroupAbandon\ informs \Kudos\
 that this process is done referencing the \opgroup.
 
 To allow processes to express updates with respect to other processes'
-updates \verb+fork()+ copies the parent's \opgroup\ table and engaged
-\opgroup\ set. This allows explicit process coordination and
-non-\opgroup{}-aware processes to be manipulated, as in the above
+updates, \verb+fork()+ copies the parent's \opgroup\ table and engaged
+\opgroup\ set to the child process. This allows explicit process coordination
+and non-\opgroup{}-aware processes to be manipulated, as in the above
 \texttt{depend} example.
 
 \begin{figure}[htb]
@@ -218,7 +218,7 @@ The goal of the updated IMAP server is to ensure all changes occur in
 a safe ordering while performing a minimal number of disk writes.  The
 original IMAP server conservatively preserved command ordering by
 syncing the mailbox file after each copy into it or check. With
-\opgroups\, each command is given an \opgroup\ and its changes made to
+\opgroups, each command is given an \opgroup\ and its changes made to
 depend on the previous command's. The check command uses \opgroupSync
 to sync all preceding disk changes. Because the check command is now
 able to ensure that preceding copies are on disk the copy command no
@@ -231,8 +231,8 @@ the server's runloop no longer need to ensure changes for a command
 are committed to disk before any following, dependent commands'
 changes. The simple \opgroup\ dependency links for each command ensure
 ordering correctness. In the original server, modules like the mbox
-driver forced a conservative disk sync protocol because to ensure
-safety more efficiently they needed to track additional state, adding
+driver forced a conservative disk sync protocol, because ensuring
+safety more efficiently requires additional state information, which adds
 further complexity. The Dovecot IMAP server notes this exact
 difficulty~\cite[maildir-save.c]{dovecot}:
 

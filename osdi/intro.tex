@@ -7,16 +7,16 @@ configurable, extensible, and easier to understand -- as has been done in other
 domains, like packet forwarding~\cite{kohler00click}. Upon examining existing
 systems that accomplish similar tasks, and after some initial design for the new
 system, it became clear that a key part of modern file system design is not
-addressed by \modules\ alone: consistency. For robustness, stability, and reboot
-speed, modern file system implementations must ensure that the file system's
-stored image is kept consistent or easy to return to consistency. Advanced
-consistency mechanisms such as soft updates~\cite{ganger00soft} and journaling
-make this possible; unfortunately, they are generally tied to a particular file
-system, and can't be ported or adapted without significant engineering effort.
-Furthermore, existing module systems did not provide a way to actually
-\emph{implement} (or even just \emph{change}) such consistency mechanisms; the
-stacking is done either above or below where that part of the system would need
-to be implemented.
+addressed by \modules\ alone: consistency. For robustness, stability, and
+recovery speed, modern file system implementations must ensure that the file
+system's stored image is kept consistent or easy to return to consistency.
+Advanced consistency mechanisms such as soft updates~\cite{ganger00soft} and
+journaling make this possible; unfortunately, they are generally tied to a
+particular file system, and can't be ported or adapted without significant
+engineering effort. Furthermore, existing module systems did not provide a way
+to actually \emph{implement} (or even just \emph{change}) such consistency
+mechanisms; the stacking is done either above or below where that part of the
+system would need to be implemented.
 
 These consistency mechanisms all hinge on one critical ability in the file
 system software: the ability to place specific ordering requirements on writes
@@ -28,7 +28,7 @@ cooperate to implement strong and often complex consistency guarantees, even
 though each individual \module\ does only a small and simple part of the work.
 
 \textbf{FROM ABSTRACT}
-For robustness, stability, and reboot speed, file system implementations must
+For robustness, stability, and recovery speed, file system implementations must
 ensure that the file system's stored image is kept consistent or easy to return
 to consistency. Advanced consistency mechanisms such as soft
 updates~\cite{ganger00soft} and journaling make this possible; unfortunately,
@@ -52,7 +52,7 @@ invariants without understanding the file system itself. Change descriptors can
 implement many consistency mechanisms, including soft updates and journaling.
 They can also be extended, in a carefully controlled way, into userspace --
 enabling applications with custom consistency and performance requirements to
-speficy specific write ordering restrictions to be honored by the file system.
+specify explicit write ordering restrictions to be honored by the file system.
 
 \Kudos\ is decomposed into fine-grained \modules\ which generate, consume,
 forward, and manipulate change descriptors. A particular innovation of the

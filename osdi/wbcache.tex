@@ -7,9 +7,9 @@ instance, one for each block device), but each is responsible for holding on to
 the \chdescs\ sent to it by connected \modules\ until they can be safely sent on
 towards the disk. To a write-back cache, the complex consistency protocols that
 other \modules\ want to enforce are nothing more than sets of dependencies among
-\chdescs\ -- it has no idea what consistency protocol (or protocols) it is
-implementing, if any at all. Yet it is the \module\ that ends up doing most of
-the work to make sure that \chdescs\ are written in an acceptable order.
+\chdescs\ -- it has no idea what consistency protocols it is implementing, if
+any at all. Yet it is the \module\ that ends up doing most of the work to make
+sure that \chdescs\ are written in an acceptable order.
 
 Even though a write-back cache has such an important and central role in the
 system, there's not a lot to it. The current write-back cache is a simple LRU

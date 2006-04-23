@@ -16,7 +16,7 @@ server starts up a kernel thread which performs all the initialization to get
 the \module\ graph set up, and \modules\ then can make file systems available to
 mount though the VFS front end. Each file system is given a name which can be
 used to mount it using the standard Linux \texttt{mount} program, using a
-command like \mbox{\texttt{mount kfs:\textit{name} /mnt/point -t kfs}}.
+command like \mbox{\texttt{mount -t kfs kfs:\textit{name} /mnt/point}}.
 
 There is a small change necessary to the standard Linux kernel in order to
 provide support for \opgroups, however. As a kernel module, there is no way to
@@ -39,9 +39,8 @@ RAM disk, IDE disk, etc.). When the \module\ receives a read or write call, it
 passes the request to Linux via \texttt{generic\_make\_request()}. Linux is
 configured to use a `noop' elevator, meaning that the calls we make to
 \texttt{generic\_make\_request()} are sent to the physical disk in the exact
-order we make them. If the call was a write, the \module\ doesn't wait for the
-DMA request to finish. However if the request is a read it must wait for the DMA
-request.
+order we make them. \Kudos\ takes advantage of DMA capabilities offered by
+Linux to do disk reads and writes efficiently.
 
 The \module\ also implements rudimentary read-ahead. When a read call needs to
 be made to the physical device, the \module\ checks to see if any of the
