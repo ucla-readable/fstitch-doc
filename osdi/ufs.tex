@@ -141,10 +141,11 @@ traversal time significantly.
 \begin{figure}[htb]
   \centering
   \includegraphics[width=92pt]{fig/figures_5}
-  \caption{\label{fig:overlap} For inode 17, \chdesc\ A and \chdesc\ B are
-  independent changes to separate fields that do not overlap. Making \chdescs\ 
-  for the entire inode data structure will, in turn, make \chdesc\ B depend
-  on \chdesc\ A because they overlap.}
+  \caption{\label{fig:overlap} On inode 17, the gray regions represent
+  modified fields that do not overlap. If \chdesc\ A and \chdesc\ B are exactly
+  the size of the gray regions, then there is no implicit dependency.
+  Making \chdescs\ for the entire inode data structure will, in turn, make
+  \chdesc\ B depend on \chdesc\ A because they overlap.}
 \end{figure}
 
 Our UFS code is mostly complete, but some features are missing:
