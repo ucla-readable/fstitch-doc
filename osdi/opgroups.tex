@@ -54,7 +54,7 @@ already ensuring internal file system consistency, user programs are
 only concerned that the deletes do not occur before the summary is
 created.
 %
-Furthermore, this level of granulatity even allows updated
+Furthermore, this level of granularity even allows updated
 applications to affect non-\opgroup{}-aware applications (or updated
 portions of an applications to affect other portions). For example, a
 \texttt{"depend"} program that runs each argument as a shell command
@@ -81,7 +81,7 @@ we plan other types, such as transactional \opgroups; the
 \opgroupEngage\ and \opgroupDisengage\ add/remove the \opgroup\ to/from
 the set of engaged \opgroups. \opgroupRelease\ allows an \opgroup\ to go
 to disk. \opgroupSync\ sends \anopgroup\ to disk, preserving
-the \opgroup{}'s ordering contraints. \opgroupAbandon\ informs \Kudos\
+the \opgroup{}'s ordering constraints. \opgroupAbandon\ informs \Kudos\
 that this process is done referencing the \opgroup.
 
 To allow processes to express updates with respect to other processes'
@@ -135,13 +135,13 @@ disengaged & has dependents
 \begin{itemize}
 \item Mention simplicity using opgroups vs fsync?
 \item Opgroups are simpler than chdescs. Retaining not possible (app
-  waits tomake write) and destruction not an issue (unless a
+  waits to make write) and destruction not an issue (unless a
   transaction). Apply/rollback and dependency removal aren't seen as
   helpful since apps are not doing transformations, just specifying
   ordering requirements. (We should improve this reasoning.)
 \item Explain why create and engage are distinct. Why disengage,
   release, and abandon are distinct. (Cycle prevention and for
-  atomic/trancactional opgroups.)
+  atomic/transactional opgroups.)
 \end{itemize}
 
 \subsection{Implementation}
@@ -184,13 +184,69 @@ being hooked up to \anopgroup.
 \end{itemize}
 
 \begin{figure}[htb]
-\caption{\label{fig:opgroup-chdescs} \Opgroup\ \chdescs}
+\caption{\label{fig:opgroup-chdescs} \Opgroup\ \Chdescs}
 \end{figure}
 
 \subsection{UW-IMAP Case Study}
 \label{sec:opgroup:uwimap}
-\begin{itemize}
-\item \cite{rfc3501}
-\item changes
-\item benefits: simplicity and efficency
-\end{itemize}
+\todo{Name this section ``IMAP Server Case Study'' or ``UW-IMAP Case Study''?}
+
+To assess the utility of \opgroups\ in a real world application we
+updated the University of Washington's ``imapd'' mailserver to take
+advantage of \opgroups\ to ensure mail updates are committed to disk
+in safe and efficient orderings.
+
+The Internet Message Access Protocol (IMAP)~\cite{rfc3501} provides
+remote access to a mail server's email message store. An IMAP client
+is in one of four states: not authenticated, authenticated, selected
+mailbox, and logged out. States define the set of valid commands a
+client may issue. For example, not authenticated clients may only
+authenticate, authenticated clients may create or open a mailbox, and
+clients in the selected state may retrieve messages from the selected
+mailbox. In our case study we are interested mailbox manipulation. The
+authenticated and selected states allow mailbox manipulation. The
+modification commands include select (select a mailbox), store (add
+flags to a message, such as flagged or deleted), copy (copy a message
+from the selected mailbox to another mailbox), expunge (remove
+messages marked for deletion), check (ensure all previous commands
+updates are on disk), and close (check and leave the selected
+mailbox). We have updated the UW IMAP~\cite{uwimap} imapd mail server
+and mbox mail storage driver, authored by Mark Crispin of the IMAP RFC.
+\todo{Be more explicitly about which commands sync}
+
+The goal of the updated IMAP server is to ensure all changes occur in
+a safe ordering while performing a minimal number of disk writes.  The
+original IMAP server conservatively preserved command ordering by
+syncing the mailbox file after each copy into it or check. With
+\opgroups\, each command is given an \opgroup\ and its changes made to
+depend on the previous command's. The check command uses \opgroupSync
+to sync all preceding disk changes. Because the check command is now
+able to ensure that preceding copies are on disk the copy command no
+longer requires a file sync.
+
+These \opgroup\ changes result in two benefits: simpler change
+ordering correctness and simpler disk efficiency. As each command's
+changes depend on the preceding commands' changes, code called from
+the server's runloop no longer need to ensure changes for a command
+are committed to disk before any following, dependent commands'
+changes. The simple \opgroup\ dependency links for each command ensure
+ordering correctness. In the original server, modules like the mbox
+driver forced a conservative disk sync protocol because to ensure
+safety more efficiently they needed to track additional state, adding
+further complexity. The Dovecot IMAP server notes this exact
+difficulty~\cite[maildir-save.c]{dovecot}:
+
+\vspace{-0.5\baselineskip}
+\begin{scriptsize}
+\begin{verbatim}
+/* FIXME: when saving multiple messages, we could get
+   better performance if we left the fd open and
+   fsync()ed it later */
+\end{verbatim}
+\end{scriptsize}
+
+\vspace{-0.5\baselineskip}
+\noindent \Opgroups\ allow for both simpler and more efficient ordering correctness.
+
+The performance of the \opgroup{}-enabled UW IMAP imapd server is
+evaluated in \S\ref{sec:evaluation:uwimap}.
