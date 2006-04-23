@@ -226,8 +226,8 @@ endfig;
 beginfig(5);
   label.top(btex Chdesc A etex, (15,25));
   boxjoin(a.width = b.width; a.height = b.height; a.s - b.n = (0,20));
-  elementit.a(btex \quad Inode 7 \quad etex, 0, 0, pull);
-  elementit.b(btex \quad Inode 7 \quad etex, 0, 0, pull);
+  elementit.a(btex \quad Inode 17 \quad etex, 0, 0, pull);
+  elementit.b(btex \quad Inode 17 \quad etex, 0, 0, pull);
   label.bot(btex Chdesc B etex, (50,-55));
 
   fixelement(a,b);

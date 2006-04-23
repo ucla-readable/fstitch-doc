@@ -80,8 +80,8 @@ arrangement of \chdescs\ and cancel them.
 
 Previously, \Kudos\ used a minimal file system called JOSFS. Even though JOSFS
 is extremely simple, at the time it was the largest \module\ in \Kudos\ in
-terms of LOC. With a real file system like UFS, a monolithic version will easily be
-3 to 4 times bigger than JOSFS. In earlier version of the \Kudos UFS
+terms of LOC. With a real file system like UFS, a monolithic version will
+easily be 3 to 4 times bigger than JOSFS. In earlier version of the \Kudos UFS
 implementation, having one monolithic \module\ made it difficult to change the
 algorithms and policies for particular parts of UFS. The code also got more
 difficult to manage. The problem of how to generalize the subdivision within
@@ -141,7 +141,7 @@ traversal time significantly.
 \begin{figure}[htb]
   \centering
   \includegraphics[width=92pt]{fig/figures_5}
-  \caption{\label{fig:overlap} For inode 7, \chdesc\ A and \chdesc\ B are
+  \caption{\label{fig:overlap} For inode 17, \chdesc\ A and \chdesc\ B are
   independent changes to separate fields that do not overlap. Making \chdescs\ 
   for the entire inode data structure will, in turn, make \chdesc\ B depend
   on \chdesc\ A because they overlap.}
