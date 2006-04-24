@@ -3,16 +3,17 @@
 
 \subsubsection {Overview}
 UFS is the modern incarnation of the classic Berkeley Fast File
-System~\cite{mckusick84fast} used in 4.2 BSD. The general concepts for UFS, such
-as inodes, cylinder groups, and indirect blocks, are well understood. UFS
-implementations exist for many popular UNIX-derived operating systems, including
-FreeBSD, Solaris, and Mac OS X. Many vendors have added extentions to UFS.
-Examples include UFS with journaling on Solaris and UFS with soft updates on
-FreeBSD. Linux's Ext2 file system has much in common with UFS, since it borrowed
-many ideas from FFS. In \Kudos, we implemented the UFS1 file system as a LFS
-\module. We chose UFS because it has been extended in many ways. In particular,
-it is the only file system that has been extended with both soft updates and
-journaling. We chose UFS1 over UFS2, as UFS1 is well establish and more widely
+System~\cite{mckusick84fast} used in 4.2 BSD. The general concepts for UFS,
+such as inodes, cylinder groups, and indirect blocks, are well understood. UFS
+implementations exist for many popular UNIX-derived operating systems,
+including FreeBSD, Solaris, and Mac OS X. Many vendors have added extentions to
+UFS. Examples include UFS with journaling on Solaris and UFS with soft updates
+on FreeBSD. Linux's Ext2 file system has much in common with UFS, since it
+borrowed many ideas from FFS. In \Kudos, we implemented the UFS1 file system as
+a LFS \module. We chose UFS because it has been extended in many ways. In
+particular, it is the only file system that has been extended with both soft
+updates and journaling. We chose UFS1 over UFS2, as UFS1 is well establish and
+more widely
 supported.
 
 Soft updates for UFS is one of the biggest innovations in file systems in terms
@@ -25,47 +26,52 @@ consistency checks using the \emph{fsck} ~\cite{mckusick94fsck} tool.
 Another approach to protecting the integrity of the file system is to write
 upcoming operations to a journal first. The content and the layout of the
 journal varies per implementation, but in all cases, the system can use the
-journal to play out or rollback the operations that did not complete as a result
-of a crash. Thereby \emph{fsck} can be avoided. \S\ref{sec:consistency:journal}
-explains journaling with \chdescs. For a comparison of journaling versus soft
-updates for UFS, see ~\cite{seltzer00journaling}.
+journal to play out or rollback the operations that did not complete as a
+result of a crash. Thereby \emph{fsck} can be avoided.
+\S\ref{sec:consistency:journal} explains journaling with \chdescs. For a
+comparison of journaling versus soft updates for UFS, see
+~\cite{seltzer00journaling}.
 
-\subsubsection {Implementation Design Philosophy}
-% FIXME biatch
-The LFS interface naturally divides the implementation into a set of simpler
-tasks. By breaking down CFS calls into smaller LFS calls, we come up with a
-set of problems that are easier to reason about. For example, the CFS write()
-call, and similarly the Linux VFS write() call, has the task of writing N
-bytes of data to a file at a given offset. Rather than implementing a single
-function that will have to calculate which block to write to, when to
-allocated and append new blocks, and writing the data, LFS separates the
-logic into four calls:
+\subsubsection {Design Philosophy}
+As part of the overall \Kudos\ design, the \emph{UHFS} module encompasses all
+logic for decomposing higher level CFS calls into lower level LFS calls. The
+finer granularity of LFS calls divides the problem space into smaller chunks.
+Since the issue of how to tie the LFS micro-ops together has already been
+solved, file system \module\ developers can give more attention to the
+particulars of the file system, such as, how to allocated a new filename and
+how to lookup the Nth data block for a file. To show how this simplifies the
+developmment process, consider the VFS write() call, which has the task of
+writing N bytes of data to a file at a given offset. In \Kudos, the problem is
+well defined and requires the implementation of these four LFS calls:
 get\_file\_block(), allocate\_block(), append\_block(), and write\_block().
-This allows us to systematically add functionality to our UFS \module\ in
-an incremental fashion. With some basic knowledge of the UFS data structures,
-we implemented read functionality by examining pre-existing UFS disk images.
-For write functionality, we did writes to disk and verified correctness using
-FreeBSD's \emph{fsck}.
+Additionally, the granularity of calls at the LFS layer makes it an appropriate
+layer for inserting test harnesses and developing file system unit tests.
 
-Properties specific to a file system, such as the UFS on-disk format and rules
-governing block allocation, are not exposed at the LFS layer. Although file
-systems can have uncommon requirements, LFS is flexible enough to accomidate
-many of them. One problem we ran into concerns UFS and its use of fragments
-and blocks. In UFS, typically a block is divided into 8 equal sized fragments.
-For space efficiency, UFS allocates fragments to small files. Once a file gets
-big enough to require the use of indirect blocks, then UFS changes its
-allocation policy and starts allocating blocks for speed. To implement this
-property of UFS, we used fragments as the basic block size. For large files,
-our UFS \module\ internally allocates a block, but returns only the first
-fragment in that block at the LFS level. The next 7 allocation calls will be
-no-ops that simply return the subsequent fragments in the allocated block.
+In accord with our ideas on the division of responsibilities between the file
+system \module\ and higher \modules, we chose to keep properties specific to
+UFS, such as the UFS on-disk format and rules governing block allocation,
+hidden within the file system \module. Although file systems can have uncommon
+requirements, LFS is flexible enough to accommodate many of them. One problem
+we ran into concerns UFS and its use of fragments and blocks. In UFS, typically
+a block is divided into 8 equal sized fragments. For space efficiency, UFS
+allocates fragments to small files. Once a file gets big enough to require the
+use of indirect blocks, then UFS changes its allocation policy and starts
+allocating blocks for speed. To implement this property of UFS, we used
+fragments as the basic block size. For large files, our UFS
+\module\ internally allocates a block, but returns only the first fragment in
+that block at the LFS level. The next 7 allocation calls will be no-ops that
+simply return the subsequent fragments in the allocated block. Overall, we
+believe most conventional file systems fit within the bounds set by the LFS
+interface.
 
-Using \chdescs, the UFS \module\ can control the ordering for writes to disk.
-This allows UFS to create sets of \chdescs\ and hooking them up in
-configurations that achieve soft updates consistency. Unlike FreeBSD's soft
-updates implementation, once the dependencies have been created, UFS no longer
-needs to concern itself with the \chdescs\ it created. The BD subsystem will
-track and enforce the \chdesc\ orderings.
+With regards to \chdescs, file system \modules\ like UFS should use them
+exclusively to indicate writes to disk. The advantage of using \chdescs\ over
+conventional writes, is that, using \chdescs, the UFS \module\ can control the
+ordering for writes to disk. This allows UFS to create sets of \chdescs\ and
+hooking them up in configurations that achieve soft updates consistency. Unlike
+FreeBSD's soft updates implementation, once the dependencies have been created,
+UFS no longer needs to concern itself with the \chdescs\ it created. The BD
+subsystem will track and enforce the \chdesc\ orderings.
 
 \begin{figure}[htb]
   \centering
@@ -99,9 +105,9 @@ more file system \modules, we will discover commonalities to help solve the
 subdivision problem.
 
 Applying our modularity philosophy to UFS, we refactored the file system
-\module\ and separated many logical parts into sub-\modules\ internal to UFS,
+\module\ and separated many parts into sub-\modules\ internal to UFS,
 as shown in Figure~\ref{fig:ufsmodules}.
-Within the UFS \module, the \emph{base} module cotains the core code for the
+Within the UFS \module, the \emph{base} module contains the core code for the
 file system. Using object-orientation techniques, we encapsulated the code
 for data structures in the file system, like the superblock and the cylinder
 groups. We also recognized two locations where we can apply different
@@ -165,13 +171,14 @@ to allocate resources in an efficient manner.
 \end{figure}
 
 \subsubsection {Change Descriptor Arrangements}
-With regards to optimizations for our UFS implementation, we found a couple
-practices critical to good performance. First, do not create unnecessary
-dependencies between \chdescs. Doing so artificially limits the commit order
-for \chdescs, which results in bad performance for several reasons. Not only
-will unneeded dependencies force the disk to do more writes and seeks, but
-\Kudos\ will have to scan through the \chdesc\ graph multiple times, since the
-dependencies prevent the \chdescs\ from being flushed out to disk at once.
+In the odyssey of optimizing our UFS implementation, we gained some insight and
+found a couple practices critical to good performance. First, do not create
+unnecessary dependencies between \chdescs. Doing so artificially limits the
+commit order for \chdescs, which results in bad performance for several
+reasons. Not only will unneeded dependencies force the disk to do more writes
+and seeks, but \Kudos\ will have to scan through the \chdesc\ graph multiple
+times, since the dependencies prevent the \chdescs\ from being flushed out to
+disk at once.
 
 In Figure~\ref{fig:chdescarrange}, we have two possible arrangements for three
 byte \chdescs. The noop \chdesc\ represents a root node that can reach all
