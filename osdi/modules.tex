@@ -1,24 +1,14 @@
 \section{\Modules}
 \label{sec:modules}
 
-% FIXME: add an intro section describing the less cool modules in a few sentences
-% Should be like the beginning of section design:interfaces: "A complete Kudos..."
-
-wt\_cache
-partition\_bd
-block\_resizer
-uhfs
-ufs\_base
-md\_bd
-devfs\_cfs
-file\_hiding
-loop\_bd
-mem\_bd
-nbd\_bd
-mirror\_bd
-wholedisk\_lfs
-linux\_bd
-unix\_file\_bd
+A complete \Kudos\ configuration is composed of many different \modules. In this
+section, we will describe some of the ones which contribute most to the \chdesc\
+related functionality of the system. There are several other block device
+\modules, like the write-through cache, partitioner, memory block device, and
+loopback block device, which perform more traditional functions, and a handful
+of CFS and LFS \modules\ like the block device file system \module, file hiding
+\module\, and whole disk access \module, which demonstrate various other
+abilities of the \module\ system.
 
 \input{wbcache}
 \input{ufs}
