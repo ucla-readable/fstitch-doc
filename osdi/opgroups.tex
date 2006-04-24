@@ -52,7 +52,7 @@ interface functions.
 
 \begin{figure}[htb]
 \vskip-14pt
-\begin{tabular}{@{\hskip0.0in}p{2in}@{}}
+\begin{tabular}{@{\hskip0.22in}p{2in}@{}}
 \begin{scriptsize}
 \begin{alltt}
 typedef int changegroup_id_t;
@@ -234,7 +234,6 @@ labeled 2 occurred during a second operation that depended on the first.}
 
 \subsection{UW IMAP Case Study}
 \label{sec:opgroup:uwimap}
-\todo{Name this section ``IMAP Server Case Study'' or ``UW IMAP Case Study''?}
 
 % FIXME: Should definitely mention the CHECK command. The other commands,
 % select store copy etc etc, are probably less important to mention.
@@ -248,19 +247,17 @@ The Internet Message Access Protocol (IMAP)~\cite{rfc3501} provides
 remote access to a mail server's email message store. An IMAP client
 is in one of four states: not authenticated, authenticated, selected
 mailbox, and logged out. States define the set of valid commands a
-client may issue. For example, not authenticated clients may only
-authenticate, authenticated clients may create or open a mailbox, and
-clients in the selected state may retrieve messages from the selected
-mailbox. In our case study we are interested mailbox manipulation. The
-authenticated and selected states allow mailbox manipulation. The
-modification commands include select (select a mailbox), store (add
-flags to a message, such as flagged or deleted), copy (copy a message
-from the selected mailbox to another mailbox), expunge (remove
-messages marked for deletion), check (ensure all previous commands
-updates are on disk), and close (check and leave the selected
-mailbox). We have updated the UW IMAP~\cite{uwimap} imapd mail server
-and mbox mail storage driver, authored by Mark Crispin of the IMAP RFC.
-\todo{Be more explicitly about which commands sync}
+client may issue. For example, clients in the selected state may
+retrieve messages from the selected mailbox. In our case study we are
+interested mailbox manipulation. The authenticated and selected states
+allow mailbox manipulation. The modification commands include select
+(select a mailbox), store (add flags to a message, such as flagged or
+deleted), copy (copy a message from the selected mailbox to another
+mailbox), expunge (remove messages marked for deletion), check (ensure
+all previous commands updates are on disk), and close (check and leave
+the selected mailbox). We have updated the UW IMAP~\cite{uwimap} imapd
+mail server and mbox mail storage driver, authored by Mark Crispin of
+the IMAP RFC.  \todo{Be more explicitly about which commands sync}
 
 The goal of the updated IMAP server is to ensure all changes occur in
 a safe ordering while performing a minimal number of disk writes.  The
