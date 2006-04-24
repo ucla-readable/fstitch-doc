@@ -29,7 +29,7 @@ consistency. By carefully ordering writes to disk, soft updates avoids the need
 for synchronous writes to disk or duplicate writes to a journal. Soft updates
 also guarantees a strong level of consistency after a crash, enough so that the
 system can avoid time-consuming file system consistency checks using a utility
-like \emph{fsck}~\cite{mckusick94fsck}. \S\ref{sec:consistency:softupdate}
+like \emph{fsck}~\cite{mckusick94fsck}. Section \ref{sec:consistency:softupdate}
 explains soft updates in greater detail.
 
 Another approach to protecting the integrity of the file system is to write
