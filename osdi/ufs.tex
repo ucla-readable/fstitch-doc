@@ -178,6 +178,7 @@ will unneeded dependencies force the disk to do more writes and seeks, but
 \Kudos\ will have to scan through the \chdesc\ graph multiple times, since the
 dependencies prevent the \chdescs\ from being flushed out to disk at once.
 
+% FIXME: add an example to make this more concrete?
 In Figure~\ref{fig:chdescarrange}, we have two possible arrangements for three
 byte \chdescs. The noop \chdesc\ represents a root node that can reach all
 other \chdescs. In the parallel arrangement on the left, \Kudos\ has the
@@ -192,27 +193,27 @@ the \emph{cylinder group summaries} out to disk. By simply changing the
 arrangement between three \chdescs\ created in a single function, UFS got a
 33\% speed increase for several common file operations.
 
-A corollary of this observation is to create \chdescs\ of the minimal size
-to avoid accidental overlaps, which in turn, creates unnecessary dependencies.
-With \chdescs, they can represent changes to regions as small as one byte, and
-as large as an entire block. Many times, it can be tedious for developers
-to calculate exactly what parts in a large data structure has been modified and
-needs to be written to disk. As such, laziness will result in the creation of
-\chdescs\ for the entire data structure. Doing this can be detrimental to
-performance, as shown in Figure~\ref{fig:overlap}.
+A corollary of this observation is to create \chdescs\ of the minimal size to
+avoid accidental overlaps, which in turn, creates unnecessary dependencies.
+\Chdescs can represent changes to regions as small as one byte, and as large
+as an entire block. Many times, it can be tedious for developers to calculate
+exactly what parts in a large data structure have been modified and need to be
+written to disk. As such, laziness will result in the creation of \chdescs\
+for the entire data structure. Doing this can be detrimental to performance,
+as shown in Figure~\ref{fig:overlap}.
 
 An occurrance of this problem came up for inodes, where we make several
 independent modifications to different fields within an inode. In principle,
 the \chdescs\ created are independent of one another. Previously, because we
 did not take the time to calculate the exact offsets and lengths for the fields
-that changes, we just created a \chdesc\ for the entire inode every time we
-modified any part of the inode. Thereby all \chdescs\ to any given inode
-overlapped, causing unnecessary dependencies. Our solution to this problem is
-a utility function called chdesc\_create\_diff(), which compares a modified
-copy of the data structure to the original, and creates a minimal set of
-\chdescs\ accordingly. Do to the frequent use of inodes, one simple use of
-chdesc\_create\_diff() in the UFS inode functions reduced \chdescs\ graph
-traversal time significantly.
+that changed, we just created a \chdesc\ for the entire inode every time we
+modified any part of the inode. Thus all changes to any particular inode would
+always overlap, causing unnecessary dependencies. Our solution to this problem
+is a utility function called \texttt{chdesc\_create\_diff()}, which compares a
+modified copy of a data structure to the original, and creates a minimal set of
+\chdescs\ accordingly. Due to the frequent use of inodes, one simple use of
+\texttt{chdesc\_create\_diff()} in the UFS inode functions reduced \chdesc\
+graph traversal time significantly.
 
 \begin{figure}[htb]
   \centering
@@ -226,20 +227,21 @@ traversal time significantly.
 
 \subsubsection {Future Improvements}
 Our UFS implementation is usable for everyday purposes. However, there are
-some tasty features we do not have. For example, we do not support symbolic
-links, triple indirect blocks, and sparse files. The first two can easily be
-implemented given time. Sparse file support will require the LFS interface
-to be aware of files with holes. This also means the layer immediately above
-the LFS interface may need to discard some assumptions it currently makes
+some features we do not have. For example, we do not support symbolic links,
+triple indirect blocks, and sparse files. The first two can easily be
+implemented given time. Sparse file support will require the LFS interface to
+be aware of files with holes. This also means the layer immediately above the
+LFS interface may need to adjust some of the assumptions it currently makes
 about files and block allocation.
 
-There are also auxillary on disk data structures that assist the resource
+There are also auxiliary on-disk data structures that assist the resource
 allocation algorithms. We currently ignore many of them, partially because
-our basic algorithms do not use them, and partially because there lacks
-documentation to explain what those data structures represent. Over time,
-we hope to improve our UFS \module\ with more sophisticated allocation
+our basic algorithms do not use them, and partially because documentation
+explaining what those data structures represent is sparse. Over time, we
+hope to improve our UFS \module\ with more sophisticated allocation
 algorithms, as the infrastructure for this already exists.
 
+% FIXME: we don't have to read direntries multiple times anymore
 Having a modular system also means there are places where we are less
 efficient than a more integrated solution. Although we have removed some
 of the redundency, some still exist. One example is having to read directory
@@ -247,9 +249,9 @@ entries multiple times during lookup operations. Coupled with our naive
 directory search implementation, we can see why \Kudos\ has not reached
 optimal performance.
 
-For rare cases when errors occur, UFS oftentimes undo the operation by
+For rare cases when errors occur, UFS oftentimes undoes the operation by
 creating \chdescs\ that reverse the original operation. We hope future
-versions of \Kudos\  will be able to automatically detect arrangement of
-\chdescs\ and coalesce them into a \noop. Another idea is to have some
-mechanism for voiding \chdescs\ that the file system has already sent down to
-the BD layer.
+versions of \Kudos\ will be able to automatically detect this sort of
+arrangement of \chdescs\ and coalesce them into a \noop. Another idea is to
+have some mechanism for voiding \chdescs\ that the file system has already
+sent down to the block device layer.
