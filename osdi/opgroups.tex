@@ -95,12 +95,11 @@ system operations, and to preserve existing file system syscalls.
 Each process is associated with a set of \opgroups\ to support modular
 order specification composition.
 
-To allow \opgroup\ interactions among processes, a \verb+fork()+ed
-child is given a copy of its parent's \opgroup\ state, its
-non-abandoned \opgroups\ and engaged set. This behavior also allows a
-process to express ordering requirements with respect to updates a
-non-\opgroup-aware child process's disk changes. For example, suppose
-a user wants to run the command sequence:
+To allow \opgroup\ interactions among processes, child processes copy
+their parent's engaged set and \opgroup\ id table.
+%
+This behavior also allows a process to run a helper process within
+\anopgroup. For example, suppose a user wants to run in their shell:
 %
 \vspace{-0.5\baselineskip}
 \begin{center}
@@ -110,11 +109,16 @@ a user wants to run the command sequence:
 \end{center}
 \vspace{-0.5\baselineskip}
 %
-and ensure that the file \verb+src+is not removed before the file
-\verb+sorted+ is committed to disk, so that a crash should result in
-no lost data. A program \texttt{depend} can evaluate each argument as
-a shell command and make each evaluation dependent on the previous
-evaluation:
+However, the user wants to ensure that \verb+src+ is not removed
+before \verb+sorted+ is committed to disk, so that a crash part way
+through does not lose both files.
+%
+Using \opgroups, the user could make \verb+rm+'s updates depend on
+\verb+sort+'s.
+%
+A program \texttt{depend}, that creates \anopgroup\ for each argument,
+evaluates the argument as a shell command, and makes the \opgroup\
+depend on the previous argument, can do just this:
 %
 \vspace{-0.5\baselineskip}
 \begin{center}
@@ -124,13 +128,12 @@ evaluation:
 \end{center}
 \vspace{-0.5\baselineskip}
 
-With an application's ability to create dependencies among \opgroups\,
-cyclic dependencies could arise. The \opgroup\ interface design
-ensures that cycles can only arise in \opgroup\ operations, ensuring
-file system operations can not fail due to cycles. The \opgroup\
-interface limits cycle creation opportunity through the allowed
-\opgroup\ state transitions, shown in
-Figures~\ref{fig:opgroup-transitions-states}
+With an application's ability to create dependencies among \opgroups,
+cyclic dependencies could arise. The \opgroup\ interface ensures that
+cycles can only arise in \opgroup\ operations, ensuring file system
+operations can not fail due to cycles. The \opgroup\ interface limits
+cycle creation opportunity through the allowed \opgroup\ state
+transitions, shown in Figures~\ref{fig:opgroup-transitions-states}
 and~\ref{fig:opgroup-transitions-intuition}, which ensure that
 dependees can not be added when the \opgroup\ contains any \chdescs\
 or has any dependers.
@@ -169,16 +172,10 @@ disengaged & has dependers
   or dependers.}
 \end{figure}
 
-
-\begin{itemize}
-\item Mention simplicity using opgroups vs fsync?
-\item Opgroups are simpler than chdescs. Retaining not possible (app
-  waits to make write) and destruction not an issue (unless a
-  transaction). Apply/rollback and dependency removal aren't seen as
-  helpful since apps are not doing transformations, just specifying
-  ordering requirements. (We should improve this reasoning.)
-\end{itemize}
-
+\todo{Mention simplicity using opgroups vs fsync?}
+\todo{Note that destruction is not an issue (unless a
+  transaction) and that apply/rollback and dependency removal aren't seen as
+  helpful since apps are not doing transformations?}
 
 \subsection{Implementation}
 \label{sec:opgroup:implementation}
@@ -234,7 +231,7 @@ labeled 2 occurred during a second operation that depended on the first.}
 
 To assess the utility of \opgroups\ in a real world application we
 updated the University of Washington's IMAP mailserver to take
-advantage of \opgroups\, to ensure mail updates are committed to disk
+advantage of \opgroups, to ensure mail updates are committed to disk
 in safe and efficient orderings.
 
 The Internet Message Access Protocol (IMAP)~\cite{rfc3501} provides
