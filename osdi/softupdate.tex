@@ -17,11 +17,11 @@ mostly consisting of the idea that a structure should never be marked free
 while a reference to a structure still exists on the disk, accomplishes this
 easily. In the FFS implementation of soft updates, each file system operation
 is represented by a structure in memory which encapsulates the different
-structural changes to the disk image necessary to implement that operation.
-As a result, there exists many specialized data structures to represent the
-many possible file system operations. The learning curve is high when it comes
-to understanding these structures, their relationships to one another, and
-their uses for tracking and enforcing dependencies.
+structural changes to the disk image necessary to implement that operation. As
+a result, there exist many specialized data structures to represent the
+different possible file system operations. The learning curve is high when it
+comes to understanding these structures, their relationships to one another,
+and their uses for tracking and enforcing dependencies.
 
 In \Kudos, \chdescs\ are used to store all changes to the disk. So, rather than
 a single structure which represents the whole file system operation, several
