@@ -244,7 +244,7 @@ algorithms, as the infrastructure for this already exists.
 % FIXME: we don't have to read direntries multiple times anymore
 Having a modular system also means there are places where we are less
 efficient than a more integrated solution. Although we have removed some
-of the redundency, some still exist. One example is having to read directory
+of the redundancy, some still exist. One example is having to read directory
 entries multiple times during lookup operations. Coupled with our naive
 directory search implementation, we can see why \Kudos\ has not reached
 optimal performance.
