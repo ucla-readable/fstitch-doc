@@ -1,9 +1,7 @@
 \subsection {Soft Updates}
 \label{sec:consistency:softupdate}
 
-% FIXME: Be forthright about the disadvantage of our soft updates
-% implementation: memory. Also, is the FFS implementation easier for the
-% programmer to manage?
+% FIXME: Is the FFS implementation easier for the programmer to manage?
 
 Generally, a file system image is consistent if a program like \emph{fsck}
 would report no errors -- that is, all the structures are in a completely
@@ -52,9 +50,9 @@ straightforwardly. Another example is depicted in Figure~\ref{fig:softupdate}.
 The difference between soft updates and \Kudos\ is that soft updates tracks
 these updates to the disk image at the level of file system operations, which
 are specific to the file system in use (which, in practice, is FFS), while
-\Kudos\ represents the changes in a file system independent way. The \Kudos\
-approach allows the enforcement of the dependency information to be separated
-from the specification, and it also allows the dependency structure to be
-examined and modified by other \modules\ of the system that may not have any
-idea what the changes are actually implementing in terms of the file system
-structures they are changing.
+\Kudos\ represents the changes in a file system independent way. Although it
+uses more memory, the \Kudos\ approach allows the enforcement of the dependency
+information to be separated from the specification. It also allows the
+dependency structure to be examined and modified by other \modules\ of the
+system that may not have any idea what the changes are actually implementing in
+terms of the file system structures they are changing.
