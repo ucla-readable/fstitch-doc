@@ -9,7 +9,7 @@ the write-back cache) is that with soft updates, \chdescs\ can always
 be written to the disk in order to empty the cache, while journals can
 ``lock'' changes into the cache when transactions are in progress.
 
-To accomplish this, journal \module\ makes all \chdescs\ passing through it
+To accomplish this, the journal \module\ makes all \chdescs\ passing through it
 depend on a managed \noop\ \chdesc (\S\ref{sec:design:chdescs:noop}), and makes
 copies of them to write to the journal. When the transaction is over, it creates
 a commit record, sets all the \chdescs\ in the transaction to depend on it, and

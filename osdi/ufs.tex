@@ -21,7 +21,7 @@ logic for decomposing higher level CFS calls into lower level LFS calls. The
 finer granularity of LFS calls divides the problem space into smaller chunks.
 Since the issue of how to tie the LFS micro-ops together has already been
 solved, file system \module\ developers can give more attention to the
-particulars of the file system, such as, how to allocated a new filename and
+particulars of the file system, such as how to allocate a new filename and
 how to lookup the Nth data block for a file. To show how this simplifies the
 developmment process, consider the VFS write() call, which has the task of
 writing N bytes of data to a file at a given offset. In \Kudos, the problem is
@@ -67,11 +67,11 @@ orderings.
 \subsubsection {Modularity}
 Previously, \Kudos\ used a minimal file system called JOSFS. Even though JOSFS
 is extremely simple, at the time it was the largest \module\ in \Kudos\ in
-terms of lines of code. This is from the fact that much of the actual work
+terms of lines of code. This stems from the fact that much of the actual work
 occurs in the file system \modules. For instance, most \chdescs\ in the system
 are created when a file system \module\ needs to write to disk. With a real
-file system like UFS, a monolithic version will easily be 3 to 4 times bigger
-than JOSFS. In earlier version of the \Kudos\ UFS implementation, having one
+file system like UFS, a monolithic version will easily be 3 to 4 times larger
+than JOSFS. In earlier versions of the \Kudos\ UFS implementation, having one
 monolithic \module\ made it difficult to change the algorithms and policies
 for particular parts of UFS. In addition, the large amount of code for one
 \module\ made it more difficult to manage.
@@ -127,22 +127,22 @@ The UFS cylinder group module interface regulates access to the cylinder
 groups. While there is unrestricted read access to cylinder groups, the
 interface limits write access to certain fields within the \emph{UFS\_cg}
 struct. This is because, under normal operations, fields like the number of
-data blocks per cylinder group remains constant. The cylinder group module can
-also define the policy for when changes to the cylinder group goes to disk.
-It can, for example, make the policy ``write-through'' and have all changes
-immediately go to disk. However, choosing this policy means on every block
-allocation, UFS needs to write to disk \emph{cg\_rotor}, the position of the
-last used block. To avoid performance hits like this, we implemented the
-``write-back'' policy instead. To support flushing dirty data to disk, the
-cylinder group module interface also has a sync call.
+data blocks per cylinder group remain constant. The cylinder group module can
+also define the policy for when changes to the cylinder group are written to
+disk. It can, for example, make the policy ``write-through'' and have all
+changes immediately go to disk. However, choosing this policy means that on
+every block allocation, UFS needs to write to disk \emph{cg\_rotor}, the
+position of the last used block. To avoid performance hits like this, we
+implemented the ``write-back'' policy instead. To support flushing dirty data
+to disk, the cylinder group module interface also has a sync call.
 
 The UFS allocator module interface has similar methods for allocating blocks,
-fragments, and inodes. All three methods take in a \emph{file descriptor} and
-a \emph{purpose} variable. The UFS \emph{file descriptor} contains all relevant
+fragments, and inodes. All three methods take in a \emph{file descriptor} and a
+\emph{purpose} variable. The UFS \emph{file descriptor} contains all relevant
 information pertaining to a given file, including an in-memory copy of the
-file's inode. The intent of the \emph{purpose} variable, is to provide hints to
-the allocator about what the newly allocated resource will be used for. Given
-these two pieces of information, as well as cylinder group information from the
+file's inode. The intent of the \emph{purpose} variable is to provide hints to
+the allocator about how the newly allocated resource will be used.  Given these
+two pieces of information, as well as cylinder group information from the
 previously mentioned module, UFS allocator modules can make informed decisions
 to allocate resources in an efficient manner.
 
@@ -180,8 +180,8 @@ arrangement between three \chdescs\ created in a single function, UFS got a
 33\% speed increase for several common file operations.
 
 A corollary of this observation is to create \chdescs\ of the minimal size to
-avoid accidental overlaps, which in turn, creates unnecessary dependencies.
-\Chdescs can represent changes to regions as small as one byte, and as large
+avoid accidental overlaps, which in turn, create unnecessary dependencies.
+\Chdescs\ can represent changes to regions as small as one byte, and as large
 as an entire block. Many times, it can be tedious for developers to calculate
 exactly what parts in a large data structure have been modified and need to be
 written to disk. As such, laziness will result in the creation of \chdescs\
