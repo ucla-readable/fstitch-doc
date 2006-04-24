@@ -1,7 +1,7 @@
 digraph opgrouptransitions
 {
 	rankdir=LR
-	"start" [label="start"]
+	"start" [label="start",peripheries=2]
 	"a" [label=""]
 	"b" [label="write"]
 	"c" [label=""]
