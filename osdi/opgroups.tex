@@ -1,4 +1,4 @@
-\section{User-level Change Descriptors}
+\section{Changegroups}
 \label{sec:opgroup}
 
 % FIXME: A bit harder to follow than earlier sections, but on the plus
@@ -11,15 +11,6 @@
 \newcommand{\opgroupDisengage}{\texttt{opgroup\_disengage()}}
 \newcommand{\opgroupRelease}{\texttt{opgroup\_release()}}
 \newcommand{\opgroupAbandon}{\texttt{opgroup\_abandon()}}
-
-\begin{comment}
-opgroup
-changegroup
-user-level change descriptor
-chap (CHAnge grouP)
-uchad (User-level CHAnge Descriptor)
-sher (uSer-level cHange dEscriptor gRoup)
-\end{comment}
 
 \Kudos\ \modules\ use \chdescs\ to express internal file system
 consistency protocols, such as soft updates and journaling
@@ -60,27 +51,26 @@ operation; applications can specify ordering requirements among these
 groups. Figure~\ref{fig:opgroup-interface} shows the \opgroup\
 interface functions.
 
-\newcommand{\opgroupid}{opgroup\_id\_t}
-
 \begin{figure}[htb]
 \vskip-14pt
 \begin{tabular}{@{\hskip0.0in}p{2in}@{}}
 \begin{scriptsize}
 \begin{alltt}
-typedef int opgroup_id_t;
-opgroup_id_t \textbf{opgroup_create}(int type);
-int \textbf{opgroup_sync}(opgroup_id_t opgroup);
-int \textbf{opgroup_add_depend}(
-    opgroup_id_t depender, opgroup_id_t dependee);
-int \textbf{opgroup_engage}(opgroup_id_t opgroup);
-int \textbf{opgroup_disengage}(opgroup_id_t opgroup);
-int \textbf{opgroup_release}(opgroup_id_t opgroup);
-int \textbf{opgroup_abandon}(opgroup_id_t opgroup);
+typedef int changegroup_id_t;
+changegroup_id_t \textbf{changegroup_create}(int type);
+int \textbf{changegroup_sync}(changegroup_id_t cg);
+int \textbf{changegroup_add_depend}(
+    changegroup_id_t depender,
+    changegroup_id_t dependee);
+int \textbf{changegroup_engage}(changegroup_id_t cg);
+int \textbf{changegroup_disengage}(changegroup_id_t cg);
+int \textbf{changegroup_release}(changegroup_id_t cg);
+int \textbf{changegroup_abandon}(changegroup_id_t cg);
 \end{alltt}
 \end{scriptsize}
 \end{tabular}
 \vspace{-10pt}
-\caption{\label{fig:opgroup-interface} User-level Change Descriptor Interface}
+\caption{\label{fig:opgroup-interface} \Opgroup\ Interface}
 \end{figure}
 
 New \opgroups\ are created using \opgroupCreate. Ordering constraints
@@ -155,9 +145,9 @@ or has any dependers.
 \includegraphics[width=\hsize]{opgroup_transitions}
 }
 \vspace{-0.5\baselineskip}
-\caption{\label{fig:opgroup-transitions-states} User-level Change
-  Descriptor State Transitions. Edges represent \opgroup\ operations,
-  add dependen\textbf{C}y, add dependen\textbf{T}, \textbf{R}elease,
+\caption{\label{fig:opgroup-transitions-states} \Opgroup\ State
+  Transitions. Edges represent \opgroup\ operations, add
+  dependen\textbf{C}y, add dependen\textbf{T}, \textbf{R}elease,
   \textbf{E}ngage, and \textbf{D}isengage. Not drawn, every state
   connects to the end node via abandon.}
 \end{figure}
@@ -176,8 +166,8 @@ disengaged & has dependents
 \end{tabular}
 \end{small}
 }
-\caption{\label{fig:opgroup-transitions-intuition} User-level Change
-  Descriptor State Transition Rules. An alternative view of
+\caption{\label{fig:opgroup-transitions-intuition} \Opgroup\ State
+  Transitions --- alternative view of
   Figure~\ref{fig:opgroup-transitions-states}. A fresh \opgroup\ is
   not released, is not abandoned, is disengaged, and has no dependees
   or dependents.}
@@ -237,7 +227,7 @@ being hooked up to \anopgroup.
 \centering{
 \includegraphics[width=0.5\hsize]{fig/figures_7}
 }
-\caption{\label{fig:opgroup-chdescs} \Opgroup\ \chdescs. H and T are the head
+\caption{\label{fig:opgroup-chdescs} \Opgroup\ \ChDescs. H and T are the head
 and tail of the \opgroup; HK and TK are the head keep and tail keep. The three
 \chdescs\ labeled 1 occurred during one file system operation, and the \chdesc\
 labeled 2 occurred during a second operation that depended on the first.}
