@@ -57,32 +57,32 @@ struct chdesc {
 \begin{tabular}{@{\hskip0.25in}p{2in}@{}}
 \begin{scriptsize}
 \begin{alltt}
-chdesc_t *{\bf chdesc_create_noop}(
+chdesc_t *\textbf{chdesc_create_noop}(
     bdesc_t *block, BD_t *owner);
-chdesc_t *{\bf chdesc_create_bit}(
+chdesc_t *\textbf{chdesc_create_bit}(
     bdesc_t *block, BD_t *owner,
     uint16_t offset, uint32_t xor);
-int {\bf chdesc_create_byte}(
+int \textbf{chdesc_create_byte}(
     bdesc_t *block, BD_t *owner,
     uint16_t offset, uint16_t length,
     const void *data, chdesc_t **head);
-int {\bf chdesc_create_diff}(
+int \textbf{chdesc_create_diff}(
     bdesc_t *block, BD_t *owner,
     uint16_t offset, uint16_t length,
     const void *newdata, chdesc_t **head);
-int {\bf chdesc_add_depend}(
+int \textbf{chdesc_add_depend}(
     chdesc_t *depender, chdesc_t *dependee);
-void {\bf chdesc_remove_depend}(
+void \textbf{chdesc_remove_depend}(
     chdesc_t *depender, chdesc_t *dependee);
-int {\bf chdesc_apply}(chdesc_t *chdesc);
-int {\bf chdesc_rollback}(chdesc_t *chdesc);
-int {\bf chdesc_satisfy}(chdesc_t *chdesc);
-int {\bf chdesc_noop_reassign}(
+int \textbf{chdesc_apply}(chdesc_t *chdesc);
+int \textbf{chdesc_rollback}(chdesc_t *chdesc);
+int \textbf{chdesc_satisfy}(chdesc_t *chdesc);
+int \textbf{chdesc_noop_reassign}(
     chdesc_t *noop, bdesc_t *block);
-int {\bf chdesc_push_down}(
+int \textbf{chdesc_push_down}(
     BD_t *current_bd, bdesc_t *current_block,
     BD_t *target_bd, bdesc_t *target_block);
-int {\bf chdesc_move}(
+int \textbf{chdesc_move}(
     chdesc_t *chdesc, bdesc_t *destination,
     BD_t *target_bd, uint16_t source_offset);
 \end{alltt}
