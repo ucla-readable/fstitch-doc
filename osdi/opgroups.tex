@@ -86,7 +86,8 @@ Each file system operation's \chdescs\ are added to the
 \textit{engaged set} of \opgroups. \opgroupEngage\ and
 \opgroupDisengage\ add and remove \anopgroup\ from this set.
 %
-Lastly, \opgroupAbandon\ invalidates \anopgroup\ for the calling process.
+Lastly, \opgroupAbandon\ invalidates \anopgroup\ handle for the
+calling process.
 
 The \opgroup\ interface uses a per-process engaged \opgroup\ rather
 than \anopgroup\ parameter in file system syscalls to match common
@@ -205,16 +206,6 @@ for the shell to connect them in a pipeline -- the parent process creates and
 \engages\ the \opgroups\ before calling \texttt{exec()}, and then the process
 does its file system operations without knowing or needing to know that they are
 being hooked up to \anopgroup.
-
-\begin{itemize}
-\item cycle detection
-\item chdesc implementation
-  \begin{itemize}
-  \item \chdesc\ structure; Figure~\ref{fig:opgroup-chdescs}
-  \item opgroup\_lfs for head chdesc
-  \end{itemize}
-\item scopes and opgroups across forks (multithreaded todos?)
-\end{itemize}
 
 \begin{figure}[htb]
 \centering{
