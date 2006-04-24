@@ -15,14 +15,14 @@ it is the only file system that has been extended with both soft updates and
 journaling. We chose UFS1 over UFS2, as UFS1 is well established and more widely
 supported.
 
-% FIXME: "...crash. Thereby..." is awkward
 Soft updates for UFS is one of the biggest innovations in file systems in terms
 of lowering the overhead required to provide file system consistency. By
 carefully ordering writes to disk, soft updates avoids the need for synchronous
 writes to disk or duplicate writes to a journal. Soft updates also guarantees
-consistency after a crash, so the system can avoid time-consuming file system
-consistency checks using the \emph{fsck}~\cite{mckusick94fsck} tool.
-\S\ref{sec:consistency:softupdate} explains soft updates in greater detail.
+a strong level of consistency after a crash. Enough so that the system can
+avoid time-consuming file system consistency checks using the
+\emph{fsck}~\cite{mckusick94fsck} tool. \S\ref{sec:consistency:softupdate}
+explains soft updates in greater detail.
 Another approach to protecting the integrity of the file system is to write
 upcoming operations to a journal first. The content and the layout of the
 journal varies per implementation, but in all cases, the system can use the
@@ -93,17 +93,14 @@ monolithic \module\ made it difficult to change the algorithms and policies
 for particular parts of UFS. In addition, the large amount of code for one
 \module\ made it more difficult to manage.
 
-% FIXME: Christina didn't like this paragraph
 From our experiences with JOSFS, we realized that UFS would become harder to
-maintain as it grew in size. We failed several times trying to come up with a
-way to further divide the file system module. The problem of how to generalize
-the subdivision within a file system is a difficult one, since not all file
-systems share the same characteristics. In light of this issue, we decided to
-have specialized interfaces specific to each file system \module. As we
-implement more file system \modules, we will discover commonalities to help
-solve the subdivision problem.
+maintain as it grew in size. The problem of how to generalize the subdivision
+within a file system is a difficult one, since not all file systems share the
+same characteristics. In light of this issue, we decided to have specialized
+interfaces specific to each file system \module. As we implement more file
+system \modules, we will discover commonalities between different file systems,
+and use that knowledge to better modularize \Kudos.
 
-% FIXME: Christina doesn't like "refactored"
 Applying our modularity philosophy to UFS, we refactored the file system
 \module\ and separated many parts into sub-\modules\ internal to UFS, as shown
 in Figure~\ref{fig:ufsmodules}. Within the UFS \module, the \emph{base} module
@@ -210,12 +207,12 @@ as shown in Figure~\ref{fig:overlap}.
 
 An occurrance of this problem came up for inodes, where we make several
 independent modifications to different fields within an inode. In principle,
-the \chdescs\ created are independent of one another. Previously, because we
-did not take the time to calculate the exact offsets and lengths for the fields
-that changed, we just created a \chdesc\ for the entire inode every time we
-modified any part of the inode. Thus all changes to any particular inode would
-always overlap, causing unnecessary dependencies. Our solution to this problem
-is a utility function called \texttt{chdesc\_create\_diff()}, which compares a
+the \chdescs\ created are conflict-free. Previously, because we did not take
+the time to calculate the exact offsets and lengths for the fields that
+changed, we just created a \chdesc\ for the entire inode every time we modified
+any part of the inode. Thus all changes to any particular inode would always
+overlap, causing unnecessary dependencies. Our solution to this problem is a
+utility function called \texttt{chdesc\_create\_diff()}, which compares a
 modified copy of a data structure to the original, and creates a minimal set of
 \chdescs\ accordingly. Due to the frequent use of inodes, one simple use of
 \texttt{chdesc\_create\_diff()} in the UFS inode functions reduced \chdesc\
@@ -246,14 +243,6 @@ our basic algorithms do not use them, and partially because documentation
 explaining what those data structures represent is sparse. Over time, we
 hope to improve our UFS \module\ with more sophisticated allocation
 algorithms, as the infrastructure for this already exists.
-
-% FIXME: we don't have to read direntries multiple times anymore
-Having a modular system also means there are places where we are less
-efficient than a more integrated solution. Although we have removed some
-of the redundancy, some still exist. One example is having to read directory
-entries multiple times during lookup operations. Coupled with our naive
-directory search implementation, we can see why \Kudos\ has not reached
-optimal performance.
 
 For rare cases when errors occur, UFS oftentimes undoes the operation by
 creating \chdescs\ that reverse the original operation. We hope future
