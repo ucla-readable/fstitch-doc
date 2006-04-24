@@ -16,13 +16,12 @@ need to be made to the \opgroup\ interface in order to facilitate adapting those
 applications.
 
 \subsection {Optimizations}
-
 There are several ways in which the performance can be improved. For instance,
 we create a very large number of \chdescs, and the sheer number of them can
-cause problems for any of our algorithms which need to traverse parts of the
-\chdesc\ dependency graph. We can attack this problem in two ways: first, we can
-reduce the number of \chdescs\ by intelligently merging them when we determine
-that having separate \chdescs\ is not necessary. For example, if the file system
+cause problems for any algorithm which needs to traverse parts of the \chdesc\
+dependency graph. We can attack this problem in two ways: first, we can reduce
+the number of \chdescs\ by intelligently merging them when we determine that
+having separate \chdescs\ is not necessary. For example, if the file system
 creates a file and immediately deletes it, we can take the two opposing
 \chdescs\ sets and coalesce them into a \noop.
 
@@ -36,17 +35,16 @@ extremely expensive, and optimizating them has improved and will likely continue
 to improve the performance of \Kudos.
 
 We have worked on both of these approaches, especially the second, but we
-believe further improvements can be made.
-
-One simple change which helped enormously was hidden in the order that \chdescs\
-were listed as dependencies of other \chdescs. We had originally used a simple
-linked list for this structure, and treated it like a stack for ease of
-insertion to the list. It turned out that a much better way to use the linked
-list was to treat the list like a queue, because almost always, elements being
-removed from the list were at the end of the list. (Since they had been added
-longest ago, and often changes are written in an order similar to the order in
-which they were made.) This converted a linear time search into one which would
-usually execute in constant time.
+believe further improvements can be made. One simple change which helped
+enormously was hidden in the order that \chdescs\ were listed as dependencies of
+other \chdescs. We had originally used a simple linked list for this structure,
+and treated it like a stack for ease of insertion to the list. It turned out
+that a much better way to use the linked list was to treat the list like a
+queue, because almost always, elements being removed from the list were at the
+end of the list. (Since they had been added longest ago, and often changes are
+written in an order similar to the order in which they were made.) This
+converted a linear time search into one which would usually execute in constant
+time.
 
 Another example is that when examining a block and deciding which \chdescs\ must
 be rolled back in order for the block's data to be safe to write to the disk,
@@ -71,7 +69,7 @@ than a standard Linux 2.6 kernel.
 Currently, we have only written one production quality file system \module\
 (UFS). The other file system \module\ in \Kudos\ is for a very simple prototype
 file system. We would like to add an ext2 file system \module. Once we have such
-a \module, we could use our journal \module to get ``ext3b''. Implementing an
+a \module, we could use our journal \module\ to get ``ext3b''. Implementing an
 ext2 \module\ would also help us to identify more opportunities for sharing code
 between file system implementations, and ways in which our interfaces might
 accomodate different file systems more neutrally.
@@ -92,13 +90,13 @@ due to the lack of documentation to explain the purpose of some data
 structures. Over time, we hope to better understand UFS and improve our UFS
 implementation.
 
-To prevent the system from going into an infinite loop, it is important for
-\chdescs\ to never form cycles. Although it is never our intent, cycles can
-form as a result of implementation bugs. Currently we can do cycle checking,
-but it is slow and not scalable as the \chdesc\ graph grows in size. We want to
-delve into graph algorthms and find faster ways to check for cycles. Ideally,
-the overhead of cycle checking will be low enough that we can afford to leave
-it enabled all the time.
+To prevent the system from going into an infinite loop, it is important that
+\chdescs\ never form cycles. Although it is never our intent, cycles can form
+as a result of implementation bugs. Currently we can do cycle checking, but it
+is slow and not scalable as the \chdesc\ graph grows in size. We want to delve
+into graph algorthms and find faster ways to check for cycles. Ideally, the
+overhead of cycle checking will be low enough that we can afford to leave it
+enabled all the time.
 
 \begin{itemize}
 \item Transactional user-level \chdescs

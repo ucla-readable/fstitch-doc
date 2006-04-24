@@ -133,11 +133,11 @@ depend on the previous argument, can do just this:
 With an application's ability to create dependencies among \opgroups,
 cyclic dependencies could arise. The \opgroup\ interface ensures that
 cycles can only arise in \opgroup\ operations, ensuring file system
-operations can not fail due to cycles. The \opgroup\ interface limits
+operations cannot fail due to cycles. The \opgroup\ interface limits
 cycle creation opportunity through the allowed \opgroup\ state
 transitions, shown in Figures~\ref{fig:opgroup-transitions-states}
 and~\ref{fig:opgroup-transitions-intuition}, which ensure that
-dependees can not be added when the \opgroup\ contains any \chdescs\
+dependees cannot be added when the \opgroup\ contains any \chdescs\
 or has any dependers.
 
 \begin{figure}[htb]
@@ -232,8 +232,8 @@ is in one of four states: not authenticated, authenticated, mailbox
 selected, and logged out. States define the set of valid commands a
 client may issue. For example, clients in the selected state may
 retrieve messages from the selected mailbox. In our case study we are
-interested mailbox manipulation; the authenticated and selected states
-allow mailbox manipulation. The most relevant IMAP commands
+interested in mailbox manipulation; the authenticated and selected
+states allow mailbox manipulation. The most relevant IMAP commands
 synchronize changes to the server's disk (CHECK), copy a message from
 the selected mailbox to another mailbox (COPY), and delete messages
 marked for deletion (EXPUNGE).
@@ -266,10 +266,10 @@ ensuring change ordering correctness
 %
 and making efficient usage of disk updates.
 %
-As each command's changes now depend on the preceding commands'
+As each command's changes now depend on the preceding command's
 changes, it is no longer required that all code be concerned with
 ensuring its changes are committed before any later, dependent
-commands' changes. Without \opgroups, modules like the mbox driver
+command's changes. Without \opgroups, modules like the mbox driver
 forced a conservative disk sync protocol because ensuring safety more
 efficiently required additional state information, adding further
 complexity. The Dovecot IMAP server's source code notes this exact
