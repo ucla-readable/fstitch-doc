@@ -83,13 +83,13 @@ orderings.
 \subsubsection {Modularity}
 Previously, \Kudos\ used a minimal file system called JOSFS. Even though JOSFS
 is extremely simple, at the time it was the largest \module\ in \Kudos\ in
-terms of LOC. This is from the fact that much of the actual work occurs in the
-file system \modules. For instance, most \chdescs\ in the system are created
-when the file system \modules\ needs to write to disk. With a real file system
-like UFS, a monolithic version will easily be 3 to 4 times bigger than JOSFS.
-In earlier version of the \Kudos\ UFS implementation, having one monolithic
-\module\ made it difficult to change the algorithms and policies for
-particular parts of UFS. In addition, the large amount of code for one
+terms of lines of code. This is from the fact that much of the actual work
+occurs in the file system \modules. For instance, most \chdescs\ in the system
+are created when the file system \modules\ needs to write to disk. With a real
+file system like UFS, a monolithic version will easily be 3 to 4 times bigger
+than JOSFS. In earlier version of the \Kudos\ UFS implementation, having one
+monolithic \module\ made it difficult to change the algorithms and policies
+for particular parts of UFS. In addition, the large amount of code for one
 \module\ made it more difficult to manage.
 
 From our experiences with JOSFS, we realized UFS will become harder to maintain
