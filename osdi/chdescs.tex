@@ -144,53 +144,6 @@ which have not yet reached a particular \module, and then roll them forward
 again after that \module\ is done using the previous version of the block's data
 (e.g. to write it to disk).
 
-\subsubsection {Optimizations}
-% FIXME: should this section be in the discussion section?
-% FIXME: don't beat ourselves up so much
-Many of the operations that \modules\ like the write-back cache need to do
-involve quickly discovering the set of \chdescs\ that satisfy some property,
-and often even some ordering of those \chdescs. In early prototypes, these sets
-were often calculated by doing graph traversals of the dependency graph of
-\chdescs. However, these traversals are in practice extremely expensive, and
-many optimizations were necessary in order to improve the performance of
-\Kudos.
-
-For instance, consider the structure of a \chdesc\ itself. The list of
-dependencies is often changing as a \chdesc\ moves through the system. Even
-when no \modules\ are explicitly ``rewiring'' the \chdescs, dependencies on a
-\chdesc\ must be removed when that \chdesc\ is destroyed as a result of having
-been written to disk. Simple singly linked lists originally stored the lists of
-dependencies, and it turned out that a lot of time was being spent traversing
-those lists in order to destroy each \chdesc. It turned out that almost always,
-the element being removed from the list was at the end of the list -- because
-it had been added longest ago, and often changes were being written to disk in
-an order similar to the order in which they had been made. The solution was to
-convert the linked list into a queue, so that elements would be added to one
-end of the list and removed from the other. This converted a linear time search
-into one which would usually execute in constant time.
-
-Another example is that when examining a block and deciding which \chdescs\ must
-be rolled back in order for the block's data to be safe to write to the disk,
-the dependency graph between the various changes on that block must be taken
-into account so that changes which depend on one another are rolled back in
-proper dependency order. Originally, a traversal of the \chdesc\ graph rooted at
-the block's \noop\ \chdesc\ (which depends on all the changes on that block) was
-used to calculate the correct ordering. This was very computationally intensive
-when more than a small number of \chdescs\ were involved. The algorithm was
-changed to examine only those \chdescs\ actually on the block, and still it was
-not as good as we had hoped. Finally, we discovered that we were examining the
-\chdescs\ in almost exactly the opposite order as the order they should be
-rolled back in -- for the same reason as the previous example. By simply
-changing the direction of the loop, we were able to improve the loop from
-quadratic time to linear time.
-
-We believe that there are still many places \chdesc\ operations can be
-optimized to improve the performance of \Kudos. Many of these places likely
-will have the same flavor as the two examples here: information we already have
-can be used in order to determine the answers we need, without needing to
-directly calculate those answers. Even as it is, however, \Kudos\ does not run
-dramatically slower than a standard Linux 2.6 kernel.
-
 \subsubsection {Manipulations and Transformations}
 % FIXME: add concrete details here
 \Chdescs\ play a central role in \Kudos, and therefore many parts of the system

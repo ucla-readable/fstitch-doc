@@ -1,13 +1,21 @@
 \section {Discussion}
 \label{sec:discussion}
 
-There are several areas in which we would like to expand our work. The obvious
+There are several areas in which we would like to improve our work. The obvious
 first area we would like to work on is the performance of \Kudos. We have
 already improved the performance by literally several orders of magnitude, since
 we only recently began examining performance in addition to correctness, but the
 system is not as fast as it could be -- and not quite as fast as it needs to be
 to be a viable option for most computer systems.
 
+We would also like to identify places where \Kudos\ can be made more flexible,
+by adding more features to the system and changing the existing parts that make
+these features difficult to add. For instance, we would like to find more
+applications which can take advantage of \opgroups, and see what changes might
+need to be made to the \opgroup\ interface in order to facilitate adapting those
+applications.
+
+\subsection {Optimizations}
 There are several ways in which the performance can be improved. First, we
 create a very large number of \chdescs, and the sheer number of them can cause
 problems for any of our algorithms which needs to traverse parts of the \chdesc\
@@ -18,14 +26,50 @@ traversal algorithms to need to examine fewer \chdescs. We have worked on both
 of these approaches, especially the second, but we believe further improvements
 can be made.
 
-Another item we would like to add is an ext2 file system \module. Currently,
-we have only written one production quality file system \module. The other
-file system \module\ in \Kudos\ is for a very simple prototype file system
-called JOSFS. Once we have an ext2 \module, we could use our journal module to
-get ``ext3b''. Implementing an ext2 \module\ would also help us to identify
-more opportunities for sharing code between file system implementations, and
-ways in which our interfaces might accomodate different file systems more
-neutrally.
+Many of the operations that \modules\ like the write-back cache need to do
+involve quickly discovering the set of \chdescs\ that satisfy some property, and
+often even some ordering of those \chdescs. In early prototypes, these sets were
+often calculated by doing graph traversals of the \chdesc\ dependency graph.
+However, these traversals are in practice extremely expensive, and many
+optimizations were necessary in order to improve the performance of \Kudos.
+
+One simple change which helped enormously was hidden in the order that \chdescs\
+were listed as dependencies of other \chdescs. We had originally used a simple
+linked list for this structure, and treated it like a stack for ease of
+insertion to the list. It turned out that a much better way to use the linked
+list was to treat the list like a queue, because almost always, elements being
+removed from the list were at the end of the list. (Since they had been added
+longest ago, and often changes are written in an order similar to the order in
+which they were made.) This converted a linear time search into one which would
+usually execute in constant time.
+
+Another example is that when examining a block and deciding which \chdescs\ must
+be rolled back in order for the block's data to be safe to write to the disk,
+the dependency graph between the various changes on that block must be taken
+into account so that changes which depend on one another are rolled back in
+proper dependency order. Once again, we discovered that we were examining the
+\chdescs\ in almost exactly the opposite order as the order they should be
+rolled back in -- for the same reason as the previous example. By simply
+changing the direction of the loop, we were able to improve the loop from
+quadratic time to linear time.
+
+We believe that there are still many places \chdesc\ operations can be optimized
+to improve the performance of \Kudos. Many of these places likely will have the
+same flavor as the two examples here: information we already have can be used in
+order to determine the answers we need, without needing to directly calculate
+those answers. Even as it is, however, \Kudos\ does not run dramatically slower
+than a standard Linux 2.6 kernel.
+
+% FIXME: better cache eviction algorithm
+
+\subsection {Features}
+Currently, we have only written one production quality file system \module\
+(UFS). The other file system \module\ in \Kudos\ is for a very simple prototype
+file system. We would like to add an ext2 file system \module. Once we have such
+a \module, we could use our journal \module to get ``ext3b''. Implementing an
+ext2 \module\ would also help us to identify more opportunities for sharing code
+between file system implementations, and ways in which our interfaces might
+accomodate different file systems more neutrally.
 
 To prevent the system from going into an infinite loop, it is important for
 \chdescs\ to never form cycles. Although it is never our intent, cycles can
@@ -33,12 +77,10 @@ form as a result of implementation bugs. Currently we can do cycle checking,
 but it is slow and not scalable as the \chdesc\ graph grows in size. We want to
 delve into graph algorthms and find faster ways to check for cycles. Ideally,
 the overhead of cycle checking will be low enough that we can afford to leave
-it on all the time.
+it enabled all the time.
 
 \begin{itemize}
-\item Better cache eviction algorithm
 \item Transactional user-level \chdescs
 \item More flexible rules for user-level \chdescs
 \item Metadata-only journaling
-\item More references
 \end{itemize}
