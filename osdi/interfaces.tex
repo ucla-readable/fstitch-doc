@@ -36,15 +36,88 @@ implementations into common (reusable) code and file system specific code. In
 other stackable \module\ systems, which generally allow stacking only a single
 interface.
 
-The LFS interface has functions to allocate blocks, add blocks to files,
-allocate file names, and other file system micro-ops. A \module\ implementing
-the LFS interface should define how bits are laid out on the disk, but doesn't
-have to know how to combine the micro-ops into larger, more familiar file system
-operations. A generic CFS-to-LFS \module\ decomposes the larger file write,
-read, append, and other standard operations into LFS micro-ops. This one
-\module\ can be used with many different LFS \modules\ implementing different
-file systems. (There is also a generic VFS-to-CFS layer, which has two
-implementations: one for the Linux kernel module, and one for the
+\begin{figure}[htb]
+\vskip-14pt
+\begin{tabular}{@{\hskip0.25in}p{2in}@{}}
+\begin{scriptsize}
+\begin{verbatim}
+int (*get_root)(inode_t *inode);
+
+uint32_t (*allocate_block)(
+    fdesc_t *file, int purpose,
+    chdesc_t **head);
+
+int (*free_block)(
+    fdesc_t *file, uint32_t block,
+    chdesc_t **head);
+
+bdesc_t *(*lookup_block)(uint32_t number);
+
+int (*write_block)(
+    bdesc_t *block, chdesc_t **head);
+
+int (*lookup_name)(
+    inode_t parent, const char *name,
+    inode_t *inode);
+
+fdesc_t *(*lookup_inode)(inode_t inode);
+
+void (*free_fdesc)(fdesc_t *fdesc);
+
+uint32_t (*get_file_numblocks)(fdesc_t *file);
+
+uint32_t (*get_file_block)(
+    fdesc_t *file, uint32_t offset);
+
+int (*get_dirent)(
+    fdesc_t *file, struct dirent *entry,
+    uint16_t size, uint32_t *basep);
+
+int (*append_file_block)(
+    fdesc_t *file, uint32_t block,
+    chdesc_t **head);
+
+uint32_t (*truncate_file_block)(
+    fdesc_t *file, chdesc_t **head);
+
+fdesc_t *(*allocate_name)(
+    inode_t parent, const char *name,
+    uint8_t type, fdesc_t *link,
+    inode_t *newinode, chdesc_t **head);
+
+int (*remove_name)(
+    inode_t parent, const char *name,
+    chdesc_t **head);
+
+int (*rename)(
+    inode_t oldparent, const char *oldname,
+    inode_t newparent, const char *newname,
+    chdesc_t **head);
+
+int (*get_metadata)(
+    inode_t inode, uint32_t id,
+    size_t size, void *data);
+
+int (*set_metadata)(
+    inode_t inode, uint32_t id,
+    size_t size, const void *data,
+    chdesc_t **head);
+\end{verbatim}
+\end{scriptsize}
+\end{tabular}
+\vspace{-10pt}
+\caption{\label{fig:lfs} The LFS interface, simplified slightly.}
+\end{figure}
+
+The LFS interface (Figure \ref{fig:lfs}) has functions to allocate blocks, add
+blocks to files, allocate file names, and other file system micro-ops. A
+\module\ implementing the LFS interface should define how bits are laid out on
+the disk, but doesn't have to know how to combine the micro-ops into larger,
+more familiar file system operations. A generic CFS-to-LFS \module\ decomposes
+the larger file write, read, append, and other standard operations into LFS
+micro-ops. This one \module\ can be used with many different LFS \modules\
+implementing different file systems. (There is also a generic VFS-to-CFS layer,
+which has two implementations: one for the Linux kernel module, and one for the
 FUSE~\cite{fuse} version. See \S\ref{sec:implementation} for details.)
 
 \begin{figure}[tb]
@@ -64,5 +137,3 @@ device as \chdescs, allowing dependency information to be maintained across
 boundaries that might otherwise lose that information. In contrast, without
 \chdescs\ and the ability to forward \chdescs\ through loop devices, BSD cannot
 express soft updates' consistency requirements through loop-back file systems.
-
-% FIXME: add a table of interface functions

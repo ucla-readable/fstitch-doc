@@ -57,10 +57,10 @@ struct chdesc {
 \begin{tabular}{@{\hskip0.25in}p{2in}@{}}
 \begin{scriptsize}
 \begin{verbatim}
-chdesc_t chdesc_create_noop(
+chdesc_t *chdesc_create_noop(
     bdesc_t *block, BD_t *owner);
 
-chdesc_t chdesc_create_bit(
+chdesc_t *chdesc_create_bit(
     bdesc_t *block, BD_t *owner,
     uint16_t offset, uint32_t xor);
 
