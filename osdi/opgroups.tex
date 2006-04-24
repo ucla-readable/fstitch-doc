@@ -69,8 +69,8 @@ interface functions.
 \texttt{typedef int \opgroupid;}\\ \singlespace
 \figfn{\opgroupid{}}{opgroup\_create}{int flags}\\ \singlespace
 \figfn{int}{opgroup\_sync}{\opgroupid\ opgroup}\\ \singlespace
-\texttt{int \figfnname{opgroup\_add\_depend}}\\
-\hspace{20pt} \texttt{\opgroupid\ depender, \opgroupid\ dependee}\\ \singlespace
+\texttt{int \figfnname{opgroup\_add\_depend}(}\\
+\hspace{20pt} \texttt{\opgroupid\ depender, \opgroupid\ dependee);}\\ \singlespace
 \figfn{int}{opgroup\_engage}{\opgroupid\ opgroup}\\ \singlespace
 \figfn{int}{opgroup\_disengage}{\opgroupid\ opgroup}\\ \singlespace
 \figfn{int}{opgroup\_release}{\opgroupid\ opgroup}\\ \singlespace
