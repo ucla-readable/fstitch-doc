@@ -1,19 +1,23 @@
 \section {Evaluation}
 \label{sec:evaluation}
 
-% FIXME
+We will evaluate our prototype implementation of \Kudos\ in two ways: first, we
+show that the overall performance is within reason, even though it is slower
+than Linux by a nontrivial amount. We justify this difference, and argue that it
+can be improved substantially. Second, we show specific block write orderings in
+a variety of situations, demonstrating the effect and utility of \opgroups\ and
+the potential for them to improve the efficiency of applications using them.
 
-It doesn't suck that much. Plus it is really neat.
-
-Ideas:
+\subsection {Overall Performance}
 \begin{itemize}
-\item Demonstrate numbers of writes vs. BSD
-\item Show fewer writes in UW IMAP using \opgroups\ (see \S\ref{sec:opgroup:uwimap})
 \item Show performance is not \emph{that} bad (macrobenchmarks)
 \item Argue performance can be improved (see \S\ref{sec:discussion})
 \end{itemize}
 
+\subsection {Block Writes}
+Demonstrate numbers of writes vs. BSD with and without soft updates.
+
 \subsection {UW IMAP Case Study}
 \label{sec:evaluation:uwimap}
 
-% FIXME
+Show fewer writes in UW IMAP using \opgroups\ (see \S\ref{sec:opgroup:uwimap})

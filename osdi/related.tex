@@ -5,21 +5,22 @@
 
 % \cite{webber93portable}
 
-Stackable \module\ software for file systems is not a new idea. For instance, it
-was proposed in the early 90s in \cite{rosenthal90evolving, heidemann91layered,
-skinner93stacking, heidemann94filesystem}. Nevertheless, it remains an
-interesting idea, and still attracts active research (\cite{zadok99extending,
-zadok00fist}). However, previous systems like FiST~\cite{zadok00fist} or
-GEOM~\cite{geom} generally focus on an individual portion of the system and
-thus restrict both what a \module\ can do and how \modules\ can be arranged.
-FiST, for instance, does not provide a way to deal with structures on the disk
-directly -- it provides only ``wrapper'' functionality around existing file
-systems. (Wrapfs~\cite{zadok99stackable, zadok99extending} is similar.) GEOM, on
-the other hand, deals only with the block device layer, and has no way to work
-with the file systems stored on those block devices. Neither has a formal way of
-specifying or honoring complex write-ordering information, which is what
-\chdescs\ in \Kudos\ provide. We imagine that systems like these could be
-adapted to work with \chdescs, giving the benefits of both ideas.
+Stackable \module\ software for file systems is not a new idea. For instance,
+it was proposed in the early 90s in several papers~\cite{rosenthal90evolving,
+heidemann91layered, skinner93stacking, heidemann94filesystem}. Nevertheless,
+it remains an interesting idea, and still attracts active research
+(\cite{zadok99extending, zadok00fist}). However, previous systems like
+FiST~\cite{zadok00fist} or GEOM~\cite{geom} generally focus on an individual
+portion of the system and thus restrict both what a \module\ can do and how
+\modules\ can be arranged. FiST, for instance, does not provide a way to deal
+with structures on the disk directly -- it provides only ``wrapper''
+functionality around existing file systems. (Wrapfs~\cite{zadok99stackable,
+zadok99extending} is similar.) GEOM, on the other hand, deals only with the
+block device layer, and has no way to work with the file systems stored on
+those block devices. Neither has a formal way of specifying or honoring
+complex write-ordering information, which is what \chdescs\ in \Kudos\
+provide. We imagine that systems like these could be adapted to work with
+\chdescs, giving the benefits of both ideas.
 
 \subsection{Consistency}
 
