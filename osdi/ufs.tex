@@ -178,7 +178,6 @@ will unneeded dependencies force the disk to do more writes and seeks, but
 \Kudos\ will have to scan through the \chdesc\ graph multiple times, since the
 dependencies prevent the \chdescs\ from being flushed out to disk at once.
 
-% FIXME: add an example to make this more concrete?
 In Figure~\ref{fig:chdescarrange}, we have two possible arrangements for three
 byte \chdescs. The noop \chdesc\ represents a root node that can reach all
 other \chdescs. In the parallel arrangement on the left, \Kudos\ has the
