@@ -94,7 +94,7 @@ int \textbf{chdesc_move}(
 
 When a \Kudos\ \module\ first generates \chdescs\ to write to the disk, it
 specifies write ordering requirements similar to those of soft updates (see
-\S\ref{sec:consistency:softupdates}). The \module\ passes these \chdescs\ to
+\S\ref{sec:consistency:softupdate}). The \module\ passes these \chdescs\ to
 another \module\ closer to the disk. This second \module\ can inspect, delay,
 and even modify them before passing them on further. For instance, the
 write-back cache \module\ (\S\ref{sec:modules:wbcache}) holds on to blocks and
