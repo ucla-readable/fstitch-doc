@@ -118,21 +118,28 @@ means it is easy to try out new algorithms. Currently we have two allocator
 modules as a proof of concept for modularity.
 
 \begin{figure}[htb]
-Cylinder Group Interface:\\
+Cylinder Group Interface:
+\vspace{-0.5\baselineskip}
 \begin{scriptsize}
-\texttt{const UFS\_cg\_t * read(int num);}\\
-\texttt{int write\_time(int num, int value, chdesc\_t ** head);}\\
-\texttt{int write\_rotor(int num, int value, chdesc\_t ** head);}\\
-\texttt{int write...}\\
-\texttt{int sync(int num, chdesc\_t ** head);}
-\end{scriptsize}\\
-\\
-Allocator Interface:\\
-\begin{scriptsize}
-\texttt{int find\_free\_block(fdesc\_t * file, int purpose);}\\
-\texttt{int find\_free\_frag(fdesc\_t * file, int purpose);}\\
-\texttt{int find\_free\_inode(fdesc\_t * file, int purpose);}
+\begin{alltt}
+const UFS_cg_t * \textbf{read}(int num);
+int \textbf{write_time}(int num, int value, chdesc_t ** head);
+int \textbf{write_rotor}(int num, int value, chdesc_t ** head);
+int \textbf{write}...
+int \textbf{sync}(int num, chdesc_t ** head);
+\end{alltt}
 \end{scriptsize}
+
+Allocator Interface:
+\vspace{-0.5\baselineskip}
+\begin{scriptsize}
+\begin{alltt}
+int \textbf{find_free_block}(fdesc_t * file, int purpose);
+int \textbf{find_free_frag}(fdesc_t * file, int purpose);
+int \textbf{find_free_inode}(fdesc_t * file, int purpose);
+\end{alltt}
+\end{scriptsize}
+\vspace{-0.5\baselineskip}
 \caption{\label{fig:moduleinterface} UFS Internal Module Interfaces}
 \end{figure}
 
