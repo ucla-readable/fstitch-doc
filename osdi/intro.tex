@@ -18,17 +18,57 @@ File systems are expected to do more things: they can automatically encrypt
 Improved disk interfaces can make use of file system usage patterns to
  improve
  performance~\cite{sivathanu03semantically-smart,sivathanu05database-aware}.
-%
-But even as file system functionality increases, file system
- \emph{correctness} is increasingly a focus of
+
+
+
+As file system functionality increases, file system \emph{correctness} is
+ also increasingly a focus of
  research~\cite{abunchofmuthiansivathanu,denehy05journal-guided}.
 %
-Ad hoc file system extensions and disk-layer interventions risk violating
+File system extensions and disk-layer interventions risk violating
  the dependency relationships between written blocks on which file system
- correctness riles~\cite{ganger00soft,...}.
+ correctness relies~\cite{ganger00soft,...}.
+%
+Stackable file
+ systems~\cite{zadok00fist,zadok99extending,heidemann94filesystem,rosenthal90evolving}
+ avoid some of these issues by placing extensions over an existing
+ file system, which is responsible for maintaining consistency.
+%
+Unfortunately, not all extensions are easily implemented over an unmodified
+ file system.
+%
+Furthermore, a stackable file system may implement a single system call
+ with multiple operations; for instance, imagine creating a file whose
+ additional metadata information is stored in another file with a related
+ name.
+%
+Since current VFS (virtual file system) implementations don't allow
+ overlying layers to express dependencies among operations, the stackable
+ file system must must either impose an ordering using \texttt{fsync},
+ which is expensive, or accept and account for the possibility of
+ application-level inconsistency.
+%
+
+%
+Suggested solutions differ mainly in the kind of consistency they aim to
+ impose,
 
 
-We therefore aim to 
+
+This work develops a modular file system architecture called \Kudos\ that
+ facilitates both file system extension and file system consistency
+ maintenance.
+%
+We decompose the entire file system layer, from system calls to block
+ devices, into pluggable \modules, hopefully making the system as a whole
+ more configurable, extensible, and easier to understand.
+%
+\Kudos's fundamental difference from conventional file system interfaces
+ lies in its fundamental data types.
+ the introduction
+%
+Inspired by soft updates~\cite{ganger00soft}, 
+
 
 
 
