@@ -15,23 +15,6 @@ particular, it is the only file system that has been extended with both soft
 updates and journaling. We chose UFS1 over UFS2, as UFS1 is well established
 and more widely supported.
 
-Soft updates for UFS is one of the biggest innovations in file systems in terms
-of lowering the overhead required to provide file system consistency. By
-carefully ordering writes to disk, soft updates avoids the need for synchronous
-writes to disk or duplicate writes to a journal. Soft updates also guarantees
-a strong level of consistency after a crash. Enough so that the system can
-avoid time-consuming file system consistency checks using the
-\emph{fsck}~\cite{mckusick94fsck} tool. \S\ref{sec:consistency:softupdate}
-explains soft updates in greater detail.
-Another approach to protecting the integrity of the file system is to write
-upcoming operations to a journal first. The content and the layout of the
-journal varies per implementation, but in all cases, the system can use the
-journal to play out or roll back the operations that did not complete as a
-result of a crash. Thereby \emph{fsck} can be avoided.
-\S\ref{sec:consistency:journal} explains journaling with \chdescs. For a
-comparison of journaling versus soft updates for UFS, see
-~\cite{seltzer00journaling}.
-
 \subsubsection {Design Philosophy}
 As part of the overall \Kudos\ design, the \emph{UHFS} module encompasses all
 logic for decomposing higher level CFS calls into lower level LFS calls. The
