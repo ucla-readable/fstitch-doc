@@ -113,13 +113,29 @@ child is given a copy of its parent's \opgroup\ state, its
 non-abandoned \opgroups\ and engaged set. This behavior also allows a
 process to express ordering requirements with respect to updates a
 non-\opgroup-aware child process's disk changes. For example, suppose
-a user wants to run the command sequence \texttt{sort < source >
-  sorted \&\& rm source} and ensure that the source file is not
-removed before the sorted file is committed to disk, so that a crash
-should result in no lost data. A program \texttt{depend} can evaluate
-each argument as a shell command and make each evaluation dependent on
-the previous evaluation, \texttt{depend "summarize < source > sum" "rm
-  source"}.
+a user wants to run the command sequence:
+%
+\vspace{-0.5\baselineskip}
+\begin{center}
+\begin{small}
+\verb+sort < src > sorted && rm src+
+\end{small}
+\end{center}
+\vspace{-0.5\baselineskip}
+%
+and ensure that the file \verb+src+is not removed before the file
+\verb+sorted+ is committed to disk, so that a crash should result in
+no lost data. A program \texttt{depend} can evaluate each argument as
+a shell command and make each evaluation dependent on the previous
+evaluation:
+%
+\vspace{-0.5\baselineskip}
+\begin{center}
+\begin{small}
+\verb+depend "sort < src > sorted" "rm src"+
+\end{small}
+\end{center}
+\vspace{-0.5\baselineskip}
 
 
 Both \opgroups\ and \chdescs\ express storage update ordering
