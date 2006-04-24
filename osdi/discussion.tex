@@ -21,8 +21,10 @@ create a very large number of \chdescs, and the sheer number of them can cause
 problems for any of our algorithms which needs to traverse parts of the \chdesc\
 dependency graph. We can attack this problem from two sides: we can reduce the
 number of \chdescs\ by intelligently merging them when we determine that having
-separate \chdescs\ is not necessary, or we can improve the efficiency of the
-traversal algorithms to need to examine fewer \chdescs. We have worked on both
+separate \chdescs\ is not necessary. For example, if the file system creates a
+file and immediately delete it, we can take the two opposing \chdescs\ sets and
+coalesce them into a \noop. As another strategy, we can improve the efficiency
+of the traversal algorithms to examine fewer \chdescs. We have worked on both
 of these approaches, especially the second, but we believe further improvements
 can be made.
 
@@ -70,6 +72,22 @@ a \module, we could use our journal \module to get ``ext3b''. Implementing an
 ext2 \module\ would also help us to identify more opportunities for sharing code
 between file system implementations, and ways in which our interfaces might
 accomodate different file systems more neutrally.
+
+For the \Kudos\ UFS module, we want to add more features to make the
+implementation complete. Currently, we do not support symbolic links, triple
+indirect blocks, and sparse files. The first two can easily be implemented
+given time. Sparse file support will require the LFS interface to be aware of
+files with holes. This also means the layer immediately above the LFS interface
+may need to adjust some of the assumptions it currently makes about files and
+block allocation.
+
+We have not taken advantage of the UFS \module's infrastructure for supporting
+more sophisticated allocation algorithms. There are auxiliary on-disk data
+structures that assist resource allocation algorithms. We currently ignore many
+of them, partially because our basic algorithms do not use them, and partially
+due to the lack of documentation to explain the purpose of some data
+structures. Over time, we hope to better understand UFS and improve our UFS
+implementation.
 
 To prevent the system from going into an infinite loop, it is important for
 \chdescs\ to never form cycles. Although it is never our intent, cycles can

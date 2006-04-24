@@ -2,18 +2,18 @@
 \label{sec:modules:ufs}
 
 \subsubsection {Overview}
-UFS is the modern incarnation of the classic Berkeley Fast File
-System~\cite{mckusick84fast} used in 4.2 BSD. The general concepts for UFS, such
-as inodes, cylinder groups, and indirect blocks, are well understood. UFS
-implementations exist for many popular UNIX-derived operating systems, including
-FreeBSD, Solaris, and Mac OS X. Many vendors have added extentions to UFS.
-Examples include UFS with journaling on Solaris and UFS with soft updates on
-FreeBSD. Linux's ext2 file system has much in common with UFS, since it borrowed
-many ideas from FFS. In \Kudos, we implemented the UFS1 file system as an LFS
-\module. We chose UFS because it has been extended in many ways. In particular,
-it is the only file system that has been extended with both soft updates and
-journaling. We chose UFS1 over UFS2, as UFS1 is well established and more widely
-supported.
+UFS (UNIX File System) is the modern incarnation of the classic Berkeley Fast
+File System~\cite{mckusick84fast} used in 4.2 BSD. The general concepts for
+UFS, such as inodes, cylinder groups, and indirect blocks, are well understood.
+UFS implementations exist for many popular UNIX-derived operating systems,
+including FreeBSD, Solaris, and Mac OS X. Many vendors have added extentions to
+UFS. Examples include UFS with journaling on Solaris and UFS with soft updates
+on FreeBSD. Linux's ext2 file system has much in common with UFS, since it
+borrowed many ideas from FFS. In \Kudos, we implemented the UFS1 file system as
+an LFS \module. We chose UFS because it has been extended in many ways. In
+particular, it is the only file system that has been extended with both soft
+updates and journaling. We chose UFS1 over UFS2, as UFS1 is well established
+and more widely supported.
 
 Soft updates for UFS is one of the biggest innovations in file systems in terms
 of lowering the overhead required to provide file system consistency. By
@@ -76,8 +76,8 @@ orderings.
   \includegraphics[width=108pt]{fig/figures_4}
   \caption{\label{fig:ufsmodules} The UFS \module\ is itself composed of
   sub-\modules. The UFS base \module\ holds the core code that does not
-  vary, while components that should be flexible, such as those that relate
-  to block/inode allocation, cylinder groups, directory entries, and the
+  vary, while plug-in components that should be flexible, such as those that
+  relate to block/inode allocation, cylinder groups, directory entries, and the
   superblock, can be easily exchanged.}
 \end{figure}
 
@@ -228,25 +228,3 @@ graph traversal time significantly.
   one \chdesc\ depend on the other because they overlap.}
 \end{figure}
 
-\subsubsection {Future Improvements}
-Our UFS implementation is usable for everyday purposes. However, there are
-some features we do not have. For example, we do not support symbolic links,
-triple indirect blocks, and sparse files. The first two can easily be
-implemented given time. Sparse file support will require the LFS interface to
-be aware of files with holes. This also means the layer immediately above the
-LFS interface may need to adjust some of the assumptions it currently makes
-about files and block allocation.
-
-There are also auxiliary on-disk data structures that assist the resource
-allocation algorithms. We currently ignore many of them, partially because
-our basic algorithms do not use them, and partially because documentation
-explaining what those data structures represent is sparse. Over time, we
-hope to improve our UFS \module\ with more sophisticated allocation
-algorithms, as the infrastructure for this already exists.
-
-For rare cases when errors occur, UFS oftentimes undoes the operation by
-creating \chdescs\ that reverse the original operation. We hope future
-versions of \Kudos\ will be able to automatically detect this sort of
-arrangement of \chdescs\ and coalesce them into a \noop. Another idea is to
-have some mechanism for voiding \chdescs\ that the file system has already
-sent down to the block device layer.
