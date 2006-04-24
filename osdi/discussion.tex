@@ -16,24 +16,27 @@ need to be made to the \opgroup\ interface in order to facilitate adapting those
 applications.
 
 \subsection {Optimizations}
-There are several ways in which the performance can be improved. First, we
-create a very large number of \chdescs, and the sheer number of them can cause
-problems for any of our algorithms which needs to traverse parts of the \chdesc\
-dependency graph. We can attack this problem from two sides: we can reduce the
-number of \chdescs\ by intelligently merging them when we determine that having
-separate \chdescs\ is not necessary. For example, if the file system creates a
-file and immediately delete it, we can take the two opposing \chdescs\ sets and
-coalesce them into a \noop. As another strategy, we can improve the efficiency
-of the traversal algorithms to examine fewer \chdescs. We have worked on both
-of these approaches, especially the second, but we believe further improvements
-can be made.
 
-Many of the operations that \modules\ like the write-back cache need to do
-involve quickly discovering the set of \chdescs\ that satisfy some property, and
-often even some ordering of those \chdescs. In early prototypes, these sets were
-often calculated by doing graph traversals of the \chdesc\ dependency graph.
-However, these traversals are in practice extremely expensive, and many
-optimizations were necessary in order to improve the performance of \Kudos.
+There are several ways in which the performance can be improved. For instance,
+we create a very large number of \chdescs, and the sheer number of them can
+cause problems for any of our algorithms which need to traverse parts of the
+\chdesc\ dependency graph. We can attack this problem in two ways: first, we can
+reduce the number of \chdescs\ by intelligently merging them when we determine
+that having separate \chdescs\ is not necessary. For example, if the file system
+creates a file and immediately deletes it, we can take the two opposing
+\chdescs\ sets and coalesce them into a \noop.
+
+As another strategy, we can improve the efficiency of the traversal algorithms
+to examine fewer \chdescs. Many of the operations that \modules\ like the
+write-back cache need to do involve quickly discovering the set of \chdescs\
+that satisfy some property, and often even some ordering of those \chdescs. In
+early prototypes, these sets were often calculated by doing large traversals of
+the \chdesc\ dependency graph. However, these traversals are in practice
+extremely expensive, and optimizating them has improved and will likely continue
+to improve the performance of \Kudos.
+
+We have worked on both of these approaches, especially the second, but we
+believe further improvements can be made.
 
 One simple change which helped enormously was hidden in the order that \chdescs\
 were listed as dependencies of other \chdescs. We had originally used a simple
@@ -57,7 +60,7 @@ quadratic time to linear time.
 
 We believe that there are still many places \chdesc\ operations can be optimized
 to improve the performance of \Kudos. Many of these places likely will have the
-same flavor as the two examples here: information we already have can be used in
+same flavor as the examples here: information we already have can be used in
 order to determine the answers we need, without needing to directly calculate
 those answers. Even as it is, however, \Kudos\ does not run dramatically slower
 than a standard Linux 2.6 kernel.

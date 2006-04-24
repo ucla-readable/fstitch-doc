@@ -92,17 +92,15 @@ int \textbf{chdesc_move}(
 \caption{\label{fig:chdapi} Partial \chdesc\ API.}
 \end{figure}
 
-% FIXME: use a closer figure
 When a \Kudos\ \module\ first generates \chdescs\ to write to the disk, it
-specifies write ordering requirements similar to those of soft updates. For
-example, Figure~\ref{fig:softupdate} depicts \chdescs\ that allocate and add a
-new block to an inode. The \module\ passes these \chdescs\ to another \module\
-closer to the disk. This second \module\ can inspect, delay, and even modify
-them before passing them on further. For instance, the write-back cache \module\
-(\S\ref{sec:modules:wbcache}) holds on to blocks and their \chdescs\ instead of
-forwarding them immediately. When evicting a block and associated \chdescs, the
-write-back cache enforces an order consistent with the \chdesc\ dependency
-information.
+specifies write ordering requirements similar to those of soft updates (see
+\S\ref{sec:consistency:softupdates}). The \module\ passes these \chdescs\ to
+another \module\ closer to the disk. This second \module\ can inspect, delay,
+and even modify them before passing them on further. For instance, the
+write-back cache \module\ (\S\ref{sec:modules:wbcache}) holds on to blocks and
+their \chdescs\ instead of forwarding them immediately. When evicting a block
+and associated \chdescs, the write-back cache enforces an order consistent with
+the \chdesc\ dependency information.
 
 \subsubsection{\Noop\ Change Descriptors}
 \label{sec:design:chdescs:noop}

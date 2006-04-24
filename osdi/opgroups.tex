@@ -89,18 +89,19 @@ Each file system operation's \chdescs\ are added to the
 Lastly, \opgroupAbandon\ invalidates \anopgroup\ handle for the
 calling process.
 
-The \opgroup\ interface uses a per-process engaged \opgroup\ rather
-than \anopgroup\ parameter in file system syscalls to match common
-\opgroup\ usage, an application operation composed of multiple file
-system operations, and to preserve existing file system syscalls.
-Each process is associated with a set of \opgroups\ to support modular
-order specification composition.
+The \opgroup\ interface uses a set of engaged \opgroups\ for each
+process rather than \anopgroup\ parameter in file system calls to match
+common \opgroup\ usage (an application operation composed of multiple
+file system operation), and to avoid changing existing file system
+calls. Each process is associated with a set of \opgroups\ to support
+modular order specification composition.
 
 To allow \opgroup\ interactions among processes, child processes copy
-their parent's engaged set and \opgroup\ id table.
+their parent's engaged set and \opgroup\ ID table.
 %
-This behavior also allows a process to run a helper process within
-\anopgroup. For example, suppose a user wants to run in their shell:
+This behavior also allows a process to run a helper process whose file
+system changes will all be contained within \anopgroup. For example,
+suppose a user wants to run in their shell:
 %
 \vspace{-0.5\baselineskip}
 \begin{center}
