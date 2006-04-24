@@ -15,6 +15,7 @@ it is the only file system that has been extended with both soft updates and
 journaling. We chose UFS1 over UFS2, as UFS1 is well established and more widely
 supported.
 
+% FIXME: "...crash. Thereby..." is awkward
 Soft updates for UFS is one of the biggest innovations in file systems in terms
 of lowering the overhead required to provide file system consistency. By
 carefully ordering writes to disk, soft updates avoids the need for synchronous
@@ -46,13 +47,13 @@ get\_file\_block(), allocate\_block(), append\_block(), and write\_block().
 Additionally, the granularity of calls at the LFS layer makes it an appropriate
 layer for inserting test harnesses and developing file system unit tests.
 
-In accord with our ideas on the division of responsibilities between the file
-system \module\ and higher \modules, we chose to keep properties specific to
-UFS, such as the UFS on-disk format and rules governing block allocation, hidden
-within the file system \module. Although file systems can have uncommon
-requirements, LFS is flexible enough to accommodate many of them. One problem we
-ran into concerns UFS and its use of fragments and blocks. In UFS, typically a
-block is divided into 8 equal sized fragments. For space efficiency, UFS
+In accordance with our ideas on the division of responsibilities between the
+file system \module\ and higher \modules, we chose to keep properties specific
+to UFS (such as the UFS on-disk format and rules governing block allocation)
+hidden within the file system \module. Although file systems can have uncommon
+requirements, LFS is flexible enough to accommodate many of them. One problem
+we ran into concerns UFS and its use of fragments and blocks. In UFS, typically
+a block is divided into 8 equal sized fragments. For space efficiency, UFS
 allocates fragments to small files. Once a file gets big enough to require the
 use of indirect blocks, then UFS changes its allocation policy and starts
 allocating blocks for speed. To implement this property of UFS, we used
@@ -85,35 +86,36 @@ Previously, \Kudos\ used a minimal file system called JOSFS. Even though JOSFS
 is extremely simple, at the time it was the largest \module\ in \Kudos\ in
 terms of lines of code. This is from the fact that much of the actual work
 occurs in the file system \modules. For instance, most \chdescs\ in the system
-are created when the file system \modules\ needs to write to disk. With a real
+are created when a file system \module\ needs to write to disk. With a real
 file system like UFS, a monolithic version will easily be 3 to 4 times bigger
 than JOSFS. In earlier version of the \Kudos\ UFS implementation, having one
 monolithic \module\ made it difficult to change the algorithms and policies
 for particular parts of UFS. In addition, the large amount of code for one
 \module\ made it more difficult to manage.
 
-From our experiences with JOSFS, we realized UFS will become harder to maintain
-as it grows in size. We failed several times trying to come up with a way to
-further divide the file system module. The problem of how to generalize the
-subdivision within a file system is a difficult one, since not all file systems
-share the same characteristics. In light of this issue, we decided to have
-specialized interfaces specific to each file system \module. As we implement
-more file system \modules, we will discover commonalities to help solve the
-subdivision problem.
+% FIXME: Christina didn't like this paragraph
+From our experiences with JOSFS, we realized that UFS would become harder to
+maintain as it grew in size. We failed several times trying to come up with a
+way to further divide the file system module. The problem of how to generalize
+the subdivision within a file system is a difficult one, since not all file
+systems share the same characteristics. In light of this issue, we decided to
+have specialized interfaces specific to each file system \module. As we
+implement more file system \modules, we will discover commonalities to help
+solve the subdivision problem.
 
+% FIXME: Christina doesn't like "refactored"
 Applying our modularity philosophy to UFS, we refactored the file system
-\module\ and separated many parts into sub-\modules\ internal to UFS,
-as shown in Figure~\ref{fig:ufsmodules}.
-Within the UFS \module, the \emph{base} module contains the core code for the
-file system. Using object-orientation techniques, we encapsulated the code
-for data structures in the file system, like the superblock and the cylinder
-groups. We also recognized two locations where we can apply different
-search algorithms. One is with respect to the allocation functions for blocks,
-fragments, and inodes. The other is for searching and writing directory
-entries. (See Figure~\ref{fig:moduleinterface}) In addition to making the code
-easier to manage, having a modular file system means it is easy to try out new
-algorithms. Currently we have two allocator modules as a proof of concept for
-modularity.
+\module\ and separated many parts into sub-\modules\ internal to UFS, as shown
+in Figure~\ref{fig:ufsmodules}. Within the UFS \module, the \emph{base} module
+contains the core code for the file system. Using object-orientation
+techniques, we encapsulated the code for data structures in the file system,
+like the superblock and the cylinder groups. We also recognized two locations
+where we can apply different search algorithms. One is with respect to the
+allocation functions for blocks, fragments, and inodes. The other is for
+searching and writing directory entries (see Figure~\ref{fig:moduleinterface}).
+In addition to making the code easier to manage, having a modular file system
+means it is easy to try out new algorithms. Currently we have two allocator
+modules as a proof of concept for modularity.
 
 \begin{figure}[htb]
 Cylinder Group Interface:\\
@@ -168,14 +170,13 @@ to allocate resources in an efficient manner.
 \end{figure}
 
 \subsubsection {Change Descriptor Arrangements}
-In the odyssey of optimizing our UFS implementation, we gained some insight and
-found a couple practices critical to good performance. First, do not create
-unnecessary dependencies between \chdescs. Doing so artificially limits the
-commit order for \chdescs, which results in bad performance for several
-reasons. Not only will unneeded dependencies force the disk to do more writes
-and seeks, but \Kudos\ will have to scan through the \chdesc\ graph multiple
-times, since the dependencies prevent the \chdescs\ from being flushed out to
-disk at once.
+While optimizing our UFS implementation, we gained some insight and found a
+couple practices critical to good performance. First, do not create unnecessary
+dependencies between \chdescs. Doing so artificially limits the commit order
+for \chdescs, which results in bad performance for several reasons. Not only
+will unneeded dependencies force the disk to do more writes and seeks, but
+\Kudos\ will have to scan through the \chdesc\ graph multiple times, since the
+dependencies prevent the \chdescs\ from being flushed out to disk at once.
 
 In Figure~\ref{fig:chdescarrange}, we have two possible arrangements for three
 byte \chdescs. The noop \chdesc\ represents a root node that can reach all

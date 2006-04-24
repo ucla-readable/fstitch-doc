@@ -12,7 +12,7 @@ recovery speed, modern file system implementations must ensure that the file
 system's stored image is kept consistent or easy to return to consistency.
 Advanced consistency mechanisms such as soft updates~\cite{ganger00soft} and
 journaling make this possible; unfortunately, they are generally tied to a
-particular file system, and can't be ported or adapted without significant
+particular file system and can't be ported or adapted without significant
 engineering effort. Furthermore, existing module systems did not provide a way
 to actually \emph{implement} (or even just \emph{change}) such consistency
 mechanisms; the stacking is done either above or below where that part of the
