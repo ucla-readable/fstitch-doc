@@ -1,9 +1,6 @@
 \subsection{Write-Back Cache}
 \label{sec:modules:wbcache}
 
-% FIXME: Can you describe the specific algorithm used by the WB cache?
-% How many lines of code? Probably should have a bit on the WT cache as well.
-
 The write-back cache is in some sense the \module\ that does all the real work
 in \Kudos. There can be many write-back caches in a configuration at once (for
 instance, one for each block device), but each is responsible for holding on to
@@ -15,12 +12,13 @@ any at all. Yet it is the \module\ that ends up doing most of the work to make
 sure that \chdescs\ are written in an acceptable order.
 
 Even though a write-back cache has such an important and central role in the
-system, there's not a lot to it. The current write-back cache is a simple LRU
-cache, but with an important twist: blocks can't be evicted unless all the
-\chdescs\ on them are ``ready'' to be sent to the next \module\ (for example,
-the disk). So, when looking for a block to evict, the cache may not be able to
-evict any block it chooses -- but it evicts the least recently used block that
-it can.
+system, there's not a lot to it -- it's only about 550 lines of code, including
+comments. The current write-back cache is a simple LRU cache, but with an
+important twist: blocks can't be evicted unless all the \chdescs\ on them are
+``ready'' to be sent to the next \module\ (for example, the disk). A \chdesc\ is
+ready if all of its dependencies are at least as close to the disk as it is. So,
+when looking for a block to evict, the cache may not be able to evict any block
+it chooses -- but it evicts the least recently used block that it can.
 
 The write-back cache may need to write a non-evictable block anyway, however.
 For instance, \chdescs\ may be arranged in a way that creates a dependency cycle
@@ -43,8 +41,7 @@ are explained in \S\ref{sec:opgroup}.
 \subsection{Elevator Scheduler}
 \label{sec:modules:elevator}
 
-% FIXME: "rearranged subject to some constraints" -- Such as???? Does
-% the elevator scheduler actually improve our benchmarks? Lines of code?
+% FIXME: Does the elevator scheduler actually improve our benchmarks?
 
 The elevator scheduler is like a simpler version of the write-back cache. Unlike
 the write-back cache, it will not hold on to \chdescs\ indefinitely until their
@@ -52,7 +49,7 @@ dependencies have been satisfied. Its purpose is instead to function like a
 ``peephole optimizer'' on the block writes done by some other \module, while
 respecting any dependencies among the \chdescs\ on the blocks being written.
 Effectively, a sliding window of writes to the disk (or some other \module) is
-rearranged subject to some constraints. Having a separate module to do this job,
-rather than the write-back cache itself, allows us to separate the policy the
-elevator scheduler implements (in this case, elevator scheduling) from the main
-write-back cache code.
+rearranged subject to the constraints mandated by the \chdesc\ dependencies.
+Having a separate module to do this job, rather than the write-back cache
+itself, allows us to separate the policy the elevator scheduler implements (in
+this case, elevator scheduling) from the main write-back cache code.

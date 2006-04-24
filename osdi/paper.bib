@@ -6,7 +6,7 @@
 	number = "3",
 	pages = "181-197",
 	year = "1984",
-	url = "citeseer.ist.psu.edu/article/mckusick84fast.html"
+	url = "http://citeseer.ist.psu.edu/article/mckusick84fast.html"
 }
 
 @manual{ geom,
@@ -37,20 +37,6 @@
 	note = "\url{http://olstrans.sf.net/release/OLS2000-ext3/OLS2000-ext3.html}"
 }
 
-@article{ heidemann94stackable,
-	author = "John S. Heidemann and Gerald J. Popek",
-	title = "File-system development with stackable layers",
-	journal = "ACM Transactions on Computer Systems",
-	volume = "12",
-	number = "1",
-	year = "1994",
-	issn = "0734-2071",
-	pages = "58--89",
-	doi = "http://doi.acm.org/10.1145/174613.174616",
-	publisher = "ACM Press",
-	address = "New York, NY, USA"
-}
-
 @inproceedings{ zadok99stackable,
 	author = "Erez Zadok and Ion Badulescu",
 	title = "{A Stackable File System Interface For Linux}",
@@ -59,7 +45,7 @@
 	location = "Raleigh, North Carolina",
 	month = "May",
 	year = "1999",
-	url = "citeseer.ist.psu.edu/zadok99stackable.html"
+	url = "http://citeseer.ist.psu.edu/zadok99stackable.html"
 }
 
 @inproceedings{ zadok99extending,
@@ -69,7 +55,7 @@
 	pages = "57--70",
 	month = "June",
 	year = "1999",
-	url = "citeseer.ist.psu.edu/zadok99extending.html"
+	url = "http://citeseer.ist.psu.edu/zadok99extending.html"
 }
 
 @techreport{ rfc3501,
@@ -92,13 +78,59 @@
 }
 
 @misc{ mckusick94fsck,
-	author = "M. McKusick and T. Kowalski",
-	title = "Fsck -- The UNIX File System Check Program",
-	text = "M. McKusick, T.J. Kowalski, Fsck -- The UNIX File System Check
-		Program, 4.4 BSD System Manager's Manual, O'Reilley & Associates,
-		Inc., Sebastopol, CA, 1994, pp. 3:1--21.",
+	author = "Marshall K. McKusick and T. Kowalski",
+	title = "{Fsck -- The UNIX File System Check Program}",
+	booktitle = "4.4 BSD System Manager's Manual",
+	publisher = "O'Reilley & Associates, Inc.",
+	address = "Sebastopol, CA",
 	year = "1994",
-	url = "citeseer.ist.psu.edu/mckusick94fsck.html"
+	volume = "3",
+	pages = "1--21",
+	url = "http://citeseer.ist.psu.edu/mckusick94fsck.html"
 }
 
-% Add other stackable references
+@techreport{ heidemann91layered,
+	author = "John. S. Heidemann and Gerald. J. Popek",
+	title = "{A Layered Approach to File System Development}",
+	institution = "UCLA",
+	address = "Los Angeles, CA",
+	year = "1991",
+	month = "March",
+	info = "Technical Report CSD-910007"
+}
+
+@inproceedings{ skinner93stacking,
+	author = "G. C. Skinner and T. K. Wong",
+	title = "{``Stacking'' Vnodes: A Progress Report}",
+	year = "1993",
+	booktitle = "Proceedings of the 1993 USENIX Summer Technical Conference",
+	address = "Cincinnati, OH",
+	pages = "161--174",
+	info = "USENIX Conference Proceedings"
+}
+
+@phdthesis{ zadok97fist,
+	author = "Erez Zadok",
+	title = "{FiST: A File System Component Compiler}",
+	year = "1997",
+	month = "April",
+	institution = "Columbia University",
+	info = "Published as Technical Report CUCS-033-97"
+}
+
+@techreport{ zadok98cryptfs,
+	author = "Erez Zadok and Ion Badulescu and Alex Shender",
+	title = "{Cryptfs: A Stackable Vnode Level Encryption File System}",
+	year = "1998",
+	month = "July",
+	institution = "Columbia University",
+	info = "Technical Report CUCS-021-98"
+}
+
+@inproceedings{ webber93portable,
+	author = "N. Webber",
+	title = "{Operating System Support for Portable Filesystem Extensions}",
+	booktitle = "Proceedings of the 1993 USENIX Winter Technical Conference",
+	pages = "219--225",
+	year = "1993"
+}
