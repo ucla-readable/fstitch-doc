@@ -3,30 +3,29 @@
 
 \subsubsection {Overview}
 UFS is the modern incarnation of the classic Berkeley Fast File
-System~\cite{mckusick84fast} used in 4.2 BSD. The general concepts for UFS,
-such as inodes, cylinder groups, and indirect blocks, are well understood. UFS
-implementations exist for many popular UNIX-derived operating systems,
-including FreeBSD, Solaris, and Mac OS X. Many vendors have added extentions to
-UFS. Examples include UFS with journaling on Solaris and UFS with soft updates
-on FreeBSD. Linux's Ext2 file system has much in common with UFS, since it
-borrowed many ideas from FFS. In \Kudos, we implemented the UFS1 file system as
-a LFS \module. We chose UFS because it has been extended in many ways. In
-particular, it is the only file system that has been extended with both soft
-updates and journaling. We chose UFS1 over UFS2, as UFS1 is well establish and
-more widely
+System~\cite{mckusick84fast} used in 4.2 BSD. The general concepts for UFS, such
+as inodes, cylinder groups, and indirect blocks, are well understood. UFS
+implementations exist for many popular UNIX-derived operating systems, including
+FreeBSD, Solaris, and Mac OS X. Many vendors have added extentions to UFS.
+Examples include UFS with journaling on Solaris and UFS with soft updates on
+FreeBSD. Linux's ext2 file system has much in common with UFS, since it borrowed
+many ideas from FFS. In \Kudos, we implemented the UFS1 file system as an LFS
+\module. We chose UFS because it has been extended in many ways. In particular,
+it is the only file system that has been extended with both soft updates and
+journaling. We chose UFS1 over UFS2, as UFS1 is well established and more widely
 supported.
 
 Soft updates for UFS is one of the biggest innovations in file systems in terms
 of lowering the overhead required to provide file system consistency. By
-carefully ordering writes to disk, soft updates avoid the need for synchronous
+carefully ordering writes to disk, soft updates avoids the need for synchronous
 writes to disk or duplicate writes to a journal. Soft updates also guarantees
 consistency after a crash, so the system can avoid time-consuming file system
-consistency checks using the \emph{fsck} ~\cite{mckusick94fsck} tool.
+consistency checks using the \emph{fsck}~\cite{mckusick94fsck} tool.
 \S\ref{sec:consistency:softupdate} explains soft updates in greater detail.
 Another approach to protecting the integrity of the file system is to write
 upcoming operations to a journal first. The content and the layout of the
 journal varies per implementation, but in all cases, the system can use the
-journal to play out or rollback the operations that did not complete as a
+journal to play out or roll back the operations that did not complete as a
 result of a crash. Thereby \emph{fsck} can be avoided.
 \S\ref{sec:consistency:journal} explains journaling with \chdescs. For a
 comparison of journaling versus soft updates for UFS, see
@@ -49,29 +48,27 @@ layer for inserting test harnesses and developing file system unit tests.
 
 In accord with our ideas on the division of responsibilities between the file
 system \module\ and higher \modules, we chose to keep properties specific to
-UFS, such as the UFS on-disk format and rules governing block allocation,
-hidden within the file system \module. Although file systems can have uncommon
-requirements, LFS is flexible enough to accommodate many of them. One problem
-we ran into concerns UFS and its use of fragments and blocks. In UFS, typically
-a block is divided into 8 equal sized fragments. For space efficiency, UFS
+UFS, such as the UFS on-disk format and rules governing block allocation, hidden
+within the file system \module. Although file systems can have uncommon
+requirements, LFS is flexible enough to accommodate many of them. One problem we
+ran into concerns UFS and its use of fragments and blocks. In UFS, typically a
+block is divided into 8 equal sized fragments. For space efficiency, UFS
 allocates fragments to small files. Once a file gets big enough to require the
 use of indirect blocks, then UFS changes its allocation policy and starts
 allocating blocks for speed. To implement this property of UFS, we used
-fragments as the basic block size. For large files, our UFS
-\module\ internally allocates a block, but returns only the first fragment in
-that block at the LFS level. The next 7 allocation calls will be no-ops that
-simply return the subsequent fragments in the allocated block. Overall, we
-believe most conventional file systems fit within the bounds set by the LFS
-interface.
+fragments as the basic block size. For large files, our UFS \module\ internally
+allocates a block, but returns only the first fragment in that block at the LFS
+level. The next 7 allocation calls will be no-ops that simply return the
+subsequent fragments in the allocated block. Overall, we believe most
+conventional file systems fit within the bounds set by the LFS interface.
 
-With regards to \chdescs, file system \modules\ like UFS should use them
-exclusively to indicate writes to disk. The advantage of using \chdescs\ over
-conventional writes, is that, using \chdescs, the UFS \module\ can control the
-ordering for writes to disk. This allows UFS to create sets of \chdescs\ and
-hooking them up in configurations that achieve soft updates consistency. Unlike
-FreeBSD's soft updates implementation, once the dependencies have been created,
-UFS no longer needs to concern itself with the \chdescs\ it created. The BD
-subsystem will track and enforce the \chdesc\ orderings.
+In order to provide the rest of the system with write-ordering requirements for
+soft updates, the UFS \module\ creates \chdescs\ for all its changes to the
+disk, and connects them to form configurations that achieve soft updates
+consistency. Unlike FreeBSD's soft updates implementation, once the dependencies
+have been created, UFS no longer needs to concern itself with the \chdescs\ it
+has created. The block device subsystem will track and enforce the \chdesc\
+orderings.
 
 \begin{figure}[htb]
   \centering
