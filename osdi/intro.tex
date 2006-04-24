@@ -1,5 +1,36 @@
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
 \section {Introduction}
 \label{sec:intro}
+
+
+Ongoing massive growth in both disk capacities and the amount of persistent
+ storage required by users and applications, combined with the increasing
+ disparity between disk and processor speeds, have led to ongoing
+ innovation in file system design.
+%
+File systems are expected to do more things: they can automatically encrypt
+ stored data~\cite{wright03ncryptfs}, support extensible metadata, such as
+ content indexes~\cite{xxx}, automatically
+ version~\cite{soules03metadata,zadok,venti}, and even detect
+ viruses~\cite{zadok}.
+%
+Improved disk interfaces can make use of file system usage patterns to
+ improve
+ performance~\cite{sivathanu03semantically-smart,sivathanu05database-aware}.
+%
+But even as file system functionality increases, file system
+ \emph{correctness} is increasingly a focus of
+ research~\cite{abunchofmuthiansivathanu,denehy05journal-guided}.
+%
+Ad hoc file system extensions and disk-layer interventions risk violating
+ the dependency relationships between written blocks on which file system
+ correctness riles~\cite{ganger00soft,...}.
+
+
+We therefore aim to 
+
+
 
 Once upon a time, our research began as an attempt to decompose file system
 software into small \modules, which would make the system as a whole more
