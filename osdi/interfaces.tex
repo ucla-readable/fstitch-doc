@@ -9,20 +9,19 @@ changing the arrangement of the \modules, a broad range of behaviors can be
 implemented -- and it is easy to tell what behavior a given arrangement will
 give just by looking at the connections between the \modules.
 
-% FIXME: cite other stackable file systems
-% FIXME: state that we could do the ext2 block replication from SOSP 05 with LFS?
-
 Stackable \module\ software for file systems is not a new idea (for instance, it
 was proposed in the early 90s in \cite{rosenthal90evolving, heidemann91layered,
 skinner93stacking, heidemann94filesystem}), but previous work like
 FiST~\cite{zadok00fist} or GEOM~\cite{geom} generally focuses on a small portion
-of the system and thus restrict both what a \module\ can do and how \modules\
+of the system and thus restricts both what a \module\ can do and how \modules\
 can be arranged. FiST, for instance, does not provide a way to deal with
 structures on the disk directly -- it provides only ``wrapper'' functionality
 around existing file systems. GEOM, on the other hand, deals only with the block
 device layer, and has no way to work with the file systems stored on those block
 devices. Neither has a formal way of specifying or honoring complex
-write-ordering information, which is what \chdescs\ in \Kudos\ provide.
+write-ordering information, which is what \chdescs\ in \Kudos\ provide. We
+imagine that systems like these could be adapted to work with \chdescs, giving
+the benefits of both ideas.
 
 \Kudos\ has three major types of \modules. First, there are block device
 (``BD'') \modules, which have a fairly conventional interface. Next, there are
@@ -35,7 +34,8 @@ can be used between block devices and the high-level CFS interface: the
 implementations into common (reusable) code and file system specific code. In
 \Kudos, all three interfaces can be combined in many ways -- a departure from
 other stackable \module\ systems, which generally allow stacking only a single
-interface.
+interface. \Kudos\ \modules\ are implemented in C using structures of function
+pointers to achieve object oriented behavior.
 
 \begin{figure}[htb]
 \vskip-14pt
@@ -90,10 +90,10 @@ int (*\textbf{set_metadata})(
 \end{scriptsize}
 \end{tabular}
 \vspace{-10pt}
-\caption{\label{fig:lfs} The LFS interface, simplified slightly.}
+\caption{\label{fig:lfs} Important functions in the LFS interface.}
 \end{figure}
 
-The LFS interface (Figure~\ref{fig:lfs}\todo{Put inside a \texttt{struct LFS}?}) has functions to allocate blocks, add
+The LFS interface (Figure~\ref{fig:lfs}) has functions to allocate blocks, add
 blocks to files, allocate file names, and other file system micro-ops. A
 \module\ implementing the LFS interface should define how bits are laid out on
 the disk, but doesn't have to know how to combine the micro-ops into larger,
