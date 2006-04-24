@@ -99,9 +99,10 @@ blocks to files, allocate file names, and other file system micro-ops. A
 the disk, but doesn't have to know how to combine the micro-ops into larger,
 more familiar file system operations. A generic CFS-to-LFS \module\ decomposes
 the larger file write, read, append, and other standard operations into LFS
-micro-ops. This one \module\ can be used with many different LFS \modules\
-implementing different file systems. (There is also a generic VFS-to-CFS layer,
-which has two implementations: one for the Linux kernel module, and one for the
+micro-ops. This one \module, called the ``universal high-level file system''
+or \emph{UHFS}, can be used with many different LFS \modules\ implementing
+different file systems. (There is also a generic VFS-to-CFS layer, which has
+two implementations: one for the Linux kernel module, and one for the
 FUSE~\cite{fuse} version. See \S\ref{sec:implementation} for details.)
 
 \begin{figure}[tb]
