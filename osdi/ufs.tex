@@ -57,7 +57,6 @@ systems in general.
   superblock, can be easily exchanged.}
 \end{figure}
 
-
 Within the UFS \module, the internal organization is shown in
 Figure~\ref{fig:ufsmodules}. The \emph{base} module contains the core code for
 the file system. Using object-orientation techniques, we encapsulated the code
@@ -91,7 +90,7 @@ int \textbf{find_free_inode}(fdesc_t * file, int purpose);
 \end{alltt}
 \end{scriptsize}
 \vspace{-0.5\baselineskip}
-\caption{\label{fig:moduleinterface} UFS Internal Module Interfaces}
+\caption{\label{fig:moduleinterface} Example UFS Internal Module Interfaces}
 \end{figure}
 
 The UFS cylinder group module interface regulates access to the cylinder
@@ -105,9 +104,10 @@ changes immediately go to disk. However, choosing this policy means that on
 every block allocation, UFS needs to write \emph{cg\_rotor}, the position of
 the last used block, to disk. To avoid performance hits like this, we
 implemented the ``write-back'' policy instead. To support flushing dirty data
-to disk, the cylinder group module interface also has a sync call.
+to disk, the cylinder group module interface also has a sync call. Similarly,
+the super block module interface controls access to the super block.
 
-The UFS allocator module interface has similar methods for allocating blocks,
+The UFS allocator module interface has methods for allocating blocks,
 fragments, and inodes. All three methods take in a \emph{file descriptor} and a
 \emph{purpose} variable. The UFS \emph{file descriptor} contains all relevant
 information pertaining to a given file, including an in-memory copy of the
@@ -115,7 +115,10 @@ file's inode. The intent of the \emph{purpose} variable is to provide hints to
 the allocator about how the newly allocated resource will be used.  Given these
 two pieces of information, as well as cylinder group information from the
 previously mentioned module, UFS allocator modules can make informed decisions
-to allocate resources in an efficient manner.
+to allocate resources in an efficient manner. For instance, given the status
+for all cylinder groups, a block allocator function can examine the blocks
+previously allocated to a given file and figure out what block to allocate
+next based on the strategies used by FreeBSD.
 
 \begin{figure}[htb]
   \centering
