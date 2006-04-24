@@ -41,69 +41,52 @@ interface.
 \vskip-14pt
 \begin{tabular}{@{\hskip0.25in}p{2in}@{}}
 \begin{scriptsize}
-\begin{verbatim}
-int (*get_root)(inode_t *inode);
-
-uint32_t (*allocate_block)(
+\begin{alltt}
+int (*{\bf get_root})(inode_t *inode);
+uint32_t (*{\bf allocate_block})(
     fdesc_t *file, int purpose,
     chdesc_t **head);
-
-int (*free_block)(
+int (*{\bf free_block})(
     fdesc_t *file, uint32_t block,
     chdesc_t **head);
-
-bdesc_t *(*lookup_block)(uint32_t number);
-
-int (*write_block)(
+bdesc_t *(*{\bf lookup_block})(uint32_t number);
+int (*{\bf write_block})(
     bdesc_t *block, chdesc_t **head);
-
-int (*lookup_name)(
+int (*{\bf lookup_name})(
     inode_t parent, const char *name,
     inode_t *inode);
-
-fdesc_t *(*lookup_inode)(inode_t inode);
-
-void (*free_fdesc)(fdesc_t *fdesc);
-
-uint32_t (*get_file_numblocks)(fdesc_t *file);
-
-uint32_t (*get_file_block)(
+fdesc_t *(*{\bf lookup_inode})(inode_t inode);
+void (*{\bf free_fdesc})(fdesc_t *fdesc);
+uint32_t (*{\bf get_file_numblocks})(fdesc_t *file);
+uint32_t (*{\bf get_file_block})(
     fdesc_t *file, uint32_t offset);
-
-int (*get_dirent)(
+int (*{\bf get_dirent})(
     fdesc_t *file, struct dirent *entry,
     uint16_t size, uint32_t *basep);
-
-int (*append_file_block)(
+int (*{\bf append_file_block})(
     fdesc_t *file, uint32_t block,
     chdesc_t **head);
-
-uint32_t (*truncate_file_block)(
+uint32_t (*{\bf truncate_file_block})(
     fdesc_t *file, chdesc_t **head);
-
-fdesc_t *(*allocate_name)(
+fdesc_t *(*{\bf allocate_name})(
     inode_t parent, const char *name,
     uint8_t type, fdesc_t *link,
     inode_t *newinode, chdesc_t **head);
-
-int (*remove_name)(
+int (*{\bf remove_name})(
     inode_t parent, const char *name,
     chdesc_t **head);
-
-int (*rename)(
+int (*{\bf rename})(
     inode_t oldparent, const char *oldname,
     inode_t newparent, const char *newname,
     chdesc_t **head);
-
-int (*get_metadata)(
+int (*{\bf get_metadata})(
     inode_t inode, uint32_t id,
     size_t size, void *data);
-
-int (*set_metadata)(
+int (*{\bf set_metadata})(
     inode_t inode, uint32_t id,
     size_t size, const void *data,
     chdesc_t **head);
-\end{verbatim}
+\end{alltt}
 \end{scriptsize}
 \end{tabular}
 \vspace{-10pt}
