@@ -93,7 +93,7 @@ int (*\textbf{set_metadata})(
 \caption{\label{fig:lfs} The LFS interface, simplified slightly.}
 \end{figure}
 
-The LFS interface (Figure \ref{fig:lfs}) has functions to allocate blocks, add
+The LFS interface (Figure~\ref{fig:lfs}\todo{Put inside a \texttt{struct LFS}?}) has functions to allocate blocks, add
 blocks to files, allocate file names, and other file system micro-ops. A
 \module\ implementing the LFS interface should define how bits are laid out on
 the disk, but doesn't have to know how to combine the micro-ops into larger,
@@ -114,7 +114,7 @@ FUSE~\cite{fuse} version. See \S\ref{sec:implementation} for details.)
   \label{fig:kfs-graph}
 \end{figure}
 
-Figure~\ref{fig:kfs-graph} shows a contrived example taking advantage of the LFS
+Figure~\ref{fig:kfs-graph}\todo{Show multiple WB caches? Remove the mount selector?} shows a contrived example taking advantage of the LFS
 interface and \chdescs. A file system image is mounted with an external journal,
 both of which are loop devices on the root file system, which uses soft updates.
 The journaled file system's ordering requirements are sent through the loop
