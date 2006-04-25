@@ -46,13 +46,19 @@ updates (see \S\ref{sec:discussion}).
 
 \subsection {Block Writes}
 We have also looked at the number of block writes that \Kudos\ makes
-relative to other systems for several operations. In one test, we create
-100 small files in a directory and measure the number of blocks written to
-disk. We do this with and without soft updates.
+relative to other systems for several operations. In one test, we
+create 100 small files in a directory and measure the number of blocks
+written to disk. We do this with and without soft updates. \Kudos\
+writes 122 blocks, while FreeBSD writes 135 blocks.
 
-We also look at a very small benchmark: removing a file from a directory
-and adding a new file to it. We compare the number of blocks written by
-\Kudos\ with that of FreeBSD using soft updates.
+We also look at a very small benchmark: removing a file from a
+directory and adding a new file to it. We compare the number of blocks
+written by \Kudos\ with that of FreeBSD using soft updates. Here
+\Kudos\ writes 15 blocks, while FreeBSD writes 83 blocks.
+
+From this we gather that our UFS and soft updates implementations are
+correct, and this reinforces our case that we need to reduce CPU
+ussage to be competative.
 
 \subsection {UW IMAP Case Study}
 \label{sec:evaluation:uwimap}
