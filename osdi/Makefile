@@ -14,7 +14,7 @@ OUTPUT_FILES = paper.dvi paper.ps paper.pdf paper.txt $(TMP_DVI_IMAGES)
 TMP_FILES = $(TMP_PDF_IMAGES)
 
 paper.dvi paper.pdf paper.txt: \
-	paper.tex abstract.tex intro.tex related.tex design.tex chdescs.tex interfaces.tex modules.tex wbcache.tex ufs.tex raid.tex consistency.tex softupdate.tex journal.tex opgroups.tex implementation.tex evaluation.tex discussion.tex conclusion.tex paper.bib
+	paper.tex abstract.tex intro.tex related.tex design.tex chdescs.tex interfaces.tex modules.tex wbcache.tex ufs.tex raid.tex consistency.tex softupdate.tex journal.tex opgroups.tex implementation.tex evaluation.tex discussion.tex conclusion.tex paper.bib kmaster.bib
 
 bib:
 	latex paper
