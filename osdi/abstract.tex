@@ -28,7 +28,7 @@ The uniform change descriptor abstraction allows modules to impose and
 For example, by observing and modifying \chdesc\ constraints, our
  journaling \module\ can automatically add journaling to any file system.
 %
-Additionally, A new system call interface gives applications some direct
+Additionally, a new system call interface gives applications some direct
  control over change descriptors. We have used this interface to
 improve the UW IMAP server, removing inefficient and unnecessary calls to
 \texttt{fsync()} while preserving the integrity of mail messages.
