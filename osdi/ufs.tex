@@ -3,7 +3,7 @@
 \subsection{UFS}
 \label{sec:modules:ufs}
 
-Kudos supports two base file system types, a simple inodeless
+Kudos supports two base file system types, a simple inode-less
 implementation called JOSFS and a version of UFS (Unix File System), the
 modern incarnation of the Fast File System~\cite{mckusick84fast} used in
 4.2 BSD. 
@@ -21,9 +21,9 @@ well established and more widely supported.
 The UFS \module\ is implemented at the LFS interface. This keeps properties
 specific to UFS (such as the UFS on-disk format and rules governing block
 allocation) hidden within the file system \module. For instance, UFS uses
-2 KB \emph{fragments} to store small files efficiently. Once a file gets big
+2KB \emph{fragments} to store small files efficiently. Once a file gets big
 enough to require the use of indirect blocks, then UFS changes its allocation
-policy and starts allocating 16 KB \emph{blocks}, where a block is made up of 8
+policy and starts allocating 16KB \emph{blocks}, where a block is made up of 8
 aligned and contiguous fragments. Our UFS \module\ implement this by using
 fragments as the basic block size. For large files, our UFS \module\ internally
 allocates a block, but returns only the first fragment in that block at the LFS
