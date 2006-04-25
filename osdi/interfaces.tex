@@ -85,27 +85,27 @@ blocks to files, allocate file names, and other file system micro-ops. A
 the disk, but doesn't have to know how to combine the micro-ops into larger,
 more familiar file system operations. A generic CFS-to-LFS \module\ decomposes
 the larger file write, read, append, and other standard operations into LFS
-micro-ops. This one \module, called the ``universal high-level file system''
-or \emph{UHFS}, can be used with many different LFS \modules\ implementing
-different file systems. (There is also a generic VFS-to-CFS layer, which has
-two implementations: one for the Linux kernel module, and one for the
+micro-ops. This one \module, called the ``universal high-level file system'' or
+UHFS, can be used with many different LFS \modules\ implementing different file
+systems. (There is also a generic VFS-to-CFS layer, which has two
+implementations: one for the Linux kernel module, and one for the
 FUSE~\cite{fuse} version. See \S\ref{sec:implementation} for details.)
 
-% FIXME this used to be in the ufs section, it should be integrated right
-% around here
-As part of the overall \Kudos\ design, the \emph{UHFS} module encompasses all
-logic for decomposing higher level CFS calls into lower level LFS calls. The
-finer granularity of LFS calls divides the problem space into smaller chunks.
-Since the issue of how to tie the LFS micro-ops together has already been
-solved, file system \module\ developers can give more attention to the
-particulars of the file system, such as, how to allocated a new filename and
-how to lookup the Nth data block for a file. To show how this simplifies the
-developmment process, consider the VFS write() call, which has the task of
-writing N bytes of data to a file at a given offset. In \Kudos, the problem is
-well defined and requires the implementation of these four LFS calls:
-get\_file\_block(), allocate\_block(), append\_block(), and write\_block().
-Additionally, the granularity of calls at the LFS layer makes it an appropriate
-layer for inserting test harnesses and developing file system unit tests.
+The UHFS \module\ encompasses all logic for decomposing higher level CFS calls
+into lower level LFS calls, and for connecting the resulting change descriptors
+together. The finer granularity of LFS calls divides the problem space into
+smaller chunks. Since the issue of how to tie the LFS micro-ops together has
+already been solved, file system \module\ developers can give more attention to
+the particulars of the file system, such as how to allocate a new filename or
+how to look up the Nth data block for a file. To see how this simplifies the
+developmment process, consider the VFS \texttt{write()} call, which has the task
+of writing some amount of data to a file at a given offset. In \Kudos, the logic
+to determine the correct offsets within blocks and whether new blocks must be
+allocated is built into UHFS. A file system \module\ need only implement four
+LFS calls: \texttt{get\_file\_block()}, \texttt{allocate\_block()},
+\texttt{append\_block()}, and \texttt{write\_block()}. Additionally, the
+granularity of calls at the LFS layer makes it an appropriate layer for
+inserting test harnesses and developing file system unit tests.
 
 \begin{figure}[tb]
   \centering
