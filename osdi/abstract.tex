@@ -24,7 +24,10 @@ have some direct control over change descriptors. We have used this interface to
 improve the UW IMAP server, removing inefficient and unnecessary calls to
 \texttt{fsync()} while preserving the integrity of mail messages.
 
-We have implemented \Kudos\ as both a Linux kernel module and a FUSE~\cite{fuse}
-userspace file system server. INSERT BRIEF PERFORMANCE MEASUREMENTS HERE.
+We have implemented \Kudos\ as both a Linux kernel module and a
+FUSE~\cite{fuse} userspace file system server. Our current
+implementation is about a factor of two slower than FreeBSD soft
+updates by wall-clock time, and competative with FreeBSD soft updates
+for number of blocks written.
 
 \end{abstract}
