@@ -90,13 +90,13 @@ A change descriptor represents both a change to disk data and any
  \emph{dependencies} between that change and other changes.
 %
 Change descriptors were inspired by the dependency abstraction from BSD's
- soft updates~\cite{ganger00soft}, but whereas soft updates dependencies
- are specific to the UFS file system, change descriptors are fully general.
+ soft updates~\cite{ganger00soft}, but whereas the soft updates implementation
+ is specific to the UFS file system, change descriptors are fully general.
 %
 Any file system can generate change descriptors, and those change
  descriptors are obeyed by all other file system layers.
 %
-Change descriptors may be examined and modified by other system components
+Change descriptors may be examined and modified by other modules
  as well, and even passed through layers such as loopback file systems.
 %
 As a result, the loosely-coupled \modules\ that make up a file system
@@ -129,15 +129,15 @@ Additionally, we give user-level applications controlled access to change
  policies.
 %
 Modifying an IMAP mail server to use this interface requires only localized
- changes; the resulting server follows the protocol's consistency
+ changes; the resulting server follows IMAP's consistency
  requirements while writing fewer blocks to disk.
 %
 Although implementation experience is preliminary, and change descriptors
- do not yet support all consistency policies (for instance, transactions
- should be independent, but any file system client can observe all active
- change descriptors), we believe the \Kudos\ architecture will allow the
- construction of consistent, modular, extensible file systems that are much
- easier to understand.
+ do not yet support all consistency policies (for instance, not ACID
+ transactions: transactions should be independent, but any file system
+ client can observe all active change descriptors), we believe the \Kudos\
+ architecture will allow the construction of consistent, modular,
+ extensible file systems that are much easier to understand.
 
 
 

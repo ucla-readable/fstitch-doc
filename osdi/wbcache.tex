@@ -1,21 +1,28 @@
 \subsection{Write-Back Cache}
 \label{sec:modules:wbcache}
 
-The write-back cache is in some sense the \module\ that does all the real work
-in \Kudos. There can be many write-back caches in a configuration at once (for
-instance, one for each block device), but each is responsible for holding on to
-the \chdescs\ sent to it by connected \modules\ until they can be safely sent on
-towards the disk. To a write-back cache, the complex consistency protocols that
+Write-back cache modules act as the system's primary cache, and are
+responsible for holding on to the \chdescs\ sent to them until they can be
+safely sent on towards the disk.
+%
+%
+There can be many write-back caches in a configuration at once (for
+instance, one for each block device).
+%
+%
+To a write-back cache, the complex consistency protocols that
 other \modules\ want to enforce are nothing more than sets of dependencies among
 \chdescs\ -- it has no idea what consistency protocols it is implementing, if
-any at all. Yet it is the \module\ that ends up doing most of the work to make
+any at all.
+%
+Yet it is the \module\ that ends up doing most of the work to make
 sure that \chdescs\ are written in an acceptable order.
 
-Even though a write-back cache has such an important and central role in the
-system, there's not a lot to it -- it's only about 550 lines of code, including
-comments. The current write-back cache is a simple LRU cache, but with an
-important twist: blocks can't be evicted unless all the \chdescs\ on them are
-``ready'' to be sent to the next \module\ (for example, the disk). A \chdesc\ is
+Despite this, write-back caches are relatively simple
+-- only about 550 lines of code, including
+comments. The current write-back cache uses a simple LRU policy, except that
+blocks can't be evicted unless all the \chdescs\ on them are
+ready to be sent to the next \module\ (for example, the disk). A \chdesc\ is
 ready if all of its dependencies are at least as close to the disk as it is. So,
 when looking for a block to evict, the cache may not be able to evict any block
 it chooses -- but it evicts the least recently used block that it can.
@@ -35,7 +42,7 @@ dependencies between the changes on a file system and its external journal are
 properly respected. This is actually not a special case, nor does it require any
 extra code -- it is a property that just falls out of the way \chdesc\ graphs
 are processed in order to determine which \chdescs\ are ready to move towards
-the disk. This property of write-back caches also extends to \opgroups, which
+the disk. This property also extends to \opgroups, which
 are explained in \S\ref{sec:opgroup}.
 
 \subsection{Elevator Scheduler}
