@@ -132,11 +132,16 @@ inserting test harnesses and developing file system unit tests.
 \end{figure}
 
 % FIXME: show multiple WB caches?
-Figure~\ref{fig:kfs-graph} shows a contrived example taking advantage of the LFS
-interface and \chdescs. A file system image is mounted with an external journal,
-both of which are loop devices on the root file system, which uses soft updates.
-The journaled file system's ordering requirements are sent through the loop
-device as \chdescs, allowing dependency information to be maintained across
-boundaries that might otherwise lose that information. In contrast, without
-\chdescs\ and the ability to forward \chdescs\ through loop devices, BSD cannot
-express soft updates' consistency requirements through loop-back file systems.
+Figure~\ref{fig:kfs-graph} shows a somewhat contrived example taking advantage
+of the LFS interface and \chdescs. A file system image is mounted with an
+external journal, both of which are loop devices on the root file system, which
+uses soft updates. The journaled file system's ordering requirements are sent
+through the loop device as \chdescs, allowing dependency information to be
+maintained across boundaries that might otherwise lose that information. In
+contrast, without \chdescs\ and the ability to forward \chdescs\ through loop
+devices, BSD cannot express soft updates' consistency requirements through
+loop-back file systems. The \modules\ in Figure~\ref{fig:kfs-graph} are a
+complete and working \Kudos\ configuration, and although the use of a loop
+device is somewhat contrived in the example, they are increasingly being used in
+conventional operating systems. For instance, Mac OS X uses them in order to
+allow users to encrypt their home directories.
