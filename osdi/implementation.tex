@@ -5,32 +5,36 @@
 for a small operating system (called ``KudOS''), but now runs as either a
 FUSE~\cite{fuse} file system server under Linux or BSD, or as a Linux kernel
 module. The former is particularly useful for profiling and debugging, while the
-latter is best for real-world performance testing and actual use. Additionally,
-it supports \opgroups\ which are not supported by the FUSE version due to the
-IPC that would be required to implement them.
+latter is best for real-world performance testing and actual use. 
+
+%% Additionally,
+%% it supports \opgroups\ which are not supported by the FUSE version due to the
+%% IPC that would be required to implement them.
 
 The \Kudos\ Linux kernel module looks like a VFS file system to Linux, but
-unlike traditional file system modules which are connected directly to block
-devices, it is merely a front end to a \Kudos\ \module\ graph. The \Kudos\
+unlike traditional file system modules,
+ %% which are connected directly to block devices, 
+it is merely a front end to a \Kudos\ \module\ graph. The \Kudos\
 server starts up a kernel thread which performs all the initialization to get
 the \module\ graph set up, and \modules\ then can make file systems available to
-mount though the VFS front end. Each file system is given a name which can be
-used to mount it using the standard Linux \texttt{mount} program, using a
+mount though the VFS front end. Each file system can be
+mounted using a
 command like \mbox{\texttt{mount -t kfs kfs:\textit{name} /mnt/point}}.
 
-There is a small change necessary to the standard Linux kernel in order to
-provide support for \opgroups, however. As a kernel module, there is no way to
-get notifications about when processes are created, or when they terminate. This
-is necessary to clone the \opgroup\ scope (which is a lot like a file descriptor
-table) from the parent process when the process is created, and to \abandon\ all
+The Linux kernel must be modified in order to
+provide support for \opgroups.  As a kernel module, there is no way to
+get notifications about when processes are created, or when they terminate; this
+is necessary to clone the \opgroup\ scope 
+from the parent process when the process is created, and to \abandon\ all
 the \opgroups\ when it terminates. Ordinarily, this sort of state would be kept
 as part of the Linux \texttt{task\_struct} (i.e. process) structure, but this is
 not a viable option for a dynamically loadable kernel module. Instead, the
-\Kudos\ module keeps this state internally, and it uses hooks we added to the
-kernel to be notified when processes fork or exit. The patch to add these hooks
-is based on the ``process events connector'' which was introduced in Linux
-2.6.15, and is only about 250 lines long. Without it, \Kudos\ can still operate,
-but it does not allow \opgroups.
+\Kudos\ module keeps this state internally and uses new kernel hooks
+to be notified when processes fork or exit. 
+%% The patch to add these hooks
+%% is based on the ``process events connector'' which was introduced in Linux
+%% 2.6.15, and is only about 250 lines long. Without it, \Kudos\ can still operate,
+%% but it does not allow \opgroups.
 
 At the other end of the \Kudos\ \module\ graph, the terminal block device
 \modules\ are wrappers for Linux's normal block devices. By using Linux's
@@ -52,7 +56,7 @@ Our interfaces bypass all Linux caches, because \Kudos\ provides its own
 \chdesc-aware caches (\S\ref{sec:modules:wbcache}) in order to provide its
 write-ordering guarantees.
 
-In the current implementation, we are using Linux's queuing structures for
+Our current implementation uses Linux's queuing structures for
 queuing I/O requests for block devices. Although this is working, there are a
 couple subtle problems that we would like to solve in a future version. First of
 all, while we can be sure that writes to a single block device are delivered in
@@ -60,5 +64,5 @@ our exact order, we cannot be sure that writes we make to multiple block devices
 are made in the correct order relative to each other. Also, we would like to be
 able to insert read and write requests to different sides of the I/O queue.
 Right now a read request will be satisfied only after all the pending writes
-are completed, but a better queue design would allow reads to ``cut the line,''
+are completed, but a better queue design would allow reads to ``cut the line''
 since they are more urgent.
