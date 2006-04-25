@@ -12,7 +12,7 @@ personalitycolor[7] = 0.9white;
 
 beginfig(1);
   boxjoin(a.width = b.width);
-  velementit.selector(btex \raise0.8ex\hbox{mount selector\strut}\strut etex, 1, 2, pull);
+  velementit.vfsiface(btex \raise0.8ex\hbox{VFS interface\strut}\strut etex, 1, 2, pull);
   velementit.uhfsa(btex UHFS\strut etex, 1, 1, pull);
   uhfsa.outpers[0] := 7;
   velementit.uhfsb(btex UHFS\strut etex, 1, 1, pull);
@@ -37,10 +37,10 @@ beginfig(1);
   uhfsb.w - uhfsa.e = (60,0);
   %ypart(loopj.n - resizer.n) = ypart(loopd.n - resizer.n) = 0;
   journal.s - .5[loopj.n,loopd.n] = (0,20);
-  selector.s - .5[uhfsa.n,uhfsb.n] = (0,25);
+  vfsiface.s - .5[uhfsa.n,uhfsb.n] = (0,25);
 
-  fixelement (resizer,ide,wbcache,ufsa,ufsb,uhfsa,uhfsb,journal,loopj,loopd,selector);
-  drawelement(resizer,ide,wbcache,ufsa,ufsb,uhfsa,uhfsb,journal,loopj,loopd,selector);
+  fixelement (resizer,ide,wbcache,ufsa,ufsb,uhfsa,uhfsb,journal,loopj,loopd,vfsiface);
+  drawelement(resizer,ide,wbcache,ufsa,ufsb,uhfsa,uhfsb,journal,loopj,loopd,vfsiface);
   drawconnect(uhfsa,0,0,ufsb) dashed evenly;
   drawconnect(uhfsb,0,0,ufsa) dashed evenly;
   drawconnect(ufsa,0,0,journal);
@@ -53,10 +53,10 @@ beginfig(1);
   drawconnect(ufsb,0,0,wbcache);
   drawconnect(wbcache,0,0,resizer);
   drawconnect(resizer,0,0,ide);
-  drawconnarrow selector.in[0] + (0,15) -- selector.in[0] dashed evenly scaled 0.5;
-  drawconnect(selector,0,0,uhfsa) dashed evenly scaled 0.5;
-  drawconnect(selector,1,0,uhfsb) dashed evenly scaled 0.5;
-  label.top(btex application etex, selector.in[0]+(0,15));
+  drawconnarrow vfsiface.in[0] + (0,15) -- vfsiface.in[0] dashed evenly scaled 0.5;
+  drawconnect(vfsiface,0,0,uhfsa) dashed evenly scaled 0.5;
+  drawconnect(vfsiface,1,0,uhfsb) dashed evenly scaled 0.5;
+  label.top(btex application etex, vfsiface.in[0]+(0,15));
 % Slightly better loop -> ufs connections
   drawconnarrowna loopj.out[0] {down}
   .. loopj.out[0] - (24,15) {left}
@@ -71,11 +71,11 @@ beginfig(1);
   dashed evenly;
 
 
-  label.urt(btex VFS etex scaled 0.5, selector.in[0]);
-  label.lrt(btex VFS etex scaled 0.5, selector.out[0]);
-  label.llft(btex VFS etex scaled 0.5, selector.out[1]);
-  label.ulft(btex VFS etex scaled 0.5, uhfsa.in[0]);
-  label.urt(btex VFS etex scaled 0.5, uhfsb.in[0]);
+  label.urt(btex VFS etex scaled 0.5, vfsiface.in[0]);
+  label.lrt(btex CFS etex scaled 0.5, vfsiface.out[0]);
+  label.llft(btex CFS etex scaled 0.5, vfsiface.out[1]);
+  label.ulft(btex CFS etex scaled 0.5, uhfsa.in[0]);
+  label.urt(btex CFS etex scaled 0.5, uhfsb.in[0]);
   label.llft(btex LFS etex scaled 0.5, uhfsa.out[0]);
   label.lrt(btex LFS etex scaled 0.5, uhfsb.out[0]);
   label.urt(btex BD etex scaled 0.5, journal.in[0]);
@@ -94,8 +94,8 @@ beginfig(1);
   label.urt(btex BD etex scaled 0.5, resizer.in[0]);
   label.lrt(btex BD etex scaled 0.5, resizer.out[0]);
   label.urt(btex BD etex scaled 0.5, ide.in[0]);
-  label.top(btex \texttt{/\strut} etex scaled 0.5, selector.out[0] + (0,2));
-  label.top(btex \texttt{/loop\strut} etex scaled 0.5, selector.out[1] + (0,2));
+  label.top(btex \texttt{/\strut} etex scaled 0.5, vfsiface.out[0] + (0,2));
+  label.top(btex \texttt{/loop\strut} etex scaled 0.5, vfsiface.out[1] + (0,2));
   label.top(btex journal\strut etex scaled 0.5, journal.out[0] + (0,2));
   label.top(btex data\strut etex scaled 0.5, journal.out[1] + (0,2));
   label.top(btex \texttt{/fs.journal\strut} etex scaled 0.5, loopj.out[0] + (0,2));
