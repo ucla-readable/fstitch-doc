@@ -15,7 +15,7 @@ applications which can take advantage of \opgroups, and see what changes might
 need to be made to the \opgroup\ interface in order to facilitate adapting those
 applications.
 
-\subsection {Optimizations}
+% \subsection {Optimizations}
 There are several ways in which the performance can be improved. For instance,
 we create a very large number of \chdescs, and the sheer number of them can
 cause problems for any algorithm which needs to traverse parts of the \chdesc\
@@ -56,24 +56,9 @@ rolled back in -- for the same reason as the previous example. By simply
 changing the direction of the loop, we were able to improve the loop from
 quadratic time to linear time.
 
-We believe that there are still many places \chdesc\ operations can be optimized
-to improve the performance of \Kudos. Many of these places likely will have the
-same flavor as the examples here: information we already have can be used in
-order to determine the answers we need, without needing to directly calculate
-those answers. Even as it is, however, \Kudos\ does not run dramatically slower
-than a standard Linux 2.6 kernel.
-
 % FIXME: better cache eviction algorithm
 
-\subsection {Features}
-Currently, we have only written one production quality file system \module\
-(UFS). The other file system \module\ in \Kudos\ is for a very simple prototype
-file system. We would like to add an ext2 file system \module. Once we have such
-a \module, we could use our journal \module\ to get ``ext3b''. Implementing an
-ext2 \module\ would also help us to identify more opportunities for sharing code
-between file system implementations, and ways in which our interfaces might
-accommodate different file systems more neutrally.
-
+% \subsection {Features}
 For the \Kudos\ UFS module, we want to add more features to make the
 implementation complete. Currently, we do not support symbolic links, triple
 indirect blocks, or sparse files. The first two can easily be implemented
@@ -90,10 +75,3 @@ due to the lack of documentation to explain the purpose of some data
 structures. Over time, we hope to better understand UFS and improve our UFS
 implementation.
 
-To prevent the system from going into an infinite loop, it is important that
-\chdescs\ never form cycles. Although it is never our intent, cycles can form
-as a result of implementation bugs. Currently we can do cycle checking, but it
-is slow and not scalable as the \chdesc\ graph grows in size. We want to delve
-into graph algorithms and find faster ways to check for cycles. Ideally, the
-overhead of cycle checking will be low enough that we can afford to leave it
-enabled all the time.
