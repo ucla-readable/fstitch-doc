@@ -4,8 +4,8 @@
 \label{sec:intro}
 
 
-Ongoing massive growth in both disk capacities and the amount of persistent
- storage required by users and applications, combined with the increasing
+Ongoing massive growth in both disk capacities and user and application
+ storage requirements, combined with the increasing
  disparity between disk and processor speeds, have led to ongoing
  innovation in file system design.
 %
@@ -42,11 +42,11 @@ Furthermore, a stackable file system may implement a single system call
  additional metadata information is stored in another file with a related
  name.
 %
-Since current VFS (virtual file system) implementations don't allow
- overlying layers to express dependencies among operations, the stackable
+Since current VFS (virtual file system) implementations can't
+ express dependencies among operations, the stackable
  file system must must either impose an ordering using \texttt{fsync},
  which is expensive, or accept and account for the possibility of
- application-level inconsistency.
+ inconsistency.
 %
 This problem exists for applications as well.
 %
@@ -76,7 +76,7 @@ A better choice might be an abstraction that could express many consistency
 
 
 This work develops a modular file system architecture called \Kudos\ that
- facilitates both file system extension and file system consistency
+ facilitates both file system extension and consistency
  maintenance.
 %
 We decompose the entire file system layer, from system calls to block
