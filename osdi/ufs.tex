@@ -1,14 +1,22 @@
-\subsection{UFS implementation}
+% -*- mode: latex; tex-main-file: "paper" -*-
+
+\subsection{UFS}
 \label{sec:modules:ufs}
 
-\subsubsection {Overview}
-UFS (UNIX File System) is the modern incarnation of the classic Berkeley Fast
-File System~\cite{mckusick84fast} used in 4.2 BSD. The general concepts for
-UFS, such as inodes, cylinder groups, and indirect blocks, are well understood.
-In \Kudos, we implemented the UFS1 file system as an LFS \module. UFS is of
-particular interest because it is the only file system that has been extended
-with both soft updates and journaling. ~\cite{seltzer00journaling} We chose
-UFS1 over UFS2, as UFS1 is well established and more widely supported.
+Kudos supports two base file system types, a simple inodeless
+implementation called JOSFS and a version of UFS (Unix File System), the
+modern incarnation of the Fast File System~\cite{mckusick84fast} used in
+4.2 BSD. 
+%
+We describe UFS as an example of a complete and relatively complex file
+system.
+
+The general concepts for UFS, such as inodes, cylinder groups, and
+indirect blocks, are well understood.  In \Kudos, we implemented the UFS1
+file system as an LFS \module. UFS is of particular interest because it is
+the only file system that has been extended with both soft updates and
+journaling. ~\cite{seltzer00journaling} We chose UFS1 over UFS2, as UFS1 is
+well established and more widely supported.
 
 The UFS \module\ is implemented at the LFS interface. This keeps properties
 specific to UFS (such as the UFS on-disk format and rules governing block
