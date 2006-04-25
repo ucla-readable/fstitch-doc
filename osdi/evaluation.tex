@@ -59,9 +59,9 @@ written by \Kudos\ with that of FreeBSD using soft updates. Here
 
 We ran the two small benchmarks with the journal module, which does
 full data journaling. Creating 100 small files with the journal
-resulted in 980 blocks written to the disk, but only 504 blocks
+resulted in 245 blocks written to the disk, but only 126 blocks
 without the journal. Deleting and adding a file resulted in writing
-124 with the journal module and 72 without it.
+31 with the journal module and 18 without it.
 
 From this we gather that our UFS, soft updates, and journal
 implementations are correct, and this reinforces our case that we need
