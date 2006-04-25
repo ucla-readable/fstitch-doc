@@ -173,7 +173,8 @@ utility function called \texttt{chdesc\_create\_diff()}, which compares a
 modified copy of a data structure to the original, and creates a minimal set of
 \chdescs\ accordingly. Due to the frequent use of inodes, one simple use of
 \texttt{chdesc\_create\_diff()} in the UFS inode functions reduced \chdesc\
-graph traversal time significantly.
+graph traversal time significantly. Althugh this does introduce a slight
+overhead, due to the need to \emph{diff} the two structures.
 
 \begin{figure}[htb]
   \centering
