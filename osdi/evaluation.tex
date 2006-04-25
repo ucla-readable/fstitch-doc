@@ -20,19 +20,35 @@ test, we then delete the resulting source tree. The times below include time to
 fully sync the changes to disk.
 
 % make this into a table
-Kudos (SU)
-Kudos (no SU)
-FreeBSD 5.4 (SU)
-FreeBSD 5.4 (no SU)
-Linux 2.6.12
+\begin{figure}[htb]
+%\centering
+%\begin{tabular}{|l|r|r|} \\ \hline
+System -- Untar time (sec) -- Delete time (sec) \\
+Kudos (SU) -- 24.50 -- 11.69 \\ 
+Kudos (no SU) -- -- \\ 
+FreeBSD 5.4 (SU) -- 20.5 -- 4.7 \\ 
+FreeBSD 5.4 (no SU) -- 17.75 -- 15.15 \\ 
+Linux 2.6.12 -- 12.90 -- 4.90 
+%\end{tabular}
+%\caption{\label{fig:macro} The macro foo}
+\end{figure}
 
-\begin{itemize}
-\item Show performance is not \emph{that} bad (macrobenchmarks)
-\item Argue performance can be improved (see \S\ref{sec:discussion})
-\end{itemize}
+\Kudos\ is about a factor of two slower than Linux. This shows that,
+although it is slow, it is close to running in acceptable time. We
+have only focused on performance for a couple weeks, in which we were
+able to speed up the filesystem by literally many orders of
+magnitude. There are more optimization opportunities that can likely
+bring us acceptably close to Linux. (See \S\ref{sec:discussion}).
 
 \subsection {Block Writes}
-Demonstrate numbers of writes vs. BSD with and without soft updates.
+We've also looked at the number of block writes that \Kudos\ makes
+relative to other filesystems. In one test, we create 100 small files
+in a directory and measure the number of blocks written to disk. We do
+this with and without soft updates.
+
+We also look at a very small benchmark: removing a file from a
+directory and adding a new file to it. We compare the number of blocks
+written by soft updates and UFS and with \Kudos.
 
 \subsection {UW IMAP Case Study}
 \label{sec:evaluation:uwimap}
