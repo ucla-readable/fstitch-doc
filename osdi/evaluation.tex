@@ -72,20 +72,18 @@ to reduce CPU usage to be competitive.
 To assess the \opgroup-enabled UW IMAP mail server
 (\S\ref{sec:opgroup:uwimap}) we compare the number of block writes
 that \Kudos\ makes relative to FreeBSD to move 100 emails. The test
-selects the source mailbox (with 100 messages, sized 2KB each),
+selects the source mailbox (with 100 messages, sized 2kB each),
 creates the new mailbox, copies each of the 100 messages to the new
 mailbox, marks each source message for deletion, expunges the marked
-messages, requests a check, and logs out.
-Figure~\ref{fig:imap-compare} shows results.
+messages, requests a check, and logs out. We compare using soft updates,
+Figure~\ref{fig:imap-compare} shows the results.
 
 \begin{figure}[htb]
 \centering{
 \begin{tabular}{|l|r|} \hline
 System & \# writes (blocks) \\ \hline\hline
 \Kudos\ (SU) & 919 \\ \hline
-\Kudos\ (async) & 139 \\ \hline
 FreeBSD 5.4 (SU) & 2200 \\ \hline
-FreeBSD 5.4 (async) & 583 \\ \hline
 \end{tabular}
 }
 \caption{\label{fig:imap-compare} Number of block writes to move 100
