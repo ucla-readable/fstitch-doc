@@ -34,24 +34,23 @@ Linux 2.6.12 -- 12.90 -- 4.90
 %\caption{\label{fig:macro} The macro foo}
 \end{figure}
 
-\Kudos\ is about 20\% slower than soft updated FreeBSD. This shows
-that, although it is slow, it is close to running in acceptable
-time. While we do have CPU usage problems, we have only focused on
-performance for a couple weeks, in which we were able to speed up the
-filesystem by literally many orders of magnitude. There are more
-optimization opportunities that can likely bring us very close in
-performance to existing soft updated filesystems. (See
-\S\ref{sec:discussion}).
+\Kudos\ is about 20\% slower than FreeBSD using soft updates. This shows
+that, although it is slow, it is close to running in acceptable time. While
+we do have CPU usage and I/O delay problems, we have only focused on
+performance for a few weeks, in which we were able to speed up the system
+enormously.  There are more optimization opportunities that can likely
+bring us very close in performance to existing implementations of soft
+updates (see \S\ref{sec:discussion}).
 
 \subsection {Block Writes}
-We've also looked at the number of block writes that \Kudos\ makes
-relative to other filesystems. In one test, we create 100 small files
-in a directory and measure the number of blocks written to disk. We do
-this with and without soft updates.
+We have also looked at the number of block writes that \Kudos\ makes
+relative to other systems for several operations. In one test, we create
+100 small files in a directory and measure the number of blocks written to
+disk. We do this with and without soft updates.
 
-We also look at a very small benchmark: removing a file from a
-directory and adding a new file to it. We compare the number of blocks
-written by soft updates and UFS and with \Kudos.
+We also look at a very small benchmark: removing a file from a directory
+and adding a new file to it. We compare the number of blocks written by
+\Kudos\ with that of FreeBSD using soft updates.
 
 \subsection {UW IMAP Case Study}
 \label{sec:evaluation:uwimap}
