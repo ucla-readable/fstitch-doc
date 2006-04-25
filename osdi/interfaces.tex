@@ -131,7 +131,8 @@ inserting test harnesses and developing file system unit tests.
   \label{fig:kfs-graph}
 \end{figure}
 
-Figure~\ref{fig:kfs-graph}\todo{Show multiple WB caches?} shows a contrived example taking advantage of the LFS
+% FIXME: show multiple WB caches?
+Figure~\ref{fig:kfs-graph} shows a contrived example taking advantage of the LFS
 interface and \chdescs. A file system image is mounted with an external journal,
 both of which are loop devices on the root file system, which uses soft updates.
 The journaled file system's ordering requirements are sent through the loop
