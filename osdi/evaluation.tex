@@ -57,4 +57,19 @@ and adding a new file to it. We compare the number of blocks written by
 \subsection {UW IMAP Case Study}
 \label{sec:evaluation:uwimap}
 
+FIXME: write about Figure~\ref{fig:imap-compare}.
 Show fewer writes in UW IMAP using \opgroups\ (see \S\ref{sec:opgroup:uwimap})
+
+\begin{figure}[htb]
+\centering{
+\begin{tabular}{|l|r|} \hline
+System & \# writes (blocks) \\ \hline\hline
+\Kudos\ (SU) & 1090 \\ \hline
+%\Kudos\ (no SU) & & \\ \hline
+FreeBSD 5.4 (SU) & 2340 \\ \hline
+FreeBSD 5.4 (sync) & 3600 \\ \hline
+\end{tabular}
+}
+\caption{\label{fig:imap-compare} Number of block writes to move 100
+  IMAP messages.}
+\end{figure}
