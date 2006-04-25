@@ -1,29 +1,44 @@
 \subsection {\Module\ Interfaces}
 \label{sec:design:interfaces}
 
-A complete \Kudos\ configuration is composed of many \modules. By breaking file
-system code into small, stackable \modules, we are able to significantly
-increase code reuse. More importantly, new \modules\ are simple to write, and
-can implement a variety of new features for the file system. Finally, by
-changing the arrangement of the \modules, a broad range of behaviors can be
-implemented -- and it is easy to tell what behavior a given arrangement will
+A complete \Kudos\ configuration is composed of many \modules. 
+%% By breaking file
+%% system code into small, stackable \modules, we are able to significantly
+%% increase code reuse. More importantly, 
+New \modules\ are simple to write, and
+%%can implement a variety of new features for the file system. Finally, 
+by
+changing the \module\ arrangement, a broad range of behaviors can be
+implemented.
+%
+It's also easy to tell what behavior a given arrangement will
 give just by looking at the connections between the \modules.
 
-\Kudos\ has three major types of \modules. First, there are block device
-(``BD'') \modules, which have a fairly conventional interface. Next, there are
-``common file system'' (``CFS'') \modules, which have an interface similar to
-VFS~\cite{kleiman86vnodes}. In traditional systems, a CFS-like \module\ would be
-connected directly to a BD-like \module\ in order to set up a file system to be
-ready for mounting. In \Kudos, however, there is an intermediate interface which
-can be used between block devices and the high-level CFS interface: the
-``low-level file system'' (``LFS'') interface. LFS helps to divide file system
-implementations into common (reusable) code and file system specific code. In
-\Kudos, all three interfaces can be combined in many ways -- a departure from
-other stackable \module\ systems, which generally allow stacking only a single
-interface. \Kudos\ \modules\ are implemented in C using structures of function
-pointers to achieve object oriented behavior.
+\Kudos\ has three major types of \modules.
+%
+Closest to the disk are block device
+(BD) \modules, which have a fairly conventional block device
+interface with interfaces such as ``read block'' and ``flush''. 
+%
+Closest to the system call interface are
+\emph{common file system} (CFS) \modules, which have an interface similar to
+VFS~\cite{kleiman86vnodes}. 
+%
+In traditional systems, a CFS-like \module\ would be
+connected directly to a BD-like \module\ in order to set up a file system for
+mounting.
+%
+In \Kudos, however, there is an intermediate interface which interposes
+between block devices and the high-level CFS interface.
+%
+This \emph{low-level file system} (LFS) interface helps divide
+file system implementations into common (reusable) code and file system
+specific code. A \Kudos\ file system designer combines modules with all
+three interfaces in many ways -- a departure from stackable file systems,
+which act only at the VFS/CFS layer. \Kudos\ \modules\ are implemented in C
+using structures of function pointers to achieve object oriented behavior.
 
-\begin{figure}[htb]
+\begin{figure}[thb]
 \vskip-14pt
 \begin{tabular}{@{\hskip0.25in}p{2in}@{}}
 \begin{scriptsize}
