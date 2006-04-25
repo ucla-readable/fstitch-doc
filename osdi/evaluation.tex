@@ -36,13 +36,14 @@ Linux 2.6.12 & 12.90 & 4.90 \\ \hline
 with and without soft updates (SU) where possible.}
 \end{figure}
 
-\Kudos\ is about 20\% slower than FreeBSD using soft updates. This shows
-that, although it is slow, it is close to running in acceptable time. While
-we do have CPU usage and I/O delay problems, we have only focused on
-performance for a few weeks, in which we were able to speed up the system
-enormously.  There are more optimization opportunities that can likely
-bring us very close in performance to existing implementations of soft
-updates (see \S\ref{sec:discussion}).
+\Kudos\ is about 20\% slower than FreeBSD using soft updates for
+writes, and a little over a factor of two slower for deletions. This
+shows that, although it is slow, \Kudos\ is close to running in
+acceptable time. While we do have CPU usage and I/O delay problems, we
+have only focused on performance for a few weeks, in which we were
+able to speed up the system enormously.  There are more optimization
+opportunities that can likely bring us very close in performance to
+existing implementations of soft updates (see \S\ref{sec:discussion}).
 
 \subsection {Block Writes}
 We have also looked at the number of block writes that \Kudos\ makes
