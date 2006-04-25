@@ -31,7 +31,7 @@ write-back cache need to do involve quickly discovering the set of \chdescs\
 that satisfy some property, and often even some ordering of those \chdescs. In
 early prototypes, these sets were often calculated by doing large traversals of
 the \chdesc\ dependency graph. However, these traversals are in practice
-extremely expensive, and optimizating them has improved and will likely continue
+extremely expensive, and optimizing them has improved and will likely continue
 to improve the performance of \Kudos.
 
 We have worked on both of these approaches, especially the second, but we
@@ -72,7 +72,7 @@ file system. We would like to add an ext2 file system \module. Once we have such
 a \module, we could use our journal \module\ to get ``ext3b''. Implementing an
 ext2 \module\ would also help us to identify more opportunities for sharing code
 between file system implementations, and ways in which our interfaces might
-accomodate different file systems more neutrally.
+accommodate different file systems more neutrally.
 
 For the \Kudos\ UFS module, we want to add more features to make the
 implementation complete. Currently, we do not support symbolic links, triple
@@ -94,6 +94,6 @@ To prevent the system from going into an infinite loop, it is important that
 \chdescs\ never form cycles. Although it is never our intent, cycles can form
 as a result of implementation bugs. Currently we can do cycle checking, but it
 is slow and not scalable as the \chdesc\ graph grows in size. We want to delve
-into graph algorthms and find faster ways to check for cycles. Ideally, the
+into graph algorithms and find faster ways to check for cycles. Ideally, the
 overhead of cycle checking will be low enough that we can afford to leave it
 enabled all the time.

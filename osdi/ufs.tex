@@ -29,7 +29,7 @@ fragments as the basic block size. For large files, our UFS \module\ internally
 allocates a block, but returns only the first fragment in that block at the LFS
 level. The next 7 allocation calls will be no-ops that simply return the
 subsequent fragments in the allocated block. In this way, UFS can stay
-consistant internally without special support from other \Kudos\ modules.
+consistent internally without special support from other \Kudos\ modules.
 
 The UFS \module\ creates \chdescs\ for all its changes to the disk, and
 connects them to form configurations that achieve soft updates consistency.
@@ -49,7 +49,7 @@ consistency.
 Although the UFS implementation must be somewhat monolithic in order to
 understand the interlinked UFS-specific disk structures, we would like to take
 advantage of modularity to allow for flexibility and encapsulation. UFS is
-divided into modules at boundaries that expose naturally replacable policies,
+divided into modules at boundaries that expose naturally replaceable policies,
 namely in resource allocation and directory entry traversal, as well as for
 objects such as the superblock and cylinder groups. We use specialized
 interfaces specific to UFS, because these interfaces do not apply to all file
@@ -166,7 +166,7 @@ written to disk. As such, laziness will result in the creation of \chdescs\
 for the entire data structure. Doing this can be detrimental to performance,
 as shown in Figure~\ref{fig:overlap}.
 
-An occurrance of this problem came up for inodes, where we make several
+An occurrence of this problem came up for inodes, where we make several
 independent modifications to different fields within an inode. In principle,
 the \chdescs\ created are conflict-free. Previously, because we did not take
 the time to calculate the exact offsets and lengths for the fields that
@@ -177,7 +177,7 @@ utility function called \texttt{chdesc\_create\_diff()}, which compares a
 modified copy of a data structure to the original, and creates a minimal set of
 \chdescs\ accordingly. Due to the frequent use of inodes, one simple use of
 \texttt{chdesc\_create\_diff()} in the UFS inode functions reduced \chdesc\
-graph traversal time significantly. Althugh this does introduce a slight
+graph traversal time significantly. Although this does introduce a slight
 overhead, due to the need to \emph{diff} the two structures.
 
 \begin{figure}[htb]

@@ -52,8 +52,8 @@ Our interfaces bypass all Linux caches, because \Kudos\ provides its own
 \chdesc-aware caches (\S\ref{sec:modules:wbcache}) in order to provide its
 write-ordering guarantees.
 
-In the current implementation, we are using Linux's queueing structures for
-queueing I/O requests for block devices. Although this is working, there are a
+In the current implementation, we are using Linux's queuing structures for
+queuing I/O requests for block devices. Although this is working, there are a
 couple subtle problems that we would like to solve in a future version. First of
 all, while we can be sure that writes to a single block device are delivered in
 our exact order, we cannot be sure that writes we make to multiple block devices
