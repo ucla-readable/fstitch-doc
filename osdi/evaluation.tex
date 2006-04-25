@@ -69,9 +69,14 @@ to reduce CPU ussage to be competative.
 
 \subsection {UW IMAP Case Study}
 \label{sec:evaluation:uwimap}
-
-FIXME: write about Figure~\ref{fig:imap-compare}.
-Show fewer writes in UW IMAP using \opgroups\ (see \S\ref{sec:opgroup:uwimap})
+To assess the \opgroup-enabled UW IMAP mail server
+(\S\ref{sec:opgroup:uwimap}) we compare the number of block writes
+that \Kudos\ makes relative to FreeBSD to move 100 emails. The test
+selects the source mailbox (with 100 messages, sized 2kB each),
+creates the new mailbox, copies each of the 100 messages to the new
+mailbox, marks each source message for deletion, expunges the marked
+messages, requests a check, and logs out.
+Figure~\ref{fig:imap-compare} shows results.
 
 \begin{figure}[htb]
 \centering{
