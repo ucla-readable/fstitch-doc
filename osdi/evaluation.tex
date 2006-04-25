@@ -57,9 +57,15 @@ directory and adding a new file to it. We compare the number of blocks
 written by \Kudos\ with that of FreeBSD using soft updates. Here
 \Kudos\ writes 15 blocks, while FreeBSD writes 83 blocks.
 
-From this we gather that our UFS and soft updates implementations are
-correct, and this reinforces our case that we need to reduce CPU
-ussage to be competative.
+We ran the two small benchmarks with the journal module, which does
+full data journaling. Creating 100 small files with the journal
+resulted in 980 blocks written to the disk, but only 504 blocks
+without the journal. Deleting and adding a file resulted in writing
+124 with the journal module and 72 without it.
+
+From this we gather that our UFS, soft updates, and journal
+implementations are correct, and this reinforces our case that we need
+to reduce CPU ussage to be competative.
 
 \subsection {UW IMAP Case Study}
 \label{sec:evaluation:uwimap}
