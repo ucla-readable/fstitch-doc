@@ -10,7 +10,14 @@ Benefits:
 - ?
 
 Change Descriptor
+- represents an in-memory change to the disk
+- deps between change descriptors enforce write orderings
+- for example, we must mark a disk block as allocated before using it
+  (figure? use->alloc)
+  (figure? ~20 chdesc figure)
 
 Modules
+- existing file systems have standard interfaces for file systems and block devices
+- an intermediate interface provides the opportunity for finer grained modules
 
 Changegroup
