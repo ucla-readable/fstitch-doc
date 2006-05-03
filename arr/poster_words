@@ -27,4 +27,9 @@ Modules
 - an intermediate interface provides the opportunity for finer grained modules
 - modules with different "in" and "out" interfaces creates interesting configurations (insert loopback picture here)
 
+- example modules
+  - UFS
+  - WB Cache
+  - more?
+
 Changegroup
