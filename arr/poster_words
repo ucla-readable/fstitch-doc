@@ -1,0 +1,16 @@
+Goals:
+- modularize file system components
+- ?
+
+Benefits:
+- easier to write crash-recoverable applications
+- disk images are as safe to use as disks
+- file system pieces easier to understand, get correct
+- new functionality through new modules or combinations of existing modules
+- ?
+
+Change Descriptor
+
+Modules
+
+Changegroup
