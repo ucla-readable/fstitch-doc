@@ -1,11 +1,11 @@
 Goals:
 - modularize file system components
-- ?
+- create a more flexible file system architecture
 
 Benefits:
 - easier to write crash-recoverable applications
 - disk images are as safe to use as disks
-- file system pieces easier to understand, get correct
+- smaller file system pieces easier to understand, get correct
 - new functionality through new modules or combinations of existing modules
 - ?
 
@@ -19,5 +19,6 @@ Change Descriptor
 Modules
 - existing file systems have standard interfaces for file systems and block devices
 - an intermediate interface provides the opportunity for finer grained modules
+- modules with different "in" and "out" interfaces creates interesting configurations (insert loopback picture here)
 
 Changegroup
