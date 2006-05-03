@@ -2,12 +2,18 @@ Goals:
 - modularize file system components
 - create a more flexible file system architecture
 
+Motivations:
+- file systems are being expected to do more (encrypt, extensible metadata, and more)
+- correctness increasingly becoming a research focus (stackable must impose using fsync or break deps)
+- robust apps either accept perf penalty of fsync or rely on raw-disk interfaces
+
 Benefits:
 - easier to write crash-recoverable applications
 - disk images are as safe to use as disks
 - smaller file system pieces easier to understand, get correct
 - new functionality through new modules or combinations of existing modules
 - ?
+
 
 Change Descriptor
 - represents an in-memory change to the disk
