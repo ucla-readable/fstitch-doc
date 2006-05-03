@@ -30,6 +30,8 @@ Modules
 - example modules
   - UFS
   - WB Cache
+  - Loopback
+  - Journaling?
   - more?
 
 Changegroups
