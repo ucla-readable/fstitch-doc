@@ -24,11 +24,11 @@
 	</array>
 	<key>ImageList</key>
 	<array>
+		<string>image8.pdf</string>
 		<string>image7.pdf</string>
 		<string>image5.pdf</string>
 		<string>image4.pdf</string>
 		<string>image2.eps</string>
-		<string>image8.pdf</string>
 	</array>
 	<key>LinksVisible</key>
 	<string>NO</string>
@@ -99,7 +99,7 @@
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2006-05-03 18:21:23 -0700</string>
+	<string>2006-05-03 19:48:09 -0700</string>
 	<key>Modifier</key>
 	<string>Andrew de los Reyes</string>
 	<key>NotesVisible</key>
@@ -174,6 +174,151 @@
 			<array>
 				<dict>
 					<key>Bounds</key>
+					<string>{{72, 1035}, {468, 67}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>FitText</key>
+					<string>Vertical</string>
+					<key>Flow</key>
+					<string>Resize</string>
+					<key>FontInfo</key>
+					<dict>
+						<key>Font</key>
+						<string>Helvetica</string>
+						<key>Size</key>
+						<real>56</real>
+					</dict>
+					<key>ID</key>
+					<integer>1490</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>shadow</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Align</key>
+						<integer>0</integer>
+						<key>Pad</key>
+						<integer>0</integer>
+						<key>Text</key>
+						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
+{\fonttbl\f0\fswiss\fcharset77 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+
+\f0\fs112 \cf0 Module Interfaces}</string>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{72, 1118.89}, {600.604, 519.11}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>FontInfo</key>
+					<dict>
+						<key>Color</key>
+						<dict>
+							<key>w</key>
+							<string>0</string>
+						</dict>
+						<key>Font</key>
+						<string>Helvetica</string>
+						<key>NSKern</key>
+						<real>0.0</real>
+						<key>Size</key>
+						<real>24</real>
+					</dict>
+					<key>ID</key>
+					<integer>1489</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>GradientColor</key>
+							<dict>
+								<key>w</key>
+								<string>0.666667</string>
+							</dict>
+						</dict>
+						<key>shadow</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>CornerRadius</key>
+							<real>5</real>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Align</key>
+						<integer>0</integer>
+						<key>Text</key>
+						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
+{\fonttbl\f0\fswiss\fcharset77 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+
+\f0\fs48 \cf0 \expnd0\expndtw0\kerning0
+\'a5 Existing file systems have standard interfaces for file systems (VFS) and block devices (BD layer)\
+\'a5 Our new intermediate interface (LFS) provides the opportunity for finer grained modules. The LFS interface provides a way of manipulating abstract disk structures common across many different filesystems. Modules that provide an LFS interface do not need to know how their abstract disk structures are used\
+\'a5 Modules with different \'d2in\'d3 and \'d2out\'d3 interfaces demonstrate the flexibility of our system\
+\
+\'a5 Change descriptors allow LFS and BD users to specify their disk write orderings with respect to those of other modules}</string>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{857.748, 2772}, {1095.25, 335}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>ID</key>
+					<integer>1488</integer>
+					<key>ImageID</key>
+					<integer>8</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>shadow</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
 					<string>{{1420.31, 737.873}, {532.687, 203}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
@@ -220,9 +365,9 @@
 						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
 {\fonttbl\f0\froman\fcharset77 Times-Roman;}
 {\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
 
-\f0\fs48 \cf0 Soft updates change descriptor graph, including the dependencies for adding a newly allocated block to an inode. Writing the new block pointer to an inode (Attach) depends on initializing the block (Clear) and updating the free block map (Alloc). Updating the size of the inode (Size) depends on writing the block pointer.}</string>
+\f0\fs48 \cf0 Soft updates change descriptor graph, including the dependencies for adding a newly allocated block to an inode. Writing the new block pointer to an inode (Attach) depends on initializing the block (Clear) and updating the free block map (Alloc). Updating the size of the inode (Size) depends on writing the block pointer}</string>
 					</dict>
 				</dict>
 				<dict>
@@ -287,7 +432,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{680.08, 1107}, {1290.92, 846}}</string>
+					<string>{{684, 1104.11}, {1290.92, 846}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -317,7 +462,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{72, 1037.24}, {270, 67}}</string>
+					<string>{{72, 1800}, {270, 67}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -370,7 +515,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{72.0001, 1123.24}, {600.604, 439.569}}</string>
+					<string>{{72, 1890}, {600.604, 275.943}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -423,16 +568,11 @@
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
 
 \f0\fs48 \cf0 \expnd0\expndtw0\kerning0
-\'a5 Existing file systems have standard interfaces for file systems (VFS) and block devices (BD layer)\
-\'a5 Our new intermediate interface (LFS) provides the opportunity for finer grained modules. \
-\'a5 Modules with different \'d2in\'d3 and \'d2out\'d3 interfaces demonstrate the flexibility of our system\
-\
 \'a5 example modules\
-  \'a5 UHFS\
+  \'a5 UHFS: \
   \'a5 UFS\
   \'a5 WB Cache\
-  \'a5 Loopback\
-  \'a5 Journaling?\
+  \'a5 Journaling: this is a module that transforms existing incoming change descriptors, preserving their ordering requirements, to implement a different consistency protocol\
   \'a5 more?}</string>
 					</dict>
 				</dict>
@@ -489,7 +629,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{75.302, 771.113}, {806.698, 180.52}}</string>
+					<string>{{75.302, 771.113}, {806.698, 209.887}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -542,13 +682,13 @@
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
 
 \f0\fs48 \cf0 \expnd0\expndtw0\kerning0
-\'a5 Change descriptors represent all in-memory changes to the disk\
-\'a5 Change descriptors can depend on other change descriptors; this enforces write orderings. For example, one must mark a disk block as allocated before using it}</string>
+\'a5 File systems make disk writes in particular orderings so that in the event of a crash, the disk data is recoverable. Change descriptors express these orderings in a filesystem-independent manner\
+\'a5 Change descriptors represent all in-memory changes to the disk. One can depend on another, thus enforcing write orderings. For example, allocating a disk block before referencing it ensures that a system crash can't result in doubly-allocated blocks}</string>
 					</dict>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{17.9999, 2399}, {600.604, 67}}</string>
+					<string>{{81.0001, 2498}, {414, 67}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -586,20 +726,22 @@
 					</dict>
 					<key>Text</key>
 					<dict>
+						<key>Align</key>
+						<integer>0</integer>
 						<key>Pad</key>
 						<integer>0</integer>
 						<key>Text</key>
 						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
 {\fonttbl\f0\fswiss\fcharset77 Helvetica;}
 {\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\pardirnatural
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
 
 \f0\fs112 \cf0 Changegroups}</string>
 					</dict>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{49.4995, 2625.75}, {1048.5, 434.25}}</string>
+					<string>{{72.0001, 2583}, {756, 504}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -663,7 +805,7 @@
 \
 \'a5 UW IMAP case study\
   \'a5 each imap command performed within a changegroup, dependent on preceeding changegro\
-up. a result: COPY longer needs to fsync() to ensure ordering correctness.\
+up. a result: COPY no longer needs to fsync() to ensure ordering correctness.\
   \'a5 benefits: correctness is easier, fewer syncs for correctness}</string>
 					</dict>
 				</dict>
@@ -4521,9 +4663,9 @@ Configuration}</string>
 							<integer>1456</integer>
 							<key>Points</key>
 							<array>
-								<string>{234.506, 1622.17}</string>
+								<string>{234.507, 1622.17}</string>
 								<string>{316, 1656}</string>
-								<string>{402.799, 1621.62}</string>
+								<string>{402.798, 1621.62}</string>
 							</array>
 							<key>Style</key>
 							<dict>
@@ -4556,7 +4698,7 @@ Configuration}</string>
 							<key>Points</key>
 							<array>
 								<string>{711.359, 1525.28}</string>
-								<string>{803.304, 1685.16}</string>
+								<string>{803.305, 1685.16}</string>
 							</array>
 							<key>Style</key>
 							<dict>
@@ -4588,8 +4730,8 @@ Configuration}</string>
 							<integer>1458</integer>
 							<key>Points</key>
 							<array>
-								<string>{723.38, 1580.29}</string>
-								<string>{791.284, 1521.25}</string>
+								<string>{723.379, 1580.29}</string>
+								<string>{791.285, 1521.25}</string>
 							</array>
 							<key>Style</key>
 							<dict>
@@ -4654,8 +4796,8 @@ Configuration}</string>
 							<integer>1460</integer>
 							<key>Points</key>
 							<array>
-								<string>{848.635, 1689.19}</string>
-								<string>{916.54, 1630.15}</string>
+								<string>{848.637, 1689.19}</string>
+								<string>{916.539, 1630.16}</string>
 							</array>
 							<key>Style</key>
 							<dict>
@@ -4753,8 +4895,8 @@ Configuration}</string>
 							<integer>1463</integer>
 							<key>Points</key>
 							<array>
-								<string>{222.356, 1580.29}</string>
-								<string>{290.26, 1521.25}</string>
+								<string>{222.355, 1580.29}</string>
+								<string>{290.261, 1521.25}</string>
 							</array>
 							<key>Style</key>
 							<dict>
@@ -4786,7 +4928,7 @@ Configuration}</string>
 							<integer>1464</integer>
 							<key>Points</key>
 							<array>
-								<string>{694.704, 1636.03}</string>
+								<string>{694.704, 1636.04}</string>
 								<string>{694.704, 1683.31}</string>
 							</array>
 							<key>Style</key>
@@ -4819,7 +4961,7 @@ Configuration}</string>
 							<integer>1465</integer>
 							<key>Points</key>
 							<array>
-								<string>{584.72, 1575.95}</string>
+								<string>{584.72, 1575.96}</string>
 								<string>{646.28, 1458}</string>
 								<string>{868.384, 1457}</string>
 								<string>{930.036, 1575.94}</string>
@@ -4854,7 +4996,7 @@ Configuration}</string>
 							<integer>1466</integer>
 							<key>Points</key>
 							<array>
-								<string>{609.687, 1622.71}</string>
+								<string>{609.688, 1622.72}</string>
 								<string>{779.72, 1696.63}</string>
 							</array>
 							<key>Style</key>
@@ -4887,8 +5029,8 @@ Configuration}</string>
 							<integer>1467</integer>
 							<key>Points</key>
 							<array>
-								<string>{598.123, 1630.15}</string>
-								<string>{666.028, 1689.19}</string>
+								<string>{598.125, 1630.16}</string>
+								<string>{666.027, 1689.19}</string>
 							</array>
 							<key>Style</key>
 							<dict>
@@ -4921,7 +5063,7 @@ Configuration}</string>
 							<key>Points</key>
 							<array>
 								<string>{609.687, 1587.73}</string>
-								<string>{779.72, 1513.81}</string>
+								<string>{779.721, 1513.81}</string>
 							</array>
 							<key>Style</key>
 							<dict>
@@ -4954,7 +5096,7 @@ Configuration}</string>
 							<key>Points</key>
 							<array>
 								<string>{598.123, 1580.29}</string>
-								<string>{666.028, 1521.25}</string>
+								<string>{666.029, 1521.25}</string>
 							</array>
 							<key>Style</key>
 							<dict>
@@ -5085,8 +5227,8 @@ Configuration}</string>
 							<integer>1473</integer>
 							<key>Points</key>
 							<array>
-								<string>{347.612, 1521.25}</string>
-								<string>{415.516, 1580.29}</string>
+								<string>{347.611, 1521.25}</string>
+								<string>{415.517, 1580.29}</string>
 							</array>
 							<key>Style</key>
 							<dict>
@@ -10648,13 +10790,13 @@ Descriptors}</string>
 		<key>FitInWindow</key>
 		<false/>
 		<key>Frame</key>
-		<string>{{15, 783}, {1252, 998}}</string>
+		<string>{{15, 779}, {1252, 1002}}</string>
 		<key>ShowRuler</key>
 		<true/>
 		<key>ShowStatusBar</key>
 		<true/>
 		<key>VisibleRegion</key>
-		<string>{{-213, 710}, {2442, 1694}}</string>
+		<string>{{-213, 504}, {2442, 1732}}</string>
 		<key>Zoom</key>
 		<string>0.5</string>
 	</dict>
