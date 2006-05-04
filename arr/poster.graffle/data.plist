@@ -99,7 +99,7 @@
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2006-05-03 19:48:09 -0700</string>
+	<string>2006-05-03 19:58:01 -0700</string>
 	<key>Modifier</key>
 	<string>Andrew de los Reyes</string>
 	<key>NotesVisible</key>
@@ -227,7 +227,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{72, 1118.89}, {600.604, 519.11}}</string>
+					<string>{{72, 1118.89}, {600.604, 528.11}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -284,7 +284,8 @@
 \'a5 Our new intermediate interface (LFS) provides the opportunity for finer grained modules. The LFS interface provides a way of manipulating abstract disk structures common across many different filesystems. Modules that provide an LFS interface do not need to know how their abstract disk structures are used\
 \'a5 Modules with different \'d2in\'d3 and \'d2out\'d3 interfaces demonstrate the flexibility of our system\
 \
-\'a5 Change descriptors allow LFS and BD users to specify their disk write orderings with respect to those of other modules}</string>
+\'a5 Change descriptors allow LFS and BD users to specify their disk write orderings with respect to those of other modules\
+\'a5 Because change descriptors are filesystem-independent, one module need not understand another module's consistency protocol to add new changes or transform existing change descriptors}</string>
 					</dict>
 				</dict>
 				<dict>
@@ -10796,7 +10797,7 @@ Descriptors}</string>
 		<key>ShowStatusBar</key>
 		<true/>
 		<key>VisibleRegion</key>
-		<string>{{-213, 504}, {2442, 1732}}</string>
+		<string>{{-213, 698}, {2442, 1732}}</string>
 		<key>Zoom</key>
 		<string>0.5</string>
 	</dict>
