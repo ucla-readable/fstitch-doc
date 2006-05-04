@@ -24,11 +24,11 @@
 	</array>
 	<key>ImageList</key>
 	<array>
-		<string>image8.pdf</string>
 		<string>image7.pdf</string>
 		<string>image5.pdf</string>
-		<string>image4.pdf</string>
 		<string>image2.eps</string>
+		<string>image4.pdf</string>
+		<string>image8.pdf</string>
 	</array>
 	<key>LinksVisible</key>
 	<string>NO</string>
@@ -99,9 +99,9 @@
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2006-05-03 22:41:11 -0700</string>
+	<string>2006-05-04 15:01:15 -0700</string>
 	<key>Modifier</key>
-	<string>Andrew de los Reyes</string>
+	<string>Software</string>
 	<key>NotesVisible</key>
 	<string>NO</string>
 	<key>OriginVisible</key>
@@ -174,7 +174,7 @@
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{72, 1035}, {468, 67}}</string>
+					<string>{{36, 2959.14}, {241.625, 59}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -183,13 +183,20 @@
 					<string>Resize</string>
 					<key>FontInfo</key>
 					<dict>
+						<key>Color</key>
+						<dict>
+							<key>w</key>
+							<string>0</string>
+						</dict>
 						<key>Font</key>
 						<string>Helvetica</string>
+						<key>NSKern</key>
+						<real>0.0</real>
 						<key>Size</key>
-						<real>56</real>
+						<real>49</real>
 					</dict>
 					<key>ID</key>
-					<integer>1490</integer>
+					<integer>1495</integer>
 					<key>Shape</key>
 					<string>Rectangle</string>
 					<key>Style</key>
@@ -198,6 +205,11 @@
 						<dict>
 							<key>Draws</key>
 							<string>NO</string>
+							<key>GradientColor</key>
+							<dict>
+								<key>w</key>
+								<string>0.666667</string>
+							</dict>
 						</dict>
 						<key>shadow</key>
 						<dict>
@@ -222,12 +234,263 @@
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
 
-\f0\fs112 \cf0 Module Interfaces}</string>
+\f0\fs98 \cf0 \expnd0\expndtw0\kerning0
+Evaluation}</string>
 					</dict>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{45, 1118.89}, {639, 771.11}}</string>
+					<string>{{36, 3027.2}, {792, 119.016}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>FontInfo</key>
+					<dict>
+						<key>Color</key>
+						<dict>
+							<key>w</key>
+							<string>0</string>
+						</dict>
+						<key>Font</key>
+						<string>Helvetica</string>
+						<key>NSKern</key>
+						<real>0.0</real>
+						<key>Size</key>
+						<real>24</real>
+					</dict>
+					<key>ID</key>
+					<integer>1494</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>GradientColor</key>
+							<dict>
+								<key>w</key>
+								<string>0.666667</string>
+							</dict>
+						</dict>
+						<key>shadow</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>CornerRadius</key>
+							<real>5</real>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Align</key>
+						<integer>0</integer>
+						<key>Text</key>
+						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
+{\fonttbl\f0\fswiss\fcharset77 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+
+\f0\fs48 \cf0 \expnd0\expndtw0\kerning0
+WE RULE}</string>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{36, 2763}, {203, 59}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>FitText</key>
+					<string>Vertical</string>
+					<key>Flow</key>
+					<string>Resize</string>
+					<key>FontInfo</key>
+					<dict>
+						<key>Color</key>
+						<dict>
+							<key>w</key>
+							<string>0</string>
+						</dict>
+						<key>Font</key>
+						<string>Helvetica</string>
+						<key>NSKern</key>
+						<real>0.0</real>
+						<key>Size</key>
+						<real>49</real>
+					</dict>
+					<key>ID</key>
+					<integer>209</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+							<key>GradientColor</key>
+							<dict>
+								<key>w</key>
+								<string>0.666667</string>
+							</dict>
+						</dict>
+						<key>shadow</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Align</key>
+						<integer>0</integer>
+						<key>Pad</key>
+						<integer>0</integer>
+						<key>Text</key>
+						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
+{\fonttbl\f0\fswiss\fcharset77 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+
+\f0\fs98 \cf0 \expnd0\expndtw0\kerning0
+Benefits}</string>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{36, 2831.06}, {792, 119.016}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>FontInfo</key>
+					<dict>
+						<key>Color</key>
+						<dict>
+							<key>w</key>
+							<string>0</string>
+						</dict>
+						<key>Font</key>
+						<string>Helvetica</string>
+						<key>NSKern</key>
+						<real>0.0</real>
+						<key>Size</key>
+						<real>24</real>
+					</dict>
+					<key>ID</key>
+					<integer>208</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>GradientColor</key>
+							<dict>
+								<key>w</key>
+								<string>0.666667</string>
+							</dict>
+						</dict>
+						<key>shadow</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>CornerRadius</key>
+							<real>5</real>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Align</key>
+						<integer>0</integer>
+						<key>Text</key>
+						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
+{\fonttbl\f0\fswiss\fcharset77 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+
+\f0\fs48 \cf0 \expnd0\expndtw0\kerning0
+\'a5 Easier to write crash-recoverable applications\
+\'a5 Smaller file system pieces are easier to understand and make correct\
+\'a5 New functionality can be achieved through new modules or combinations of existing modules}</string>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{36, 735.487}, {468, 59}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>FitText</key>
+					<string>Vertical</string>
+					<key>Flow</key>
+					<string>Resize</string>
+					<key>FontInfo</key>
+					<dict>
+						<key>Color</key>
+						<dict>
+							<key>w</key>
+							<string>0</string>
+						</dict>
+						<key>Font</key>
+						<string>Helvetica</string>
+						<key>NSKern</key>
+						<real>0.0</real>
+						<key>Size</key>
+						<real>49</real>
+					</dict>
+					<key>ID</key>
+					<integer>1490</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+							<key>GradientColor</key>
+							<dict>
+								<key>w</key>
+								<string>0.666667</string>
+							</dict>
+						</dict>
+						<key>shadow</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Align</key>
+						<integer>0</integer>
+						<key>Pad</key>
+						<integer>0</integer>
+						<key>Text</key>
+						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
+{\fonttbl\f0\fswiss\fcharset77 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs98 \cf0 \expnd0\expndtw0\kerning0
+Module Interfaces}</string>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{36, 801}, {639, 825.11}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -280,54 +543,27 @@
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
 
 \f0\fs48 \cf0 \expnd0\expndtw0\kerning0
-\'a5 A complete Kudos configuration is composed of many modules with three major interfaces:\
-\'a5 Virtual File System (VFS)\
-  \'a5 interface to files and folders (e.g. open a file, write a file)\
-\'a5 Block Devices (BD)\
-  \'a5 interface to disk blocks (e.g. read a block, write a block)\
-\'a5 Low-level File System (LFS)\
-  \'a5 a new intermediate interface to abstract filesystem structures (e.g. allocate a block, append a block to a file)\
+A complete Kudos configuration is composed of many modules with three major interfaces:\
 \
-\'a5 Finally, a new, intermediate interface (LFS) allows finer grained modules. The LFS interface provides a way of manipulating abstract disk structures common across many different filesystems. Modules that provide an LFS interface do not need to know how their abstract disk structures are used\
+\'a5 Virtual File System (VFS)\
+  \'a5 abstract file and folder operations (e.g. open/write files)\
+\'a5 Block Devices (BD)\
+  \'a5 abstract disk block operations (e.g. read/write blocks)\
+\'a5 Low-level File System (LFS)\
+  \'a5 abstract file system structure operations (e.g. allocate a block, append a block to a file)\
+\
+LFS permits modules to be finer-grained, by providing a uniform interface for manipulating disk structures without being constrained by standard file system abstractions. Modules that provide an LFS interface do not need to know how their abstract disk structures are used.\
+\
 \'a5 Modules with different \'d2in\'d3 and \'d2out\'d3 interfaces demonstrate the flexibility of our system\
 \
 \'a5 Change descriptors allow LFS and BD users to specify their disk write orderings with respect to those of other modules\
+\
 \'a5 Because change descriptors are filesystem-independent, one module need not understand another module's consistency protocol to add new changes or transform existing change descriptors}</string>
 					</dict>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{857.748, 2772}, {1095.25, 335}}</string>
-					<key>Class</key>
-					<string>ShapedGraphic</string>
-					<key>ID</key>
-					<integer>1488</integer>
-					<key>ImageID</key>
-					<integer>8</integer>
-					<key>Shape</key>
-					<string>Rectangle</string>
-					<key>Style</key>
-					<dict>
-						<key>fill</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-						<key>shadow</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-						<key>stroke</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-					</dict>
-				</dict>
-				<dict>
-					<key>Bounds</key>
-					<string>{{1420.31, 737.873}, {532.687, 203}}</string>
+					<string>{{1440, 617.487}, {540, 168}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -339,7 +575,7 @@
 						<key>Font</key>
 						<string>Times-Roman</string>
 						<key>Size</key>
-						<real>56</real>
+						<real>22</real>
 					</dict>
 					<key>ID</key>
 					<integer>1198</integer>
@@ -366,21 +602,21 @@
 					<key>Text</key>
 					<dict>
 						<key>Align</key>
-						<integer>0</integer>
+						<integer>3</integer>
 						<key>Pad</key>
 						<integer>0</integer>
 						<key>Text</key>
 						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
 {\fonttbl\f0\froman\fcharset77 Times-Roman;}
 {\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qj\pardirnatural
 
-\f0\fs48 \cf0 Soft updates change descriptor graph, including the dependencies for adding a newly allocated block to an inode. Writing the new block pointer to an inode (Attach) depends on initializing the block (Clear) and updating the free block map (Alloc). Updating the size of the inode (Size) depends on writing the block pointer}</string>
+\f0\fs44 \cf0 Soft updates change descriptor graph, including the dependencies for adding a newly allocated block to an inode. Writing the new block pointer to an inode (Attach) depends on initializing the block (Clear) and updating the free block map (Alloc). Updating the size of the inode (Size) depends on writing the block pointer.}</string>
 					</dict>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{779.38, 2007}, {1155.62, 468}}</string>
+					<string>{{36, 1683}, {1155.62, 468}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -410,7 +646,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{993.627, 731.373}, {401.373, 216}}</string>
+					<string>{{1008, 612}, {401.373, 216}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -440,92 +676,13 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{684, 1104.11}, {1290.92, 846}}</string>
-					<key>Class</key>
-					<string>ShapedGraphic</string>
-					<key>ID</key>
-					<integer>1140</integer>
-					<key>ImageID</key>
-					<integer>4</integer>
-					<key>Shape</key>
-					<string>Rectangle</string>
-					<key>Style</key>
-					<dict>
-						<key>fill</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-						<key>shadow</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-						<key>stroke</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-					</dict>
-				</dict>
-				<dict>
-					<key>Bounds</key>
-					<string>{{72, 1899}, {270, 67}}</string>
+					<string>{{1215, 1618.16}, {270, 59}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
 					<string>Vertical</string>
 					<key>Flow</key>
 					<string>Resize</string>
-					<key>FontInfo</key>
-					<dict>
-						<key>Font</key>
-						<string>Helvetica</string>
-						<key>Size</key>
-						<real>56</real>
-					</dict>
-					<key>ID</key>
-					<integer>1062</integer>
-					<key>Shape</key>
-					<string>Rectangle</string>
-					<key>Style</key>
-					<dict>
-						<key>fill</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-						<key>shadow</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-						<key>stroke</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-					</dict>
-					<key>Text</key>
-					<dict>
-						<key>Align</key>
-						<integer>0</integer>
-						<key>Pad</key>
-						<integer>0</integer>
-						<key>Text</key>
-						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
-{\fonttbl\f0\fswiss\fcharset77 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
-
-\f0\fs112 \cf0 Modules}</string>
-					</dict>
-				</dict>
-				<dict>
-					<key>Bounds</key>
-					<string>{{72, 1989}, {600.604, 275.943}}</string>
-					<key>Class</key>
-					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
 					<dict>
 						<key>Color</key>
@@ -538,16 +695,18 @@
 						<key>NSKern</key>
 						<real>0.0</real>
 						<key>Size</key>
-						<real>24</real>
+						<real>49</real>
 					</dict>
 					<key>ID</key>
-					<integer>1061</integer>
+					<integer>1062</integer>
 					<key>Shape</key>
 					<string>Rectangle</string>
 					<key>Style</key>
 					<dict>
 						<key>fill</key>
 						<dict>
+							<key>Draws</key>
+							<string>NO</string>
 							<key>GradientColor</key>
 							<dict>
 								<key>w</key>
@@ -561,32 +720,29 @@
 						</dict>
 						<key>stroke</key>
 						<dict>
-							<key>CornerRadius</key>
-							<real>5</real>
+							<key>Draws</key>
+							<string>NO</string>
 						</dict>
 					</dict>
 					<key>Text</key>
 					<dict>
 						<key>Align</key>
 						<integer>0</integer>
+						<key>Pad</key>
+						<integer>0</integer>
 						<key>Text</key>
 						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
 {\fonttbl\f0\fswiss\fcharset77 Helvetica;}
 {\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
 
-\f0\fs48 \cf0 \expnd0\expndtw0\kerning0
-\'a5 example modules\
-  \'a5 UHFS: \
-  \'a5 UFS\
-  \'a5 WB Cache\
-  \'a5 Journaling: this is a module that transforms existing incoming change descriptors, preserving their ordering requirements, to implement a different consistency protocol\
-  \'a5 more?}</string>
+\f0\fs98 \cf0 \expnd0\expndtw0\kerning0
+Modules}</string>
 					</dict>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{75.302, 692.873}, {495, 67}}</string>
+					<string>{{1017, 301.445}, {495, 59}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -595,10 +751,17 @@
 					<string>Resize</string>
 					<key>FontInfo</key>
 					<dict>
+						<key>Color</key>
+						<dict>
+							<key>w</key>
+							<string>0</string>
+						</dict>
 						<key>Font</key>
 						<string>Helvetica</string>
+						<key>NSKern</key>
+						<real>0.0</real>
 						<key>Size</key>
-						<real>56</real>
+						<real>49</real>
 					</dict>
 					<key>ID</key>
 					<integer>1060</integer>
@@ -610,6 +773,11 @@
 						<dict>
 							<key>Draws</key>
 							<string>NO</string>
+							<key>GradientColor</key>
+							<dict>
+								<key>w</key>
+								<string>0.666667</string>
+							</dict>
 						</dict>
 						<key>shadow</key>
 						<dict>
@@ -624,20 +792,23 @@
 					</dict>
 					<key>Text</key>
 					<dict>
+						<key>Align</key>
+						<integer>0</integer>
 						<key>Pad</key>
 						<integer>0</integer>
 						<key>Text</key>
 						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
 {\fonttbl\f0\fswiss\fcharset77 Helvetica;}
 {\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\pardirnatural
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
 
-\f0\fs112 \cf0 Change Descriptors}</string>
+\f0\fs98 \cf0 \expnd0\expndtw0\kerning0
+Change Descriptors}</string>
 					</dict>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{75.302, 771.113}, {806.698, 209.887}}</string>
+					<string>{{1017, 365.445}, {963, 237.555}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -690,13 +861,15 @@
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
 
 \f0\fs48 \cf0 \expnd0\expndtw0\kerning0
-\'a5 File systems make disk writes in particular orderings so that in the event of a crash, the disk data is recoverable. Change descriptors express these orderings in a filesystem-independent manner\
-\'a5 Change descriptors represent all in-memory changes to the disk. One can depend on another, thus enforcing write orderings. For example, allocating a disk block before referencing it ensures that a system crash can't result in doubly-allocated blocks}</string>
+\'a5 File systems can make disk writes in particular orderings so that in the event of a crash, the disk data is recoverable (e.g. "Soft Updates" in UFS)\
+\'a5 For example, allocating a disk block before referencing it ensures that a system crash can't result in doubly-allocated blocks.\
+\'a5 Existing consistency systems must be reimplemented for each file system wanting to use them, since the implementations are specific to each file system\
+\'a5 In Kudos, change descriptors represent all in-memory changes to the disk, and express these ordering requirements in a file system independent manner}</string>
 					</dict>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{81.0001, 2498}, {414, 67}}</string>
+					<string>{{36, 2187}, {414, 59}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -705,10 +878,17 @@
 					<string>Resize</string>
 					<key>FontInfo</key>
 					<dict>
+						<key>Color</key>
+						<dict>
+							<key>w</key>
+							<string>0</string>
+						</dict>
 						<key>Font</key>
 						<string>Helvetica</string>
+						<key>NSKern</key>
+						<real>0.0</real>
 						<key>Size</key>
-						<real>56</real>
+						<real>49</real>
 					</dict>
 					<key>ID</key>
 					<integer>211</integer>
@@ -720,6 +900,11 @@
 						<dict>
 							<key>Draws</key>
 							<string>NO</string>
+							<key>GradientColor</key>
+							<dict>
+								<key>w</key>
+								<string>0.666667</string>
+							</dict>
 						</dict>
 						<key>shadow</key>
 						<dict>
@@ -742,14 +927,15 @@
 						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
 {\fonttbl\f0\fswiss\fcharset77 Helvetica;}
 {\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
 
-\f0\fs112 \cf0 Changegroups}</string>
+\f0\fs98 \cf0 \expnd0\expndtw0\kerning0
+Changegroups}</string>
 					</dict>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{72.0001, 2583}, {756, 504}}</string>
+					<string>{{36, 2255}, {828, 508}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -819,58 +1005,7 @@ up. a result: COPY no longer needs to fsync() to ensure ordering correctness.\
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{1385.27, 329.76}, {203, 67}}</string>
-					<key>Class</key>
-					<string>ShapedGraphic</string>
-					<key>FitText</key>
-					<string>Vertical</string>
-					<key>Flow</key>
-					<string>Resize</string>
-					<key>FontInfo</key>
-					<dict>
-						<key>Font</key>
-						<string>Helvetica</string>
-						<key>Size</key>
-						<real>56</real>
-					</dict>
-					<key>ID</key>
-					<integer>209</integer>
-					<key>Shape</key>
-					<string>Rectangle</string>
-					<key>Style</key>
-					<dict>
-						<key>fill</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-						<key>shadow</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-						<key>stroke</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-					</dict>
-					<key>Text</key>
-					<dict>
-						<key>Pad</key>
-						<integer>0</integer>
-						<key>Text</key>
-						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
-{\fonttbl\f0\fswiss\fcharset77 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\pardirnatural
-
-\f0\fs112 \cf0 Benefits}</string>
-					</dict>
-				</dict>
-				<dict>
-					<key>Bounds</key>
-					<string>{{1385.27, 396.76}, {558.687, 162}}</string>
+					<string>{{36, 365.445}, {963, 354.555}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -888,7 +1023,7 @@ up. a result: COPY no longer needs to fsync() to ensure ordering correctness.\
 						<real>24</real>
 					</dict>
 					<key>ID</key>
-					<integer>208</integer>
+					<integer>1491</integer>
 					<key>Shape</key>
 					<string>Rectangle</string>
 					<key>Style</key>
@@ -918,193 +1053,24 @@ up. a result: COPY no longer needs to fsync() to ensure ordering correctness.\
 						<integer>0</integer>
 						<key>Text</key>
 						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
-{\fonttbl\f0\fswiss\fcharset77 Helvetica;}
+{\fonttbl\f0\fswiss\fcharset77 Helvetica;\f1\fswiss\fcharset77 Helvetica-Oblique;}
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
 
 \f0\fs48 \cf0 \expnd0\expndtw0\kerning0
-\'a5 Easier to write crash-recoverable applications\
-\'a5 Smaller file system pieces are easier to understand and make correct\
-\'a5 New functionality can be achieved through new modules or combinations of existing modules}</string>
-					</dict>
-				</dict>
-				<dict>
-					<key>Bounds</key>
-					<string>{{72, 486}, {1152, 162}}</string>
-					<key>Class</key>
-					<string>ShapedGraphic</string>
-					<key>FontInfo</key>
-					<dict>
-						<key>Color</key>
-						<dict>
-							<key>w</key>
-							<string>0</string>
-						</dict>
-						<key>Font</key>
-						<string>Helvetica</string>
-						<key>NSKern</key>
-						<real>0.0</real>
-						<key>Size</key>
-						<real>24</real>
-					</dict>
-					<key>ID</key>
-					<integer>207</integer>
-					<key>Shape</key>
-					<string>Rectangle</string>
-					<key>Style</key>
-					<dict>
-						<key>fill</key>
-						<dict>
-							<key>GradientColor</key>
-							<dict>
-								<key>w</key>
-								<string>0.666667</string>
-							</dict>
-						</dict>
-						<key>shadow</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-						<key>stroke</key>
-						<dict>
-							<key>CornerRadius</key>
-							<real>5</real>
-						</dict>
-					</dict>
-					<key>Text</key>
-					<dict>
-						<key>Align</key>
-						<integer>0</integer>
-						<key>Text</key>
-						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
-{\fonttbl\f0\fswiss\fcharset77 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+\'a5 File systems are being expected to do more (encryption, extensible metadata, snapshots, replication)\
+\'a5 Correctness is increasingly important, and a focus of recent development (soft updates, journaling, file system transactions)\
+\'a5 Robust applications must either accept the performance penalty of full synchronization, or bypass the file system altogether, in order to achieve consistency guarantees\
+\'a5 Existing stackable file system architectures do not provide a way to modularize consistency\
+\'a5 Modular systems are easier to understand, extend, adapt, and reorganize\
+\
 
-\f0\fs48 \cf0 \expnd0\expndtw0\kerning0
-\'a5 File systems are being expected to do more (encrypt, extensible metadata, and more)\
-\'a5 Correctness is increasingly becoming a research focus (ACID transactions, stackable filesystems with consistency preservation, and others)\
-\'a5 Robust applications either accept the performance penalty of fsync or rely on raw-disk interfaces\
-\'a5 Modular systems are easier to understand, extend, and reorganize}</string>
+\f1\i Can file system software be made modular, to allow the simple addition of new features, while still providing the required consistency guarantees?}</string>
 					</dict>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{70.7168, 428}, {434.423, 58}}</string>
-					<key>Class</key>
-					<string>ShapedGraphic</string>
-					<key>FitText</key>
-					<string>Vertical</string>
-					<key>Flow</key>
-					<string>Resize</string>
-					<key>FontInfo</key>
-					<dict>
-						<key>Font</key>
-						<string>Helvetica</string>
-						<key>Size</key>
-						<real>48</real>
-					</dict>
-					<key>HFlip</key>
-					<string>YES</string>
-					<key>ID</key>
-					<integer>206</integer>
-					<key>Shape</key>
-					<string>Rectangle</string>
-					<key>Style</key>
-					<dict>
-						<key>fill</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-						<key>shadow</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-						<key>stroke</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-					</dict>
-					<key>Text</key>
-					<dict>
-						<key>Align</key>
-						<integer>0</integer>
-						<key>Pad</key>
-						<integer>0</integer>
-						<key>Text</key>
-						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
-{\fonttbl\f0\fswiss\fcharset77 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
-
-\f0\fs96 \cf0 Motivations}</string>
-					</dict>
-				</dict>
-				<dict>
-					<key>Bounds</key>
-					<string>{{71.9999, 387.76}, {927, 35.24}}</string>
-					<key>Class</key>
-					<string>ShapedGraphic</string>
-					<key>FontInfo</key>
-					<dict>
-						<key>Color</key>
-						<dict>
-							<key>w</key>
-							<string>0</string>
-						</dict>
-						<key>Font</key>
-						<string>Helvetica</string>
-						<key>NSKern</key>
-						<real>0.0</real>
-						<key>Size</key>
-						<real>25</real>
-					</dict>
-					<key>ID</key>
-					<integer>1142</integer>
-					<key>Shape</key>
-					<string>Rectangle</string>
-					<key>Style</key>
-					<dict>
-						<key>fill</key>
-						<dict>
-							<key>GradientColor</key>
-							<dict>
-								<key>w</key>
-								<string>0.666667</string>
-							</dict>
-						</dict>
-						<key>shadow</key>
-						<dict>
-							<key>Draws</key>
-							<string>NO</string>
-						</dict>
-						<key>stroke</key>
-						<dict>
-							<key>CornerRadius</key>
-							<real>5</real>
-						</dict>
-					</dict>
-					<key>Text</key>
-					<dict>
-						<key>Align</key>
-						<integer>0</integer>
-						<key>Text</key>
-						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
-{\fonttbl\f0\fswiss\fcharset77 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
-
-\f0\fs50 \cf0 \expnd0\expndtw0\kerning0
-Create a more flexible, modularized file system architecture}</string>
-					</dict>
-				</dict>
-				<dict>
-					<key>Bounds</key>
-					<string>{{72.0001, 329.76}, {175.685, 59}}</string>
+					<string>{{36, 301.445}, {434.423, 59}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -1125,8 +1091,10 @@ Create a more flexible, modularized file system architecture}</string>
 						<key>Size</key>
 						<real>49</real>
 					</dict>
+					<key>HFlip</key>
+					<string>YES</string>
 					<key>ID</key>
-					<integer>1143</integer>
+					<integer>206</integer>
 					<key>Shape</key>
 					<string>Rectangle</string>
 					<key>Style</key>
@@ -1162,15 +1130,15 @@ Create a more flexible, modularized file system architecture}</string>
 						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
 {\fonttbl\f0\fswiss\fcharset77 Helvetica;}
 {\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
 
 \f0\fs98 \cf0 \expnd0\expndtw0\kerning0
-Goal}</string>
+Motivations}</string>
 					</dict>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{1593.78, 227.767}, {404.631, 58}}</string>
+					<string>{{1629.37, 205.247}, {404.631, 58}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -1223,7 +1191,7 @@ Goal}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{1380.5, 202.989}, {221.503, 102.303}}</string>
+					<string>{{1416.09, 180.469}, {221.503, 102.303}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -1253,7 +1221,7 @@ Goal}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{72, 208.267}, {1245, 43}}</string>
+					<string>{{37.2832, 186.274}, {1245, 43}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -1311,8 +1279,8 @@ Goal}</string>
 					<integer>196</integer>
 					<key>Points</key>
 					<array>
-						<string>{72, 198}</string>
-						<string>{1944, 198}</string>
+						<string>{36, 167.734}</string>
+						<string>{1980, 167.734}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -1331,7 +1299,7 @@ Goal}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{70.7168, 255.96}, {749, 43}}</string>
+					<string>{{36, 233.967}, {749, 43}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -1384,7 +1352,7 @@ Goal}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{115.5, 22.52}, {1785, 156}}</string>
+					<string>{{93.75, 0}, {1828.5, 156}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -1441,7 +1409,150 @@ Goal}</string>
 
 \f0\fs260 \cf2 Kudos
 \fs200 \cf0   
-\fs180 A Modular Filesystem Architecture}</string>
+\fs180 A Modular File System Architecture}</string>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{1215, 1683}, {765, 489.835}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>FontInfo</key>
+					<dict>
+						<key>Color</key>
+						<dict>
+							<key>w</key>
+							<string>0</string>
+						</dict>
+						<key>Font</key>
+						<string>Helvetica</string>
+						<key>NSKern</key>
+						<real>0.0</real>
+						<key>Size</key>
+						<real>24</real>
+					</dict>
+					<key>ID</key>
+					<integer>1061</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>GradientColor</key>
+							<dict>
+								<key>w</key>
+								<string>0.666667</string>
+							</dict>
+						</dict>
+						<key>shadow</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>CornerRadius</key>
+							<real>5</real>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Align</key>
+						<integer>0</integer>
+						<key>Text</key>
+						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
+{\fonttbl\f0\fswiss\fcharset77 Helvetica-Bold;\f1\fswiss\fcharset77 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+
+\f0\b\fs52 \cf0 \expnd0\expndtw0\kerning0
+Uniform High-level File System (UHFS)
+\f1\b0\fs48 \expnd0\expndtw0\kerning0
+\
+\'a5 translates VFS-level calls to sequences of LFS operations\
+\'a5 connects the resulting change descriptors\
+\'a5 can use any LFS module to create a full file system\
+
+\f0\b\fs52 \expnd0\expndtw0\kerning0
+Unix File System (UFS)
+\f1\b0\fs48 \expnd0\expndtw0\kerning0
+\
+\'a5 implements the on-disk format used by BSD, Solaris, and many other Unix-like operating systems\
+\'a5 LFS modularity and change descriptors help simplify UFS code\
+
+\f0\b\fs52 \expnd0\expndtw0\kerning0
+Write-Back Cache
+\f1\b0\fs48 \expnd0\expndtw0\kerning0
+\
+\'a5 accepts change descriptors generated by other modules and sends them towards the disk in a valid order\
+
+\f0\b\fs52 \expnd0\expndtw0\kerning0
+Journal
+\f1\b0\fs48 \expnd0\expndtw0\kerning0
+\
+\'a5 changes the arrangement of incoming change descriptors and adds new change descriptors to implement a different consistency protocol (journaling)\
+\'a5 transformation illustrated at left}</string>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{689.08, 801}, {1290.92, 846}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>ID</key>
+					<integer>1140</integer>
+					<key>ImageID</key>
+					<integer>4</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>shadow</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{884.75, 2204}, {1095.25, 335}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>ID</key>
+					<integer>1488</integer>
+					<key>ImageID</key>
+					<integer>8</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>shadow</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
 					</dict>
 				</dict>
 			</array>
@@ -11246,15 +11357,15 @@ Descriptors}</string>
 		<key>FitInWindow</key>
 		<false/>
 		<key>Frame</key>
-		<string>{{16, 778}, {1252, 1002}}</string>
+		<string>{{2, 6}, {1593, 1139}}</string>
 		<key>ShowRuler</key>
 		<true/>
 		<key>ShowStatusBar</key>
 		<true/>
 		<key>VisibleRegion</key>
-		<string>{{0, 1043}, {1221, 866}}</string>
+		<string>{{-246, 1584}, {2527.28, 1584}}</string>
 		<key>Zoom</key>
-		<string>1</string>
+		<string>0.6180556</string>
 	</dict>
 </dict>
 </plist>
