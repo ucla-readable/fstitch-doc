@@ -99,7 +99,7 @@
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2006-05-04 20:18:45 -0700</string>
+	<string>2006-05-04 20:25:46 -0700</string>
 	<key>Modifier</key>
 	<string>Software</string>
 	<key>NotesVisible</key>
@@ -801,7 +801,7 @@
 					<array>
 						<dict>
 							<key>Bounds</key>
-							<string>{{45, 1650.14}, {270, 61}}</string>
+							<string>{{45, 1600.02}, {270, 61}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -867,7 +867,7 @@ Modules}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{45, 1715.64}, {828, 469.5}}</string>
+							<string>{{45, 1665.52}, {828, 469.5}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FontInfo</key>
