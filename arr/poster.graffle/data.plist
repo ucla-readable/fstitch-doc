@@ -13,9 +13,11 @@
 	<key>GuidesVisible</key>
 	<string>YES</string>
 	<key>ImageCounter</key>
-	<integer>8</integer>
+	<integer>11</integer>
 	<key>ImageLinkBack</key>
 	<array>
+		<dict/>
+		<dict/>
 		<dict/>
 		<dict/>
 		<dict/>
@@ -24,11 +26,13 @@
 	</array>
 	<key>ImageList</key>
 	<array>
+		<string>image9.pdf</string>
+		<string>image8.pdf</string>
 		<string>image7.pdf</string>
 		<string>image5.pdf</string>
 		<string>image2.eps</string>
-		<string>image4.pdf</string>
 		<string>image8.pdf</string>
+		<string>image10.pdf</string>
 	</array>
 	<key>LinksVisible</key>
 	<string>NO</string>
@@ -99,7 +103,7 @@
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2006-05-04 15:01:15 -0700</string>
+	<string>2006-05-04 17:46:32 -0700</string>
 	<key>Modifier</key>
 	<string>Software</string>
 	<key>NotesVisible</key>
@@ -174,7 +178,139 @@
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{36, 2959.14}, {241.625, 59}}</string>
+					<string>{{1548, 2779.88}, {423, 126.86}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>ID</key>
+					<integer>1503</integer>
+					<key>ImageID</key>
+					<integer>9</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>shadow</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{1080, 2510.74}, {891, 342}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>FontInfo</key>
+					<dict>
+						<key>Color</key>
+						<dict>
+							<key>w</key>
+							<string>0</string>
+						</dict>
+						<key>Font</key>
+						<string>Helvetica</string>
+						<key>NSKern</key>
+						<real>0.0</real>
+						<key>Size</key>
+						<real>24</real>
+					</dict>
+					<key>ID</key>
+					<integer>1504</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>GradientColor</key>
+							<dict>
+								<key>w</key>
+								<string>0.666667</string>
+							</dict>
+						</dict>
+						<key>shadow</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>CornerRadius</key>
+							<real>5</real>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Align</key>
+						<integer>0</integer>
+						<key>Text</key>
+						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
+{\fonttbl\f0\fswiss\fcharset77 Helvetica-Bold;\f1\fswiss\fcharset77 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+
+\f0\b\fs52 \cf0 \expnd0\expndtw0\kerning0
+Changegroup\cf0 \expnd0\expndtw0\kerning0
+ Case Study
+\f1\b0\fs48 \
+\'a5 To assess the utility of changegroups in a real world application, we updated the University of Washington's IMAP mail server to take advantage of changegroups\
+\'a5 Changes:\
+  \'a5 Each IMAP command is performed within a changegroup and is made dependent on the preceding command\
+  \'a5 Mailbox checkpoints sync the current changegroup to disk\
+\'a5 Benefits:\
+  \'a5 Correctness is easier (changegroups capture all changes implicitly)\expnd0\expndtw0\kerning0
+\
+  \'a5 Fewer syncs are needed for correctness\
+(e.g. message copies), resulting in fewer\
+writes to disk}</string>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{36, 2573.74}, {514, 126.86}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>ID</key>
+					<integer>1502</integer>
+					<key>ImageID</key>
+					<integer>8</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>shadow</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{36, 2434.74}, {241.625, 59}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -240,7 +376,7 @@ Evaluation}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{36, 3027.2}, {792, 119.016}}</string>
+					<string>{{45, 2510.74}, {774, 396}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -280,6 +416,8 @@ Evaluation}</string>
 						<dict>
 							<key>CornerRadius</key>
 							<real>5</real>
+							<key>Draws</key>
+							<string>NO</string>
 						</dict>
 					</dict>
 					<key>Text</key>
@@ -293,12 +431,18 @@ Evaluation}</string>
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
 
 \f0\fs48 \cf0 \expnd0\expndtw0\kerning0
-WE RULE}</string>
+The table below shows times to extract and delete the source code for Linux 2.6.15 to disk, using Kudos, UFS in FreeBSD, and Ext2 in Linux.\
+\
+\
+\
+\
+\
+We also compare the number of disk writes. To create 100 small files Kudos writes 122 and FreeBSD writes 135 blocks. To remove a file and add a file to a directory Kudos writes 15 blocks and FreeBSD writes 83 blocks. While our prototype implementation is 20% to 2x slower in time than FreeBSD's UFS, we gather from disk write comparisons that many further data structure optimizations opportunities remain to improve Kudos' runtime.}</string>
 					</dict>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{36, 2763}, {203, 59}}</string>
+					<string>{{36, 2921.47}, {203, 59}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -364,7 +508,7 @@ Benefits}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{36, 2831.06}, {792, 119.016}}</string>
+					<string>{{36, 2986.21}, {1017, 145.788}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -419,7 +563,8 @@ Benefits}</string>
 \f0\fs48 \cf0 \expnd0\expndtw0\kerning0
 \'a5 Easier to write crash-recoverable applications\
 \'a5 Smaller file system pieces are easier to understand and make correct\
-\'a5 New functionality can be achieved through new modules or combinations of existing modules}</string>
+\'a5 New functionality can be achieved through new modules or combinations of existing modules\
+\'a5 Last item}</string>
 					</dict>
 				</dict>
 				<dict>
@@ -490,7 +635,7 @@ Module Interfaces}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{36, 801}, {639, 825.11}}</string>
+					<string>{{36, 801}, {675, 819}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -546,19 +691,18 @@ Module Interfaces}</string>
 A complete Kudos configuration is composed of many modules with three major interfaces:\
 \
 \'a5 Virtual File System (VFS)\
-  \'a5 abstract file and folder operations (e.g. open/write files)\
+  \'a5 Abstract file and folder operations (e.g. open/write files)\
 \'a5 Block Devices (BD)\
-  \'a5 abstract disk block operations (e.g. read/write blocks)\
+  \'a5 Abstract disk block operations (e.g. read/write blocks)\
 \'a5 Low-level File System (LFS)\
-  \'a5 abstract file system structure operations (e.g. allocate a block, append a block to a file)\
+  \'a5 Abstract file system structure operations (e.g. allocate a block, append a block to a file)\
 \
-LFS permits modules to be finer-grained, by providing a uniform interface for manipulating disk structures without being constrained by standard file system abstractions. Modules that provide an LFS interface do not need to know how their abstract disk structures are used.\
+The VFS and BD interfaces are similar to existing interfaces that serve the same purpose. However, the LFS interface is new in Kudos, and provides several benefits:\
 \
-\'a5 Modules with different \'d2in\'d3 and \'d2out\'d3 interfaces demonstrate the flexibility of our system\
+\'a5 Permits file system modules to be finer-grained, by providing a uniform interface for manipulating disk structures at a lower level than traditional abstractions\
+\'a5 Modules that provide an LFS interface do not need to know how their abstract disk structures are used, allowing them to be simpler and easier to develop\
 \
-\'a5 Change descriptors allow LFS and BD users to specify their disk write orderings with respect to those of other modules\
-\
-\'a5 Because change descriptors are filesystem-independent, one module need not understand another module's consistency protocol to add new changes or transform existing change descriptors}</string>
+All modules in the system can create, inspect, and modify change descriptors, allowing them to specify or adjust disk write ordering requirements for other modules to follow. Because change descriptors are file system independent, modules need not understand each other's consistency protocols to perform such transformations.}</string>
 					</dict>
 				</dict>
 				<dict>
@@ -616,7 +760,7 @@ LFS permits modules to be finer-grained, by providing a uniform interface for ma
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{36, 1683}, {1155.62, 468}}</string>
+					<string>{{36, 1653.87}, {1088.95, 441}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
@@ -676,7 +820,7 @@ LFS permits modules to be finer-grained, by providing a uniform interface for ma
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{1215, 1618.16}, {270, 59}}</string>
+					<string>{{1152, 1611}, {270, 59}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -869,7 +1013,7 @@ Change Descriptors}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{36, 2187}, {414, 59}}</string>
+					<string>{{36, 2101.74}, {414, 59}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -935,7 +1079,7 @@ Changegroups}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{36, 2255}, {828, 508}}</string>
+					<string>{{36, 2169.74}, {828, 256}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -988,19 +1132,10 @@ Changegroups}</string>
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
 
 \f0\fs48 \cf0 \expnd0\expndtw0\kerning0
-\'a5 "change descriptors for applications"\
-\'a5 a changegroup corresponds to a group of change descriptors generated by file system operations; applications can specify ordering requirements among these groups\
-\'a5 operations:\
-  create a changegroup\
-  sync a changegroup to disk\
-  add one changegroup as a dependency to another\
-  start/stop using a changegroup for file system operations\
-\'a5 implementation (figure) ?\
-\
-\'a5 UW IMAP case study\
-  \'a5 each imap command performed within a changegroup, dependent on preceeding changegro\
-up. a result: COPY no longer needs to fsync() to ensure ordering correctness.\
-  \'a5 benefits: correctness is easier, fewer syncs for correctness}</string>
+\'a5 Changegroups give applications control over their change descriptors\
+\'a5 A changegroup identifies a set of change descriptors generated by file system operations\
+\'a5 Applications can specify ordering requirements among changegroups\
+\'a5 For example, to create a sorted copy of a file and then delete the original without changegroups, one should sync after the copy and before the delete. With changegroups, one need only create a dependency. The illustration at right shows this change descriptor arrangement.}</string>
 					</dict>
 				</dict>
 				<dict>
@@ -1404,7 +1539,7 @@ Motivations}</string>
 						<key>Text</key>
 						<string>{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
 {\fonttbl\f0\fswiss\fcharset77 Helvetica;}
-{\colortbl;\red255\green255\blue255;\red71\green98\blue135;}
+{\colortbl;\red255\green255\blue255;\red71\green99\blue135;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\pardirnatural
 
 \f0\fs260 \cf2 Kudos
@@ -1414,7 +1549,7 @@ Motivations}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{1215, 1683}, {765, 489.835}}</string>
+					<string>{{1152, 1676.5}, {828, 453.835}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FontInfo</key>
@@ -1497,13 +1632,13 @@ Journal
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{689.08, 801}, {1290.92, 846}}</string>
+					<string>{{884.75, 2161.5}, {1095.25, 335}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
-					<integer>1140</integer>
+					<integer>1488</integer>
 					<key>ImageID</key>
-					<integer>4</integer>
+					<integer>8</integer>
 					<key>Shape</key>
 					<string>Rectangle</string>
 					<key>Style</key>
@@ -1527,13 +1662,63 @@ Journal
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{884.75, 2204}, {1095.25, 335}}</string>
+					<string>{{36, 2502.24}, {1944, 413.5}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>FontInfo</key>
+					<dict>
+						<key>Color</key>
+						<dict>
+							<key>w</key>
+							<string>0</string>
+						</dict>
+						<key>Font</key>
+						<string>Helvetica</string>
+						<key>NSKern</key>
+						<real>0.0</real>
+						<key>Size</key>
+						<real>24</real>
+					</dict>
+					<key>ID</key>
+					<integer>1505</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>GradientColor</key>
+							<dict>
+								<key>w</key>
+								<string>0.666667</string>
+							</dict>
+						</dict>
+						<key>shadow</key>
+						<dict>
+							<key>Draws</key>
+							<string>NO</string>
+						</dict>
+						<key>stroke</key>
+						<dict>
+							<key>CornerRadius</key>
+							<real>5</real>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Align</key>
+						<integer>0</integer>
+					</dict>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{723.176, 792}, {1256.82, 855}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>ID</key>
-					<integer>1488</integer>
+					<integer>1506</integer>
 					<key>ImageID</key>
-					<integer>8</integer>
+					<integer>10</integer>
 					<key>Shape</key>
 					<string>Rectangle</string>
 					<key>Style</key>
@@ -2086,8 +2271,8 @@ Journal
 					<integer>187</integer>
 					<key>Points</key>
 					<array>
-						<string>{792.914, 451.253}</string>
-						<string>{854.474, 418}</string>
+						<string>{792.913, 451.008}</string>
+						<string>{853.474, 418}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2130,8 +2315,8 @@ Journal
 					<integer>186</integer>
 					<key>Points</key>
 					<array>
-						<string>{788.101, 566.564}</string>
-						<string>{855.437, 511.5}</string>
+						<string>{787.318, 566.555}</string>
+						<string>{853.474, 511.5}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2174,8 +2359,8 @@ Journal
 					<integer>184</integer>
 					<key>Points</key>
 					<array>
-						<string>{792.939, 267.326}</string>
-						<string>{854.474, 291.5}</string>
+						<string>{792.939, 267.504}</string>
+						<string>{853.474, 291.5}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2218,8 +2403,8 @@ Journal
 					<integer>183</integer>
 					<key>Points</key>
 					<array>
-						<string>{370.049, 562.364}</string>
-						<string>{306.51, 522.5}</string>
+						<string>{370.917, 558.918}</string>
+						<string>{319.474, 522.5}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2262,8 +2447,8 @@ Journal
 					<integer>182</integer>
 					<key>Points</key>
 					<array>
-						<string>{369.981, 372.027}</string>
-						<string>{306.51, 383.375}</string>
+						<string>{369.983, 373.186}</string>
+						<string>{319.474, 383.375}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2306,8 +2491,8 @@ Journal
 					<integer>181</integer>
 					<key>Points</key>
 					<array>
-						<string>{370.008, 219.734}</string>
-						<string>{306.51, 244.25}</string>
+						<string>{370.016, 222.232}</string>
+						<string>{319.474, 244.25}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -2348,8 +2533,8 @@ Journal
 							<integer>201</integer>
 							<key>Points</key>
 							<array>
-								<string>{306.51, 434.5}</string>
-								<string>{306.51, 522.5}</string>
+								<string>{319.474, 434.5}</string>
+								<string>{319.474, 522.5}</string>
 							</array>
 							<key>Style</key>
 							<dict>
@@ -2375,7 +2560,7 @@ Journal
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{111.177, 434.5}, {195.334, 88}}</string>
+							<string>{{124.141, 434.5}, {195.334, 88}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2462,8 +2647,8 @@ adding an elevator scheduler module}</string>
 							<integer>195</integer>
 							<key>Points</key>
 							<array>
-								<string>{306.51, 295.375}</string>
-								<string>{306.51, 383.375}</string>
+								<string>{319.474, 295.375}</string>
+								<string>{319.474, 383.375}</string>
 							</array>
 							<key>Style</key>
 							<dict>
@@ -2489,7 +2674,7 @@ adding an elevator scheduler module}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{109.973, 295.375}, {196.537, 88}}</string>
+							<string>{{122.937, 295.375}, {196.537, 88}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2577,8 +2762,8 @@ inserting modules}</string>
 							<integer>192</integer>
 							<key>Points</key>
 							<array>
-								<string>{306.51, 156.25}</string>
-								<string>{306.51, 244.25}</string>
+								<string>{319.474, 156.25}</string>
+								<string>{319.474, 244.25}</string>
 							</array>
 							<key>Style</key>
 							<dict>
@@ -2604,7 +2789,7 @@ inserting modules}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{108.947, 156.25}, {192.224, 88}}</string>
+							<string>{{121.911, 156.25}, {192.224, 88}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2689,8 +2874,8 @@ inserting modules}</string>
 							<integer>204</integer>
 							<key>Points</key>
 							<array>
-								<string>{855.437, 445.5}</string>
-								<string>{855.437, 511.5}</string>
+								<string>{853.474, 445.5}</string>
+								<string>{853.474, 511.5}</string>
 							</array>
 							<key>Style</key>
 							<dict>
@@ -2716,7 +2901,7 @@ inserting modules}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{856.437, 445.5}, {251, 66}}</string>
+							<string>{{854.474, 445.5}, {251, 66}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2803,8 +2988,8 @@ to use RAID}</string>
 							<integer>198</integer>
 							<key>Points</key>
 							<array>
-								<string>{854.474, 308}</string>
-								<string>{854.474, 418}</string>
+								<string>{853.474, 308}</string>
+								<string>{853.474, 418}</string>
 							</array>
 							<key>Style</key>
 							<dict>
@@ -2830,7 +3015,7 @@ to use RAID}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{855.474, 308}, {251, 110}}</string>
+							<string>{{854.474, 308}, {251, 110}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
@@ -2919,8 +3104,8 @@ descriptors (see Figure 2)}</string>
 							<integer>189</integer>
 							<key>Points</key>
 							<array>
-								<string>{854.474, 203.5}</string>
-								<string>{854.474, 291.5}</string>
+								<string>{853.474, 203.5}</string>
+								<string>{853.474, 291.5}</string>
 							</array>
 							<key>Style</key>
 							<dict>
@@ -2946,7 +3131,7 @@ descriptors (see Figure 2)}</string>
 						</dict>
 						<dict>
 							<key>Bounds</key>
-							<string>{{855.474, 203.5}, {250, 88}}</string>
+							<string>{{854.474, 203.5}, {250, 88}}</string>
 							<key>Class</key>
 							<string>ShapedGraphic</string>
 							<key>FitText</key>
