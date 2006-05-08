@@ -10,3 +10,7 @@ USENIX wants us to show that we:
 - ascii art at the top of journal_bd.c that could be made into a diagram
 - ascii art in chdesc_util.c that could be made into a diagram
 - ufs implementation becomes a diagram
+
+POST-SOSP
+=========
+- related work: 2.6.17 sync_file_range
