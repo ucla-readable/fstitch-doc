@@ -42,7 +42,7 @@ is the number of fragments in a block, which is the block size divided by the
 fragment size. Some fields in the superblock are no longer used but exist for
 historical reasons. Many years ago, knowledge of the disk geometry enabled
 storage optimizations. Although the data fields remain, they are useless for
-modern disk drives because the logical disk geometry no longer reflect the
+modern disk drives because the logical disk geometry no longer reflects the
 actual disk layout.
 
 \begin{figure}[htb]
@@ -60,7 +60,7 @@ information about that cylinder. In particular, cylinder group descriptors
 contain lots of statistics and summary information regarding resource
 allocations, so the file system driver can make better allocation decisions.
 
-UFS use bitmaps to keep track of three important resource: blocks, fragments,
+UFS uses bitmaps to keep track of three important resource: blocks, fragments,
 and inodes. Each cylinder group contains a fixed number of these resources,
 thus UFS uses contiguous, static bitmaps to keep track of them efficiently.
 Since different file systems can have different sized cylinder groups, the
@@ -68,9 +68,9 @@ bitmaps' locations are given as relative offsets to the start of the group
 descriptors. To indicate free blocks and fragments, UFS marks them with the
 value 1, but for free inodes, UFS marks them with the value 0.
 
-Inodes are internal objects that UFS use to represent files. Rather than
-identifying files directly with names, UFS refer to inodes by numbers. This
-indirectness makes it easier to have hard links, where multiple names refer to
+Inodes are internal objects that UFS uses to represent files. Rather than
+identifying files directly with names, UFS refers to inodes by numbers. This
+indirection makes it easier to have hard links, where multiple names refer to
 the same file object. The first few inodes are special: inode 0 and 1 are
 reserved, and inode 2 refers to the root directory. Inodes contain all the
 vital information for files, including file type, link count, size, data blocks
@@ -118,12 +118,12 @@ being out of sync from the actual values.
 \label{sec:ufs:features}
 
 As a complete and relatively complex file system, UFS has peculiarities that
-make it difficult to fully comprehend how some parts of it work. Specifically,
+makes it difficult to fully comprehend how some parts of it work. Specifically,
 the UFS directory structure and the relationship between fragments and blocks
 are two of the harder concepts to understand.
 
 The basic UFS directory structure seems fairly simple, but the actual rules
-governing its use has several quirks. Directories are just names that point
+governing its use have several quirks. Directories are just names that point
 to inodes, like any other file object in UFS. The size of a directory is
 always a multiple of 512 bytes, even if it does not need that much space, or
 if more disk space is actually allocated. To see how these two situations can
@@ -151,7 +151,7 @@ file in the chain.
 
 The other unusual property of UFS involves fragments and blocks, where a
 constant set of aligned fragments make up a block. Most files have data stored
-in blocks, with the trailing bits that does need a full block stored in a
+in blocks, with the trailing bits that do not need a full block stored in a
 contiguous chain of fragments. For very small files, UFS conserves space and
 stores them in just fragments. As the file grows, UFS extends the file using
 fragments. For example, if the file uses fragment 60 initially, then UFS will
@@ -162,7 +162,7 @@ allocation algorithms or lack of free space. To get around it, UFS will have
 to relocate the entire fragment chain elsewhere. Likewise, a chain of fragments
 cannot cross the block alignment boundaries, so if the example file tries to
 go past fragment 64, the chain has to be relocated. Once a file gets big enough
-to require the use of indirect blocks, then UFS no longer bother with
+to require the use of indirect blocks, then UFS no longer bothers with
 fragments and just use blocks, as the amount of waste relative to the file size
 is much smaller.
 

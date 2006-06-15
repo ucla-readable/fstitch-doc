@@ -18,7 +18,7 @@ fragments in the allocated block. In this way, UFS can stay consistent
 internally without special support from other \Kudos\ modules. To keep track
 of the state of files between LFS calls, so the UFS \module\ knows which files
 it is working with, an opaque data structure called a ``fdesc'' gets passed in
-to many LFS functions. A fdesc (file descriptor) contain all relevant
+to many LFS functions. A fdesc (file descriptor) contains all relevant
 information pertaining to a file, including an in-memory copy of the inode, as
 well as allocation information such as the number of fragments in the file,
 where the last fragment is, and where the next fragment to append will be.
