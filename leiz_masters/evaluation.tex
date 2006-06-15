@@ -1,0 +1,71 @@
+\section {Evaluation}
+\label{sec:evaluation}
+
+We evaluate our prototype implementation of \Kudos\ with macro-benchmarks that
+perform nontrivial file operations, as well as micro-benchmarks that compare
+specific operations.
+We show that the overall performance is within reason, even though it is slower
+than Linux or BSD.
+
+\subsection {Overall Performance}
+
+Our first benchmark test is to untar the Linux 2.6.15 source code from
+\texttt{linux-2.6.15.tar}, which is already decompressed and cached in RAM. We
+did this test on identical machines running Linux 2.6.12 (using ext3), FreeBSD
+5.4 (using UFS, with and without soft updates), and \Kudos\ running as a Linux
+2.6.12 kernel module (using UFS, with and without soft updates). As a second
+test, we then delete the resulting source tree. The times below include time to
+fully sync the changes to disk.
+
+% make this into a table
+\begin{figure}[htb]
+\centering{
+\begin{tabular}{|l|r|r|} \hline
+System & Untar (sec) & Delete (sec) \\ \hline\hline
+\Kudos\ (SU) & 24.50 & 11.69 \\ \hline
+\Kudos\ (async) & 20.14 & 11.27 \\ \hline
+FreeBSD 5.4 (SU) & 20.47 & 4.71 \\ \hline
+FreeBSD 5.4 (async) & 9.63 & 3.72 \\ \hline\hline
+% double line to separate linux
+Linux 2.6.12 (journaling) & 12.90 & 4.90 \\ \hline
+\end{tabular}
+}
+\caption{\label{fig:macro} Untar/delete times for \Kudos, FreeBSD, and Linux,
+with soft updates (SU) and with async mode.}
+\end{figure}
+
+\Kudos\ with UFS is about 20\% slower than FreeBSD using soft updates for
+writes, and a little over a factor of two slower for deletions. This shows
+that, although it is slow, \Kudos\ is close to running in acceptable time.
+While \Kudos\ has CPU usage and I/O delay problems, we believe they can be
+fixed, given time and effort. Improvements to \chdesc\ arrangements and
+\chdesc\ traversal algorithms will make a strong impact on performance.
+The file system has a significant role in regards to optimizations, since it
+is the primary source for the creation of
+\chdescs\ (see \S\ref{sec:discussion}).
+
+\subsection {Block Writes}
+
+We have also looked at the number of block writes that \Kudos\ makes
+relative to other systems for several operations. To do this, we
+instrumented the \Kudos\ and FreeBSD disk drivers to report the number
+of writes to disk. In one test, we create 100 small files in a directory and
+measure the number of blocks written to disk. \Kudos\ writes 122 blocks, while
+FreeBSD writes 135 blocks. Differing policies for summary information updates,
+as well as incomplete support for auxiliary data structures, account for the
+discrepancy.
+
+Additionally, we ran the two small benchmarks with the journal module,
+which does full data journaling. Creating 100 small files with the journal
+resulted in 245 blocks written to the disk, but only 126 blocks
+without the journal. Deleting and adding a file resulted in writing
+31 with the journal module and 18 without it. As expected, the number of writes
+with journaling are approximately twice as much as those for without
+journaling.
+
+To verify the correctness of our implementation, we begin with a valid file
+system created by FreeBSD. Then we run our tests and copy the resulting disk
+images to a FreeBSD machine. Using the \emph{fsck} tool on FreeBSD, we check
+the modified file systems and verify their integrity. From this we gather that
+our UFS, soft updates, and journal implementations are correct.
+

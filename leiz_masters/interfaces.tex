@@ -1,0 +1,95 @@
+\subsection{Kudos Interfaces}
+\label{sec:interfaces}
+
+Componentized systems need well-defined interfaces to connect modules together.
+Previously, Heidemann~\cite{heidemann91layered} have tried to hook up modules
+together like Unix pipes. For such a solution to work, there can only be one
+interface, as the input and output interfaces must be symmetrical. It is
+difficult to settle on a single interface for all modules. If the interface is
+too narrow, then that limits the level of module interaction. Make the
+interface too wide, on the other hand, and it becomes unnecessarily complex
+and open for misuse. We recognized this as a design limitation that reduces
+flexibility in extensible file systems. With this in mind, we designed several
+interfaces, each for a specific purpose. For \Kudos, the three different
+interfaces are CFS, LFS, and BD.
+
+The interface that sits closest to userland is CFS, the
+\emph{common file system} interface. Like a VFS interface, CFS provides a set
+of high-level file operations. To hook into the operating system, a top-level
+module receives system calls and make the corresponding CFS calls.
+\Modules\ connected via the CFS interface can then translate and manipulate any
+high-level file operation that passes through. On the other end, the interface
+that sits directly above the storage devices is BD, the \emph{block device}
+interface. BD deals with data in terms of blocks and facilitates the transfer
+of data blocks to and from the underlying storage devices. Similar to CFS,
+modules with BD interfaces can transform and control the data flow in a number
+of ways.
+
+The third, and more novel \Kudos\ \module\ interface is LFS, the
+\emph{low-level file system} interface. Other systems have interfaces similar
+to CFS and BD, but \Kudos\ introduces an intermediate interface that sits in
+between CFS and BD. Here, the interface works at the file system level, and
+consists of methods that deal with operations like the creation and deletion
+of directory entries; the allocation, appending, and truncating of file blocks;
+and management of file system metadata. LFS acts as a middle layer between CFS
+and BD, since CFS has no knowledge of disk blocks, and BD has no concept of
+files. Naturally, this is where the file system modules and related parts go.
+They take high-level CFS calls, break them down into low-level LFS calls, and
+issue BD calls in response. Figure \ref{fig:lfs} outlines the methods we
+expose at the LFS interface.
+
+\begin{figure}[thb]
+\vskip-14pt
+\begin{tabular}{@{\hskip0.25in}p{2in}@{}}
+\begin{scriptsize}
+\begin{alltt}
+int (*\textbf{get_root})(inode_t *inode);
+uint32_t (*\textbf{allocate_block})(
+    fdesc_t *file, int purpose,
+    chdesc_t **head);
+int (*\textbf{free_block})(
+    fdesc_t *file, uint32_t block,
+    chdesc_t **head);
+bdesc_t *(*\textbf{lookup_block})(uint32_t number);
+int (*\textbf{write_block})(
+    bdesc_t *block, chdesc_t **head);
+int (*\textbf{lookup_name})(
+    inode_t parent, const char *name,
+    inode_t *inode);
+fdesc_t *(*\textbf{lookup_inode})(inode_t inode);
+void (*\textbf{free_fdesc})(fdesc_t *fdesc);
+uint32_t (*\textbf{get_file_numblocks})(fdesc_t *file);
+uint32_t (*\textbf{get_file_block})(
+    fdesc_t *file, uint32_t offset);
+int (*\textbf{get_dirent})(
+    fdesc_t *file, struct dirent *entry,
+    uint16_t size, uint32_t *basep);
+int (*\textbf{append_file_block})(
+    fdesc_t *file, uint32_t block,
+    chdesc_t **head);
+uint32_t (*\textbf{truncate_file_block})(
+    fdesc_t *file, chdesc_t **head);
+fdesc_t *(*\textbf{allocate_name})(
+    inode_t parent, const char *name,
+    uint8_t type, fdesc_t *link,
+    inode_t *newinode, chdesc_t **head);
+int (*\textbf{remove_name})(
+    inode_t parent, const char *name,
+    chdesc_t **head);
+int (*\textbf{rename})(
+    inode_t oldparent, const char *oldname,
+    inode_t newparent, const char *newname,
+    chdesc_t **head);
+int (*\textbf{get_metadata})(
+    inode_t inode, uint32_t id,
+    size_t size, void *data);
+int (*\textbf{set_metadata})(
+    inode_t inode, uint32_t id,
+    size_t size, const void *data,
+    chdesc_t **head);
+\end{alltt}
+\end{scriptsize}
+\end{tabular}
+\vspace{-10pt}
+\caption{\label{fig:lfs} Important functions in the LFS interface.}
+\end{figure}

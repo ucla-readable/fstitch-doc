@@ -1,0 +1,147 @@
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
+\section {Introduction}
+\label{sec:intro}
+
+Trends in file system development have led to improvements in reliability,
+security, and usability. Reliability mechanisms like journaling and soft
+updates are commonplace in modern file systems. Some file systems like ZFS
+even have built-in checksumming. In terms of security and usability, an
+increasing number of file systems have features like access control lists,
+extended attributes, encryption, and compression. With growing demand for
+additional capabilities from the file system, there comes a need to examine and
+enhance methodologies for file system development.
+
+Traditional file system implementations have been tightly coupled with a given
+operating system.
+While this yields benefits in term of performance and integrations, strong
+reliance on specific operating system features like buffer cache behavior
+makes file systems less portable and harder to develop. Currently,
+sophisticated file system consistency features like soft updates and
+journaling exist on FreeBSD and Linux, respectively. Despite the wide
+availability of the source code to both operating systems, neither operating
+system has been able to adopt the other's consistency mechanism.
+The file system development process can be improved, with code that is easier
+to comprehend, with more focus on the file system rather than other parts of
+the operating system, while taking advantage of programming concepts such as
+modules and well-defined interfaces. We strive to meet these goals in \Kudos,
+our novel file system architecture.
+\Kudos\ includes a file system module that implements the popular Unix File
+System, to showcase the advances we made in extensibility and flexibility.
+Our Unix File System component implements the functionalities necessary to
+manipulate the on-disk format for a complex file system. It cooperates with
+other \Kudos\ components to make file system consistency features easier to
+understand. Our file system design also takes advantage of modularity to
+support pluggable policies for tasks such as block allocation and directory
+index traversal.
+
+The Kudos File System Architecture is a joint project with Andrew de los Reyes,
+Chris Frost, Mike Mammarella, and Professor Eddie Kohler. The work on
+\Kudos\ is the result of our cumulative efforts. My main contribution to Kudos
+is the development of the Unix File System component and infrastructure for
+pluggable file system policies. This document highlight my individual
+contributions, in the context of the \Kudos\ architecture.
+
+\subsection{Related Work}
+
+\paragraph{Stackable File Systems}
+
+In the field of file system research, there have been many projects that
+aim to improve file system functionality through modular
+design~\cite{geom, rosenthal90evolving, heidemann91layered, skinner93stacking,
+heidemann94filesystem, zadok99extending, zadok00fist, wright01ncryptfs,
+wright06versatility}. Many of these projects concentrate their efforts on
+specific portions of the system. For example, FiST~\cite{zadok00fist} and
+related ``stackable'' file systems attach modules above some existing file
+system to add new features. They do not deal with lower level issues like
+caches, disks, and consistency.
+GEOM~\cite{geom} works from the opposite direction, where it improves
+modularity at the disk block level, but cannot assert any control over higher
+level file operations. Neither of these approaches assert enough control over
+the file system architecture to implement consistency mechanism like soft
+updates and journaling.
+
+\paragraph{Consistency}
+
+Soft updates~\cite{ganger00soft} significantly lowers the overhead required to
+provide file system consistency. By carefully ordering writes to disk, soft
+updates avoids the need for synchronous writes to disk or duplicate writes to
+a journal. Soft updates also guarantees a strong level of consistency after a
+crash, enough so that the system can avoid time-consuming file system
+consistency checks using a utility like \emph{fsck}.
+
+Another method to protecting the integrity of the file system is to write
+upcoming operations to a journal first. The content and the layout of the
+journal varies in each implementation, but in all cases, the system can use
+the journal to play out or roll back the operations that did not complete
+as a result of a crash. Thus, \emph{fsck} can be avoided by consulting the
+journal when recovering from a crash. 
+
+Current soft update and journaling implementations are specifically designed
+for some given file system. Without a formal way to express write ordering
+and dependencies, many file systems had to make their own mechanisms to enforce
+consistency.
+
+\paragraph{File System Enhancements}
+
+A variety of extensions to file systems have been proposed in recent work, like
+the FS2 Free Space File System~\cite{huang05fs2} and encrypting file systems
+like NCryptfs~\cite{wright01ncryptfs}. For UFS, Dowse and
+Malone~\cite{dowse02recent} outline recent improvements in the FreeBSD
+implementation, including soft updates, directory index hashing, and better
+allocation algorithms.
+
+\subsection{Our Approach}
+
+The Kudos File System Architecture makes file system development easier
+through a modular system, with a new abstraction for data dependencies.
+By decomposing the entire disk I/O subsystem in pluggable modules connected via
+clean interfaces, we improve the system's configurability, extensibility, and
+readability. Having modules that span from system calls to block devices,
+\Kudos\ is not limited to one layer of the system. To provide a universal
+method for modules to specify writes to disk and their dependencies, we
+created the concept of \emph{change descriptors}.
+
+In \Kudos, modularity separates the system into components with well-defined
+roles. Each component represents a small problem that is simple to understand
+and relatively easy to solve. We recognized the core functionality of a file
+system component is to correctly manipulate the on-disk format that defines
+the file system. \Kudos\ file system developers concentrate their efforts on
+this, and leave problems such as enforcing disk consistency to others.
+
+The complete \Kudos\ \emph{architecture} consists of more than just the file
+system. We have created our own modules to interface with userland, to
+interface with the file system, to add journaling, and more. With control
+over the entire system, we can move many responsibilities of a traditional
+file system into separate components. For instance, many file systems
+implementations have similar code for satisfying user requests. We
+consolidated this code into its own module, so \Kudos\ file systems do not have
+to reimplement it. Likewise, each file system should not do its own journaling
+and write ordering enforcement, so those features are encapsulated into their
+own modules as well.
+
+A modular system like \Kudos\ needs good inter-module communication to function
+effectively. For file system modules, there needs to be a way to convey 
+write ordering information to satisfy file system consistency. To do this,
+data structures called change descriptors represent writes to disk.
+More so, change descriptors contain dependency information to indicate the
+order writes should be applied to disk. This offers file system developers a
+convenient way to describe consistency constraints for mechanisms such as soft
+updates and journaling.
+
+In Section \ref{sec:consistency} we discuss the file system consistency
+protocols that motivated our work.
+Section \ref{sec:kudos} gives an overview of the interfaces and modules in the
+Kudos File System Architecture, as well as the change descriptor concept.
+Section \ref{sec:ufs} explains the Unix File System, its data structures, and
+properties that make it unique.
+Next, we go into detail about our Unix File System implementation for
+\Kudos\ in Section \ref{sec:implementation}. We describe the design and
+implementation, and we share our experiences on using change descriptors
+effectively.
+Section \ref{sec:evaluation} compares the \Kudos\ Unix File System to file
+systems on FreeBSD and Linux. 
+Section \ref{sec:discussion} looks at future improvements for \Kudos\ file
+system implementations.
+Finally, we conclude in Section \ref{sec:conclusion}.
+

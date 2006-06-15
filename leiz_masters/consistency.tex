@@ -1,0 +1,39 @@
+\section{Consistency}
+\label{sec:consistency}
+
+To better understand factors that influenced our design decisions, we examine
+file system consistency protocols and shortcomings in their implementations.
+Two mainstream methods for file system consistency are journaling and soft
+updates. Journaling has been around longer and this is evident by the number of
+file systems that use it: ext3, HFS+, JFS, NTFS, Reiserfs, and XFS, to name a
+few. In contrast, soft updates is a relatively new concept and is only widely
+used for UFS on the BSD family of operating systems.
+
+\input{journaling}
+
+\input{softupdates}
+
+\subsection{Current Implementations}
+\label{sec:consistency:implementations}
+While implementations of journaling and soft updates protect file systems
+and provide good performance, they leave much to be desired in terms of
+modularity, code reuse, and simplicity. Many file system implementations have
+journaling code that is closely-coupled with the rest of the file system.
+For instance, all the journaled file systems on Linux have their own code for
+journaling. Although there have been attempts to provide journaling capability
+as a separate \module, none of the attempts have been successful. On FreeBSD,
+the Gjournal project for GEOM is incomplete and cannot replace a proper
+journaled file system. Apple's OS X provides a generic journaling layer, but
+thus far it has only been used with HFS+. Similarly, Linux's ext3
+implementation is the sole user of Linux's generic journaling block device.
+The source code for ext3 also has much in common with the code for ext2, its
+non-journaled predecessor, yet there is little code sharing between the two
+other than common header files. For soft updates, the fundamental idea of
+sequencing writes is built into the implementation, thus making modularity
+hard or impossible. The soft updates implementations can improve on
+simplicity, however. For UFS on FreeBSD, soft updates uses 16 different types
+of data structures to manage dependencies for various parts of the file
+system. Though there are advantages to having specialized dependency
+structures, it is more difficult to understand them and manage their
+interactions with each other.
+

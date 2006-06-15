@@ -1,0 +1,33 @@
+\subsection{Change Descriptors}
+\label{sec:chdescs}
+
+In order to indicate modifications to disk blocks, \Kudos\ uses a data
+structure called the \chdesc. Fundamentally, a \chdesc\ contains
+information about the block it is on, what part of the block it is modifying,
+the content of the block before and after the change, and ordering information
+relative to other \chdescs. Whenever \Kudos\ \modules\ in the system
+need to make changes to the disk, they generate \chdescs. Like
+packets in a network, \chdescs\ flow through the \module\ graph until
+they eventually reach the disk, where they are \emph{satisfied}. To place
+ordering restraints on which \chdescs\ reach the disk first,
+\modules\ can create dependencies between \chdescs. For any \chdesc,
+it cannot be satisfied unless its dependencies are satisfied, and none of its
+dependents will be satisfied until it is satisfied. \Kudos\ uses this ability
+to control write ordering for consistency mechanisms like journaling and soft
+updates.
+
+For efficiency, \Kudos\ has three different types of \chdescs.
+The byte \chdesc\ is the one most similar to the ideal change
+descriptor mentioned above. It records changes for a byte range up to the size
+of a block. The bit \chdesc\ is an optimized version used for
+bitmap changes common to file systems. Rather than storing a byte range, the
+bit \chdesc\ stores an xor value for 32-bits. The third type, the
+\noop\ \chdesc, does not modify the disk at all. It exists as a
+convenient way to refer to a set of \chdescs. When a
+\noop\ \chdesc\ depends on a set of other \chdesc, or vice versa, the
+entire set will inherit any dependencies or dependents added to the
+\noop\ \chdesc. Additionally, at times it may come in handy to temporarily
+stop the flow of \chdescs\ through the \module\ graph, such as in the
+case of the journal \module. Using a \noop\ \chdesc, stopping it from
+being satisfied will also prevent any of its dependents from being satisfied.
+

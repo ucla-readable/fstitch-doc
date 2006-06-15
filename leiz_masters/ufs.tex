@@ -1,0 +1,168 @@
+\section{UFS}
+\label{sec:ufs}
+
+The Unix File System (UFS) is a popular file system used by the BSD family of
+operating systems. It is the modern incarnation of the Fast File
+System~\cite{mckusick84fast} used in 4.2 BSD, which in turn is derived from the
+original file system used on Unix. Given its deeply rooted history in Unix,
+many operating systems based on Unix either use a variant of UFS, like with
+Solaris and HP-UX, or a file system strongly influenced by UFS, like with
+Linux's ext2. Simplified versions of UFS, such as the Minix file system, are
+commonly used in academia to teach basic file system concepts.
+
+For the current version of UFS, there are two variants. The original, UFS1, is
+supported by all operating systems in the BSD family. The newer variant, UFS2,
+is only supported by FreeBSD and NetBSD. UFS2 switched to 64-bit pointers in
+order to break existing size limitations. UFS2 also added support for features
+like extended attributes and got rid of legacy data structure fields that are
+no longer relevant.
+
+\subsection{UFS Data Structures}
+\label{sec:ufs:structs}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=200pt]{fig/figures_8}
+  \caption{\label{fig:ufs_sb} Layout of the Unix File System.}
+\end{figure}
+
+The seven major data structures in UFS are: the superblock, cylinder groups,
+resource allocation bitmaps, inodes, directories, data blocks, and summary
+information.
+
+The superblock contains general information about the file system and disk
+geometry. Some of the essential fields include the size of fragments and
+blocks, the size of the file system, the number of cylinder groups, and where
+data structures are relative to the beginning of the cylinder groups. There
+are also non-essential fields that provide information such as whether the
+file system is clean and how much free space to reserve. For convenience, the
+UFS superblock has many redundant fields that are not strictly necessary
+because it is possible to calculate them using other fields. An example of this
+is the number of fragments in a block, which is the block size divided by the
+fragment size. Some fields in the superblock are no longer used but exist for
+historical reasons. Many years ago, knowledge of the disk geometry enabled
+storage optimizations. Although the data fields remain, they are useless for
+modern disk drives because the logical disk geometry no longer reflect the
+actual disk layout.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=200pt]{fig/figures_9}
+  \caption{\label{fig:ufs_cg} Layout of the UFS cylinder group.}
+\end{figure}
+
+To achieve better disk locality and to distribute the data structures for
+more robustness, UFS divides the file system into a number of cylinder groups.
+Each cylinder group in UFS is a smaller, self contained file system, with its
+own bitmaps, inode table, data blocks, and backup of the superblock. At the
+beginning of each cylinder group, there exists a group descriptor with
+information about that cylinder. In particular, cylinder group descriptors
+contain lots of statistics and summary information regarding resource
+allocations, so the file system driver can make better allocation decisions.
+
+UFS use bitmaps to keep track of three important resource: blocks, fragments,
+and inodes. Each cylinder group contains a fixed number of these resources,
+thus UFS uses contiguous, static bitmaps to keep track of them efficiently.
+Since different file systems can have different sized cylinder groups, the
+bitmaps' locations are given as relative offsets to the start of the group
+descriptors. To indicate free blocks and fragments, UFS marks them with the
+value 1, but for free inodes, UFS marks them with the value 0.
+
+Inodes are internal objects that UFS use to represent files. Rather than
+identifying files directly with names, UFS refer to inodes by numbers. This
+indirectness makes it easier to have hard links, where multiple names refer to
+the same file object. The first few inodes are special: inode 0 and 1 are
+reserved, and inode 2 refers to the root directory. Inodes contain all the
+vital information for files, including file type, link count, size, data blocks
+used, and ownership information. To refer to the data blocks, UFS has 12 direct
+block pointers, and three additional pointers for the single, double, and
+triple indirect pointers. The direct block pointer values are the block numbers
+for file data blocks. The indirect block pointer values are the block numbers
+for blocks that contain block pointers with one less degree of indirectness.
+
+To associate file names with inodes, directories contain entries that map
+the two identifiers. Each directory entry contains an inode value, a
+variable-sized file name, the length of the file name string, and the length
+of the directory entry. All directory entry sizes are multiples of 4 bytes,
+and they are chained together in a linked list, so the entry length field act
+as the pointer to the next entry.
+
+Besides areas reserved for metadata, UFS divides the rest of the disk into
+data blocks. One problem many general purpose file systems face is the sizing
+of the data block. Big data blocks are easier to manage, but they do not
+utilize the disk efficiently for smaller files. Small data blocks use disk
+space more efficiently, but they can cause external fragmentation and they
+present more overhead. To solve this problem, UFS use relatively big data
+blocks, but UFS further divides data blocks into fragments. Typically, each
+block contains 8 equal-sized fragments. For small files, UFS will only
+allocate fragments to conserve file space. As files grow in size, UFS will
+switch to blocks for speed.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=200pt]{fig/figures_10}
+  \caption{\label{fig:ufs_data} Directories point to inodes, which in turn,
+	  point to data blocks.}
+\end{figure}
+
+Throughout the UFS data structures, there are fields that contain summary
+information. For instance, every cylinder group and the superblock has
+knowledge of the number of free blocks, inodes, and fragments. In principle,
+UFS does not need summary information, since it is possible to read the bitmaps
+and calculate the summary information. However, caching this information saves
+UFS from having to recalculate it, at the risk of the summary information
+being out of sync from the actual values.
+
+
+\subsection{UFS Features and Requirements}
+\label{sec:ufs:features}
+
+As a complete and relatively complex file system, UFS has peculiarities that
+make it difficult to fully comprehend how some parts of it work. Specifically,
+the UFS directory structure and the relationship between fragments and blocks
+are two of the harder concepts to understand.
+
+The basic UFS directory structure seems fairly simple, but the actual rules
+governing its use has several quirks. Directories are just names that point
+to inodes, like any other file object in UFS. The size of a directory is
+always a multiple of 512 bytes, even if it does not need that much space, or
+if more disk space is actually allocated. To see how these two situations can
+occur, take an empty directory, with only the ``.'' and ``..'' entries.
+This takes up 24 bytes in the directory, yet its size is 512 bytes.
+At the same time, if the fragment size for this file system is 2048 bytes, at
+the minimum, UFS has to allocate this directory 2048 bytes. Directory entries
+can only increase in size, never decrease. They also never cross this 512 byte
+boundary. Given a 512 byte directory with 480 bytes worth of entries, if the
+next added entry is 36 bytes, UFS will not put it right after the existing
+entries. Instead, it extend the directory size to 1024 bytes, and start the new
+entry at the 512 byte offset, wasting the last 32 bytes in the first sector.
+This behavior may be due to historical reasons, but it also seems to be more
+resilient to corruption that breaks the linked list, since every 512 byte
+region is in a way separated from the adjacent sectors. Should some content in
+the directory become corrupt, UFS can still recover other parts of the
+directory starting from any 512 byte offset within the directory. Being a
+linked list, when items get deleted, the next pointer of the previous entry
+needs to be modified to point to the next item of the deleted entry. This
+presents a problem when the first entry in a sector, the head, gets deleted.
+In UFS, when this scenario occurs, the inode number of that entry becomes 0.
+UFS understands this entry has been intentionally blanked out and it is not a
+valid file, but its next pointer is valid and should be used to find the next
+file in the chain.
+
+The other unusual property of UFS involves fragments and blocks, where a
+constant set of aligned fragments make up a block. Most files have data stored
+in blocks, with the trailing bits that does need a full block stored in a
+contiguous chain of fragments. For very small files, UFS conserves space and
+stores them in just fragments. As the file grows, UFS extends the file using
+fragments. For example, if the file uses fragment 60 initially, then UFS will
+append to it fragment 61, 62, and so on. One issue that presents a problem is
+when fragment 62 has been allocated to another file. Although most UFS
+implementations will try to avoid this, it can occur either due to poor
+allocation algorithms or lack of free space. To get around it, UFS will have
+to relocate the entire fragment chain elsewhere. Likewise, a chain of fragments
+cannot cross the block alignment boundaries, so if the example file tries to
+go past fragment 64, the chain has to be relocated. Once a file gets big enough
+to require the use of indirect blocks, then UFS no longer bother with
+fragments and just use blocks, as the amount of waste relative to the file size
+is much smaller.
+

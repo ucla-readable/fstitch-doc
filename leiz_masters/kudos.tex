@@ -1,0 +1,32 @@
+\section {Kudos}
+\label{sec:kudos}
+
+The Kudos File System Architecture (Kudos) is a modular system designed for
+the flexibility, extensibility, and readability of file systems and related
+software. Being a \emph{file system architecture}, \Kudos\ encompasses more
+than just the file system. To interface with userland, \Kudos\ implements a
+VFS layer.
+From there on, \Kudos\ has its own file system, cache, and block devices.
+Additionally, \Kudos\ introduces a new concept we call
+\emph{change descriptors}.
+To support them, we have implemented libraries to create, manipulate, and use
+change descriptors. Our software has been ported to Linux, both as a kernel
+module, and as a userland server connected via FUSE. The file server is also
+an integral part of a JOS-derived experimental operating system that shares
+the \Kudos\ name.
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[height=3in]{fig/figures_1}
+  \caption{A running \Kudos\ configuration. {\it/} is a soft updated
+    file system on an IDE drive; {\it/loop} is an externally journaled
+    file system on loop devices.}
+  \label{fig:kfs-graph}
+\end{figure}
+
+\input{interfaces}
+
+\input{modules}
+
+\input{chdescs}
+

@@ -1,0 +1,38 @@
+\subsection{Journaling}
+\label{sec:journaling}
+
+Journaling improves file system consistency by keeping track of writes to
+disk. Typically the file system reserves a small section of the disk and
+designates it as the journal. Instead of directly writing a file system
+operation to the disk, journaled file systems will first log the operation to
+the journal area. After writing the journal record, the actual operation takes
+place. To complete the operation, journaled file systems will write a commit
+record to the journal to indicate the operation has been completed. By
+ensuring writes to the journal occur before writes to the file system, a
+journaled file system records enough information to recover from a crash.
+
+With journaling, if the system experiences a failure that causes a restart,
+the system can refer to the journal and either complete or rollback any
+outstanding operations from the time of the crash. This knowledge of the
+status of the file system means time-consuming file system checks can be
+avoided. Depending on the amount of data recorded to the journal, the system
+can make different levels of guarantees regarding the integrity of the file
+system.
+The robustness gained from journaling comes at the price of redundant writes.
+For any data written to the journal, the file system will have to write it
+again to the disk. Journaling also incurs extra disk seeks between the journal
+and data area, reducing disk bandwidth even further.
+
+%For instance, Linux's ext3 supports three journaling modes. In
+%\emph{journal} mode, ext3 records everything to the journal to achieve the
+%best level of integrity. In both \emph{ordered} and \emph{writeback} mode, the
+%file system will only write metadata to the journal. The difference being
+%\emph{ordered} mode will write data to disk before committing the associated
+%metadata to the journal, whereas \emph{writeback} mode can write data and
+%metadata in any order. Both metadata only modes ensures the file system will
+%be consistent, but makes little or no guarantees for data integrity.
+
+%Compared to a file system without journaling, metadata only journaling is
+%slightly slower for write operations. Full data journaling takes a more
+%significant performance hit, oftentimes halving the write throughput rate.
+

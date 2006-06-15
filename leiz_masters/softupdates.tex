@@ -1,0 +1,38 @@
+\subsection{Soft Updates}
+\label{sec:softupdates}
+
+Soft updates takes a different approach where the system carefully orders
+writes to disk. By following a few safety principles, soft
+updates' \emph{update dependencies} ensures the disk is consistent after every
+write. This gives file system integrity guarantees without a journal and the
+associated redundant writes. 
+
+For soft updates, the three golden rules are: never point to a structure
+before it has been initialized; never reuse a resource before nullifying
+all previous pointers to it; and never reset the last pointer to a live
+resource before a new pointer has been set. Although it seems easy to just
+follow these rules and write changes out to disk in a proper order, the
+reality of the situation is not that simple. Caches flush data out to disk
+in the unit of sectors or blocks, not in terms of byte-level changes. This
+leads to situations where the cache needs to write changes out to disk, but
+the byte-level dependencies create cyclic dependencies at the block level.
+To solve this problem, soft updates uses \emph{dependency structures} to
+retain the state of data structures before and after changes occur. With the
+ability to undo changes, soft updates can break block-level cyclic dependencies
+by reverting changes that cannot be safely written to disk. Once the cycle has
+been broken, soft updates restores the reverted changes and writes them out at
+a later time.
+%Compared to an unsafe file system, this presents a small
+%overhead, as it does generate more writes. With respect to journaling, soft
+%updates writes less to the disk, since it does its bookkeeping in memory.
+%
+%There are some drawbacks to soft updates for consistency and crash recovery.
+%Whereas a journaled file system can refer to the journal, soft updates has no
+%persistent information available after a crash. The soft updates rules protect
+%against inconsistencies that leads to corrupt data, but it does not protect
+%against resource leaks. As a result, unused disk blocks and inodes can be
+%marked as used, and inodes may have higher link counts than actual link counts.
+%To correct these problems, a file system using soft updates still requires
+%a file system check, though it can be done in the background while the file
+%system is online.
+
