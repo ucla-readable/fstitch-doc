@@ -24,7 +24,7 @@ allocation) hidden within the file system \module. For instance, UFS uses
 2KB \emph{fragments} to store small files efficiently. Once a file gets big
 enough to require the use of indirect blocks, then UFS changes its allocation
 policy and starts allocating 16KB \emph{blocks}, where a block is made up of 8
-aligned and contiguous fragments. Our UFS \module\ implement this by using
+aligned and contiguous fragments. Our UFS \module\ implements this by using
 fragments as the basic block size. For large files, our UFS \module\ internally
 allocates a block, but returns only the first fragment in that block at the LFS
 level. The next 7 allocation calls will be no-ops that simply return the
