@@ -9,10 +9,10 @@ how to do profile using oprofile.
    - Or build a profiling kernel by enabling CONFIG_OPROFILE (module)
 2. load kkfsd and prepare to run the benchmark
 3. setup and start oprofile:
-	$ sudo opcontrol --reset
 	$ sudo opcontrol --setup --separate=kernel --vmlinux=/boot/vmlinux-2.6.12-kudos-prof
 	# you might enable deeper callstacks here, opcontrol --callgraph <n>
 	$ sudo opcontrol --start
+	$ sudo opcontrol --reset
 4. run the test
 5. stop oprofile:
 	$ sudo opcontrol --stop
