@@ -1,0 +1,312 @@
+\documentclass{article}
+
+\usepackage{fullpage}
+\usepackage{amsthm}
+\usepackage{amssymb}
+
+\newtheorem{thm}{Theorem}[section]
+\theoremstyle{definition}
+\newtheorem{chrule}{Rule}[section]
+
+\newcommand{\cd}[1]{\ensuremath{#1}}
+\newcommand{\cdb}[2]{\ensuremath{\cd{#1}_#2}}
+
+\newcommand{\dcd}[1]{\ensuremath{\cd{#1}^\mathrm{d}}}
+\newcommand{\ncd}[1]{\ensuremath{\cd{#1}^\mathrm{n}}}
+\newcommand{\rb}[1]{\ensuremath{\cd{#1}^\mathrm{rb}}}
+\newcommand{\nrb}[1]{\ensuremath{\cd{#1}^\mathrm{nrb}}}
+
+\newcommand{\drb}[1]{\ensuremath{\cd{#1}^\mathrm{d,rb}}}
+\newcommand{\nooprb}[1]{\ensuremath{\cd{#1}^\mathrm{n,rb}}}
+\newcommand{\dnrb}[1]{\ensuremath{\cd{#1}^\mathrm{d,nrb}}}
+
+\newcommand{\depends}[2]{\ensuremath{#1\! \rightarrow\! #2}}
+\newcommand{\ldepends}[2]{\ensuremath{#1\! \leftarrow\! #2}}
+\newcommand{\indirdepends}[2]{\ensuremath{#1\! \leadsto\! #2}}
+\newcommand{\cycledepends}[2]{\ensuremath{#1\! \leftrightarrow\! #2}}
+
+\newcommand{\cdset}[1]{\ensuremath{\mathbf{#1}}}
+
+\title{Change Descriptor Optimization Safety}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+This document's purpose is to prove the safety of kudos change
+descriptor optimizations. Safety means not inducing dependency cycles
+right now, but later on we may be interested in preserving other
+properties (e.g. comitting changes to disk in reasonable time).
+%
+In this document \textbf{Rule}s describe all permitted change
+descriptor operations and \textbf{Theorem}s state their
+safety/preservation properties.
+%
+Don't be fooled that since these proofs are typeset that they are thus
+holeless or unquestionable; they are merely enough to mostly convince
+me that the theorems are true. Mention anything that seems
+questionable to you.
+
+Exciting notation:
+\begin{itemize}
+\item \cd{A} names an arbitrary change descriptor
+\item \dcd{A} changes disk data, \ncd{A} makes no changes itself
+\item \rb{A} can be rolled back, \nrb{A} cannot
+\item \cdb{A}{k} is on block $k$
+\item \depends{\cd{A}}{\cd{B}} shows that \cd{A} directly depends on
+  \cd{B}, \indirdepends{\cd{A}}{\cd{B}} shows that \cd{A}, perhaps
+  indirectly, depends on \cd{B}
+\end{itemize}
+\section{Basics}
+\label{sec:basics}
+
+Nonrollbackable change descriptors require a restriction of dependency
+operations; this section introduces these restricted versions of
+existing change descriptor operations.
+
+\subsection{General}
+\label{sec:basics:general}
+
+\begin{chrule}[Create \rb{A}]\label{chrule:create}
+  \mbox{}\\
+  Precondition: \(\cdset{B} \subseteq \mbox{Existing change descriptors}\).\\
+  Allowed: Create \rb{A} and \(\forall \cd{B}\! \in\! \cdset{B}\!: \mbox{create}\ \depends{\rb{A}}{\cd{B}}\).
+\end{chrule}
+
+\begin{thm}\label{thm:createsafe}
+  No change descriptor dependency cycle can arise from
+  Rule~\ref{chrule:create}.
+\end{thm}
+\begin{proof}
+  By contradiction.
+  %
+  For there to be a cycle there must be some change descriptor(s)
+  \cd{A} and \cd{B} such that \indirdepends{\cd{A}}{\cd{B}} and
+  \indirdepends{\cd{B}}{\cd{A}}.
+  %
+  By Rule~\ref{chrule:create}, \indirdepends{\cd{X}}{\cd{Y}} implies
+  \cd{X} was created after \cd{Y}. Thus \cd{A} existed prior to \cd{B}
+  and \cd{B} existed prior to \cd{A}. But this existance ordering is
+  invalid.  Therefore there is no way to create a cycle.
+\end{proof}
+
+\begin{chrule}[Destroy \cd{A}]\label{chrule:destroy}
+  \mbox{}\\
+  Precondition: \(\nexists \cd{B}\!: \depends{\cd{A}}{\cd{B}}\).\\
+  Allowed: Destroy all \depends{\cd{B}}{\cd{A}} and destroy \cd{A}.
+\end{chrule}
+
+\begin{thm}\label{thm:destroysafe}
+  No change descriptor dependency cycle can arise from
+  Rules~\ref{chrule:create} and~\ref{chrule:destroy}.
+\end{thm}
+\begin{proof}
+  Any application of Rule~\ref{chrule:destroy} reduces a change
+  descriptor forest to one creatable using only
+  Rule~\ref{chrule:create}. Theorem~\ref{thm:createsafe} proves such
+  a forest cannot contain a cycle.
+\end{proof}
+\subsection{Noops}
+\label{sec:basics:noops}
+
+Section~\ref{sec:basics:general} is sufficient for all change descriptor
+usage, except for the journal block device and opgroups, which currently
+use less restrictive dependency additions.
+
+\begin{chrule}[Create \depends{\ncd{A}}{\cd{B}}]\label{chrule:noop-nc}
+  \mbox{}\\
+  Precondition: \(\nexists \cd{C}\!: \indirdepends{\cd{C}}{\ncd{A}}\).\\
+  Allowed: Create \depends{\ncd{A}}{\cd{B}}.
+\end{chrule}
+
+\begin{thm}\label{thm:noop-nc-unsafe}
+  Rules~\ref{chrule:create} and~\ref{chrule:noop-nc}:
+  \begin{enumerate}
+  \item can induce cycles of noops
+  \item can be used to make a non-noop depend on a cycle of noops
+  \item cannot induce cycles that involve non-noops
+  \end{enumerate}
+\end{thm}
+\begin{proof}
+  \mbox{}
+  \begin{enumerate}
+  \item Example of noop cycle creation: Create \ncd{A}. Add
+    \depends{\ncd{A}}{\ncd{A}}, allowed by Rule~\ref{chrule:noop-nc}.
+    This creates a cycle of noops.
+  \item Given the cycle \depends{\ncd{A}}{\ncd{A}}, create change
+    descriptor \dcd{B} with the dependency set \(\{\ncd{A}\}\). This creates
+    a \dcd{B} that depends on a noop cycle.
+  \item If a \ncd{A} has no non-noop dependents, adding
+    \depends{\ncd{A}}{\dcd{B}} cannot add a dependency on \cd{\dcd{B}}
+    to any non-noop. This is the only operation allowed by
+    Rule~\ref{chrule:noop-nc}, therefore the rule cannot be used to
+    induce cycles that involve a non-noop.
+  \end{enumerate}
+\end{proof}
+
+\begin{chrule}[Create \depends{\dcd{A}}{\ncd{B}}]\label{chrule:noop-cn}
+  \mbox{}\\
+  Precondition: \(\nexists \dcd{C}\!: \indirdepends{\ncd{B}}{\dcd{C}}\).\\
+  Allowed: Create \depends{\dcd{A}}{\ncd{B}}.
+\end{chrule}
+
+\begin{thm}\label{thm:noop-cn-unsafe}
+  Rules~\ref{chrule:create} and~\ref{chrule:noop-cn}:
+  \begin{enumerate}
+  \item can be used to make a non-noop depend on a cycle of noops
+  \item cannot induce cycles
+  \end{enumerate}
+\end{thm}
+\begin{proof}
+  \mbox{}
+  \begin{enumerate}
+  \item Example: Given \dcd{A} and the noop cycle \depends{\ncd{B}}{\ncd{B}},
+    Rule~\ref{chrule:noop-cn} allows the dependency addition
+    \depends{\dcd{A}}{\ncd{B}}.
+  \item By contradiction.
+    %
+    Suppose we use Rule~\ref{chrule:noop-cn} to add
+    \depends{\dcd{A}}{\ncd{B}}. For this to induce a cycle, it must
+    already be that \indirdepends{\ncd{B}}{\dcd{A}}. But this violates
+    the application of Rule~\ref{chrule:noop-cn}.
+  \end{enumerate}
+\end{proof}
+
+\begin{thm}\label{thm:noop-cnnc}
+  Rules~\ref{chrule:create}, \ref{chrule:noop-nc},
+  and~\ref{chrule:noop-cn} cannot be used to create a cycle involving
+  non-noops.
+\end{thm}
+\begin{proof}
+  By assumption.
+\end{proof}
+
+\section{Nonrollbackable Change Descriptors}
+
+After bdescs, kudos's largest memory usage goes to byte change
+descriptors' copy of the previous data. Many change descriptors are
+never rolled back, however. This section introduces rules that detect
+that a change descriptor will never need to be rolled back, allowing
+its block data copy to be omitted (rendering the change descriptor
+nonrollbackable).
+
+\begin{chrule}[Create \cdb{\dnrb{A}}{k}]\label{chrule:nrb}
+  \mbox{}\\
+  Precondition: \(\cdset{B} \subseteq \mbox{Existing change descriptors}\).\\
+  Precondition: \(\forall \cdb{B}{k}\!: \nexists \cdb{C}{l}, k \neq l\!: \depends{\cdb{C}{l}}{\cdb{B}{k}}\).\\
+  Allowed: Create \cdb{\dnrb{A}}{k},
+  \(\forall \cd{B}\! \in\! \cdset{B}\!: \mbox{create}\ \depends{\cdb{\dnrb{A}}{k}}{\cd{B}}\),
+  and \(\forall \cdb{B}{k}\!: \mbox{create}\ \depends{\cdb{B}{k}}{\cdb{\dnrb{A}}{k}}\).\\
+\end{chrule}
+
+Rule~\ref{chrule:nrb} can induce cycles, e.g. two nonrollbackables on
+a block must each be commited no later than the other. This is OK;
+avoiding inter-block dependency cycles is what actually matters to
+preserve dependencies. Kudos's nonrollbackable implementation does not
+explicity state nonrollbackable cyclic dependencies, it is simpler to
+change the revision slice code to not allow revisions that do not
+include all nonrollbackables on a revision's block. Proving that
+Rule~\ref{chrule:nrb} is safe is easiest if nonrollbackables
+dependencies are explicity, however. This means that for each
+nonrollbackable on a block, all other change descriptors on that block
+depend on the nonrollbackable.
+
+Note that this rule does not itself make change descriptors later
+created on the same block depend on nonrollbackables. This is allowed
+via the dependency set but its enforcement is not needed to consider
+dependency cycles.
+
+\begin{thm}\label{thm:nrbsafe}
+  No inter-block change descriptor dependency cycle can arise from
+  Rules~\ref{chrule:create} and~\ref{chrule:nrb}.
+\end{thm}
+\begin{proof}
+  By induction on the number of change descriptors.
+  %
+  Notice that Rule~\ref{chrule:nrb} has no effect on dependency cycles
+  unless there is a nonrollbackable on some block (else same as
+  non-nonrollbackable case) and at least a second change descriptor on
+  that same block (else nonrollbackables change nothing).
+  %
+  Further, there must be at least one change descriptor on another
+  block for there to be an inter-block cycle. This is thus the base
+  case.
+  \begin{itemize}
+  \item \textbf{Base case}\\
+    We consider three change descriptors. WLOG from the above, these
+    are \cdb{\dcd{A}}{1}, \cdb{\dcd{B}}{1}, and \cdb{\dcd{C}}{2}
+    (TODO: consider noops?).
+    %
+    Notice that creating a change descriptor with dependencies on all
+    existing change descriptors, as opposed to some subset, allows for
+    any cycle that could exist among these change descriptors to
+    exist. Therefore there are three cases to consider, one for each
+    of the three unique creation orderings:
+    \begin{enumerate}
+    \item Case: create \cdb{\dcd{A}}{1}, \cdb{\dcd{C}}{2},
+      then \cdb{\dcd{B}}{1}. This yields
+      \ldepends{\cdb{\dnrb{A}}{1}}
+               {\depends{\depends{\cdb{\drb{B}}{1}}
+                                 {\cdb{\dnrb{C}}{2}}}
+                        {\cdb{\dnrb{A}}{1}}}.
+    \item Case: create \cdb{\dcd{C}}{2}, \cdb{\dcd{A}}{1},
+      then \cdb{\dcd{B}}{1}. This yields
+      \ldepends{\cdb{\dnrb{C}}{2}}
+               {\depends{\cycledepends{\cdb{\dnrb{A}}{1}}
+                                      {\cdb{\dnrb{B}}{1}}}
+                        {\cdb{\dnrb{C}}{2}}}.
+    \item Case: create \cdb{\dcd{A}}{1}, \cdb{\dcd{B}}{1},
+      then \cdb{\dcd{C}}{2}. This yields
+      \depends{\cdb{\dnrb{C}}{2}}
+              {\cycledepends{\cdb{\dnrb{A}}{1}}
+                            {\ldepends{\cdb{\dnrb{B}}{1}}
+                                      {\cdb{\dnrb{C}}{2}}}}.
+    \end{enumerate}
+    This creates no inter-block dependency cycles.
+    \item \textbf{$n$ change descriptors}\\
+      Given: a change descriptor forest with $n-1$ change descriptors with no
+      inter-block cycles.\\
+      Show: creating a change descriptor \dcd{A} cannot induce an inter-block
+      cycle.
+      \begin{enumerate}
+      \item Case: \cdb{\dnrb{A}}{k}, where there are no existing
+        change descriptors on block $k$.\\
+        \cdb{\dnrb{A}}{k} depends on the set of all existing change
+        descriptors.  The existing change descriptors had no
+        inter-block cycles and the only added dependencies are from
+        the dependent-less \cdb{\dnrb{A}}{k} to the elements in this
+        set, so no inter-block cycles are created.
+      \item Case: \cdb{\dnrb{A}}{k}, where there are existing change
+        descriptors on block $k$ and none have dependents.\\
+        Block $k$ has no dependents, thus no inter-block cycles can be
+        induced.
+      \item Case: \cdb{\dcd{A}}{k}, where there are existing change
+        descriptors on block $k$ and at least one of them has a dependent.\\
+        \cdb{\dcd{A}}{k} has no dependents, thus no cycles can be induced.
+      \end{enumerate}
+  \end{itemize}
+  By induction on the number of change descriptors, Rules~\ref{chrule:create}
+  and~\ref{chrule:nrb} cannot be used to create an inter-block dependency
+  cycle.
+\end{proof}
+
+\begin{thm}\label{thm::nrbnoopsafe}
+  Rules~\ref{chrule:create}, \ref{chrule:noop-nc}, \ref{chrule:noop-cn},
+  and~\ref{chrule:nrb} cannot be used to create an inter-block dependency
+  cycle that involves non-noops.
+\end{thm}
+\begin{proof}
+  Todo.
+\end{proof}
+
+\begin{thm}\label{thm::nrbimpsafe}
+  The Kudos nonrollbackable implementation cannot create cycles at all.
+\end{thm}
+\begin{proof}
+  Todo.
+\end{proof}
+
+\section{Change Descriptor Merging}
+Todo.
+\end{document}
