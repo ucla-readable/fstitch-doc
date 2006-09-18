@@ -13,6 +13,10 @@ how to do profile using oprofile.
 	# you might enable deeper callstacks here, opcontrol --callgraph <n>
 	$ sudo opcontrol --start
 	$ sudo opcontrol --reset
+   events other than the clock can also be watched, eg L2 or TLB cache misses.
+   read the manpage, but "opcontrol --event=EVENT" adds/removes events:
+   - EVENT="default" watches clocks
+   - EVENT="BSQ_CACHE_REFERENCE:45000:0x100:1:1" watches L2 cache misses on P4s
 4. run the test
 5. stop oprofile:
 	$ sudo opcontrol --stop
