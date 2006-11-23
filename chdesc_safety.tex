@@ -53,7 +53,7 @@ Exciting notation:
 \item \cd{A} names an arbitrary change descriptor
 \item \dcd{A} changes disk data, \ncd{A} makes no changes itself
 \item \rb{A} can be rolled back, \nrb{A} cannot
-\item \cdb{A}{k} is on block $k$
+\item \cdb{A}{k} is on block $k$, \cdb{\ncd{A}}{0} is not on a block
 \item \depends{\cd{A}}{\cd{B}} shows that \cd{A} directly depends on
   \cd{B}, \indirdepends{\cd{A}}{\cd{B}} shows that \cd{A}, perhaps
   indirectly, depends on \cd{B}
@@ -308,5 +308,38 @@ dependency cycles.
 \end{proof}
 
 \section{Change Descriptor Merging}
+
+After bdescs and byte change descriptor data, change descriptor structures
+use the most memory. Notice that when there are multiple change descriptors
+on a block, they could be merged into one. However, when merging
+nonrollbackables one must take care to not needlessly introduce cycles.
+Kudos uses Rule~\ref{chrule:merge} to determine when a new change descriptor
+can be merged into an existing change descriptor, instead of created.
+
+\begin{chrule}[Create Merge \cdb{\dnrb{B}}{k} into \cdb{\dnrb{A}}{k}]\label{chrule:merge}
+  \mbox{}\\
+  Let \cdset{D} be the dependencies for \cdb{\dnrb{B}}{k}.\\
+  Precondition: \(\nexists \cdb{\rb{C}}{k}\).\\
+  Precondition:
+  \(\nexists \ncd{C}\!:
+      \exists D\! \in\! \cdset{D}\!:
+        (\indirdepends{\cd{D}}{\ncd{C}})
+        \wedge
+        (\exists P\! \in\! \indirdepends{\cd{D}}{\ncd{C}}\!:
+          \forall \cdb{E}{l}, l \neq k, l \neq 0\!:
+            \cdb{E}{l}\! \notin\! P)\).\\
+  Allowed: Instead of creating \cdb{\dnrb{B}}{k},
+  merge its data into \cdb{\dnrb{A}}{k} and
+  \(\forall \cd{D}\! \in\! \cdset{D}, \neg \cdb{D}{k}\!:
+    \mbox{create}\ \depends{\cdb{\dnrb{A}}{k}}{\cd{D}}\).
+\end{chrule}
+
+\begin{thm}\label{thm:mergesafe}
+  No inter-block change descriptor dependency cycle can arise from
+  Rules~\ref{chrule:create}, \ref{chrule:nrb}, and~\ref{chrule:merge}.
+\end{thm}
+\begin{proof}
 Todo.
+\end{proof}
+
 \end{document}
