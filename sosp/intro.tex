@@ -1,0 +1,233 @@
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
+\section {Introduction}
+\label{sec:intro}
+
+
+Ongoing massive growth in both disk capacities and user and application
+ storage requirements, combined with the increasing
+ disparity between disk and processor speeds, have led to ongoing
+ innovation in file system design.
+%
+File systems are expected to do more things: they can automatically encrypt
+ stored data~\cite{wright03ncryptfs}, support extensible metadata, such as
+ content indexes~\cite{jouvelot91semantic}, automatically
+ version~\cite{soules03metadata,fast04versionfs,quinlan02venti,cornell04wayback},
+ and even detect viruses~\cite{miretskiy04avfs}.
+%
+Improved disk interfaces can make use of file system usage patterns to
+ improve
+ performance~\cite{sivathanu03semantically-smart,sivathanu05database-aware}.
+
+
+
+As file system functionality increases, file system \emph{correctness} is
+ also increasingly a focus of
+ research~\cite{sivathanuetal05-logic,denehyetal05-journal-guided}.
+%
+File system extensions and disk-layer interventions risk violating
+ the dependency relationships between written blocks on which file system
+ correctness relies~\cite{ganger00soft}.
+%
+Stackable file
+ systems~\cite{zadok00fist,zadok99extending,heidemann94filesystem,rosenthal90evolving}
+ avoid some of these issues by placing extensions over an existing
+ file system, which is responsible for maintaining consistency.
+%
+Unfortunately, not all extensions are easily implemented entirely above an
+ unmodified file system.
+%
+Furthermore, a stackable file system may implement a single system call
+ with multiple operations; for instance, imagine creating a file whose
+ additional metadata information is stored in another file with a related
+ name.
+%
+Since current VFS (virtual file system) implementations can't
+ express dependencies among operations, the stackable
+ file system must must either impose an ordering using \texttt{fsync},
+ which is expensive, or accept and account for the possibility of
+ inconsistency.
+%
+This problem exists for applications as well.
+%
+The expensive \texttt{fsync} and \texttt{sync} system calls are the only
+ tools available for enforcing file consistency.
+%
+Robust applications, including databases, mail servers, and source code
+ management tools, either accept the performance penalty of these system
+ calls or rely on specialized raw-disk interfaces.
+
+
+
+Proposed systems for improving file system integrity and consistency differ
+ mainly in the kind of consistency they aim to impose, ranging from
+ metadata consistency to full data journaling~\cite{tweedie98journaling} and even full ACID
+ transactions~\cite{gal05transactional,liskov04transactional}.
+%
+However, different extensions within a file system, or different
+ applications over the file system, may require different types of
+ consistency semantics, and performance suffers when lower layers are
+ unnecessarily denied the opportunity to reorder
+ writes~\cite{ganger00soft}.
+%
+A better choice might be an abstraction that could express many consistency
+ models.
+
+
+
+This work develops a modular file system architecture called \Kudos\ that
+ facilitates both file system extension and consistency
+ maintenance.
+%
+We decompose the entire file system layer, from system calls to block
+ devices, into pluggable \modules, hopefully making the system as a whole
+ more configurable, extensible, and easier to understand.
+%
+\Kudos\ \modules\ are built around a new fundamental data type called a
+ \emph{change descriptor}.
+%
+A change descriptor represents both a change to disk data and any
+ \emph{dependencies} between that change and other changes.
+%
+Change descriptors were inspired by the dependency abstraction from BSD's
+ soft updates~\cite{ganger00soft}, but whereas the soft updates implementation
+ is specific to the UFS file system, change descriptors are fully general.
+%
+Any file system can generate change descriptors, and those change
+ descriptors are obeyed by all other file system layers.
+%
+Change descriptors may be examined and modified by other modules
+ as well, and even passed through layers such as loop-back file systems.
+%
+As a result, the loosely-coupled \modules\ that make up a file system
+ implementation can cooperate to implement strong and often complex
+ consistency guarantees, even though each individual \module\ does a
+ relatively small part of the work.
+
+% We use "change descriptor" here on purpose. An abbreviated form, if necessary,
+% will only be introduced in the change descriptor section.
+
+%% We propose a new file system implementation architecture, called \emph{\Kudos},
+%% where \emph{change descriptor} structures represent any and all changes to
+%% stable storage. File systems generate change descriptors for all writes, then
+%% send them to block devices for eventual commit. Explicit dependencies between
+%% change descriptors let \Kudos\ \modules\ preserve necessary file system
+%% invariants without understanding the file system itself. 
+
+Change descriptors can implement many consistency mechanisms, including
+ soft updates and journaling.
+%
+Our file system modules impose soft updates-style change descriptor
+ requirements by default.
+%
+A single module placed downstream of any file system can analyze these
+ change descriptor layouts and transform them into dependencies that
+ implement a journal.
+%
+Additionally, we give user-level applications controlled access to change
+ descriptors, allowing applications to impose their own limited consistency
+ policies.
+%
+Modifying an IMAP mail server to use this interface requires only localized
+ changes; the resulting server follows IMAP's consistency
+ requirements while writing fewer blocks to disk.
+%
+Although implementation experience is preliminary, and change descriptors
+ do not yet support all consistency policies (for instance, not ACID
+ transactions: transactions should be independent, but any file system
+ client can observe all active change descriptors), we believe the \Kudos\
+ architecture will allow the construction of consistent, modular,
+ extensible file systems that are much easier to understand.
+
+
+
+Our contributions include the generalized change descriptor design,
+ \Kudos's module interfaces (a particular innovation is the separation of
+ the low-level specification of on-disk layout from higher-level
+ file-system-independent code), particular modules including the journal
+ module and the write-back cache, and the changegroup interface that
+ exports change descriptors to userspace.
+
+
+\begin{comment}
+ The rest of this 
+ A particular innovation of the
+ \module\ design is the separation of the low-level specification of on-disk
+ layout from higher-level file system-independent code, which operates on
+ abstract disk structures.
+ Our journaling \module\ can automatically add
+ journaling to any file system, and combinations of simple \modules\ can support,
+ for example, correct consistency on RAID over loop-back devices.
+\end{comment}
+
+
+%% They can also be extended, in a carefully controlled way, into userspace --
+%% enabling applications with custom consistency and performance requirements to
+%% specify explicit write ordering restrictions to be honored by the file system.
+%% We will show that this can give such applications several benefits over existing
+%% interfaces like \texttt{fsync()} which provide only coarse control over
+%% consistency, or which either impose high overhead (data journaling) or don't
+%% guarantee data consistency (soft updates, for example, ensures metadata
+%% consistency only).
+
+
+%
+%% All \Kudos\ \modules\ obey the ordering restrictions implied 
+%% Thus, arrangements of change descriptors, by enforcing 
+%% \Kudos's lower level layers 
+
+
+\begin{comment}
+Once upon a time, our research began as an attempt to decompose file system
+software into small \modules, which would make the system as a whole more
+configurable, extensible, and easier to understand -- as has been done in other
+domains, like packet forwarding~\cite{kohler00click}. Upon examining existing
+systems that accomplish similar tasks, and after some initial design for the new
+system, it became clear that a key part of modern file system design is not
+addressed by \modules\ alone: consistency. For robustness, stability, and
+recovery speed, modern file system implementations must ensure that the file
+system's stored image is kept consistent or easy to return to consistency.
+Advanced consistency mechanisms such as soft updates~\cite{ganger00soft} and
+journaling make this possible; unfortunately, they are generally tied to a
+particular file system and can't be ported or adapted without significant
+engineering effort. Furthermore, existing module systems did not provide a way
+to actually \emph{implement} (or even just \emph{change}) such consistency
+mechanisms; the stacking is done either above or below where that part of the
+system would need to be implemented.
+
+These consistency mechanisms all hinge on one critical ability in the file
+system software: the ability to place specific ordering requirements on writes
+to the disk. What was needed, then, was a way to formalize these ordering
+requirements in a file system-independent way, so that all the \modules\ in our
+system would be able to work with them. In this way, the loosely-coupled
+\modules\ that make up the complete file system implementation would be able to
+cooperate to implement strong and often complex consistency guarantees, even
+though each individual \module\ does only a small and simple part of the work.
+
+% We use "change descriptor" here on purpose. An abbreviated form, if necessary,
+% will only be introduced in the change descriptor section.
+
+We propose a new file system implementation architecture, called \emph{\Kudos},
+where \emph{change descriptor} structures represent any and all changes to
+stable storage. File systems generate change descriptors for all writes, then
+send them to block devices for eventual commit. Explicit dependencies between
+change descriptors let \Kudos\ \modules\ preserve necessary file system
+invariants without understanding the file system itself. Change descriptors can
+implement many consistency mechanisms, including soft updates and journaling.
+They can also be extended, in a carefully controlled way, into userspace --
+enabling applications with custom consistency and performance requirements to
+specify explicit write ordering restrictions to be honored by the file system.
+We will show that this can give such applications several benefits over existing
+interfaces like \texttt{fsync()} which provide only coarse control over
+consistency, or which either impose high overhead (data journaling) or don't
+guarantee data consistency (soft updates, for example, ensures metadata
+consistency only).
+
+\Kudos\ is decomposed into fine-grained \modules\ which generate, consume,
+forward, and manipulate change descriptors. A particular innovation of the
+\module\ design is the separation of the low-level specification of on-disk
+layout from higher-level file system-independent code, which operates on
+abstract disk structures. Our journaling \module\ can automatically add
+journaling to any file system, and combinations of simple \modules\ can support,
+for example, correct consistency on RAID over loop-back devices.
+\end{comment}

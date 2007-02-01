@@ -1,0 +1,41 @@
+\begin{abstract}
+
+% The abstract will call them "change descriptors" always.
+We propose a file system implementation architecture, called \emph{\Kudos},
+where \emph{change descriptor} structures represent any and all changes to
+stable storage.
+%
+%%  File systems generate change descriptors for all writes, then
+%% send them to block devices for eventual commit. Explicit dependencies between
+%% change descriptors let \Kudos\ \modules\ preserve necessary file system
+%% invariants without understanding the file system itself. Change descriptors can
+%% implement many consistency mechanisms, including soft updates and journaling.
+%
+\Kudos\ is decomposed into fine-grained \modules\ which generate, consume,
+ forward, and manipulate change descriptors. 
+%
+The uniform change descriptor abstraction allows modules to impose and
+ follow arbitrary file system consistency policies: a collection of
+ loosely-coupled modules cooperates to implement strong and possibly
+ complex guarantees, even though each individual module does a relatively
+ small part of the work.
+%
+%% A particular innovation of the
+%% \module\ design is the separation of the low-level specification of on-disk
+%% layout from higher-level file system-independent code, which operates on
+%% abstract disk structures. 
+%
+For example, by observing and modifying \chdesc\ constraints, our
+ journaling \module\ can automatically add journaling to any file system.
+%
+Additionally, a new system call interface gives applications some direct
+ control over change descriptors. We have used this interface to
+improve the UW IMAP server, removing inefficient and unnecessary calls to
+\texttt{fsync()} while preserving the integrity of mail messages.
+%
+We have implemented \Kudos\ as both a Linux kernel module and a
+FUSE~\cite{fuse} userspace file system server. Our current untuned
+implementation is competitive with FreeBSD soft updates for number of
+blocks written.
+
+\end{abstract}

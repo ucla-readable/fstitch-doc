@@ -1,0 +1,115 @@
+\documentclass[10pt,twocolumn,letterpaper]{article}
+\usepackage[nocopyright,10pt,inchmargins]{sigmin}
+\usepackage{amsmath,amssymb,alltt,comment,times,mathptmx,verbatim}
+\usepackage[square,comma,numbers,sort&compress]{natbib}
+\usepackage{multirow}
+\frenchspacing
+
+% The names of commonly referenced things in our work which
+% we might want to give different names for the paper.
+\newcommand{\chdesc}{change descriptor}
+\newcommand{\chdescs}{change descriptors}
+\newcommand{\Chdesc}{Change descriptor}
+\newcommand{\Chdescs}{Change descriptors}
+\newcommand{\ChDescs}{Change Descriptors}
+
+\newcommand{\module}{module}
+\newcommand{\modules}{modules}
+\newcommand{\Module}{Module}
+\newcommand{\Modules}{Modules}
+
+\newcommand{\opgroup}{changegroup}
+\newcommand{\anopgroup}{a changegroup}
+\newcommand{\opgroups}{changegroups}
+\newcommand{\Opgroup}{Changegroup}
+\newcommand{\Anopgroup}{A changegroup}
+\newcommand{\Opgroups}{Changegroups}
+
+\newcommand{\Kudos}{Kudos}
+\newcommand{\Noop}{No-op}
+\newcommand{\noop}{no-op}
+\newcommand{\noops}{no-ops}
+
+\newcommand{\abandon}{abandon}
+\newcommand{\engaged}{engaged}
+\newcommand{\engages}{engages}
+
+\usepackage{url,hyperref,ifpdf}
+\ifpdf
+  \usepackage[pdftex]{graphicx}
+  \usepackage[monochrome]{color}
+  \DeclareGraphicsExtensions{.jpg,.pdf,.mps,.png}
+  \pdfinfo
+  { 
+    /Title (The \Kudos\ File System Architecture)
+    /Author (Andrew de los Reyes, Chris Frost, Mike Mammarella, Lei Zhang, {adlr,frost,mikem,leiz}@cs.ucla.edu)
+  }
+  \pdfcompresslevel=9
+\else
+  \usepackage{graphicx}
+  \DeclareGraphicsExtensions{.eps,.jpg,.mps,.png}
+\fi
+
+% A list of stuff not to hyphenate
+\hyphenation{KudOS Kudos}
+
+%\renewcommand{\dbltopfraction}{1.00}
+%\renewcommand{\topfraction}{1.00}
+%\renewcommand{\textfraction}{0.10}
+
+\pagestyle{plain}
+
+%\renewcommand{\topfraction}{.8}
+%\renewcommand{\bottomfraction}{.8}
+
+\newcommand{\todo}[1]{\footnote{\textbf{TODO}: #1}}
+
+\begin{document}
+
+\normalsize
+
+\title{\sffamily\textbf{The \Kudos\ File System Architecture}}
+
+
+\author{\sffamily Andrew de los Reyes, Chris Frost, Eddie Kohler, Mike
+Mammarella, and Lei Zhang \\
+\noalign{\vskip2pt}
+\sffamily{\fontsize{10pt}{10pt}\selectfont University of California, Los Angeles} \\
+\noalign{\vskip2pt}
+\sffamily{\{adlr,frost,kohler,mikem,leiz\}@cs.ucla.edu} \\
+\noalign{\vskip-.25in}
+\null}
+\date{}
+\maketitle
+
+\def\assast{\raise.2ex\hbox{$^\ast$}}
+
+\input{abstract}
+
+\input{intro}
+
+\input{related}
+
+\input{design}
+
+\input{modules}
+
+\input{consistency}
+
+\input{opgroups}
+
+\input{implementation}
+
+\input{evaluation}
+
+\input{discussion}
+
+\input{conclusion}
+
+\begin{footnotesize}
+\bibsep=.8ex plus1ex minus.3ex
+\bibliography{paper,kmaster}
+\bibliographystyle{abbrvnat}
+\end{footnotesize}
+
+\end{document}

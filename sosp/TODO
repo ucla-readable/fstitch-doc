@@ -1,0 +1,16 @@
+USENIX wants us to show that we:
+* are attacking a significant problem,
+* have devised an interesting, compelling solution,
+* have demonstrated the practicality and benefits of the solution,
+* have drawn appropriate conclusions,
+* have clearly described what they have done, and
+* have clearly articulated the advances beyond previous work.
+
+- look at BSD implementation of soft updates; how does it work?
+- ascii art at the top of journal_bd.c that could be made into a diagram
+- ascii art in chdesc_util.c that could be made into a diagram
+- ufs implementation becomes a diagram
+
+POST-SOSP
+=========
+- related work: 2.6.17 sync_file_range

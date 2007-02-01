@@ -1,0 +1,237 @@
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
+\subsection{Block Descriptors}
+
+Disk blocks are represented by objects called \emph{block descriptors}.
+%
+\Kudos\ maintains at least one block descriptor object for each cached
+ block; in certain cases, such as encrypted file systems, where the on-disk
+ representation of a block differs fundamentally from the memory
+ representation, a block may have more than one block descriptor.
+
+
+\Kudos\ expects to be able to write blocks atomically.
+%
+Thus, the modules that interface with the disk return blocks that are 512
+ bytes long (the sector size).
+%
+A block resizer module joins sector-sized blocks into a more convenient
+ size for the relevant file system, such as 2048 or 4096 bytes, and splits
+ these large blocks into sector-sized chunks as they are written.
+
+
+\begin{figure}[t]
+\vskip-14pt
+\begin{tabular}{@{\hskip0.58in}p{2in}@{}}
+\begin{scriptsize}
+\begin{verbatim}
+struct chdesc {
+    BD_t *device;
+    bdesc_t *block;
+    enum {BIT, BYTE, NOOP} type;
+    union {
+        struct {
+            uint16_t offset;
+            uint32_t xor;
+        } bit;
+        struct {
+            uint16_t offset, length;
+            uint8_t *data;
+        } byte;
+    };
+    struct chdesc_queue *dependencies;
+/* ... */ };
+\end{verbatim}
+\end{scriptsize}
+\end{tabular}
+\vspace{-10pt}
+\caption{\label{fig:chdesc} Partial \chdesc\ structure.}
+\end{figure}
+
+
+\subsection {Change Descriptors}
+\label{sec:design:chdescs}
+
+%%\subsubsection {Overview}
+
+
+% The first use of "change descriptor" is written out. All others, if not the
+% same, should be defined in parentheses here.
+Each in-memory modification to a cached disk block has an associated
+change descriptor. 
+%
+Each change descriptor applies to data on exactly one block, and each block links
+ to all associated change descriptors.
+%
+Different change types correspond to different forms of
+\chdescs; the \chdesc\ for a flipped bit -- such as in a free-block bitmap --
+contains an offset and mask, while larger changes contain an offset, a length,
+and the new data. The \chdesc's \emph{dependencies} point to other \chdescs\ that must
+precede it to stable storage. A \chdesc\ can be applied or reverted to switch
+the cached block's state between old and new.
+
+Figure~\ref{fig:chdesc} gives a simplified version of the structure, and
+Figure~\ref{fig:chdapi} shows most of the API for working with them. The ability
+to revert and re-apply \chdescs\ is inspired by soft updates dependencies, but
+generalized so that it is not specific to any particular file system. 
+\Chdesc\ dependencies can create cyclic dependencies among
+blocks, although the \chdescs\ themselves must never form a cycle. To handle this
+case, some \chdescs\ may need to be rolled back, or reverted, in order to write the
+others, allowing such cycles to be broken.
+
+\begin{figure}[t]
+\vskip-14pt
+\begin{tabular}{@{\hskip0.25in}p{2in}@{}}
+\begin{scriptsize}
+\begin{alltt}
+chdesc_t *\textbf{chdesc_create_noop}(
+    bdesc_t *block, BD_t *owner);
+chdesc_t *\textbf{chdesc_create_bit}(
+    bdesc_t *block, BD_t *owner,
+    uint16_t offset, uint32_t xor);
+int \textbf{chdesc_create_byte}(
+    bdesc_t *block, BD_t *owner,
+    uint16_t offset, uint16_t length,
+    const void *data, chdesc_t **head);
+int \textbf{chdesc_create_diff}(
+    bdesc_t *block, BD_t *owner,
+    uint16_t offset, uint16_t length,
+    const void *newdata, chdesc_t **head);
+int \textbf{chdesc_add_depend}(
+    chdesc_t *depender, chdesc_t *dependee);
+void \textbf{chdesc_remove_depend}(
+    chdesc_t *depender, chdesc_t *dependee);
+int \textbf{chdesc_apply}(chdesc_t *chdesc);
+int \textbf{chdesc_rollback}(chdesc_t *chdesc);
+int \textbf{chdesc_satisfy}(chdesc_t *chdesc);
+int \textbf{chdesc_push_down}(
+    BD_t *current_bd, bdesc_t *current_block,
+    BD_t *target_bd, bdesc_t *target_block);
+\end{alltt}
+\end{scriptsize}
+\end{tabular}
+\vspace{-10pt}
+\caption{\label{fig:chdapi} Partial \chdesc\ API.}
+\end{figure}
+
+\Kudos\ \modules\ change blocks by attaching change descriptors to them,
+using functions such as \texttt{chdesc\_create\_bit}.
+%
+Most file system modules initially generate \chdescs\ whose
+dependencies impose soft-update-like ordering requirements (see
+\S\ref{sec:consistency:softupdate}).  These \chdescs\ are then passed down,
+through other modules, in the general direction of the disk.  The
+intervening \modules\ can
+inspect, delay, and even modify them before passing them on further. For
+instance, the write-back cache \module\ (\S\ref{sec:modules:wbcache}),
+which is essentially a buffer cache, holds
+on to blocks and their \chdescs\ instead of forwarding them
+immediately. When evicting a block and associated \chdescs, the write-back
+cache enforces an order consistent with the \chdesc\ dependency
+information.
+
+A change descriptor is \emph{satisfied} when the change to which it
+ corresponds has been resolved---for instance, written to disk.
+%
+If one change descriptor depends on another, then the depender (the change
+ descriptor depended on) must be satisfied before the dependee (the change
+ descriptor that depends) can be written to disk itself.
+
+
+
+%% Since many \modules\ may be stacked on top of one another in \Kudos, and since
+%% many of them may want to refer to the same block at the same time, 
+Each \chdesc\ on a block may or may not be visible to a given \module.
+%
+For example, modules that respond to user requests generally view the most
+ current state of every block -- the block with all \chdescs\ applied.
+%
+However, a write-back cache may choose to write some \chdescs\ on a block
+ while reverting others, since those others currently have unsatisfiable
+ dependencies.
+%
+In this case, \modules\ below the write-back cache should view the
+ unsatisfied \chdescs\ in the reverted state.
+%
+%% If this \module\ is the disk, it will need to be able to write a version of
+%%  the block's data that does not include the \chdescs\ that have not yet
+%%  been sent to it.
+%
+\Kudos\ provides a block revisioning library function that automatically rolls back those
+ \chdescs\ that should not be visible at a particular \module, and then
+ rolls them forward again after that \module\ is done with the block.
+
+
+%% \paragraph{Manipulations and Transformations}
+% FIXME: add concrete details here
+
+%% \Chdescs\ play a central role in \Kudos, and therefore many parts of the system
+%% need to generate, consume, forward, and manipulate them. Obviously there are
+
+A collection of simple operations, such as shifting a \chdesc\ from one block to another,
+ checking whether a \chdesc\ has unsatisfiable dependencies, and copying a
+ \chdesc\ (useful for modules such as RAID),
+%%  -- for instance, many
+%% simple block devices like partitioners will need to simply forward \chdescs\ on
+%% to the next block device after adjusting the block number being written. The
+%% write-back cache (\S\ref{sec:modules:wbcache}) and elevator scheduler
+%% (\S\ref{sec:modules:elevator}) both need to determine whether \chdescs\ are
+%% ready to send to the next block device or not. In implementing the \modules\ we
+are handled by common library functions available to any module.
+
+%% Additionally, there are some more complex transformations which are useful for
+%% devices like the mirroring block device (\S\ref{sec:modules:raid}), or the
+%% journaling \module (\S\ref{sec:consistency:journal}). The mirroring block device
+%% must duplicate the \chdescs\ passing through it, so that each of the mirrors has
+%% its own copy. The journal must copy entire blocks into a journal area, and
+%% overwrite that journal area efficiently when the blocks are changed again during
+%% the same transaction. Both of these \chdesc\ transformations are handled by
+%% library functions, so that if other \modules\ need to do similar things, the
+%% functionality will already be available.
+
+
+
+\paragraph{\Noop\ Change Descriptors}
+\label{sec:design:chdescs:noop}
+
+The prototypical \chdesc\ corresponds to some change on disk, but \Kudos\
+ also supports a \emph{\noop} \chdesc\ type, which doesn't change the disk
+ at all.
+%
+%% An important type of \chdesc\ is actually one that doesn't change the disk at
+%% all: the \noop\ \chdesc. 
+%
+\Noop\ \chdescs\ can have dependencies, like any other
+\chdesc, but they don't need to be written to disk:  they are trivially satisfied when all of their dependencies are
+satisfied.
+%
+Thus, they can be used to ``stand for'' entire sets of other changes.
+%
+This capability is extremely useful, and is used by most operations on disk
+structures so that a single \chdesc\ can be returned that depends on the whole
+change. Likewise, a \noop\ \chdesc\ can be passed in as a parameter to a disk
+operation to make the whole operation depend on a set of other changes. \Noop\
+\chdescs\ allow dependencies between sets without a quadratic number
+of dependency edges in the \chdesc\ graph, and without having to pass around
+arrays of \chdescs.
+%
+The cost is that some functions may have to traverse trees of \noop\ change
+ descriptors to determine true dependencies.
+
+Modules can also use \noop\ \chdescs\ to \emph{prevent} changes from being
+ written.
+%
+A \emph{managed} \noop\ must be explicitly satisfied; any changes that
+ depend on that \noop\ are delayed until the owning module explicitly
+ satisfies it.
+%
+This is used, for instance, by the journal \module\
+ (\S\ref{sec:consistency:journal}) to prevent a transaction's \chdescs\
+ from being written before the journal commits.
+
+%% \subsubsection{Block Revisions}
+% FIXME maybe make an analogy to packets flowing through a network? -LZ
+
+% Should end with an example -- a little diagram, perhaps
+% borrowed from soft updates -- and then perhaps discussion, with things like
+% the last paragraph of optimizations above

@@ -1,0 +1,192 @@
+% -*- mode: latex; tex-main-file: "paper" -*-
+
+\subsection{UFS}
+\label{sec:modules:ufs}
+
+Kudos supports two base file system types, a simple inode-less
+implementation called JOSFS and a version of UFS (Unix File System), the
+modern incarnation of the Fast File System~\cite{mckusick84fast} used in
+4.2 BSD. 
+%
+We describe UFS as an example of a complete and relatively complex file
+system.
+
+The general concepts for UFS, such as inodes, cylinder groups, and
+indirect blocks, are well understood.  In \Kudos, we implemented the UFS1
+file system as an LFS \module. UFS is of particular interest because it is
+the only file system that has been extended with both soft updates and
+journaling. ~\cite{seltzer00journaling} We chose UFS1 over UFS2, as UFS1 is
+well established and more widely supported.
+
+The UFS \module\ is implemented at the LFS interface. This keeps properties
+specific to UFS (such as the UFS on-disk format and rules governing block
+allocation) hidden within the file system \module. For instance, UFS uses
+2KB \emph{fragments} to store small files efficiently. Once a file gets big
+enough to require the use of indirect blocks, then UFS changes its allocation
+policy and starts allocating 16KB \emph{blocks}, where a block is made up of 8
+aligned and contiguous fragments. Our UFS \module\ implements this by using
+fragments as the basic block size. For large files, our UFS \module\ internally
+allocates a block, but returns only the first fragment in that block at the LFS
+level. The next 7 allocation calls will be no-ops that simply return the
+subsequent fragments in the allocated block. In this way, UFS can stay
+consistent internally without special support from other \Kudos\ modules.
+
+The UFS \module\ creates \chdescs\ for all its changes to the disk, and
+connects them to form configurations that achieve soft updates consistency.
+Unlike FreeBSD's soft updates implementation, once the dependencies have been
+hooked up, UFS no longer needs to concern itself with the \chdescs\ it has
+created. The block device subsystem will track and enforce the
+\chdesc\ orderings.
+
+In order to implement soft update ordering, we examined the places where UFS
+created \chdescs. With the consistency rules for soft update in mind, we
+carefully connected the \chdescs created within an LFS call. Assured that
+all LFS calls in the UFS \module\ followed soft updates ordering, we then made
+sure that the combinations of LFS calls do not violate soft updates
+consistency.
+
+\subsubsection {Modularity}
+Although the UFS implementation must be somewhat monolithic in order to
+understand the interlinked UFS-specific disk structures, we would like to take
+advantage of modularity to allow for flexibility and encapsulation. UFS is
+divided into modules at boundaries that expose naturally replaceable policies,
+namely in resource allocation and directory entry traversal, as well as for
+objects such as the superblock and cylinder groups. We use specialized
+interfaces specific to UFS, because these interfaces do not apply to all file
+systems in general.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=108pt]{fig/figures_4}
+  \caption{\label{fig:ufsmodules} UFS and its submodules.}
+\end{figure}
+
+Within the UFS \module, the internal organization is shown in
+Figure~\ref{fig:ufsmodules}. The \emph{base} module contains the core code for
+the file system. Using object-oriented techniques, we encapsulated the code
+for data structures in the file system, like the superblock and the cylinder
+groups. We also recognized two locations where we can apply different search
+algorithms. One is with respect to the allocation functions for blocks,
+fragments, and inodes. The other is for searching and writing directory entries
+(see Figure~\ref{fig:moduleinterface}). Currently we have two allocator modules
+as a proof of concept for modularity.
+
+\begin{figure}[htb]
+Cylinder Group Interface:
+\vspace{-0.5\baselineskip}
+\begin{scriptsize}
+\begin{alltt}
+const UFS_cg_t * \textbf{read}(int num);
+int \textbf{write_time}(int num, int value, chdesc_t ** head);
+int \textbf{write_rotor}(int num, int value, chdesc_t ** head);
+int \textbf{write}...
+int \textbf{sync}(int num, chdesc_t ** head);
+\end{alltt}
+\end{scriptsize}
+
+Allocator Interface:
+\vspace{-0.5\baselineskip}
+\begin{scriptsize}
+\begin{alltt}
+int \textbf{find_free_block}(fdesc_t * file, int purpose);
+int \textbf{find_free_frag}(fdesc_t * file, int purpose);
+int \textbf{find_free_inode}(fdesc_t * file, int purpose);
+\end{alltt}
+\end{scriptsize}
+\vspace{-0.5\baselineskip}
+\caption{\label{fig:moduleinterface} Example UFS Internal Module Interfaces}
+\end{figure}
+
+The UFS cylinder group module interface regulates access to the cylinder
+groups. While there is unrestricted read access to cylinder groups, the
+interface limits write access to certain fields within the \emph{UFS\_cg}
+struct. This is because, under normal operations, fields like the number of
+data blocks per cylinder group remain constant. The cylinder group module can
+also define the policy for when changes to the cylinder group are written to
+disk. It can, for example, make the policy ``write-through'' and have all
+changes immediately go to disk. However, choosing this policy means that on
+every block allocation, UFS needs to write \emph{cg\_rotor}, the position of
+the last used block, to disk. To avoid performance hits like this, we
+implemented the ``write-back'' policy instead. To support flushing dirty data
+to disk, the cylinder group module interface also has a sync call. Similarly,
+the super block module interface controls access to the super block.
+
+The UFS allocator module interface has methods for allocating blocks,
+fragments, and inodes. All three methods take in a \emph{file descriptor} and a
+\emph{purpose} variable. The UFS \emph{file descriptor} contains all relevant
+information pertaining to a given file, including an in-memory copy of the
+file's inode. The intent of the \emph{purpose} variable is to provide hints to
+the allocator about how the newly allocated resource will be used.  Given these
+two pieces of information, as well as cylinder group information from the
+previously mentioned module, UFS allocator modules can make informed decisions
+to allocate resources in an efficient manner. For instance, given the status
+for all cylinder groups, a block allocator function can examine the blocks
+previously allocated to a given file and figure out what block to allocate
+next based on the strategies used by FreeBSD.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=192pt]{fig/figures_6}
+  \caption{\label{fig:chdescarrange} Change descriptor dependencies, when
+  not strictly needed, restrict the possible choices for write ordering.
+  This results in suboptimal write ordering and more scans through the
+  \chdescs\ for \Kudos. On the left, \chdescs\ C1, C2, and C3 can be written
+  in any order. Only one ordering is possible on the right.}
+\end{figure}
+
+\subsubsection {Change Descriptor Arrangements}
+While optimizing our UFS implementation, we gained some insight and found a
+couple practices critical to good performance. First, do not create unnecessary
+dependencies between \chdescs. Doing so artificially limits the commit order
+for \chdescs, which results in bad performance for several reasons. Not only
+will unneeded dependencies force the disk to do more writes and seeks, but
+\Kudos\ will have to scan through the \chdesc\ graph multiple times, since the
+dependencies prevent the \chdescs\ from being flushed out to disk at once.
+
+In Figure~\ref{fig:chdescarrange}, we have two possible arrangements for three
+byte \chdescs. The noop \chdesc\ represents a root node that can reach all
+other \chdescs. In the parallel arrangement on the left, \Kudos\ has the
+freedom to write \chdescs\ $C_1$, $C_2$, and $C_3$ to disk in any order. All
+three \chdescs\ can be marked writable with one graph traversal. In the serial
+arrangement on the right, there exists only one valid write ordering. For
+\Kudos\ to write this arrangement out to disk, it will have to scan through
+the graph three times, since \chdesc\ $C_n$ cannot be marked as writable until
+$C_{n-1}$ has been written.
+An instance like this came up because our UFS implementation frequently writes
+the \emph{cylinder group summaries} out to disk. By simply changing the
+arrangement between three \chdescs\ created in a single function, UFS got a
+33\% speed increase for several common file operations.
+
+A corollary of this observation is to create \chdescs\ of the minimal size to
+avoid accidental overlaps, which in turn, create unnecessary dependencies.
+\Chdescs\ can represent changes to regions as small as one byte, and as large
+as an entire block. Many times, it can be tedious for developers to calculate
+exactly what parts in a large data structure have been modified and need to be
+written to disk. As such, laziness will result in the creation of \chdescs\
+for the entire data structure. Doing this can be detrimental to performance,
+as shown in Figure~\ref{fig:overlap}.
+
+An occurrence of this problem came up for inodes, where we make several
+independent modifications to different fields within an inode. In principle,
+the \chdescs\ created are conflict-free. Previously, because we did not take
+the time to calculate the exact offsets and lengths for the fields that
+changed, we just created a \chdesc\ for the entire inode every time we modified
+any part of the inode. Thus all changes to any particular inode would always
+overlap, causing unnecessary dependencies. Our solution to this problem is a
+utility function called \texttt{chdesc\_create\_diff()}, which compares a
+modified copy of a data structure to the original, and creates a minimal set of
+\chdescs\ accordingly. Due to the frequent use of inodes, one simple use of
+\texttt{chdesc\_create\_diff()} in the UFS inode functions reduced \chdesc\
+graph traversal time significantly. This does introduce a slight
+overhead, due to the need to \emph{diff} the two structures.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=64pt]{fig/figures_5}
+  \caption{\label{fig:overlap} On inode 17, the gray regions represent
+  modified fields that do not overlap. If \chdesc\ A and \chdesc\ B are
+  exactly the size of the gray regions, then there is no implicit dependency.
+  Making \chdescs\ for the entire inode data structure will, in turn, make
+  one \chdesc\ depend on the other because they overlap.}
+\end{figure}
+

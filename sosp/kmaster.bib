@@ -1,0 +1,1328 @@
+@string{Proc = "Proceedings of the "}
+@string{MIT = "Massachusetts Institute of Technology"}
+@string{MIT-LCS = "{MIT} Laboratory for Computer Science"}
+@string{IETF = "Internet Engineering Task Force"}
+@string{ACMabbr = "{ACM}"}
+@string{SOSP = ACMabbr # " {S}ymposium on {O}perating {S}ystems {P}rinciples"}
+@string{USENIX = "{USENIX} Annual Technical Conference"}
+@string{IEEEabbr = "{IEEE}"}
+@string{IEEECompSoc = IEEEabbr # " {C}omputer {S}ociety"}
+
+@string{DCCPWeb = "http://www.icir.org/kohler/dccp/"}
+@string{PubsWeb = "http://www.icir.org/kohler/pubs/"}
+
+@techreport{abadi94prudent,
+  title = "Prudent Engineering Practice for Cryptographic Protocols",
+  author = "Mart{\'{i}}n Abadi and Roger Needham",
+  institution = "Digital Systems Research Center", type = "{SRC} Research Report",
+  year = 1994, month = jun, number = 125,
+  readable04s = "L17",
+  wwwurl = "http://www.scs.cs.nyu.edu/G22.3033-001/sched/prudent.pdf"
+}
+
+@article{allman99tcp,
+  author = "Mark Allman",
+  title = "{TCP} Byte Counting Refinements",
+  crossref = "j:ccr", volume = 29, number = 3, month = jul, year = 1999
+}
+
+@article{allman00web,
+  title = "A {W}eb Server's View of the Transport Layer",
+  author = "Mark Allman",
+  crossref = "j:ccr", volume = 30, number = 5, month = oct, year = 2000
+}
+
+@inproceedings{andersen03mayday,
+  title = "Mayday: Distributed Filtering for {I}nternet Services",
+  author = "David G. Andersen",
+  crossref = "usits03", nopages = ""
+}
+
+@inproceedings{andersen01resilient,
+  title = "Resilient Overlay Networks",
+  author = "David Andersen and Hari Balakrishnan and Frans Kaashoek and Robert Morris",
+  crossref = "sosp18", pages = "131--145"
+}
+
+@inproceedings{andersen00system,
+  title = "System Support for Bandwidth Management and Content Adaptation in {I}nternet Applications",
+  author = "David Andersen and Deepak Bansal and Dorothy Curtis and Srinivasan Seshan and Hari Balakrishnan",
+  crossref = "osdi4", pages = "213--226",
+  readable04s = "L8",
+  wwwurl = "http://www.angio.net/res/cm-osdi2000.html"
+}
+
+@article{anderson97continuous,
+  title = "Continuous Profiling: Where Have All the Cycles Gone?",
+  author = "Jennifer M. Anderson and Lance M. Berc and Jeffrey Dean and Sanjay Ghemawat and Monika R. Henzinger and Shun-Tak A. Leung and Richard L. Sites and Mark T. Vandevoorde and Carl A. Waldspurger and William E. Weihl",
+  crossref = "j:tocs", volume = 15, number = 4, year = 1997, month = nov, pages = "357--390",
+  readable04s = "L5",
+  wwwurl = "http://pag.lcs.mit.edu/6.893/readings/anderson-tocs97.pdf"
+}
+
+@inproceedings{aranya04tracefs,
+  title = "Tracefs: A File System to Trace Them All",
+  author = "Akshat Aranya and Charles P. Wright and Erez Zadok",
+  crossref = "fast04"
+}
+
+@inproceedings{arpaci-dusseau01information,
+  title = "Information and Control in Gray-Box Systems",
+  author = "Andrea C. Arpaci-Dusseau and Remzi H. Arpaci-Dusseau",
+  crossref = "sosp18", pages = "43--56",
+  readable04s = "L5",
+  wwwurl = "http://www.cs.wisc.edu/wind/Publications/gray-box.ps"
+}
+
+@inproceedings{arpaci-dusseau03transforming,
+  title = "Transforming Policies into Mechanisms with {I}nfokernel",
+  author = "Andrea C. Arpaci-Dusseau and Remzi H. Arpaci-Dusseau and Nathan C. Burnett and Timothy E. Denehy and Thomas J. Engle and Haryadi S. Gunawi and James A. Nugent and Florentina I. Popovici",
+  crossref = "sosp19", pages = "90--105",
+  readable04s = "L5bg",
+  wwwurl = "http://www.cs.rochester.edu/sosp2003/papers/p162-arpacidusseau.pdf"
+}
+
+@inproceedings{banga99resource,
+  title = "Resource Containers: A New Facility for Resource Management in Server Systems",
+  author = "Gaurav Banga and Peter Druschel and Jeffrey C. Mogul",
+  crossref = "osdi3", pages = "45--58",
+  readable04s = "L3",
+  wwwurl = "http://www.cs.rice.edu/~gaurav/papers/osdi99.ps"
+}
+
+@inproceedings{banga99scalable,
+  title = "A scalable and explicit event delivery mechanism for {UNIX}",
+  author = "Gaurav Banga and Jeffrey C. Mogul and Peter Druschel",
+  crossref = "usenix99", pages = "253--265",
+  readable04s = "L2bg",
+  wwwurl = "http://www.cs.rice.edu/~gaurav/papers/usenix99.ps"
+}
+
+@inproceedings{blaze93cryptographic,
+  title = "A cryptographic file system for {U}nix",
+  author = "Matt Blaze",
+  crossref = "ccs93",
+  pages = "9--16"
+}
+
+@inproceedings{braden02from,
+  title = "From Protocol Stack to Protocol Heap -- Role-Based Architecture",
+  author = "Robert Braden and Ted Faber and Mark Handley",
+  crossref = "hotnets1", pages = "17--22",
+  readable04s = "L11",
+  wwwurl = "http://www.isi.edu/newarch/DOCUMENTS/hotrba.paper.pdf"
+}
+
+@inproceedings{bershad95extensibility,
+  title = "Extensibility, Safety and Performance in the {SPIN} Operating System",
+  author = "Brian N. Bershad and Stefan Savage and Przemys{\l}aw Pardyak and Emin G{\"{u}}n Sirer and Marc E. Fiuczynski and David Becker and Craig Chambers and Susan Eggers",
+  crossref = "sosp15", pages = "267--284",
+  readable04s = "L14",
+  wwwurl = "http://www.cs.washington.edu/research/projects/spin/www/papers/SOSP95/sosp95.ps"
+}
+
+@inproceedings{brecht04acceptable,
+  title = "{a}ccept()able Strategies for Improving Web Server Performance",
+  author = "Tim Brecht and David Pariag and Louay Gammo",
+  crossref = "usenix04",
+  readable04s = "L2bg",
+  wwwurl = "http://bcr2.uwaterloo.ca/~brecht/papers/getpaper.php?file=usenix-2004.pdf"
+}
+
+@inproceedings{calvert02lightweight,
+  title = "Lightweight Network Support for Scalable End-to-End Services",
+  author = "Kenneth L. Calvert and James Griffioen and Su Wen",
+  crossref = "sigcomm02", pages = "265--278",
+  readable04s = "L8",
+  wwwurl = "http://www.acm.org/sigcomm/sigcomm2002/papers/esp.pdf"
+}
+
+@article{cao93tickertaip,
+  title = "The {T}icker{TAIP} Parallel {RAID} Architecture",
+  author = "Pei Cao and Swee Boon Lim and Shivakumar Venkataraman and John Wilkes",
+  crossref = "j:tocs", volume = "12", number = "3",
+  pages = "236--269", year = "1994"
+}
+
+@inproceedings{chandra01scalability,
+  title = "Scalability of {L}inux Event-Dispatch Mechanisms",
+  author = "Abhishek Chandra and David Mosberger",
+  crossref = "usenix01", pages = "231--244"
+}
+
+@inproceedings{chen01flexible,
+   author = "Benjie Chen and Robert Morris",
+   title = "Flexible Control of Parallelism in a Multiprocessor {PC} Router",
+   crossref = "usenix01", pages = "333--346"
+}
+
+@inproceedings{chou01empirical,
+  title = "An Empirical Study of Operating Systems Errors",
+  author = "Andy Chou and Junfeng Yang and Benjamin Chelf and Seth Hallem and Dawson Engler",
+  crossref = "sosp18", pages = "73--88",
+  readable04s = "L14",
+  wwwurl = "http://www.stanford.edu/~engler/metrics-sosp-01.pdf"
+}
+
+@inproceedings{clifton00multijava,
+  title = "Multi{J}ava: Modular Open Classes and Symmetric Multiple Dispatch for {J}ava",
+  author = "Curtis Clifton and Gary T. Leavens and Craig Chambers and Todd Millstein",
+  crossref = "oopsla00", pages = "130--145"
+}
+
+@inproceedings{cunningham05making,
+  title = "Making Events Less Slippery with eel",
+  author = "Ryan Cunningham and Eddie Kohler",
+  crossref = "hotos05"
+}
+
+@inproceedings{dejonge93logical,
+  title = "The {L}ogical {D}isk: A new approach to improving file systems",
+  author = "Wiebren de Jonge and M. Frans Kaashoek and Wilson C. Hsieh",
+  crossref = "sosp14",
+  pages = "15--28"
+}
+
+@inproceedings{efstathopoulos05labels,
+  title = "Labels and Event Processes in the {A}sbestos Operating System",
+  author = "Petros Efstathopoulos and Maxwell Krohn and Steve VanDeBogart and Cliff Frey and David Ziegler and Eddie Kohler and David Mazi{\`e}res and Frans Kaashoek and Robert Morris",
+  crossref = "sosp20"
+}
+
+@inproceedings{ely01robust,
+  title = "Robust Congestion Signaling",
+  author = "David Ely and Neil Spring and David Wetherall and Stefan Savage and Tom Anderson",
+  crossref = "icnp01",
+  readable04s = "L12bg",
+  wwwurl = "http://www.cs.washington.edu/homes/nspring/papers/trustpaper.pdf"
+}
+
+@inproceedings{engler95exokernel,
+  title = "Exokernel: An Operating System Architecture for Application-Level Resource Management",
+  author = "Dawson R. Engler and M. Frans Kaashoek and James O'Toole",
+  crossref = "sosp15", pages = "251--266",
+  readable04s = "L15bg",
+  wwwurl = "http://www.pdos.lcs.mit.edu/papers/exokernel-sosp95.ps"
+}
+
+@inproceedings{engler00checking,
+  title = "Checking System Rules Using System-Specific, Programmer-Written Compiler Extensions",
+  author = "Dawson Engler and Benjamin Chelf and Andy Chou and Seth Hallem",
+  crossref = "osdi4", pages = "1--16",
+  readable04s = "L13",
+  wwwurl = "http://www.stanford.edu/~engler/mc-osdi.pdf"
+}
+
+@inproceedings{engler01bugs,
+  title = "Bugs as Deviant Behavior: A General Approach to Inferring Errors in Systems Code",
+  author = "Dawson Engler and Yu Chen, David and Seth Hallem and Andy Chou and Benjamin Chelf",
+  crossref = "sosp18", pages = "57--72",
+  readable04s = "L13",
+  wwwurl = "http://www.stanford.edu/~engler/deviant-sosp-01.pdf"
+}
+
+@inproceedings{feamster03measuring,
+  title = "Measuring the Effects of {I}nternet Path Faults on Reactive Routing",
+  author = "Nick Feamster and David G. Andersen and Hari Balakrishnan and M. Frans Kaashoek",
+  crossref = "sigmetrics03", pages = "126--137"
+}
+
+@inproceedings{flatt98units,
+  title = "Units: Cool Modules for {HOT} Languages",
+  author = "Matthew Flatt and Matthias Felleisen",
+  crossref = "pldi98", pages = "236--248"
+}
+
+@inproceedings{floyd02internet,
+  title = "Internet Research Needs Better Models",
+  author = "Sally Floyd and Eddie Kohler",
+  crossref = "hotnets1"
+}
+
+@inproceedings{ford97flux,
+  title = "The {F}lux {OSK}it: A Substrate for Kernel and Language Research",
+  author = "Bryan Ford and Godmar Back and Greg Benson and Jay Lepreau and Albert Lin and Olin Shivers",
+  crossref = "sosp16", pages = "38--51",
+  readable04s = "L15",
+  wwwurl = "http://www.cs.utah.edu/flux/papers/oskit-sosp97-10pt.ps.gz"
+}
+
+@inproceedings{ganger94metadata,
+  title = "Metadata Update Performance in File Systems",
+  author = "Gregory R. Ganger and Yale N. Patt",
+  crossref = "osdi1", pages = "49--60"
+}
+
+@article{ganger00soft,
+  title = "Soft Updates: A Solution to the Metadata Update Problem in File Systems",
+  author = "Gregory R. Ganger and Marshall Kirk McKusick and Craig A. N. Soules and Yale N. Patt",
+  crossref = "j:tocs", pages = "127--153",
+  month = may, year = 2000, volume = 18, number = 2,
+  wwwurl = "http://www.ece.cmu.edu/~ganger/papers/softupdates.pdf"
+}
+
+@inproceedings{gay03nesc,
+  title = "The {nesC} Language: A Holistic Approach to Networked Embedded Systems",
+  author = "David Gay and Philip Levis and Robert von Behren and Matt Welsh and Eric Brewer and David Culler",
+  crossref = "pldi03", pages = "1--11",
+  readable04s = "L10",
+  wwwurl = "http://nescc.sourceforge.net/papers/nesc-pldi-2003.pdf"
+}
+
+@inproceedings{girod04emstar,
+  title = "Em{S}tar: A Software Environment for Developing and Deploying Wireless Sensor Networks",
+  author = "Lewis Girod and Jeremy Elson and Alberto Cerpa and Thanos Stathopoulos and Nithya Ramanathan and Deborah Estrin", 
+  crossref = "usenix04",
+  readable04s = "L9",
+  wwwurl = "http://lecs.cs.ucla.edu/~girod/papers/emstar-usenix04.pdf"
+}
+
+@inproceedings{girod04system,
+  author = "L. Girod and T. Stathopoulos and N. Ramanathan and J. Elson and D. Estrin and E. Osterweil and T. Schoellhammer",
+  title = {A System for Simulation, Emulation, and Deployment of Heterogenous Sensor Networks},
+  crossref = "sensys04"
+}
+
+@inproceedings{gottlieb02comparative,
+  title = "A Comparative Study of Extensible Routers",
+  author = "Yitzchak Gottlieb and Larry Peterson",
+  crossref = "openarch02", pages = "51--62",
+  readable04s = "L7",
+  wwwurl = "http://www.cs.princeton.edu/nsg/papers/routerstudy-openarch.html"
+}
+
+@inproceedings{greenstein04sensor,
+  title = "A Sensor Network Application Construction Kit ({SNACK})",
+  author = "Benjamin Greenstein and Eddie Kohler and Deborah Estrin",
+  crossref = "sensys04",
+  pages = "69--80"
+}
+
+@inproceedings{grimm96atomic,
+  title = "Atomic recovery units: Failure atomicity for logical disks",
+  author = "Robert Grimm and Wilson C. Hsieh and Wiebren de Jonge and M. Frans Kaashoek",
+  crossref = "icdcs96",
+  pages = "26--37"
+}
+
+@article{gurtov04modeling,
+    title = "Modeling Wireless Links for Transport Protocols",
+    author = "Andrei Gurtov and Sally Floyd",
+    year = 2004, note = "To appear",
+    crossref = "j:ccr"
+}
+
+@inproceedings{han05dynamic,
+  author = "Chih-Chieh Han and Ram Kumar and Roy Shea and Eddie Kohler and Mani Srivastava",
+  title = "A Dynamic Operating System for Sensor Nodes",
+  www_pdf_url = PubsWeb # "han05dynamic.pdf",
+  crossref = "mobisys05"
+}
+
+@inproceedings{handley02xorp,
+  title = "{XORP}: An Open Platform for Network Research",
+  author = "Mark Handley and Orion Hodson and Eddie Kohler",
+  crossref = "hotnets02"
+}
+
+@article{harchol-balter03size-based,
+  title = "Size-based Scheduling to Improve {W}eb Performance",
+  author = "Mor Harchol-Balter and Bianca Schroeder and Nikhil Bansal and Mukesh Agrawal",
+  crossref = "j:tocs", volume = 21, number = 2, year = 2003, month = may, pages = "207--233",
+  readable04s = "L2bg",
+  wwwurl = "http://www-2.cs.cmu.edu/~harchol/Papers/tocs257.ps"
+}
+
+@inproceedings{haskin87recovery,
+  author = "R. Haskin and Y. Malachi and W. Sawdon and G. Chan",
+  title = "Recovery management in {Q}uick{S}ilver",
+  crossref = "sosp11"
+}
+
+@mastersthesis{heidemann91stackable, 
+  author = "John Shelby Heidemann",
+  title = "Stackable Layers: An Architecture for File System Development",
+  month = aug, year = 1991,
+  school = "UCLA"
+}
+
+@article{heidemann94filesystem,
+  author = "John S. Heidemann and Gerald J. Popek",
+  title = "File-System Development with Stackable Layers",
+  crossref = "j:tocs", volume = 12, number = 1, month = feb, year = 1994,
+  pages = "58--89"
+}
+
+@article{hutchinson91xkernel,
+  author = "N. C. Hutchinson and L. L. Peterson",
+  title = "The {\emph{x}}-kernel: an architecture for implementing network protocols",
+  crossref = "j:tse",
+  volume = 17, number = 1,
+  year = 1991, month = jan,
+  pages = "64--76"
+}
+
+@inproceedings{intanagonwiwat00directed,
+  title = "Directed Diffusion: A Scalable and Robust Communication Paradigm for Sensor Networks",
+  author = "Chalermek Intanagonwiwat and Ramesh Govindan and Deborah Estrin",
+  crossref = "mobicom00", pages = "56--67",
+  readable04s = "L10",
+  wwwurl = "http://lecs.cs.ucla.edu/~estrin/papers/diffusion.ps"
+}
+
+@inproceedings{joukov05increasing,
+  title = "Increasing Distributed Storage Survivability with a Stackable {RAID}-like File System",
+  author = "Nikolai Joukov and Abhishek Rai and Erez Zadok",
+  booktitle = Proc # "2005 {IEEE/ACM} Workshop on Cluster Security",
+  year = 2005, month = may
+}
+
+@inproceedings{kaashoek97application,
+  title = "Application Performance and Flexibility on {E}xokernel Systems",
+  author = "M. Frans Kaashoek and Dawson R. Engler and Gregory R. Ganger and H{\'{e}}ctor M. Brice{\~{n}}o and Russell Hunt and David Mazi{\`{e}}res and Thomas Pinckney and Robert Grimm and John Jannotti and Kenneth Mackenzie",
+  crossref = "sosp16", pages = "52--65",
+  readable04s = "L15",
+  wwwurl = "http://www.pdos.lcs.mit.edu/papers/exo-sosp97/exo-sosp97.ps"
+}
+
+@inproceedings{handley05designing,
+  author = "Mark Handley and Eddie Kohler and Atanu Ghosh and Orion Hodson and Pavlin Radoslavov",
+  title = "Designing Extensible {IP} Router Software",
+  www_pdf_url = PubsWeb # "handley05designing.pdf",
+  crossref = "nsdi05"
+}
+
+@inproceedings{katabi02congestion,
+  title = "Congestion Control for High Bandwidth-Delay Product Networks",
+  author = "Dina Katabi and Mark Handley and Charlie Rohrs",
+  crossref = "sigcomm02", pages = "89--102",
+  readable04s = "L11",
+  wwwurl = "http://www.ana.lcs.mit.edu/dina/XCP/p301-katabi.ps"
+}
+
+@techreport{katti04mandm,
+  title = "{M\&M}: A Passive Toolkit for Measuring, Correlating, and Tracking Path Characteristics",
+  author = "Sachin Katti and Dina Katabi and Eddie Kohler and Jacob Strauss",
+  institution = "MIT",
+  type = "Techical Report",
+  number = "MIT-CSAIL-TR-945", 
+  year = 2004, month = apr,
+  paperclass = "secondary",
+  www_pdf_url = PubsWeb # "mandm-feb04-tr.pdf"
+}
+
+@inproceedings{katti04multiq,
+  title = "Multi{Q}: Automated Detection of Multiple Bottleneck Capacities Along a Path",
+  author = "Sachin Katti and Chuck Blake and Dina Katabi and Eddie Kohler and Jacob Strauss",
+  crossref = "imc04"
+}
+
+@inproceedings{kleiman86vnodes,
+  title = "Vnodes: An Architecture for Multiple File System Types in {S}un {UNIX}",
+  author = "S.R. Kleiman",
+  crossref = "usenix86summer",
+  pages = "238--47"
+}
+
+@inproceedings{kohler99readable,
+  title = "A Readable {TCP} in the {P}rolac Protocol Language",
+  author = "Eddie Kohler and M. Frans Kaashoek and David R. Montgomery",
+  crossref = "sigcomm99", pages = "3--13",
+  readable04s = "L12bg",
+  wwwurl = "http://www.icir.org/kohler/pubs/prolac-sigcomm99.pdf"
+}
+
+@article{kohler00click,
+    author = "Eddie Kohler and Robert Morris and Benjie Chen and John Jannotti and M. Frans Kaashoek",
+    title = "The {C}lick Modular Router",
+    crossref = "j:tocs",
+    volume = 18, number = 3, year = 2000, month = aug,
+    pages = "263--297"
+}
+
+@inproceedings{kohler02programming,
+  title = "Programming language optimizations for modular router configurations",
+  author = "Eddie Kohler and Robert Morris and Benjie Chen",
+  crossref = "asplos10", pages = "251--263",
+  readable04s = "L7",
+  wwwurl = "http://www.pdos.lcs.mit.edu/papers/click:asplos02.pdf"
+}
+
+@inproceedings{kohler02modular,
+  title = "Modular components for network address translation",
+  author = "Eddie Kohler and Robert Morris and Massimiliano Poletto",
+  crossref = "openarch02", pages = "39--50",
+}
+
+@inproceedings{krohn04building,
+  title = "Building Secure High-Performance Web Services with {OKWS}",
+  author = "Maxwell Krohn",
+  crossref = "usenix04", pages = "185--198"
+}
+
+@inproceedings{krohn05make,
+  title = "Make Least Privilege a Right (Not a Privilege)",
+  author = "Maxwell Krohn and Petros Efstathopoulos and Cliff Frey and Frans Kaashoek and Eddie Kohler and David Mazi{\`e}res and Robert Morris and Michelle Osborne and Steve VanDeBogart and David Ziegler",
+  crossref = "hotos05"
+}
+
+@inproceedings{landfeldt99slm,
+  title = "{SLM}, A Framework for Session Layer Mobility Management",
+  author = "Bj{\"o}rn Landfeldt and Tomas Larsson and Yuri Ismailov and Aruna Seneviratne",
+  crossref = "icccn99"
+}
+
+@inproceedings{levis04emergence,
+  title = "The Emergence of Networking Abstractions and Techniques in {T}iny{OS}",
+  author = "Philip Levis and Sam Madden and David Gay and Joseph Polastre and Robert Szewczyk and Alec Woo and Eric Brewer and David Culler",
+  crossref = "nsdi04", pages = "1--14",
+  readable04s = "L9",
+  wwwurl = "http://www.tinyos.net/papers/tinyos-nsdi04.pdf"
+}
+
+@inproceedings{liskov04transactional,
+  title = "Transactional File Systems Can Be Fast",
+  author = "Barbara Liskov and Rodrigo Rodrigues",
+  crossref = "sigopsew04"
+}
+
+@inproceedings{liu99building,
+  title = "Building reliable, high-performance communication systems from components",
+  author = "Xiaoming Liu and Christoph Kreitz and Robbert van Renesse and Jason Hickey and Mark Hayden and Kenneth Birman and Robert Constable",
+  crossref = "sosp17", pages = "80--92",
+  readable04s = "L12",
+  wwwurl = "http://www.cs.cornell.edu/Info/Projects/Spinglass/public_pdfs/Building%20Reliable%20High.pdf"
+}
+
+@article{ludwig00eifel,
+  author = "Reiner Ludwig and Randy H. Katz",
+  title = "The {E}ifel Algorithm: Making {TCP} Robust Against Spurious Retransmissions",
+  crossref = "j:ccr", year = 2000, month = jan
+}
+
+@inproceedings{mazieres99separating,
+  title = "Separating key management from file system security",
+  author = "David Mazi{\`{e}}res and Michael Kaminsky and M. Frans Kaashoek and Emmett Witchel",
+  crossref = "sosp17", pages = "124--139",
+  readable04s = "L16",
+  wwwurl = "http://www.pdos.lcs.mit.edu/papers/sfs:sosp99.pdf"
+}
+
+@inproceedings{mazieres01toolkit,
+  title = "A toolkit for user-level file systems",
+  author = "David Mazi{\`{e}}res",
+  crossref = "usenix01", pages = "261--274",
+  readable04s = "L17bg",
+  wwwurl = "http://www.scs.cs.nyu.edu/~dm/nfsloop.ps"
+}
+
+@inproceedings{mckusick99soft,
+  title = "Soft Updates: A Technique for Eliminating Most Synchronous Writes in the {F}ast {F}ilesystem",
+  author = "Marshall Kirk McKusick and Gregory R. Ganger",
+  crossref = "freenix99", pages = "1--17"
+}
+
+@article{medina05measuring,
+  title = "Measuring the Evolution of Transport Protocols in the {I}nternet",
+  author = "Alberto Medina and Mark Allman and Sally Floyd",
+  crossref = "j:ccr", 
+  volume = 35, number = 2, month = apr, year = 2005, pages = "37--52"
+}
+
+@inproceedings{millstein02modular,
+  title = "Modular Typechecking for Hierarchically Extensible Datatypes and Functions",
+  author = "Todd Milsltein and Colin Bleckner and Craig Chambers",
+  crossref = "icfp02", pages = "110--122"
+}
+
+@inproceedings{miretskiy04avfs,
+  title = "Avfs: An On-Access Anti-Virus File System",
+  author = "Yevgeniy Miretskiy and Abhijith Das and Charles P. Wright and Erez Zadok",
+  crossref = "usenixsec04"
+}
+
+@inproceedings{morris99click,
+  title = "The {C}lick Modular Router",
+  author = "Robert Morris and Eddie Kohler and John Jannotti and M. Frans Kaashoek",
+  crossref = "sosp17", pages = "217--231",
+  readable04s = "L6",
+  wwwurl = "http://www.pdos.lcs.mit.edu/papers/click:tocs00/"
+}
+
+@inproceedings{mosberger96making,
+  title = "Making Paths Explicit in the {S}cout Operating System",
+  author = "David Mosberger and Larry L. Peterson",
+  crossref = "osdi2", pages = "153--167",
+  readable04s = "L7",
+  wwwurl = "http://www.cs.princeton.edu/nsg/papers/paths-osdi.html"
+}
+
+@inproceedings{muniswamy-reddy04versatile,
+  title = "A Versatile and User-Oriented Versioning File System",
+  author = "Kiran-Kumar Muniswamy-Reddy and Charles P. Wright and Andrew Himmer and Erez Zadok", 
+  crossref = "fast04"
+}
+
+@inproceedings{necula02cil,
+  title = "{CIL}: Intermediate Language and Tools for Analysis and Transformation of {C} Programs",
+  author = "George C. Necula and Scott McPeak and S. P. Rahul and Westley Weimer",
+  crossref = "cc02"
+}
+
+@inproceedings{pai99flash,
+  title = "Flash: An efficient and portable {W}eb server",
+  author = "Vivek S. Pai and Peter Druschel and Willy Zwaenepoel",
+  crossref = "usenix99", pages = "199--212",
+  readable04s = "L2",
+  wwwurl = "http://www.cs.princeton.edu/~vivek/flash99/"
+}
+
+@article{pai00io-lite,
+  title = "{IO}-{L}ite: A Unified {I/O} Buffering and Caching System",
+  author = "Vivek S. Pai and Peter Druschel and Willy Zwaenepoel",
+  crossref = "j:tocs", volume = 18, number = 1, year = 2000, month = feb, pages = "37--66",
+  readable04s = "L3",
+  wwwurl = "http://www.cs.princeton.edu/~vivek/iol-tocs.ps.gz"
+}
+
+@article{polastre04versatile,
+  title = "Versatile Low Power Media Access for Wireless Sensor Networks",
+  author = "Joseph Polastre and Jason Hill and David Culler",
+  crossref = "sensys04", pages = "95--107"
+}
+
+@inproceedings{ramanathan05sympathy, 
+  title = "Sympathy for the Sensor Network Debugger",
+  author = "Nithya Ramanathan and Kevin Chang and Eddie Kohler and Deborah Estrin",
+  crossref = "sensys05"
+}
+
+@inproceedings{reid00knit,
+  title = "{K}nit: Component Composition for Systems Software",
+  author = "Alastair Reid and Matthew Flatt and Leigh Stoller and Jay Lepreau and Eric Eide",
+  crossref = "osdi4"
+}
+
+@article{ritchie84stream,
+  author = "D. M. Ritchie",
+  title = "A stream input-output system",
+  journal = "AT\&T Bell Laboratories Technical Journal",
+  year = 1984, month = oct,
+  volume = 63, number = 8,
+  pages = "1897--1910"
+}
+
+@article{rosenblum92design,
+  title = "The Design and Implementation of a Log-Structured File System",
+  author = "Mendel Rosenblum and John K. Ousterhout",
+  crossref = "j:tocs",
+  volume = 10, number = 1, year = 1992, month = feb,
+  pages = "26--52"
+}
+
+@inproceedings{pang04characteristics,
+  author = "Ruoming Pang and Vinod Yegneswaran and Paul Barford and Vern Paxson and Larry Peterson",
+  title = "Characteristics of {I}nternet Background Radiation",
+  crossref = "imc04"
+}
+
+@inproceedings{olson93design,
+  author = "M. A. Olson",
+  title = "The design and implementation of the {I}nversion file system",
+  crossref = "usenix93winter",
+  pages = "205--217"
+}
+
+@inproceedings{rosenthal90evolving, 
+  title = "Evolving the Vnode Interface",
+  author = "David S. H. Rosenthal",
+  crossref = "usenix90summer"
+}
+
+@inproceedings{ruan04making,
+  title = "Making the ``Box'' Transparent: System Call Performance as a First-class Result",
+  author = "Yaoping Ruan and Vivek Pai",
+  crossref = "usenix04",
+  readable04s = "L4"
+}
+
+@article{savage99tcp,
+  title = "{TCP} Congestion Control with a Misbehaving Receiver",
+  author = "Stefan Savage and Neal Cardwell and David Wetherall and Tom Anderson",
+  crossref = "j:ccr", volume = 29, number = 5, year = 1999, month = oct, pages = "71--78",
+  readable04s = "L12",
+  wwwurl = "http://www.cs.washington.edu/homes/tom/pubs/CCR99.pdf"
+}
+
+@inproceedings{seltzer00journaling,
+  title = "Journaling versus Soft Updates: Asynchronous Meta-data Protection in File Systems",
+  author = "Margo I. Seltzer and Gregory R. Ganger and M. Kirk McKusick and Keith A. Smith and Craig A. N. Soules and Christopher A. Stein",
+  crossref = "usenix00"
+}
+
+@article{shapiro02eros,
+  title = "{EROS}: A Principle-Driven Operating System from the Ground Up",
+  author = "Jonathan S. Shapiro and Norm Hardy",
+  crossref = "j:ieeesoftware", volume = 19, number = 1, year = 2002, month = jan # "/" # feb, pages = "26--33",
+  readable04s = "L16",
+  wwwurl = "http://www.eros-os.org/papers/IEEE-Software-Jan-2002.pdf"
+}
+
+@article{shnayder04simulating,
+  title = "Simulating the Power Consumption of Large-Scale Sensor Network Applications",
+  author = "Victor Shnayder and Mark Hempstead and Bor-rong Chen and Werner Allen, Geoff and Matt Welsh",
+  crossref = "sensys04", pages = "188--200",
+  wwwurl = "http://www.eecs.harvard.edu/~shnayder/papers/sensys04ptossim.pdf"
+}
+
+@inproceedings{sherwood02automatically,
+  title = "Automatically Characterizing Large Scale Program Behavior",
+  author = "Timothy Sherwood and Erez Perelman and Greg Hamerly and Brad Calder",
+  crossref = "asplos10", pages = "45--57",
+  readable04s = "L5bg",
+  wwwurl = "http://www.cs.ucsd.edu/~calder/abstracts/ASPLOS-02-SimPoint.html"
+}
+
+@inproceedings{snoeren01reconsidering,
+  title = "Reconsidering Internet Mobility",
+  author = "Alex C. Snoeren and Hari Balakrishnan and Kaashoek, M. Frans",
+  crossref = "hotos01"
+}
+
+@inproceedings{snoeren00endtoend,
+  title = "An End-to-End Approach to Host Mobility",
+  author = "Alex C. Snoeren and Hari Balakrishnan",
+  crossref = "mobicom00"
+}
+
+@inproceedings{spalink01building,
+  title = "Building a Robust Software-Based Router Using Network Processors",
+  author = "Tammo Spalink and Scott Karlin and Larry Peterson and Yitzchak Gottlieb",
+  crossref = "sosp18", pages = "216--229",
+  readable04s = "L7bg",
+  wwwurl = "http://www.cs.princeton.edu/nsg/papers/ixp-sosp.html"
+}
+
+@inproceedings{srivastava94atom,
+  title = "{ATOM}: A System for Building Customized Program Analysis Tools",
+  author = "Amitabh Srivastava and Alan Eustace",
+  crossref = "pldi94", pages = "196--205",
+  readable04s = "L5",
+  wwwurl = "http://portal.acm.org/citation.cfm?id=178260&dl=ACM&coll=portal"
+}
+
+@inproceedings{staniford02how,
+  title = "How to 0wn the {I}nternet in Your Spare Time",
+  author = "Stuart Staniford and Vern Paxson and Nicholas Weaver",
+  crossref = "usenixsec02", pages = "149--167",
+  readable04s = "L16",
+  wwwurl = "http://www.icir.org/vern/papers/cdc-usenix-sec02/"
+}
+
+@inproceedings{stoica02internet,
+  title = "{I}nternet {I}ndirection {I}nfrastructure",
+  author = "Ion Stoica and Daniel Adkins and Shelley Zhuang and Scott Shenker and Sonesh Surana",
+  crossref = "sigcomm02", pages = "73--86",
+  readable04s = "L12",
+  wwwurl = "http://i3.cs.berkeley.edu/publications/papers/i3-sigcomm.pdf"
+}
+
+@inproceedings{swift03improving,
+  title = "Improving the Reliability of Commodity Operating Systems",
+  author = "Michael M. Swift and Brian N. Bershad and Henry M. Levy",
+  crossref = "sosp19", pages = "207--222",
+  readable04s = "L14",
+  wwwurl = "http://www.cs.washington.edu/homes/mikesw/nooks/nooks-sosp.pdf"
+}
+
+@article{tennenhouse96towards,
+  title = "Towards an Active Network Architecture",
+  author = "David L. Tennenhouse and David J. Wetherall",
+  crossref = "j:ccr", volume = 26, number = 2, year = 1996, month = apr, pages = "5--17",
+  readable04s = "L8bg",
+  wwwurl = "http://www.cs.washington.edu/homes/djw/papers/ccr96.ps"
+}
+
+@inproceedings{vanit-anunchai05discovering,
+  title = "Discovering Chatter and Incompleteness in the {D}atagram {C}ongestion {C}ontrol {P}rotocol",
+  author = "Somsak Vanit-Anunchai and Jonathan Billington and Tul Kongprakaiwoot",
+  crossref = "forte05"
+}
+
+@inproceedings{vonbehren03why,
+  title = "Why Events Are A Bad Idea (for high-concurrency servers)",
+  author = "Rob von Behren and Jeremy Condit and Eric Brewer",
+  crossref = "hotos03",
+  readable04s = "L2bg",
+  wwwurl = "http://capriccio.cs.berkeley.edu/pubs/threads-hotos-2003.pdf"
+}
+
+@inproceedings{vonbehren03capriccio,
+  title = "Capriccio: Scalable Threads for {I}nternet Services",
+  author = "Rob von Behren and Jeremy Condit and Feng Zhou and George C. Necula and Eric Brewer",
+  crossref = "sosp19", pages = "268--281",
+  readable04s = "L2",
+  wwwurl = "http://capriccio.cs.berkeley.edu/pubs/capriccio-sosp-2003.pdf"
+}
+
+@inproceedings{welsh01seda,
+  title = "{SEDA}: An Architecture for Well-Conditioned, Scalable {I}nternet Services",
+  author = "Matt Welsh and David Culler and Eric Brewer",
+  crossref = "sosp18", pages = "230--243",
+  readable04s = "L2",
+  wwwurl = "http://www.eecs.harvard.edu/~mdw/papers/seda-sosp01.pdf"
+}
+
+@inproceedings{welsh04programming,
+  title = "Programming Sensor Networks Using Abstract Regions",
+  author = "Matt Welsh and Geoff Mainland",
+  crossref = "nsdi04", pages = "29--42",
+  readable04s = "L10",
+  wwwurl = "http://www.eecs.harvard.edu/~mdw/papers/regions-nsdi04.pdf"
+}
+
+@inproceedings{wetherall99active,
+  title = "Active network vision and reality: lessons from a capsule-based system",
+  author = "David Wetherall",
+  crossref = "sosp17", pages = "64--79",
+  readable04s = "L8",
+  wwwurl = "http://www.cs.washington.edu/homes/djw/papers/anet-sosp99.pdf"
+}
+
+@inproceedings{wright01ncryptfs,
+  title = "{NC}ryptfs: A Secure and Convenient Cryptographic File System",
+  author = "Charles P. Wright and Michael C. Martino and Erez Zadok",
+  crossref = "usenix03"
+}
+
+@inproceedings{zadok00fist,
+  author = "Erez {Zadok} and Jason {Nieh}",
+  title = "{FiST}: A Language for Stackable File Systems",
+  crossref = "usenix00",
+  pages = "55--70"
+}
+
+@inproceedings{zeldovich03multiprocessor,
+  title = "Multiprocessor Support for Event-Driven Programs",
+  author = "Nickolai Zeldovich and Alexander Yip and Frank Dabek and Robert T. Morris and David Mazi{\`{e}}res and Frans Kaashoek",
+  crossref = "usenix03", pages = "239--252",
+  readable04s = "L3bg",
+  wwwurl = "http://www.pdos.lcs.mit.edu/papers/asyncmp/"
+}
+
+@inproceedings{zhang02on,
+  title = "On the Characteristics and Origins of {I}nternet Flow Rates",
+  author = "Yin Zhang and Lee Breslau and Vern Paxson and Scott Shenker",
+  crossref = "sigcomm02"
+}
+
+
+@inproceedings{zadok99extending,
+  title = "{Extending File Systems Using Stackable Templates}",
+  author = "Erez Zadok and Ion Badulescu and Alex Shender",
+  pages = "57--70",
+  crossref = "usenix99"
+}
+
+@inproceedings{vilayannur05providing,
+  title = "Providing Tunable Consistency for a Parallel File Store",
+  author = "Murali Vilayannur and Partho Nath and Anand Sivasubramaniam",
+  crossref = "fast05"
+}
+
+@inproceedings{sivathanu05database-aware,
+  title = "Database-Aware Semantically-Smart Storage",
+  author = "Muthian Sivathanu and Lakshmi Bairavasundaram and Andrea C. Arpaci-Dusseau and Remzi H. Arpaci-Dusseau",
+  crossref = "fast05"
+}
+
+@inproceedings{sivathanu03semantically-smart,
+  title = "Semantically-Smart Disk Systems",
+  author = "Muthian Sivathanu and Vijayan Prabhakaran and Florentina Popovici and Timothy Denehy and Andrea C. Arpaci-Dusseau and Remzi H. Arpaci-Dusseau",
+  crossref = "fast03"
+}
+
+@article{wright06versatility,
+  author = "Charles P. Wright and  Jay Dave and Puja Gupta and Harikesavan Krishnan and David P. Quigley and Erez Zadok and Mohammad Nayyer Zubair",
+  title = "Versatility and {U}nix Semantics in Namespace Unification",
+  crossref = "j:tos", month = mar, year = 2006
+}
+
+@inproceedings{gal05transactional,
+  title = "A Transactional {F}lash File System for Microcontrollers",
+  author = "Eran Gal and Sivan Toledo",
+  crossref = "usenix05", pages = "89--104"
+}
+
+@inproceedings{denehy05journal-guided,
+  title = "Journal-guided Resynchronization for Software {RAID}",
+  author = "Timothy E. Denehy and Andrea C. Arpaci-Dusseau and Remzi H. Arpaci-Dusseau",
+  crossref = "fast05"
+}
+
+
+%% PROCEEDINGS
+
+@proceedings{asplos6,
+  booktitle = Proc # "6th International Conference on Architectural Support for Programming Languages and Operating Systems ({ASPLOS-VI})",
+  year = 1994, month = oct,
+  address = "San Jose, California"
+}
+
+@proceedings{asplos10,
+  booktitle = Proc # "10th International Conference on Architectural Support for Programming Languages and Operating Systems ({ASPLOS-X})",
+  year = 2002, month = oct,
+  address = "San Jose, California",
+  bookurl = "http://www.cs.wisc.edu/asplos-X/"
+}
+
+@proceedings{cc02,
+  booktitle = Proc # "11th International Conference on Compiler Construction ({CC}~'02)",
+  year = 2002, month = mar,
+  address = "Grenoble, France"
+}
+
+@proceedings{ccs93,
+  booktitle = Proc # "1st ACM Conference on Communications and Computing Security",
+  year = 1993, month = nov
+}
+
+@proceedings{fast03,
+  booktitle = Proc # "2nd {USENIX} Conference on File and Storage Technologies ({FAST} '03)", 
+  year = 2003, month = mar,
+  address = "San Francisco, California"
+}
+
+@proceedings{fast04,
+  booktitle = Proc # "3rd {USENIX} Conference on File and Storage Technologies ({FAST} '04)", 
+  year = 2004, month = mar,
+  address = "San Francisco, California"
+}
+
+@proceedings{fast05,
+  booktitle = Proc # "4th {USENIX} Conference on File and Storage Technologies ({FAST} '05)", 
+  year = 2005, month = dec,
+  address = "San Francisco, California"
+}
+
+@proceedings{forte05,
+  booktitle = Proc # "25th {IFIP} International Conference on Formal Techniques for Networked and Distributed Systems",
+  year = 2005, month = oct,
+  address = "Taipei, Taiwan"
+}
+
+@proceedings{freenix99,
+  booktitle = Proc # "1999 USENIX Technical Conference---FREENIX Track",
+  year = 1999, month = jun,
+  address = "Monterey, California"
+}
+
+@proceedings{hotnets1,
+  booktitle = "Workshop Record of the 1st Workshop on Hot Topics in Networks ({HOTNETS}-I)",
+  year = 2002, month = oct,
+  address = "Princeton, New Jersey",
+  bookurl = "http://www.acm.org/sigcomm/HotNets-I/"
+}
+
+@proceedings{hotos01,
+  booktitle = Proc # "8th Workshop on Hot Topics in Operating Systems ({H}ot{OS}-{VIII})",
+  year = 2001, month = may,
+  address = "Elmau/Oberbayern, Germany",
+  bookurl = "http://i30www.ira.uka.de/conferences/HotOS/"
+}
+
+@proceedings{hotos03,
+  booktitle = Proc # "9th Hot Topics in Operating Systems Symposium ({H}ot{OS}-{IX})",
+  year = 2003, month = may,
+  address = "Lihue, Hawaii",
+  bookurl = "http://www.usenix.org/events/hotos03/"
+}
+
+@proceedings{hotos05,
+  booktitle = Proc # "10th Hot Topics in Operating Systems Symposium ({H}ot{OS}-{X})",
+  year = 2005, month = jun,
+  address = "Santa Fe, New Mexico",
+  bookurl = "http://www.usenix.org/events/hotos05/"
+}
+
+@proceedings{icdcs96,
+  booktitle = Proc # "16th International Conference on Distributed Computing Systems", 
+  year = 1996, month = may,
+  address = "Hong Kong"
+}
+
+@proceedings{icfp02,
+  booktitle = Proc # "2002 International Conference on Functional Programming ({ICFP} '02)",
+  year = 2002, month = oct,
+  address = "Pittsburgh, Pennsylvania",
+  bookurl = "http://icfp2002.cs.brown.edu/"
+}
+
+@proceedings{icccn99,
+  booktitle = Proc # "{IEEE} {ICCCN}'99",
+  year = 1999,
+  address = "Boston, Massachusetts"
+}
+
+@proceedings{icnp00,
+  booktitle = Proc # "8th International Conference on Network Protocols ({ICNP} '01)",
+  year = 2000, month = nov
+}
+
+@proceedings{icnp01,
+  booktitle = Proc # "9th International Conference on Network Protocols ({ICNP} '01)",
+  year = 2001, month = nov,
+  address = "Mission Inn, Riverside, California"
+}
+
+@proceedings{imc04,
+  booktitle = Proc # "Internet Measurement Conference ({IMC}) 2004",
+  year = 2004, month = oct,
+  address = "Taormina, Sicily",
+  bookurl = "http://www-net.cs.umass.edu/imc-2004/",
+}
+
+@proceedings{infocom02,
+  booktitle = Proc # "21st Annual Joint Conference of the IEEE Computer and Communications Societies (IEEE Infocom 2002)",
+  year = 2002, month = jun,
+  bookurl = "New York, New York"
+}
+
+@proceedings{imw02,
+  booktitle = Proc # "2nd Internet Measurement Workshop ({IMW} '02)",
+  year = 2002, month = nov,
+  address = "Marseille, France",
+  bookurl = "http://www.icir.org/vern/imw-2002/"
+}
+
+@proceedings{ipsn04,
+  booktitle = Proc # "3rd International Symposium on Information Processing in Sensor Networks ({IPSN} '04)",
+  year = 2004, month = apr,
+  bookurl = "Berkeley, California"
+}
+
+@proceedings{nsdi04,
+  booktitle = Proc # "1st Symposium on Networked Systems Design and Implementation ({NSDI} '04)",
+  year = 2004, month = mar,
+  address = "San Francisco, California"
+}
+
+@proceedings{mobicom99,
+  booktitle = Proc # "5th Annual International Conference on Mobile Computing and Networking (MobiCom '99)",
+  year = 1999, month = aug,
+  location = "Seattle, Washington"
+}
+
+@proceedings{mobicom00,
+  booktitle = Proc # "6th Annual International Conference on Mobile Computing and Networking (MobiCom 2000)",
+  year = 2000, month = aug,
+  location = "Boston, Massachusetts"
+}
+
+@proceedings{mobicom01,
+  booktitle = Proc # "7th Annual International Conference on Mobile Computing and Networking (MobiCom 2001)",
+  year = 2001, month = jul,
+  location = "Rome, Italy"
+}
+
+@proceedings{mobicom02,
+  booktitle = Proc # "8th Annual International Conference on Mobile Computing and Networking (MobiCom 2002)",
+  year = 2002, month = sep,
+  location = "Atlanta, Georgia"
+}
+
+@proceedings{mobisys05,
+  booktitle = Proc # "3rd International Conference on Mobile Systems, Applications, and Services ({M}obi{S}ys '05)",
+  year = 2005, month = jun,
+  address = "Seattle, Washington",
+  bookurl = "http://www.sigmobile.org/mobisys/2005/"
+}
+
+@proceedings{nsdi05,
+  booktitle = Proc # "2nd Symposium on Networked Systems Design \& Implementation ({NSDI} '05)",
+  year = 2005, month = may,
+  address = "Boston, Massachusetts",
+  bookurl = "http://www.usenix.org/events/nsdi05/"
+}
+
+@proceedings{oopsla00,
+  booktitle = Proc # "2000 {ACM} {SIGPLAN} Conference on Object-Oriented Programming Systems, Languages, and Applications ({OOPSLA} '00)",
+  year = 2000, month = oct,
+  address = "Minneapolis, Minnesota"
+}
+
+@proceedings{openarch99,
+  booktitle = Proc # "2nd {IEEE} Conference on Open Architectures and Network Programming ({OpenArch} '99)",
+  year = 1999, month = mar,
+  address = "New York, New York",
+  bookurl = "http://www.ctr.columbia.edu/comet/activities/openarch99/",
+}
+
+@proceedings{openarch02,
+  booktitle = Proc # "5th International Conference on Open Architectures and Network Programming ({OPENARCH} '02)",
+  year = 2002, month = jun,
+  address = "New York, New York",
+  bookurl = "http://www.openarch.org/",
+}
+
+@proceedings{osdi1,
+  booktitle = Proc # "1st {USENIX} Symposium on Operating Systems Design and Implementation ({OSDI} '94)",
+  year = 1994, month = nov
+}
+
+@proceedings{osdi2,
+  booktitle = Proc # "2nd {USENIX} Symposium on Operating Systems Design and Implementation ({OSDI} '96)",
+  year = 1996, month = oct,
+  address = "Seattle, Washington"
+}
+
+@proceedings{osdi3,
+  booktitle = Proc # "3rd {USENIX} Symposium on Operating Systems Design and Implementation ({OSDI} '99)",
+  year = 1999, month = feb,
+  address = "New Orleans, Louisiana"
+}
+
+@proceedings{osdi4,
+  booktitle = Proc # "4th Symposium on Operating Systems Design and Implementation ({OSDI} 2000)",
+  year = 2000, month = oct,
+  address = "San Diego, California"
+}
+
+@proceedings{osdi5,
+  booktitle = Proc # "5th Symposium on Operating Systems Design and Implementation ({OSDI} '02)",
+  year = 2002, month = dec,
+  address = "Boston, Massachusetts"
+}
+
+@proceedings{pldi94,
+  booktitle = Proc # "{ACM} {SIGPLAN} '94 Conference on Programming Language Design and Implementation ({PLDI})",
+  year = 1994, month = jun,
+  address = "Orlando, Florida"
+}
+
+@proceedings{pldi98,
+  booktitle = Proc # "{ACM} {SIGPLAN} '98 Conference on Programming Language Design and Implementation ({PLDI})",
+  year = 1998, month = jun,
+  address = "Montr{\'e}al, Canada"
+}
+
+@proceedings{pldi03,
+  booktitle = Proc # "{ACM} {SIGPLAN} 2003 Conference on Programming Language Design and Implementation ({PLDI})",
+  year = 2003, month = jun,
+  address = "San Diego, California"
+}
+
+@proceedings{sensys03,
+  booktitle = Proc # "1st {ACM} Conference on Embedded Networked Sensor Systems ({SenSys} 2003)",
+  year = 2003, month = nov,
+  address = "Los Angeles, California"
+}
+
+@proceedings{sensys04,
+  booktitle = Proc # "2nd {ACM} Conference on Embedded Networked Sensor Systems ({SenSys} 2004)",
+  year = 2004, month = nov,
+  address = "Baltimore, Maryland",
+  bookurl = "http://www.cse.ohio-state.edu/sensys04/",
+}
+
+@proceedings{sensys05,
+  booktitle = "To appear in " # Proc # "3rd {ACM} Conference on Embedded Networked Sensor Systems ({S}en{S}ys '05)",
+  year = 2005, month = nov,
+  address = "San Diego, California"
+}
+
+@proceedings{sigcomm99,
+  booktitle = Proc # "{ACM} {SIGCOMM} '99 Conference: Applications, Technologies, Architectures, and Protocols for Computer Communication",
+  year = 1999, month = aug,
+  address = "Cambridge, Massachusetts",
+  bookurl = "http://www.acm.org/sigcomm/sigcomm99/",
+}
+
+@proceedings{sigcomm02,
+  booktitle = Proc # "{ACM} {SIGCOMM} 2002 Conference: Applications, Technologies, Architectures, and Protocols for Computer Communication",
+  year = 2002, month = aug,
+  address = "Pittsburgh, Pennsylvania",
+  bookurl = "http://www.acm.org/sigcomm/sigcomm2002/",
+}
+
+@proceedings{sigmetrics03,
+  booktitle = Proc # "2003 {ACM} {SIGMETRICS} International Conference on Measurement and Modeling of Computer Systems",
+  year = 2003, month = jun,
+  address = "San Diego, California"
+}
+
+@proceedings{sigopsew04,
+  booktitle = Proc # "11th ACM SIGOPS European Workshop",
+  year = 2004, month = sep,
+  address = "Leuven, Belgium"
+}
+
+@proceedings{sosp11,
+  booktitle = Proc # "11th " # SOSP,
+  year = 1987, month = nov,
+  address = "Austin, Texas"
+}
+
+@proceedings{sosp14,
+  booktitle = Proc # "14th " # SOSP,
+  year = 1993, month = dec,
+  address = "Asheville, North Carolina"
+}
+
+@proceedings{sosp15,
+  booktitle = Proc # "15th " # SOSP,
+  year = 1995, month = dec,
+  address = "Copper Mountain Resort, Colorado"
+}
+
+@proceedings{sosp16,
+  booktitle = Proc # "16th " # SOSP,
+  year = 1997, month = oct,
+  address = "Saint-Mal{\^{o}}, France"
+}
+
+@proceedings{sosp17,
+  booktitle = Proc # "17th " # SOSP,
+  year = 1999, month = dec,
+  address = "Kiawah Island, South Carolina",
+  bookurl = "http://www.acm.org/sigs/sigops/sosp99/",
+}
+
+@proceedings{sosp18,
+  booktitle = Proc # "18th " # SOSP,
+  year = 2001, month = oct,
+  address = "Ch{\^{a}}teau Lake Louise, Alberta, Canada"
+}
+
+@proceedings{sosp19,
+  booktitle = Proc # "19th " # SOSP,
+  year = 2003, month = oct,
+  address = "Bolton Landing, Lake George, New York"
+}
+
+@proceedings{sosp20,
+  booktitle = Proc # "20th " # SOSP,
+  year = 2005, month = oct,
+  address = "Brighton, England"
+}
+
+@proceedings{usenix86summer,
+  booktitle = Proc # "1986 USENIX Summer Technical Conference",
+  year = 1986,
+  address = "Atlanta, Georgia"
+}
+
+@proceedings{usenix90summer,
+  booktitle = Proc # "1990 USENIX Summer Technical Conference",
+  year = 1990, month = jan,
+  address = "Anaheim, California"
+}
+
+@proceedings{usenix93winter,
+  booktitle = Proc # "1993 USENIX Winter Technical Conference",
+  year = 1993, month = jan,
+  address = "San Diego, California"
+}
+
+@proceedings{usenix99,
+  booktitle = Proc # "1999 " # USENIX,
+  year = 1999, month = jun,
+  address = "Monterey, California"
+}
+
+@proceedings{usenix00,
+  booktitle = Proc # "2000 " # USENIX,
+  year = 2000, month = jun,
+  location = "San Diego"
+}
+
+@proceedings{usenix01,
+  booktitle = Proc # "2001 " # USENIX,
+  year = 2001, month = jun,
+  location = "Boston"
+}
+
+@proceedings{usenix02,
+  booktitle = Proc # "2002 " # USENIX,
+  year = 2002, month = jun,
+  location = "Monterey, California"
+}
+
+@proceedings{usenix03,
+  booktitle = Proc # "2003 " # USENIX,
+  year = 2003, month = jun,
+  address = "San Antonio, Texas"
+}
+
+@proceedings{usenix04,
+  booktitle = Proc # "2004 " # USENIX,
+  year = 2004, month = jun,
+  address = "Boston, Massachusetts"
+}
+
+@proceedings{usenix05,
+  booktitle = Proc # "2005 " # USENIX,
+  year = 2005, month = apr,
+  address = "Anaheim, California"
+}
+
+@proceedings{usenixsec02,
+  booktitle = Proc # "11th {USENIX} Security Symposium (Security '02)", 
+  year = 2002, month = aug,
+  address = "San Francisco, California"
+}
+
+@proceedings{usenixsec04,
+  booktitle = Proc # "13th {USENIX} Security Symposium (Security '04)", 
+  year = 2004, month = aug,
+  address = "San Diego, California"
+}
+
+@proceedings{usits03,
+  booktitle = Proc # "4th {USENIX} Symposium on {I}nternet Technologies and Systems ({USITS} '03)",
+  year = 2003, month = mar,
+  address = "Seattle, Washington"
+}
+
+@proceedings{wcsss99,
+  booktitle = "Workshop Record of {WCSSS} '99: The 2nd {ACM} {SIGPLAN} Workshop on Compiler Support for Systems Software",
+  year = 1999, month = may,
+  address = "Atlanta, Georgia",
+  bookurl = "http://www.irisa.fr/compose/wcsss99/"
+}
+
+%% JOURNALS
+
+@article{j:ccr,
+  journal = "{ACM} Computer Communication Review"
+}
+
+@article{j:ieee-toc,
+  journal = IEEEabbr # " Transactions on Computers",
+}
+
+@article{j:osr,
+  journal = "Operating Systems Review",
+  organization = ACM,
+}
+
+@article{j:toplas,
+  journal = ACMabbr # " Transactions on Programming Languages and Systems",
+}
+
+@article{j:tocs,
+  journal = ACMabbr # " Transactions on Computer Systems",
+}
+
+@article{j:tos,
+  journal = ACMabbr # " Transactions on Storage",
+}
+
+@article{j:tse,
+  journal = ACMabbr # " Transactions on Software Engineering",
+}
+
+@article{j:winet,
+  journal = ACMabbr # " Wireless Networks",
+}
+
