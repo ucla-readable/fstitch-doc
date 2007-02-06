@@ -40,6 +40,9 @@ struct chdesc {
         } byte;
     };
     struct chdesc_queue *dependencies;
+    uint32_t nbefores[NBDLEVEL];
+    chdesc_t * ddesc_ready_next;
+    chdesc_t ** ddesc_ready_prev;
 /* ... */ };
 \end{verbatim}
 \end{scriptsize}
@@ -228,6 +231,41 @@ A \emph{managed} \noop\ must be explicitly satisfied; any changes that
 This is used, for instance, by the journal \module\
  (\S\ref{sec:consistency:journal}) to prevent a transaction's \chdescs\
  from being written before the journal commits.
+
+\paragraph{Fast Revision Slice Creation}
+\todo{Should we integrate this paragraph into the rest of this section?}
+%
+For a \module\ like the write back cache to forward \chdescs\ in a
+dependency-preserving order, the \module\ must find all \chdescs\ on a
+given block whose befores are either on a lower block device or are
+part of the new revision slice and on the current block device.
+Because the write back cache frequently scans for dirty blocks,
+\Kudos\ incrementally builds and caches before information and uses
+this to maintain a list of ready \chdescs\ for each block at each
+level.
+
+Each \chdesc\ tracks the number of befores it has, on a per-level basis;
+%
+thus a \chdesc\ is ready to move down a level in a dependency-preserving
+order when it has no befores at a level greater than the target level.
+%
+A \chdesc{}'s before counts are incrementally updated, as befores are
+added to and removed from the \chdesc\ and as befores move between
+block devices. NOOPs not on a block device are not at a level and thus
+require special handling; instead of directly increasing the before
+counts of its afters, such a NOOP propagates its own before counts.
+%
+When a before count update indicates a \chdesc\ is ready to move down
+a level, the \chdesc\ is added to its owner's ready list. To create a
+revision slice for a block, an owner thus iterates through the block's
+ready list, moving \chdescs\ to the target block device, until the
+list is empty.\todo{Should we include performance improvement numbers?}
+
+\paragraph{Nonrollbackable Change Descriptors}
+
+Saving Data and Merging Chdescs
+
+NRBs, single NRB per block, ddesc external after count, propagation, \ldots
 
 %% \subsubsection{Block Revisions}
 % FIXME maybe make an analogy to packets flowing through a network? -LZ
