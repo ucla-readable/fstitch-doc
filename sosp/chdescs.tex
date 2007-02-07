@@ -251,9 +251,9 @@ order when it has no befores at a level greater than the target level.
 %
 A \chdesc{}'s before counts are incrementally updated, as befores are
 added to and removed from the \chdesc\ and as befores move between
-block devices. NOOPs not on a block device are not at a level and thus
+block devices. \Noops\ not on a block device are not at a level and thus
 require special handling; instead of directly increasing the before
-counts of its afters, such a NOOP propagates its own before counts.
+counts of its afters, such a \noop\ propagates its own before counts.
 %
 When a before count update indicates a \chdesc\ is ready to move down
 a level, the \chdesc\ is added to its block's ready list. To create a
@@ -271,24 +271,44 @@ implemented using two bytes of memory for each byte to change on disk.
 %
 However, many \chdescs\ are never rolled back; e.g., file data blocks
 often contain a single \chdesc. Restricting the addition of befores to
-\chdescs\ being created and to NOOPs with no afters\todo{Talk about
-  this more? Elsewhere?} allows reasoning about a \chdesc{}'s future.
-Significantly, a \chdesc\ created on a block for which there were no
-external afters on any existing \chdesc\ on the block will
+\chdescs\ being created and to \noops\ with no afters\todo{Talk about
+  this more? Elsewhere?} allows strong reasoning about a \chdesc{}'s
+future.  Significantly, a \chdesc\ created on a block for which there
+were no external afters on any existing \chdesc\ on the block will
 \textit{never} need to be rolled back. One can thus omit such a
 \chdesc{}'s rollback information, creating a \textit{nonrollbackable}
 \chdesc.
 
 A \chdesc\ is external to a block if and only if it is a byte, bit, or
-on-block NOOP \chdesc\ on another block. In determining whether a NOOP
-not on a block is an external after, the NOOP's afters are recursively
-analyzed. To avoid redundant scanning, each block descriptor tracks
-its number of external afters, updated when afters are added to and
-removed from \chdescs\ on the block. Whereas \chdesc\ before counts
-track befores and propagate through NOOP afters, block descriptor
-external after counts track afters and propagate through NOOP befores.
+on-block \noop\ \chdesc\ on a different block. In determining whether a
+\noop\ not on a block is an external after, the \noop{}'s afters are
+recursively analyzed. To avoid redundant scanning, each block
+descriptor tracks its number of external afters, updated when afters
+are added to and removed from \chdescs\ on the block. Whereas \chdesc\
+before counts track befores and propagate through \noop\ afters, block
+descriptor external after counts track afters and propagate through
+\noop\ befores\todo{Does this sentence actually provide any insight?}.
 
-Now describe single NRB per block and NRB merging\ref{fig:nrb-merge}.
+Notice that two nonrollbackable \chdescs\ on a block must be committed
+in the same revision slice; neither can (or will need to) be rolled
+back. This illustrates the underlying reason why two nonrollbackable
+\chdescs\ can be merged into a single nonrollbackable \chdesc.
+%
+While no block-level dependency cycles can be induced by a merge,
+without sufficient care a merge could induce \chdesc{}-level
+dependency cycles. A trivial example is merging \nrb{B} into \nrb{A}
+when \nrb{B} has an explicit dependency on \nrb{A}; the combined
+\nrb{(A+B)} should not and need not depend on itself. The dependency
+addition and nonrollbackable \chdesc\ creation rules restrict the
+possible dependencies involving \nrb{A} and \nrb{B} to \textit{only}
+those shown in Figure~\ref{fig:nrb-merge}\todo{Should we give these
+  deductions or a flavor?}. From these possible dependencies follows
+an algorithm that recurses \nrb{B}'s before dependency chains until an
+external \chdesc\ is encountered and that for each \ncd{C} along the
+chain with a before path to \nrb{A}, moves all of \ncd{C}'s befores
+without before paths to be befores of \nrb{A}\todo{This could be more
+  lucid.} This graph manipulation preserves the system's \chdesc\
+dependencies.
 
 \begin{figure}[htb]
   \centering
@@ -296,6 +316,18 @@ Now describe single NRB per block and NRB merging\ref{fig:nrb-merge}.
   \caption{Possible dependencies when merging \chdesc\ $C$ into $A$.}
   \label{fig:nrb-merge}
 \end{figure}
+
+TODO: talk about why NRBs slow down revision slice creation or talk
+about how we detect RB$\rightarrow$NRB changes and do then NRB merges
+to avoid this slowdown.
+
+Say something along the lines:
+%
+The dynamic optimizations facilitated through nonrollbackable
+\chdescs\ implement the efficiency in systems using soft updates or
+journaling\todo{Actually do this for journaling} while expressing
+changes modularly through structural descriptions rather than through
+internal and semantic file system descriptors.
 
 \todo{Should we include memory/performance improvement numbers?}
 

@@ -27,12 +27,36 @@
 
 \newcommand{\Kudos}{Kudos}
 \newcommand{\Noop}{No-op}
+\newcommand{\Noops}{No-ops}
 \newcommand{\noop}{no-op}
 \newcommand{\noops}{no-ops}
 
 \newcommand{\abandon}{abandon}
 \newcommand{\engaged}{engaged}
 \newcommand{\engages}{engages}
+
+
+% chdesc notation
+\newcommand{\cd}[1]{\ensuremath{#1}} % basic chdesc
+\newcommand{\cdb}[2]{\ensuremath{\cd{#1}_#2}} % chdesc on a block
+
+\newcommand{\dcd}[1]{\ensuremath{\cd{#1}^\mathrm{d}}} % data chdesc
+\newcommand{\ncd}[1]{\ensuremath{\cd{#1}^\mathrm{n}}} % noop chdesc
+
+\newcommand{\rb}[1]{\ensuremath{\cd{#1}^\mathrm{rb}}} % RB chdesc
+\newcommand{\nrb}[1]{\ensuremath{\cd{#1}^\mathrm{nrb}}} % NRB chdesc
+
+\newcommand{\drb}[1]{\ensuremath{\cd{#1}^\mathrm{d,rb}}} % data RB
+\newcommand{\nooprb}[1]{\ensuremath{\cd{#1}^\mathrm{n,rb}}} % noop RB
+\newcommand{\dnrb}[1]{\ensuremath{\cd{#1}^\mathrm{d,nrb}}} % data NRB
+
+\newcommand{\depends}[2]{\ensuremath{#1\! \rightarrow\! #2}} % depends (right)
+\newcommand{\ldepends}[2]{\ensuremath{#1\! \leftarrow\! #2}} % depends (left)
+\newcommand{\indirdepends}[2]{\ensuremath{#1\! \leadsto\! #2}} % indirect depends
+\newcommand{\cycledepends}[2]{\ensuremath{#1\! \leftrightarrow\! #2}} % cycle
+
+\newcommand{\cdset}[1]{\ensuremath{\mathbf{#1}}} % chdesc set
+
 
 \usepackage{url,hyperref,ifpdf}
 \ifpdf
