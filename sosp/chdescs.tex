@@ -256,16 +256,48 @@ require special handling; instead of directly increasing the before
 counts of its afters, such a NOOP propagates its own before counts.
 %
 When a before count update indicates a \chdesc\ is ready to move down
-a level, the \chdesc\ is added to its owner's ready list. To create a
+a level, the \chdesc\ is added to its block's ready list. To create a
 revision slice for a block, an owner thus iterates through the block's
 ready list, moving \chdescs\ to the target block device, until the
 list is empty.\todo{Should we include performance improvement numbers?}
 
 \paragraph{Nonrollbackable Change Descriptors}
+\todo{Should we entitle this paragraph after the goal (two goals?)
+  instead of our solution?}
+%
+Each byte and bit \chdesc\ includes information permitting that
+\chdesc\ to be rolled back to resolve block-level dependency cycles,
+implemented using two bytes of memory for each byte to change on disk.
+%
+However, many \chdescs\ are never rolled back; e.g., file data blocks
+often contain a single \chdesc. Restricting the addition of befores to
+\chdescs\ being created and to NOOPs with no afters\todo{Talk about
+  this more? Elsewhere?} allows reasoning about a \chdesc{}'s future.
+Significantly, a \chdesc\ created on a block for which there were no
+external afters on any existing \chdesc\ on the block will
+\textit{never} need to be rolled back. One can thus omit such a
+\chdesc{}'s rollback information, creating a \textit{nonrollbackable}
+\chdesc.
 
-Saving Data and Merging Chdescs
+A \chdesc\ is external to a block if and only if it is a byte, bit, or
+on-block NOOP \chdesc\ on another block. In determining whether a NOOP
+not on a block is an external after, the NOOP's afters are recursively
+analyzed. To avoid redundant scanning, each block descriptor tracks
+its number of external afters, updated when afters are added to and
+removed from \chdescs\ on the block. Whereas \chdesc\ before counts
+track befores and propagate through NOOP afters, block descriptor
+external after counts track afters and propagate through NOOP befores.
 
-NRBs, single NRB per block, ddesc external after count, propagation, \ldots
+Now describe single NRB per block and NRB merging\ref{fig:nrb-merge}.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\columnwidth]{nrb_merge}
+  \caption{Possible dependencies when merging \chdesc\ $C$ into $A$.}
+  \label{fig:nrb-merge}
+\end{figure}
+
+\todo{Should we include memory/performance improvement numbers?}
 
 %% \subsubsection{Block Revisions}
 % FIXME maybe make an analogy to packets flowing through a network? -LZ
