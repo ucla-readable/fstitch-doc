@@ -318,7 +318,7 @@ dependencies.
 \end{figure}
 
 TODO: talk about why NRBs slow down revision slice creation or talk
-about how we detect RB$\rightarrow$NRB changes and do then NRB merges
+about how we detect RB$\rightarrow$NRB changes and then do NRB merges
 to avoid this slowdown.
 
 Say something along the lines:
@@ -327,9 +327,11 @@ The dynamic optimizations facilitated through nonrollbackable
 \chdescs\ implement the efficiency in systems using soft updates or
 journaling\todo{Actually do this for journaling} while expressing
 changes modularly through structural descriptions rather than through
-internal and semantic file system descriptors.
+internal and semantic file system descriptions.
 
 \todo{Should we include memory/performance improvement numbers?}
+\todo{Should we talk about why we allow NRBs to be disabled? (Debugging
+simplicity and depend add to noops with afters bug catching.)}
 
 %% \subsubsection{Block Revisions}
 % FIXME maybe make an analogy to packets flowing through a network? -LZ
