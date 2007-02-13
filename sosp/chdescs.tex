@@ -192,9 +192,39 @@ are handled by common library functions available to any module.
 %% library functions, so that if other \modules\ need to do similar things, the
 %% functionality will already be available.
 
+\noindent Definition: A \chdesc\ on a device at level $l$ is at level $l$
+if it is not in flight or level $l+1$ if it is in flight.
 
+\newcounter{chdescinvari}
+\newcommand{\chdescinvar}[1]{\begin{enumerate}\setcounter{enumi}{\value{chdescinvari}}\item #1\setcounter{chdescinvari}{\value{enumi}}\end{enumerate}}
 
-\paragraph{\Noop\ Change Descriptors}
+\noindent Invariants:
+\chdescinvar{A \chdesc\ dependency graph is acyclic.}
+
+\chdescinvar{A \chdesc\ at level $l$'s befores are at levels $\leq l$.}
+
+\chdescinvar{A rolledback \chdesc{}'s afters are rolledback.}
+
+\subsection{\ChDesc\ Optimizations}
+
+Definition: A \noop{}'s level is the max level of its befores.
+
+\noindent Optimization invariants:
+\chdescinvar{Each \chdesc\ tracks how many befores it has at each level.}
+
+\chdescinvar{Each block has a list of \chdescs\ on that block.}
+
+\chdescinvar{Each block has a list of \chdescs\ on that block that are ready
+  to be moved down by one level.}
+
+\chdescinvar{Each block has a list of \chdescs\ that are not entirely overlaped.}
+
+\chdescinvar{Each block tracks the total number of external afters for
+  \chdescs\ on that block.}
+
+\chdescinvar{Each block has at most one nonrollbackable \chdesc.}
+
+\paragraph{\Noop\ \ChDescs}
 \label{sec:design:chdescs:noop}
 
 The prototypical \chdesc\ corresponds to some change on disk, but \Kudos\
