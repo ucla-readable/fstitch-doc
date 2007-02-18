@@ -33,9 +33,9 @@ Additionally, a new system call interface gives applications some direct
 improve the UW IMAP server, removing inefficient and unnecessary calls to
 \texttt{fsync()} while preserving the integrity of mail messages.
 %
-We have implemented \Kudos\ as both a Linux kernel module and a
-FUSE~\cite{fuse} userspace file system server. Our current untuned
+We have implemented \Kudos\ as a Linux kernel module. Our current
 implementation is competitive with FreeBSD soft updates for number of
-blocks written.
+blocks written, and allows several novel configurations like ext2 with
+soft updates or correct UFS soft updates over a loopback device.
 
 \end{abstract}

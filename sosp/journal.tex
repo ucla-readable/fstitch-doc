@@ -43,9 +43,9 @@ premature reuse of blocks -- we could even obtain metadata-only journaling (as
 opposed to the full data journaling described here). The extra \chdesc\
 dependencies would serve the same purpose as the special hooks and corner cases
 surrounding reuse of blocks discussed in \cite{tweedie00ext3}. The journal
-\module\ can automatically identify metadata \chdescs\ because of the LFS
+\module\ can automatically identify metadata \chdescs\ because of the \LFS\
 interface described in \S\ref{sec:design:interfaces}. Other block device
 layering systems, like GEOM~\cite{geom} or JBD in Linux, would or do need
 special hooks into file system code to determine what disk changes represent
-metadata in order to do metadata-only journaling. \Chdescs\ and the LFS
+metadata in order to do metadata-only journaling. \Chdescs\ and the \LFS\
 interface allow us to do this automatically.

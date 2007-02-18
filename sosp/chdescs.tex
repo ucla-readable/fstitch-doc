@@ -68,7 +68,7 @@ Each change descriptor applies to data on exactly one block, and each block link
 %
 Different change types correspond to different forms of
 \chdescs; the \chdesc\ for a flipped bit -- such as in a free-block bitmap --
-contains an offset and mask, while larger changes contain an offset, a length,
+contains an offset and mask, while larger changes contain a byte offset, a length,
 and the new data. The \chdesc's \emph{dependencies} point to other \chdescs\ that must
 precede it to stable storage. A \chdesc\ can be applied or reverted to switch
 the cached block's state between old and new.
@@ -136,8 +136,8 @@ information.
 A change descriptor is \emph{satisfied} when the change to which it
  corresponds has been resolved---for instance, written to disk.
 %
-If one change descriptor depends on another, then the depender (the change
- descriptor depended on) must be satisfied before the dependee (the change
+If one change descriptor depends on another, then the dependee (the change
+ descriptor depended on) must be satisfied before the depender (the change
  descriptor that depends) can be written to disk itself.
 
 
@@ -183,14 +183,11 @@ A collection of simple operations, such as shifting a \chdesc\ from one block to
 are handled by common library functions available to any module.
 
 %% Additionally, there are some more complex transformations which are useful for
-%% devices like the mirroring block device (\S\ref{sec:modules:raid}), or the
-%% journaling \module (\S\ref{sec:consistency:journal}). The mirroring block device
-%% must duplicate the \chdescs\ passing through it, so that each of the mirrors has
-%% its own copy. The journal must copy entire blocks into a journal area, and
-%% overwrite that journal area efficiently when the blocks are changed again during
-%% the same transaction. Both of these \chdesc\ transformations are handled by
-%% library functions, so that if other \modules\ need to do similar things, the
-%% functionality will already be available.
+%% devices like the journaling \module (\S\ref{sec:consistency:journal}). The
+%% journal must copy entire blocks into a journal area, and overwrite that journal
+%% area efficiently when the blocks are changed again during the same transaction.
+%% This \chdesc\ transformation is handled by a library function, so that if other
+%% \modules\ need to do similar things, the functionality will already be available.
 
 \noindent Definition: A \chdesc\ on a device at level $l$ is at level $l$
 if it is not in flight or level $l+1$ if it is in flight.

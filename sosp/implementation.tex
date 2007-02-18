@@ -40,11 +40,15 @@ At the other end of the \Kudos\ \module\ graph, the terminal block device
 \modules\ are wrappers for Linux's normal block devices. By using Linux's
 generic block layer, \Kudos\ can interface with any existing block device (e.g.
 RAM disk, IDE disk, etc.). When the \module\ receives a read or write call, it
-passes the request to Linux via \texttt{generic\_make\_request()}. Linux is
-configured to use a `noop' elevator, meaning that the calls we make to
-\texttt{generic\_make\_request()} are sent to the physical disk in the exact
-order we make them. \Kudos\ takes advantage of DMA capabilities offered by
-Linux to do disk reads and writes efficiently.
+passes the request to Linux via \texttt{generic\_make\_request()}. The block is
+of course not written immediately upon making this call, so \Kudos\ does not
+satisfy the \chdescs\ on the block that are being written until it receives
+notification that the block has made it to the disk controller (or, with
+sufficient hardware support like SCSI TCQ or ATA NCQ, to the physical disk). As
+a result of this mechanism, block writes coming out of \Kudos\ may be reordered
+and/or merged at will by Linux (or the hardware), since \Kudos\ will not
+consider the \chdescs\ which depend on these ``in-flight'' blocks to be ready to
+be written themselves.
 
 The \module\ also implements rudimentary read-ahead. When a read call needs to
 be made to the physical device, the \module\ checks to see if any of the
@@ -56,13 +60,10 @@ Our interfaces bypass all Linux caches, because \Kudos\ provides its own
 \chdesc-aware caches (\S\ref{sec:modules:wbcache}) in order to provide its
 write-ordering guarantees.
 
-Our current implementation uses Linux's queuing structures for
-queuing I/O requests for block devices. Although this is working, there are a
-couple subtle problems that we would like to solve in a future version. First of
-all, while we can be sure that writes to a single block device are delivered in
-our exact order, we cannot be sure that writes we make to multiple block devices
-are made in the correct order relative to each other. Also, we would like to be
-able to insert read and write requests to different sides of the I/O queue.
-Right now a read request will be satisfied only after all the pending writes
-are completed, but a better queue design would allow reads to ``cut the line''
-since they are more urgent.
+Our current implementation uses Linux's queuing structures for queuing I/O
+requests for block devices. Although this is working, there are a couple subtle
+problems that we would like to solve in a future version. For instance, we
+would like to be able to insert read and write requests to different sides of
+the I/O queue. Right now a read request will be satisfied only after all the
+pending writes are completed, but a better queue design would allow reads to
+``cut the line'' since they are more urgent.
