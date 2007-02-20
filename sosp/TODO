@@ -40,8 +40,5 @@ More uses:
 	* tar, then rm: shell or utility depend
 
 Contrast with:
-	* (new) Linux fdatasync range call
-
-POST-SOSP
-=========
-- related work: 2.6.17 sync_file_range
+	* Linux 2.6.17 sync_file_range range system call
+	* fdatasync?
