@@ -35,6 +35,13 @@ Modules:
 
 Write ext2 section.
 
+More uses:
+	* gzip/bzip2
+	* tar, then rm: shell or utility depend
+
+Contrast with:
+	* (new) Linux fdatasync range call
+
 POST-SOSP
 =========
 - related work: 2.6.17 sync_file_range
