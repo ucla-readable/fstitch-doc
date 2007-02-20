@@ -3,21 +3,19 @@
 \subsection{Block Descriptors}
 
 Disk blocks are represented by objects called \emph{block descriptors}.
-%
-\Kudos\ maintains at least one block descriptor object for each cached
- block; in certain cases, such as encrypted file systems, where the on-disk
- representation of a block differs fundamentally from the memory
- representation, a block may have more than one block descriptor.
+\Kudos\ maintains a block descriptor object for each cached block, and tracks
+pointers to the block descriptors using reference counting. In addition to the
+``retain'' and ``release'' operations which increment and decrement the
+reference counts, \Kudos\ also provides an ``autorelease'' operation which
+decrements the usage count after the calling system call completes. This is
+useful for simulating garbage collection.
 
-
-\Kudos\ expects to be able to write blocks atomically.
-%
-Thus, the modules that interface with the disk return blocks that are 512
- bytes long (the sector size).
-%
-A block resizer module joins sector-sized blocks into a more convenient
- size for the relevant file system, such as 2048 or 4096 bytes, and splits
- these large blocks into sector-sized chunks as they are written.
+\Kudos\ expects to be able to write blocks atomically. Thus, the modules that
+interface with the disk return blocks that are 512 bytes long (the sector
+size). However, a single block descriptor can correspond to a range of
+contiguous blocks. This feature is used by the \Kudos\ block resizer module to
+``join'' sector-sized blocks into a more convenient size for the relevant file
+system, such as 2048 or 4096 bytes.
 
 
 \begin{figure}[t]
@@ -169,18 +167,16 @@ In this case, \modules\ below the write-back cache should view the
 % FIXME: add concrete details here
 
 %% \Chdescs\ play a central role in \Kudos, and therefore many parts of the system
-%% need to generate, consume, forward, and manipulate them. Obviously there are
-
-A collection of simple operations, such as shifting a \chdesc\ from one block to another,
- checking whether a \chdesc\ has unsatisfiable dependencies, and copying a
- \chdesc\ (useful for modules such as RAID),
-%%  -- for instance, many
+%% need to generate, consume, forward, and manipulate them. Obviously there are many
 %% simple block devices like partitioners will need to simply forward \chdescs\ on
 %% to the next block device after adjusting the block number being written. The
-%% write-back cache (\S\ref{sec:modules:wbcache}) and elevator scheduler
-%% (\S\ref{sec:modules:elevator}) both need to determine whether \chdescs\ are
-%% ready to send to the next block device or not. In implementing the \modules\ we
-are handled by common library functions available to any module.
+%% write-back cache (\S\ref{sec:modules:wbcache}) needs to determine whether
+%% \chdescs\ are ready to send to the next block device or not.
+
+%% A collection of simple operations, such as shifting a \chdesc\ from one block
+%% to another, checking whether a \chdesc\ has unsatisfiable dependencies, and
+%% copying a \chdesc\ (useful for modules such as RAID), are handled by common
+%% library functions available to any module.
 
 %% Additionally, there are some more complex transformations which are useful for
 %% devices like the journaling \module (\S\ref{sec:consistency:journal}). The

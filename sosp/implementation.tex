@@ -2,14 +2,13 @@
 \label{sec:implementation}
 
 \Kudos\ was originally implemented as a stand-alone file system server daemon
-for a small operating system (called ``KudOS''), but now runs as either a
-FUSE~\cite{fuse} file system server under Linux or BSD, or as a Linux kernel
-module. The former is particularly useful for profiling and debugging, while the
-latter is best for real-world performance testing and actual use. 
-
-%% Additionally,
-%% it supports \opgroups\ which are not supported by the FUSE version due to the
-%% IPC that would be required to implement them.
+for a small operating system (called ``KudOS''), then later as a
+FUSE~\cite{fuse} file system server under Linux or BSD. It currently runs as a
+Linux kernel module. The FUSE implementation was particularly useful for
+debugging, but we have found (unsurprisingly) that the Linux kernel module
+version is best for real-world performance testing and actual use. Due to the
+complexity involved in maintaining both versions, we eventually dropped the
+FUSE version.
 
 The \Kudos\ Linux kernel module looks like a VFS file system to Linux, but
 unlike traditional file system modules,
@@ -17,8 +16,7 @@ unlike traditional file system modules,
 it is merely a front end to a \Kudos\ \module\ graph. The \Kudos\
 server starts up a kernel thread which performs all the initialization to get
 the \module\ graph set up, and \modules\ then can make file systems available to
-mount though the VFS front end. Each file system can be
-mounted using a
+mount though the VFS front end. Each file system can be mounted using a
 command like \mbox{\texttt{mount -t kfs kfs:\textit{name} /mnt/point}}.
 
 The Linux kernel must be modified in order to

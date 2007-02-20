@@ -11,6 +11,30 @@ USENIX wants us to show that we:
 - ascii art in chdesc_util.c that could be made into a diagram
 - ufs implementation becomes a diagram
 
+Things to work on:
+
+Change the name of "dependencies" to something else?
+Change the name of NOOP change descriptors?
+
+Introduction:
+	* Implementation experience is preliminary?
+
+Related Work, Applications:
+	* If they're so easy, why haven't we done them?
+
+Design, Change Descriptors:
+	* Do we want to jump right into "definition" without a mini-introduction?
+
+Modules:
+	* We say that we will describe the modules that contribute most to
+	  change descriptor functionality, but the only such module here is the
+	  write-back cache. We should probably rethink this section heading, and
+	  add information about the revisioning code and how change descriptor
+	  states are propagated. Some of this gets close to information you'd
+	  find in the change descriptor section though.
+
+Write ext2 section.
+
 POST-SOSP
 =========
 - related work: 2.6.17 sync_file_range
