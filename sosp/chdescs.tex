@@ -53,47 +53,54 @@ struct chdesc {
 \subsection {Change Descriptors}
 \label{sec:design:chdescs}
 
+\newcounter{chdescinvari}
+\newcommand{\chdescinvar}[2]{\begin{enumerate}\setcounter{enumi}{\value{chdescinvari}}\item #2\label{invar:#1}\setcounter{chdescinvari}{\value{enumi}}\end{enumerate}}
+
 %%\subsubsection {Overview}
 
 
 % The first use of "change descriptor" is written out. All others, if not the
 % same, should be defined in parentheses here.
 Each in-memory modification to a cached disk block has an associated
-change descriptor. 
+change descriptor.
 %
-Each change descriptor applies to data on exactly one block, and each block links
- to all associated change descriptors.
-%
-Different change types correspond to different forms of
-\chdescs; the \chdesc\ for a flipped bit -- such as in a free-block bitmap --
-contains an offset and mask, while larger changes contain a byte offset, a length,
-and the new data. The \chdesc's \emph{dependencies} point to other \chdescs\ that must
+A \chdesc's \emph{dependencies} point to other \chdescs\ that must
 precede it to stable storage. A \chdesc\ can be applied or reverted to switch
 the cached block's state between old and new.
 
 Figure~\ref{fig:chdesc} gives a simplified version of the structure, and
-Figure~\ref{fig:chdapi} shows most of the API for working with them. The ability
+Figure~\ref{fig:chdapi} shows much of the API for working with them.
+%
+The ability
 to revert and re-apply \chdescs\ is inspired by soft updates dependencies, but
-generalized so that it is not specific to any particular file system. 
+generalized so that it is not specific to any particular file system.
+%
 \Chdesc\ dependencies can create cyclic dependencies among
-blocks, although the \chdescs\ themselves must never form a cycle. To handle this
-case, some \chdescs\ may need to be rolled back, or reverted, in order to write the
-others, allowing such cycles to be broken.
+blocks. \Chdescs\ themselves are not allowed to form cycles
+to prevent inter-block cycles and to simplify \chdesc\ algorithms;
+this is the first \chdesc\ invariant:
+\chdescinvar{acyclic}{\Chdesc\ dependency graphs are acyclic.}
+%
+To break block-level cycles, some \chdescs\ may need to be rolled
+back, or reverted, in order to first write other \chdescs. To ensure a
+rollback operation results in a well-defined block state, we have our
+second \chdesc\ invariant: \chdescinvar{rollback}{A rolledback \chdesc{}'s
+afters are rolledback.}
 
 \begin{figure}[t]
 \vskip-14pt
 \begin{tabular}{@{\hskip0.25in}p{2in}@{}}
 \begin{scriptsize}
 \begin{alltt}
-chdesc_t *\textbf{chdesc_create_noop}(
-    bdesc_t *block, BD_t *owner);
-chdesc_t *\textbf{chdesc_create_bit}(
-    bdesc_t *block, BD_t *owner,
-    uint16_t offset, uint32_t xor);
 int \textbf{chdesc_create_byte}(
     bdesc_t *block, BD_t *owner,
     uint16_t offset, uint16_t length,
     const void *data, chdesc_t **head);
+chdesc_t *\textbf{chdesc_create_bit}(
+    bdesc_t *block, BD_t *owner,
+    uint16_t offset, uint32_t xor);
+chdesc_t *\textbf{chdesc_create_noop}(
+    BD_t *owner, chdesc_t *tail, ...);
 int \textbf{chdesc_create_diff}(
     bdesc_t *block, BD_t *owner,
     uint16_t offset, uint16_t length,
@@ -116,7 +123,7 @@ int \textbf{chdesc_push_down}(
 \end{figure}
 
 \Kudos\ \modules\ change blocks by attaching change descriptors to them,
-using functions such as \texttt{chdesc\_create\_bit}.
+using functions such as \texttt{chdesc\_create\_byte}.
 %
 Most file system modules initially generate \chdescs\ whose
 dependencies impose soft-update-like ordering requirements (see
@@ -125,20 +132,24 @@ through other modules, in the general direction of the disk.  The
 intervening \modules\ can
 inspect, delay, and even modify them before passing them on further. For
 instance, the write-back cache \module\ (\S\ref{sec:modules:wbcache}),
-which is essentially a buffer cache, holds
+essentially a buffer cache, holds
 on to blocks and their \chdescs\ instead of forwarding them
-immediately. When evicting a block and associated \chdescs, the write-back
-cache enforces an order consistent with the \chdesc\ dependency
-information.
-
-A change descriptor is \emph{satisfied} when the change to which it
- corresponds has been resolved---for instance, written to disk.
+immediately. Each delay-inducing \module\ increases its \module\
+level by one over its below \module{}(s), starting at zero.
 %
-If one change descriptor depends on another, then the dependee (the change
- descriptor depended on) must be satisfied before the depender (the change
- descriptor that depends) can be written to disk itself.
+When evicting a block and associated \chdescs, the write-back
+cache enforces an order consistent with the \chdesc\ dependency
+information. Specifically,
+\chdescinvar{before-levels}{The befores of a \chdesc\ at level $l$ are at levels $\leq l$.}
 
-
+When a \module\ asynchronously writes the data associated with a set
+of \chdescs\ to stable storage it marks the \chdescs\ as
+\emph{inflight} to indicate that the \chdescs\ are considered to still
+have the above level. Afters will thus remain at the above level (or
+higher), preserving the \chdescs{}'s dependencies.
+%
+A \chdesc\ is \emph{satisfied} when its associated data reaches stable
+storage.
 
 %% Since many \modules\ may be stacked on top of one another in \Kudos, and since
 %% many of them may want to refer to the same block at the same time, 
@@ -185,41 +196,43 @@ In this case, \modules\ below the write-back cache should view the
 %% This \chdesc\ transformation is handled by a library function, so that if other
 %% \modules\ need to do similar things, the functionality will already be available.
 
-\noindent Definition: A \chdesc\ on a device at level $l$ is at level $l$
-if it is not in flight or level $l+1$ if it is in flight.
-
-\newcounter{chdescinvari}
-\newcommand{\chdescinvar}[1]{\begin{enumerate}\setcounter{enumi}{\value{chdescinvari}}\item #1\setcounter{chdescinvari}{\value{enumi}}\end{enumerate}}
-
-\noindent Invariants:
-\chdescinvar{A \chdesc\ dependency graph is acyclic.}
-
-\chdescinvar{A \chdesc\ at level $l$'s befores are at levels $\leq l$.}
-
-\chdescinvar{A rolledback \chdesc{}'s afters are rolledback.}
-
 \subsection{\ChDesc\ Optimizations}
+\label{sec:design:chdesc-opts}
 
-Definition: A \noop{}'s level is the max level of its befores.
+Here we describe \chdesc\ optimizations that speed \chdesc\ state
+queries through incremental cache updates
+%
+and lower \chdesc\ memory overhead by
+%
+providing specialized change descriptions,
+%
+expressing dependencies more efficiently,
+%
+omitting unneeded rollback information,
+%
+and merging \chdescs.
 
-\noindent Optimization invariants:
-\chdescinvar{Each \chdesc\ tracks how many befores it has at each level.}
+Include this invariant?
+\chdescinvar{add-before}{A data \chdesc\ can gain befores only during creation.  A
+  \noop\ \chdesc\ can also gain befores if it has no afters.}
 
-\chdescinvar{Each block has a list of \chdescs\ on that block.}
+Mention these?:
+%
+Each block has a list of \chdescs\ on that block.
+%
+Each block has a list of \chdescs\ on that block that are ready to be
+moved down by one level.
+%
+Each block has a list of \chdescs\ that are not entirely overlaped.
 
-\chdescinvar{Each block has a list of \chdescs\ on that block that are ready
-  to be moved down by one level.}
-
-\chdescinvar{Each block has a list of \chdescs\ that are not entirely overlaped.}
-
-\chdescinvar{Each block tracks the total number of external afters for
-  \chdescs\ on that block.}
-
-\chdescinvar{Each block has at most one nonrollbackable \chdesc.}
+\paragraph{Bit \ChDescs}
+\label{sec:design:chdescs:bit}
+A bit \chdesc\ is a specialized \chdesc\ that expresses small changes
+more efficiently than than the general byte \chdesc\, using an inline
+mask instead of a pointer to a copy of previous data to support rollbacks.
 
 \paragraph{\Noop\ \ChDescs}
 \label{sec:design:chdescs:noop}
-
 The prototypical \chdesc\ corresponds to some change on disk, but \Kudos\
  also supports a \emph{\noop} \chdesc\ type, which doesn't change the disk
  at all.
@@ -243,6 +256,9 @@ arrays of \chdescs.
 %
 The cost is that some functions may have to traverse trees of \noop\ change
  descriptors to determine true dependencies.
+%
+A \noop\ \chdesc's level is defined to be the max level of its befores;
+in effect, propagating a \noop's befores to its afters.
 
 Modules can also use \noop\ \chdescs\ to \emph{prevent} changes from being
  written.
@@ -255,36 +271,49 @@ This is used, for instance, by the journal \module\
  (\S\ref{sec:consistency:journal}) to prevent a transaction's \chdescs\
  from being written before the journal commits.
 
-\paragraph{Fast Revision Slice Creation}
-\todo{Should we integrate this paragraph into the rest of this section?}
-%
+\paragraph{Scalable Dependency-Preserving Writes}
 For a \module\ like the write back cache to forward \chdescs\ in a
-dependency-preserving order, the \module\ must find all \chdescs\ on a
-given block whose befores are either on a lower block device or are
-part of the new revision slice and on the current block device.
-Because the write back cache frequently scans for dirty blocks,
-\Kudos\ incrementally builds and caches before information and uses
-this to maintain a list of ready \chdescs\ for each block at each
-level.
+dependency-preserving order, the \module\ must find \chdescs\ whose
+befores are on a lower block device (or are part of the block write
+and on the current block device). Because the write back cache
+frequently searches for and writes many ready \chdescs{}, redundant
+before traversals to calculate \chdesc\ ready state would severly
+limit cache size scalabity.
+%
+\Kudos\ therefore
+%
+1) explictly tracks a \chdesc{}'s before counts through incremental
+dependency updates
+%
+and 2) uses these counts to maintain a \chdesc\ ready list for each
+block.
 
-Each \chdesc\ tracks the number of befores it has, on a per-level basis;
+A \chdesc{}'s before counts are incrementally updated
 %
-thus a \chdesc\ is ready to move down a level in a dependency-preserving
-order when it has no befores at a level greater than the target level.
+as befores are added and removed
 %
-A \chdesc{}'s before counts are incrementally updated, as befores are
-added to and removed from the \chdesc\ and as befores move between
-block devices. \Noops\ not on a block device are not at a level and thus
-require special handling; instead of directly increasing the before
-counts of its afters, such a \noop\ propagates its own before counts.
+and as before \chdesc{}'s change levels.
 %
-When a before count update indicates a \chdesc\ is ready to move down
-a level, the \chdesc\ is added to its block's ready list. To create a
-revision slice for a block, an owner thus iterates through the block's
-ready list, moving \chdescs\ to the target block device, until the
-list is empty.\todo{Should we include performance improvement numbers?}
 
-\paragraph{Nonrollbackable Change Descriptors}
+Due to invariant~\ref{invar:before-levels}, only directly reachable
+before \chdescs\ need to be included in a \chdesc's before counts.
+%
+Note that because a \noop\ \chdesc's level is a function of its befores,
+%
+a \noop\ \chdesc\ before count update that changes the \noop's level
+must propagate the level change to the \noop's afters.
+%
+When a before count update changes whether a \chdesc\ is ready to
+write, the \chdesc's inclusion in its block's ready list is updated.
+%
+To write a block, an owner thus iterates through the block's ready
+list, moving \chdescs\ to the target block device, until the list is
+empty.
+
+TODO: Include invariants that the max before level computation is
+$O(1)$ or that ready \chdescs\ can be moved in $\sim\! O(r)$ time?
+
+\paragraph{Nonrollbackable \ChDescs\ and \ChDesc\ Merging}
 \todo{Should we entitle this paragraph after the goal (two goals?)
   instead of our solution?}
 %
@@ -355,6 +384,11 @@ internal and semantic file system descriptions.
 \todo{Should we include memory/performance improvement numbers?}
 \todo{Should we talk about why we allow NRBs to be disabled? (Debugging
 simplicity and depend add to noops with afters bug catching.)}
+
+\chdescinvar{extern-after}{Each block tracks the total number of
+  external afters for \chdescs\ on that block.}
+
+\chdescinvar{one-nrb}{Each block has at most one nonrollbackable \chdesc.}
 
 %% \subsubsection{Block Revisions}
 % FIXME maybe make an analogy to packets flowing through a network? -LZ
