@@ -53,9 +53,6 @@ struct chdesc {
 \subsection {Change Descriptors}
 \label{sec:design:chdescs}
 
-\newcounter{chdescinvari}
-\newcommand{\chdescinvar}[2]{\begin{enumerate}\setcounter{enumi}{\value{chdescinvari}}\item #2\label{invar:#1}\setcounter{chdescinvari}{\value{enumi}}\end{enumerate}}
-
 %%\subsubsection {Overview}
 
 
@@ -79,12 +76,12 @@ generalized so that it is not specific to any particular file system.
 blocks. \Chdescs\ themselves are not allowed to form cycles
 to prevent inter-block cycles and to simplify \chdesc\ algorithms;
 this is the first \chdesc\ invariant:
-\chdescinvar{acyclic}{\Chdesc\ dependency graphs are acyclic.}
+\cdinvar{acyclic}{\Chdesc\ dependency graphs are acyclic.}
 %
 To break block-level cycles, some \chdescs\ may need to be rolled
 back, or reverted, in order to first write other \chdescs. To ensure a
 rollback operation results in a well-defined block state, we have our
-second \chdesc\ invariant: \chdescinvar{rollback}{A rolledback \chdesc{}'s
+second \chdesc\ invariant: \cdinvar{rollback}{A rolledback \chdesc{}'s
 afters are rolledback.}
 
 \begin{figure}[t]
@@ -140,7 +137,7 @@ level by one over its below \module{}(s), starting at zero.
 When evicting a block and associated \chdescs, the write-back
 cache enforces an order consistent with the \chdesc\ dependency
 information. Specifically,
-\chdescinvar{before-levels}{The befores of a \chdesc\ at level $l$ are at levels $\leq l$.}
+\cdinvar{before-levels}{The befores of a \chdesc\ at level $l$ are at levels $\leq l$.}
 
 When a \module\ asynchronously writes the data associated with a set
 of \chdescs\ to stable storage it marks the \chdescs\ as
@@ -211,10 +208,6 @@ expressing dependencies more efficiently,
 omitting unneeded rollback information,
 %
 and merging \chdescs.
-
-Include this invariant?
-\chdescinvar{add-before}{A data \chdesc\ can gain befores only during creation.  A
-  \noop\ \chdesc\ can also gain befores if it has no afters.}
 
 Mention these?:
 %
@@ -295,7 +288,7 @@ as befores are added and removed
 and as before \chdesc{}'s change levels.
 %
 
-Due to invariant~\ref{invar:before-levels}, only directly reachable
+Due to invariant~\ref{cdinvar:before-levels}, only directly reachable
 before \chdescs\ need to be included in a \chdesc's before counts.
 %
 Note that because a \noop\ \chdesc's level is a function of its befores,
@@ -313,23 +306,52 @@ empty.
 TODO: Include invariants that the max before level computation is
 $O(1)$ or that ready \chdescs\ can be moved in $\sim\! O(r)$ time?
 
-\paragraph{Nonrollbackable \ChDescs\ and \ChDesc\ Merging}
-\todo{Should we entitle this paragraph after the goal (two goals?)
-  instead of our solution?}
+\paragraph{\ChDesc\ Merging}
+Talk about overlap merging. It's fast. It's simple. It's fun.
+Who are the big users? Inode size updates. Bitmap blocks. Others?
+
+\paragraph{Nonrollbackable \ChDescs}
+To enable byte \chdesc\ rollback, each byte \chdesc\ contains a copy
+of the previous block data.
 %
-Each byte and bit \chdesc\ includes information permitting that
-\chdesc\ to be rolled back to resolve block-level dependency cycles,
-implemented using two bytes of memory for each byte to change on disk.
+While these copies are needed to rollback byte \chdescs, many
+\chdescs\ are actually never rolledback (e.g. file data blocks) and
+previous data copies nearly double the memory usage of change and
+block descriptors.
 %
-However, many \chdescs\ are never rolled back; e.g., file data blocks
-often contain a single \chdesc. Restricting the addition of befores to
-\chdescs\ being created and to \noops\ with no afters\todo{Talk about
-  this more? Elsewhere?} allows strong reasoning about a \chdesc{}'s
-future.  Significantly, a \chdesc\ created on a block for which there
-were no external afters on any existing \chdesc\ on the block will
-\textit{never} need to be rolled back. One can thus omit such a
-\chdesc{}'s rollback information, creating a \textit{nonrollbackable}
-\chdesc.
+\Kudos\ makes use of invariant~\ref{cdinvar:add-before} and
+conservative heuristics to identify \chdescs\ that will never need to
+be rolledback. We call these \emph{nonrollbackable} \chdescs\
+(\emph{NRB}s). NRBs can safely omit their previous data copies and
+can safely be merged together.
+
+To not store the previous block data when creating a \chdesc\ one must know
+%
+that the \chdesc\ need not be rolledback to write the existing
+\chdesc\ graph
+%
+and also that later \chdesc\ graph changes will not induce a forced
+rollback:
+%
+\cdinvar{add-before}{All block-level cycles induced through
+\chdesc\ $C$'s befores exist when $C$ is
+created\todo{Change this phrasing? ``Once created, a \chdesc\ will not
+  gain any befores that induce block-level cycles.''}.}
+%
+\Kudos\ ensures this invariant by restricting before additions to
+\chdesc\ creation, to \noops\ with no afters, or when the invariant
+is statically proven to hold.
+
+To quickly determine whether a new \chdesc\ may need to be rolledback
+
+
+Restricting the addition of befores to \chdescs\ being created and to
+\noops\ with no afters\todo{Talk about this more? Elsewhere?} allows
+strong reasoning about a \chdesc{}'s future.  Significantly, a
+\chdesc\ created on a block for which there were no external afters on
+any existing \chdesc\ on the block will \textit{never} need to be
+rolled back. One can thus omit such a \chdesc{}'s rollback
+information, creating a \textit{nonrollbackable} \chdesc.
 
 A \chdesc\ is external to a block if and only if it is a byte, bit, or
 on-block \noop\ \chdesc\ on a different block. In determining whether a
@@ -385,10 +407,10 @@ internal and semantic file system descriptions.
 \todo{Should we talk about why we allow NRBs to be disabled? (Debugging
 simplicity and depend add to noops with afters bug catching.)}
 
-\chdescinvar{extern-after}{Each block tracks the total number of
+\cdinvar{extern-after}{Each block tracks the total number of
   external afters for \chdescs\ on that block.}
 
-\chdescinvar{one-nrb}{Each block has at most one nonrollbackable \chdesc.}
+\cdinvar{one-nrb}{Each block has at most one nonrollbackable \chdesc.}
 
 %% \subsubsection{Block Revisions}
 % FIXME maybe make an analogy to packets flowing through a network? -LZ
