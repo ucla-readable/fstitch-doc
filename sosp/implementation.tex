@@ -43,9 +43,9 @@ of course not written immediately upon making this call, so \Kudos\ does not
 satisfy the \chdescs\ on the block that are being written until it receives
 notification that the block has made it to the disk controller (or, with
 sufficient hardware support like SCSI TCQ or ATA NCQ, to the physical disk). As
-a result of this mechanism, block writes coming out of \Kudos\ may be reordered
+a result of this mechanism, block writes coming out of \Kudos\ may safely be reordered
 and/or merged at will by Linux (or the hardware), since \Kudos\ will not
-consider the \chdescs\ which depend on these ``in-flight'' blocks to be ready to
+consider the \chdescs\ which depend on these in flight blocks to be ready to
 be written themselves.
 
 The \module\ also implements rudimentary read-ahead. When a read call needs to
