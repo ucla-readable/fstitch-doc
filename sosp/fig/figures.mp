@@ -76,19 +76,19 @@ beginfig(1);
   label.llft(btex CFS etex scaled 0.5, vfsiface.out[1]);
   label.ulft(btex CFS etex scaled 0.5, uhfsa.in[0]);
   label.urt(btex CFS etex scaled 0.5, uhfsb.in[0]);
-  label.llft(btex LFS etex scaled 0.5, uhfsa.out[0]);
-  label.lrt(btex LFS etex scaled 0.5, uhfsb.out[0]);
+  label.llft(btex L2FS etex scaled 0.5, uhfsa.out[0]);
+  label.lrt(btex L2FS etex scaled 0.5, uhfsb.out[0]);
   label.urt(btex BD etex scaled 0.5, journal.in[0]);
   label.lrt(btex BD etex scaled 0.5, journal.out[0]);
   label.llft(btex BD etex scaled 0.5, journal.out[1]);
-  label.urt(btex LFS etex scaled 0.5, ufsa.in[0]);
+  label.urt(btex L2FS etex scaled 0.5, ufsa.in[0]);
   label.lrt(btex BD etex scaled 0.5, ufsa.out[0]);
-  label.ulft(btex LFS etex scaled 0.5, ufsb.in[0]);
+  label.ulft(btex L2FS etex scaled 0.5, ufsb.in[0]);
   label.lrt(btex BD etex scaled 0.5, ufsb.out[0]);
   label.ulft(btex BD etex scaled 0.5, loopj.in[0]);
-  label.lrt(btex LFS etex scaled 0.5, loopj.out[0]);
+  label.lrt(btex L2FS etex scaled 0.5, loopj.out[0]);
   label.urt(btex BD etex scaled 0.5, loopd.in[0]);
-  label.lrt(btex LFS etex scaled 0.5, loopd.out[0]);
+  label.lrt(btex L2FS etex scaled 0.5, loopd.out[0]);
   label.urt(btex BD etex scaled 0.5, wbcache.in[0]);
   label.lrt(btex BD etex scaled 0.5, wbcache.out[0]);
   label.urt(btex BD etex scaled 0.5, resizer.in[0]);
@@ -133,7 +133,7 @@ beginfig(2);
   drawelement(crc,cr,aj,crcn,a,b,c,d,fn,crn,bj,cj,dj);
 
   vardef ffff(suffix a,b) =
-    drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
+    drawconnarrow (b.c -- a.c) cutbefore bpath.b cutafter bpath.a
   enddef;
 
   %forsuffixes $ = crcn, fn, crn:
@@ -184,7 +184,7 @@ beginfig(3);
   drawelement(a,b,c,d);
 
   vardef ffff(suffix a,b) =
-    drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
+    drawconnarrow (b.c -- a.c) cutbefore bpath.b cutafter bpath.a
   enddef;
 
   ffff(c,a);
@@ -214,7 +214,7 @@ beginfig(4);
   drawelement(a,b,c,d,e);
 
   vardef ffff(suffix a,b) =
-    drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
+    drawconnarrow (b.c -- a.c) cutbefore bpath.b cutafter bpath.a
   enddef;
 
   ffff(b,a);
@@ -267,7 +267,7 @@ beginfig(6);
   drawelement(a,b,c,d,e,f,g,h);
 
   vardef ffff(suffix a,b) =
-    drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
+    drawconnarrow (b.c -- a.c) cutbefore bpath.b cutafter bpath.a
   enddef;
 
   ffff(a,b);
@@ -309,7 +309,7 @@ beginfig(7);
   drawelement(hk,tk,h,t,aa,ab,ac,b);
 
   vardef ffff(suffix a,b) =
-    drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
+    drawconnarrow (b.c -- a.c) cutbefore bpath.b cutafter bpath.a
   enddef;
 
   ffff(h,hk);

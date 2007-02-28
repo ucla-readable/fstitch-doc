@@ -34,6 +34,7 @@ Modules:
 	  find in the change descriptor section though.
 
 Write ext2 section.
+Make directory synchronous module.
 
 More uses:
 	* gzip/bzip2

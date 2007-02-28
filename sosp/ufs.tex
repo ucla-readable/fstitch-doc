@@ -35,7 +35,7 @@ created. The block device subsystem will track and enforce the
 \chdesc\ orderings.
 
 In order to implement soft update ordering, we examined the places where UFS
-created \chdescs. With the consistency rules for soft update in mind, we
+created \chdescs. With the consistency rules for soft updates in mind, we
 carefully connected the \chdescs created within an \LFS\ call. Assured that
 all \LFS\ calls in the UFS \module\ followed soft updates ordering, we then made
 sure that the combinations of \LFS\ calls do not violate soft updates
