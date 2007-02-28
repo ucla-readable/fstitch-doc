@@ -39,7 +39,13 @@
 \newcommand{\LFS}{L2FS}
 
 \newcounter{cdinvari}
-\newcommand{\cdinvar}[2]{\begin{enumerate}\setcounter{enumi}{\value{cdinvari}}\item #2\label{cdinvar:#1}\setcounter{cdinvari}{\value{enumi}}\end{enumerate}}
+% TODO: reduce pre and post \cdinvar vspace
+\newcommand{\cdinvar}[2]{
+  \begin{enumerate}
+    \setcounter{enumi}{\value{cdinvari}}
+    \item #2\label{cdinvar:#1}
+    \setcounter{cdinvari}{\value{enumi}}
+  \end{enumerate}}
 
 % chdesc notation
 \newcommand{\cd}[1]{\ensuremath{#1}} % basic chdesc

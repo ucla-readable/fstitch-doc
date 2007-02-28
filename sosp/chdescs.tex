@@ -82,7 +82,7 @@ To break block-level cycles, some \chdescs\ may need to be rolled
 back, or reverted, in order to first write other \chdescs. To ensure a
 rollback operation results in a well-defined block state, we have our
 second \chdesc\ invariant: \cdinvar{rollback}{A rolledback \chdesc{}'s
-afters are rolledback.}
+afters are rolledback\todo{Be more precise to be correct.}.}
 
 \begin{figure}[t]
 \vskip-14pt
@@ -132,7 +132,7 @@ instance, the write-back cache \module\ (\S\ref{sec:modules:wbcache}),
 essentially a buffer cache, holds
 on to blocks and their \chdescs\ instead of forwarding them
 immediately. Each delay-inducing \module\ increases its \module\
-level by one over its below \module{}(s), starting at zero.
+level by one over the module(s) it uses, starting at zero.
 %
 When evicting a block and associated \chdescs, the write-back
 cache enforces an order consistent with the \chdesc\ dependency
@@ -141,7 +141,7 @@ information. Specifically,
 
 When a \module\ asynchronously writes the data associated with a set
 of \chdescs\ to stable storage it marks the \chdescs\ as
-\emph{inflight} to indicate that the \chdescs\ are considered to still
+\emph{in flight} to indicate that the \chdescs\ are considered to still
 have the above level. Afters will thus remain at the above level (or
 higher), preserving the \chdescs{}'s dependencies.
 %
@@ -339,30 +339,18 @@ created\todo{Change this phrasing? ``Once created, a \chdesc\ will not
   gain any befores that induce block-level cycles.''}.}
 %
 \Kudos\ ensures this invariant by restricting before additions to
-\chdesc\ creation, to \noops\ with no afters, or when the invariant
+\chdesc\ creation, \noops\ with no afters, or when the invariant
 is statically proven to hold.
 
-To quickly determine whether a new \chdesc\ may need to be rolledback
+To avoid a costly dependency traversal to determine whether a new
+\chdesc\ will need to be rolledback, \Kudos\ conservatively identifies
+a new \chdesc\ as nonrollbackable only if the block has no \chdescs\
+with external (on a different block\todo{Descriptive enough? Mention
+\noop\ after recursion?}) afters. Each block tracks the number of
+external afters through incremental updates as afters are added and
+removed.
 
-
-Restricting the addition of befores to \chdescs\ being created and to
-\noops\ with no afters\todo{Talk about this more? Elsewhere?} allows
-strong reasoning about a \chdesc{}'s future.  Significantly, a
-\chdesc\ created on a block for which there were no external afters on
-any existing \chdesc\ on the block will \textit{never} need to be
-rolled back. One can thus omit such a \chdesc{}'s rollback
-information, creating a \textit{nonrollbackable} \chdesc.
-
-A \chdesc\ is external to a block if and only if it is a byte, bit, or
-on-block \noop\ \chdesc\ on a different block. In determining whether a
-\noop\ not on a block is an external after, the \noop{}'s afters are
-recursively analyzed. To avoid redundant scanning, each block
-descriptor tracks its number of external afters, updated when afters
-are added to and removed from \chdescs\ on the block. Whereas \chdesc\
-before counts track befores and propagate through \noop\ afters, block
-descriptor external after counts track afters and propagate through
-\noop\ befores\todo{Does this sentence actually provide any insight?}.
-
+\paragraph{Nonrollbackable \ChDesc\ Merging}
 Notice that two nonrollbackable \chdescs\ on a block must be committed
 in the same revision slice; neither can (or will need to) be rolled
 back. This illustrates the underlying reason why two nonrollbackable
@@ -383,6 +371,14 @@ chain with a before path to \nrb{A}, moves all of \ncd{C}'s befores
 without before paths to be befores of \nrb{A}\todo{This could be more
   lucid.} This graph manipulation preserves the system's \chdesc\
 dependencies.
+
+NRBs, RBs, and ready lists:
+%
+all post-NRB created chdescs depend on NRB because of overlaps.
+%
+no NRB-prior created chdescs exist (RB->NRB).
+%
+single NRB.
 
 \begin{figure}[htb]
   \centering
