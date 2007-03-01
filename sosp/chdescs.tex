@@ -216,6 +216,68 @@ moved down by one level.
 %
 Each block has a list of \chdescs\ that are not entirely overlaped.
 
+\paragraph{Initial formalisms}
+
+\noindent\\ Invariants:
+\cdinvar{a}{If \indirdepends{a}{b} then \notindirdepends{b}{a}.}
+
+\cdinvar{b}{If \(\indirdepends{a}{b} \land \inset{a}{\psetinflight{t}}\)
+then \(\inset{b}{\psetsat{t}} \lor (\inset{b}{\psetinflight{t}}
+\land \blockof{a} = \blockof{b})\).}
+
+\noindent Want invariant:
+\cdinvar{c}{If \(\inset{a}{\psetsat{t}} \land \indirdepends{a}{b}\)
+then \inset{b}{\psetsat{t}}}
+
+\noindent At any time $t$, one of the following transformations may be applied:
+\begin{enumerate}
+\item For some \block{w}:\\
+Let \(\pset{B} = \{a\ |\ \inset{a}{\psetinflight{t}} \land \blockof{a} = \block{w} \}\) in\\
+\(\psetsat{t+1} := \psetsat{t} \cup \pset{B}\)\\
+\(\psetinflight{t+1} := \psetinflight{t} \setminus \pset{B}\)
+\label{action:write}
+
+\item \(\deps{t+1} := \deps{t} \cup\ \pset{X}\) where
+\(\notinset{a}{\psetall{t}} \land \pset{X} \subset \{\depends{a}{b}\}\)
+\label{action:create}
+
+\item \(\psetinflight{t+1} := \psetinflight{t} \cup \{a\}\) for some
+\notinset{a}{\psetsat{t}} s.t. \(\forall b: \indirdepends{a}{b},\
+\inset{b}{\psetsat{t}} \lor (\inset{b}{\psetinflight{t}} \land
+\blockof{a} = \blockof{b}\)
+\label{action:fly}
+\end{enumerate}
+
+We can prove that invariants~\ref{cdinvar:a} and~\ref{cdinvar:b}
+with actions~\ref{action:write}, \ref{action:create}, and~\ref{action:fly}
+imply that invariant~\ref{cdinvar:c} holds.
+
+\noindent Action~\ref{action:create} replacements for hard patches:
+\begin{enumerate}
+\item \(\deps{t+1}\ := \deps{t} \cup\ \pset{X}\) for
+\(\notinset{a}{\psetall{t}} \land \pset{X}\! \subset\!
+\{\depends{a}{b}\ |\ \inset{b}{\psetall{t}}\}\)
+
+\item \(\psethard{t+1}\ := \psethard{t} \cup \{a\}\) where \(\forall b\!:
+\indirdepends{b}{a},\ \blockof{b} = \blockof{a}\)
+\end{enumerate}
+
+\noindent Action~\ref{action:fly} replacements for hard patches:
+\begin{enumerate}
+\item \(\psetinflight{t+1} := \psetinflight{t} \cup \{a\}\) for
+\notinset{a}{\psetall{t} \cup \psethard{t}}\\
+\(\forall b\!: \indirdepends{a}{b},\ \inset{b}{\psetsat{t}} \lor (\inset{b}{\psetinflight{t}} \land \blockof{a} = \blockof{b})\)\\
+\(\not\exists\inset{b}{\psethard{t}}\ \mbox{s.t.}\ \blockof{b} = \blockof{a}\)
+
+\item For some \block{w}:\\
+\(\psetinflight{t+1} := \psetinflight{t} \cup \pset{X}\) for
+\(\pset{X} = \{\inset{a}{\psethard{t}}\ |\ \blockof{a} = \block{w}\}\)\\
+\(\forall \notinset{b}{\pset{X}}\!: \forall \inset{a}{\pset{X}}\!:
+\indirdepends{a}{b},\ \inset{b}{\psetsat{t}} \lor
+(\inset{b}{\psetinflight{t}} \land \blockof{a} = \blockof{b})\)\\
+\(\psethard{t+1} := \psethard{t} \setminus \pset{X}\)
+\end{enumerate}
+
 \paragraph{Bit \ChDescs}
 \label{sec:design:chdescs:bit}
 A bit \chdesc\ is a specialized \chdesc\ that expresses small changes
