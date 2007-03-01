@@ -35,6 +35,8 @@ Modules:
 
 Write ext2 section.
 Make directory synchronous module.
+Cite type-safe disks.
+Cite rethink the sync.
 
 More uses:
 	* gzip/bzip2

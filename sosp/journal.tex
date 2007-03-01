@@ -51,7 +51,7 @@ be the case for the journal \module\ by hand.
 Figure~\ref{fig:journal} shows the \chdesc\ configuration which is created by
 applying this transformation to the \chdescs\ in Figure~\ref{fig:softupdate}.
 The original four \chdescs\ have been modified to depend on a journal commit
-record (via a \noop\ \chdesc), and no longer have explicit dependencies on each
+record (via \anoop\ \chdesc), and no longer have explicit dependencies on each
 other. The commit record depends on journal blocks containing copies of the
 changes. Finally, a the commit record can be marked as completed once the
 original four \chdescs\ have been written. This transformation is performed

@@ -1,20 +1,19 @@
 \begin{abstract}
 
-% The abstract will call them "change descriptors" always.
 We propose a file system implementation architecture, called \emph{\Kudos},
-where \emph{change descriptor} structures represent any and all changes to
+where \emph{\chdesc} structures represent any and all changes to
 stable storage.
 %
-%%  File systems generate change descriptors for all writes, then
+%%  File systems generate \chdescs\ for all writes, then
 %% send them to block devices for eventual commit. Explicit dependencies between
-%% change descriptors let \Kudos\ \modules\ preserve necessary file system
-%% invariants without understanding the file system itself. Change descriptors can
+%% \chdescs\ let \Kudos\ \modules\ preserve necessary file system
+%% invariants without understanding the file system itself. \Chdescs\ can
 %% implement many consistency mechanisms, including soft updates and journaling.
 %
 \Kudos\ is decomposed into fine-grained \modules\ which generate, consume,
- forward, and manipulate change descriptors. 
+ forward, and manipulate \chdescs.
 %
-The uniform change descriptor abstraction allows modules to impose and
+The uniform \chdesc\ abstraction allows modules to impose and
  follow arbitrary file system consistency policies: a collection of
  loosely-coupled modules cooperates to implement strong and possibly
  complex guarantees, even though each individual module does a relatively
@@ -29,7 +28,7 @@ For example, by observing and modifying \chdesc\ constraints, our
  journaling \module\ can automatically add journaling to any file system.
 %
 Additionally, a new system call interface gives applications some direct
- control over change descriptors. We have used this interface to
+ control over \chdescs. We have used this interface to
 improve the UW IMAP server, removing inefficient and unnecessary calls to
 \texttt{fsync()} while preserving the integrity of mail messages.
 %

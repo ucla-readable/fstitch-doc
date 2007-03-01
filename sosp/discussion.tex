@@ -23,7 +23,7 @@ dependency graph. We can attack this problem in two ways: first, we can reduce
 the number of \chdescs\ by intelligently merging them when we determine that
 having separate \chdescs\ is not necessary. For example, if the file system
 creates a file and immediately deletes it, we can take the two opposing
-\chdescs\ sets and coalesce them into a \noop.
+\chdesc\ sets and coalesce them into \anoop\ \chdesc.
 
 As another strategy, we can improve the efficiency of the traversal algorithms
 to examine fewer \chdescs. Many of the operations that \modules\ like the

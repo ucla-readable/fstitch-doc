@@ -123,14 +123,14 @@ next based on the strategies used by FreeBSD.
 \begin{figure}[htb]
   \centering
   \includegraphics[width=192pt]{fig/figures_6}
-  \caption{\label{fig:chdescarrange} Change descriptor dependencies, when
+  \caption{\label{fig:chdescarrange} \Chdesc\ dependencies, when
   not strictly needed, restrict the possible choices for write ordering.
   This results in suboptimal write ordering and more scans through the
   \chdescs\ for \Kudos. On the left, \chdescs\ C1, C2, and C3 can be written
   in any order. Only one ordering is possible on the right.}
 \end{figure}
 
-\subsubsection {Change Descriptor Arrangements}
+\subsubsection {\ChDesc\ Arrangements}
 While optimizing our UFS implementation, we gained some insight and found a
 couple practices critical to good performance. First, do not create unnecessary
 dependencies between \chdescs. Doing so artificially limits the commit order
@@ -140,7 +140,7 @@ will unneeded dependencies force the disk to do more writes and seeks, but
 dependencies prevent the \chdescs\ from being flushed out to disk at once.
 
 In Figure~\ref{fig:chdescarrange}, we have two possible arrangements for three
-byte \chdescs. The noop \chdesc\ represents a root node that can reach all
+byte \chdescs. The \noop\ \chdesc\ represents a root node that can reach all
 other \chdescs. In the parallel arrangement on the left, \Kudos\ has the
 freedom to write \chdescs\ $C_1$, $C_2$, and $C_3$ to disk in any order. All
 three \chdescs\ can be marked writable with one graph traversal. In the serial

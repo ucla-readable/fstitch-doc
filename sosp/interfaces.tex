@@ -107,7 +107,7 @@ systems. (There is also a generic VFS-to-CFS layer, to interface with Linux. See
 \S\ref{sec:implementation} for details.)
 
 The UHFS \module\ encompasses all logic for decomposing higher level CFS calls
-into lower level \LFS\ calls, and for connecting the resulting change descriptors
+into lower level \LFS\ calls, and for connecting the resulting \chdescs\
 together. The finer granularity of \LFS\ calls divides the problem space into
 smaller chunks. Since the issue of how to tie the \LFS\ micro-ops together has
 already been solved, file system \module\ developers can give more attention to

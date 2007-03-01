@@ -50,16 +50,14 @@ struct chdesc {
 \end{figure}
 
 
-\subsection {Change Descriptors}
+\subsection {\ChDescs}
 \label{sec:design:chdescs}
 
 %%\subsubsection {Overview}
 
 
-% The first use of "change descriptor" is written out. All others, if not the
-% same, should be defined in parentheses here.
 Each in-memory modification to a cached disk block has an associated
-change descriptor.
+\chdesc.
 %
 A \chdesc's \emph{dependencies} point to other \chdescs\ that must
 precede it to stable storage. A \chdesc\ can be applied or reverted to switch
@@ -119,7 +117,7 @@ int \textbf{chdesc_push_down}(
 \caption{\label{fig:chdapi} Partial \chdesc\ API.}
 \end{figure}
 
-\Kudos\ \modules\ change blocks by attaching change descriptors to them,
+\Kudos\ \modules\ change blocks by attaching \chdescs\ to them,
 using functions such as \texttt{chdesc\_create\_byte}.
 %
 Most file system modules initially generate \chdescs\ whose
@@ -241,23 +239,23 @@ Thus, they can be used to ``stand for'' entire sets of other changes.
 %
 This capability is extremely useful, and is used by most operations on disk
 structures so that a single \chdesc\ can be returned that depends on the whole
-change. Likewise, a \noop\ \chdesc\ can be passed in as a parameter to a disk
+change. Likewise, \anoop\ \chdesc\ can be passed in as a parameter to a disk
 operation to make the whole operation depend on a set of other changes. \Noop\
 \chdescs\ allow dependencies between sets without a quadratic number
 of dependency edges in the \chdesc\ graph, and without having to pass around
 arrays of \chdescs.
 %
-The cost is that some functions may have to traverse trees of \noop\ change
- descriptors to determine true dependencies.
+The cost is that some functions may have to traverse trees of \noop\ \chdescs\
+to determine true dependencies.
 %
-A \noop\ \chdesc's level is defined to be the max level of its befores;
-in effect, propagating a \noop's befores to its afters.
+\Anoop\ \chdesc's level is defined to be the max level of its befores;
+in effect, propagating \anoop\ \chdesc's befores to its afters.
 
 Modules can also use \noop\ \chdescs\ to \emph{prevent} changes from being
  written.
 %
-A \emph{managed} \noop\ must be explicitly satisfied; any changes that
- depend on that \noop\ are delayed until the owning module explicitly
+A \emph{managed} \noop\ \chdesc\ must be explicitly satisfied; any changes that
+ depend on that \noop\ \chdesc\ are delayed until the owning module explicitly
  satisfies it.
 %
 This is used, for instance, by the journal \module\
@@ -291,10 +289,10 @@ and as before \chdesc{}'s change levels.
 Due to invariant~\ref{cdinvar:before-levels}, only directly reachable
 before \chdescs\ need to be included in a \chdesc's before counts.
 %
-Note that because a \noop\ \chdesc's level is a function of its befores,
+Note that because \anoop\ \chdesc's level is a function of its befores,
 %
-a \noop\ \chdesc\ before count update that changes the \noop's level
-must propagate the level change to the \noop's afters.
+\anoop\ \chdesc\ before count update that changes the \noop\ \chdesc's level
+must propagate the level change to the \noop\ \chdesc's afters.
 %
 When a before count update changes whether a \chdesc\ is ready to
 write, the \chdesc's inclusion in its block's ready list is updated.
@@ -315,10 +313,10 @@ existing \chdesc's disk change and dependencies; in effect, merging
 the two \chdescs.
 %
 In this section we describe overlapping \chdesc\ merging; after
-introducing nonrollbackable \chdescs\ in the next section we describe
+introducing \nrb\ \chdescs\ in the next section we describe
 two additional merge opportunties.
 %
-All three merge rules build on invariant~\ref{cdinvar:add-before}\todo{Introduce invariant~\ref{cdinvar:add-before} sooner than with NRBs}
+All three merge rules build on invariant~\ref{cdinvar:add-before}\todo{Introduce invariant~\ref{cdinvar:add-before} sooner than with \nrb\ \chdescs}
 and use fast, conservative checks during \chdesc\ creation to identify
 \chdescs\ that will be possible to write together;
 %
@@ -344,7 +342,7 @@ Rule: exactly one overlap and new before does not depend on overlap.
 Overlapping makes it easy (but could extend chdescs so that they do overlap).
 Gain new before (if not the overlap).
 
-\paragraph{Nonrollbackable \ChDescs}
+\paragraph{\Nrb\ \ChDescs}
 To enable byte \chdesc\ rollback, each byte \chdesc\ contains a copy
 of the previous block data.
 %
@@ -355,8 +353,8 @@ block descriptors.
 %
 \Kudos\ makes use of invariant~\ref{cdinvar:add-before} and
 conservative heuristics to identify \chdescs\ that will never need to
-be rolledback. We call these \emph{nonrollbackable} \chdescs\
-(\emph{NRB}s). NRBs can safely omit their previous data copies and
+be rolledback. We call these \emph{\nrb} \chdescs.
+\Nrb\ \chdescs\ can safely omit their previous data copies and
 can safely be merged together.
 
 To not store the previous block data when creating a \chdesc\ one must know
@@ -373,41 +371,41 @@ created\todo{Change this phrasing? ``Once created, a \chdesc\ will not
   gain any befores that induce block-level cycles.''}.}
 %
 \Kudos\ ensures this invariant by restricting before additions to
-\chdesc\ creation, \noops\ with no afters, or when the invariant
+\chdesc\ creation, \noop\ \chdescs\ with no afters, or when the invariant
 is statically proven to hold.
 
 To avoid a costly dependency traversal to determine whether a new
 \chdesc\ will need to be rolledback, \Kudos\ conservatively identifies
-a new \chdesc\ as nonrollbackable only if the block has no \chdescs\
+a new \chdesc\ as \nrb\ only if the block has no \chdescs\
 with external (on a different block\todo{Descriptive enough? Mention
-\noop\ after recursion?}) afters. Each block tracks the number of
+\noop\ \chdesc\ after recursion?}) afters. Each block tracks the number of
 external afters through incremental updates as afters are added and
 removed.
 
-\paragraph{Nonrollbackable \ChDesc\ Merging}
+\paragraph{\Nrb\ \ChDesc\ Merging}
 \label{sec:design:chdesc-opts:nrb-merge}
-Notice that two nonrollbackable \chdescs\ on a block must be committed
+Notice that two \nrb\ \chdescs\ on a block must be committed
 in the same revision slice; neither can (or will need to) be rolled
-back. This illustrates the underlying reason why two nonrollbackable
-\chdescs\ can be merged into a single nonrollbackable \chdesc.
+back. This illustrates the underlying reason why two \nrb\
+\chdescs\ can be merged into a single \nrb\ \chdesc.
 %
 While no block-level dependency cycles can be induced by a merge,
 without sufficient care a merge could induce \chdesc{}-level
-dependency cycles. A trivial example is merging \nrb{B} into \nrb{A}
-when \nrb{B} has an explicit dependency on \nrb{A}; the combined
-\nrb{(A+B)} should not and need not depend on itself. The dependency
-addition and nonrollbackable \chdesc\ creation rules restrict the
-possible dependencies involving \nrb{A} and \nrb{B} to \textit{only}
+dependency cycles. A trivial example is merging \nrbof{B} into \nrbof{A}
+when \nrbof{B} has an explicit dependency on \nrbof{A}; the combined
+\nrbof{(A+B)} should not and need not depend on itself. The dependency
+addition and \nrb\ \chdesc\ creation rules restrict the
+possible dependencies involving \nrbof{A} and \nrbof{B} to \textit{only}
 those shown in Figure~\ref{fig:nrb-merge}\todo{Should we give these
   deductions or a flavor?}. From these possible dependencies follows
-an algorithm that recurses \nrb{B}'s before dependency chains until an
+an algorithm that recurses \nrbof{B}'s before dependency chains until an
 external \chdesc\ is encountered and that for each \ncd{C} along the
-chain with a before path to \nrb{A}, moves all of \ncd{C}'s befores
-without before paths to be befores of \nrb{A}\todo{This could be more
+chain with a before path to \nrbof{A}, moves all of \ncd{C}'s befores
+without before paths to be befores of \nrbof{A}\todo{This could be more
   lucid.} This graph manipulation preserves the system's \chdesc\
 dependencies.
 
-NRBs, RBs, and ready lists:
+\Nrb\ \chdescs, \Rb\ \chdescs, and ready lists:
 %
 all post-NRB created chdescs depend on NRB because of overlaps.
 %
@@ -418,17 +416,17 @@ single NRB.
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\columnwidth]{nrb_merge}
-  \caption{Possible dependencies when merging \nrb{B} into \nrb{A}.}
+  \caption{Possible dependencies when merging \nrbof{B} into \nrbof{A}.}
   \label{fig:nrb-merge}
 \end{figure}
 
-TODO: talk about why NRBs slow down revision slice creation or talk
-about how we detect RB$\rightarrow$NRB changes and then do NRB merges
+TODO: talk about why \nrb\ \chdescs\ slow down revision slice creation or talk
+about how we detect RB$\rightarrow$NRB changes and then do \nrb\ \chdesc\ merges
 to avoid this slowdown.
 
 Say something along the lines:
 %
-The dynamic optimizations facilitated through nonrollbackable
+The dynamic optimizations facilitated through \nrb\
 \chdescs\ implement the efficiency in systems using soft updates or
 journaling\todo{Actually do this for journaling} while expressing
 changes modularly through structural descriptions rather than through
@@ -436,12 +434,12 @@ internal and semantic file system descriptions.
 
 \todo{Should we include memory/performance improvement numbers?}
 \todo{Should we talk about why we allow NRBs to be disabled? (Debugging
-simplicity and depend add to noops with afters bug catching.)}
+simplicity and depend add to \noop\ \chdescs\ with afters bug catching.)}
 
 \cdinvar{extern-after}{Each block tracks the total number of
   external afters for \chdescs\ on that block.}
 
-\cdinvar{one-nrb}{Each block has at most one nonrollbackable \chdesc.}
+\cdinvar{one-nrb}{Each block has at most one \nrb\ \chdesc.}
 
 %% \subsubsection{Block Revisions}
 % FIXME maybe make an analogy to packets flowing through a network? -LZ

@@ -84,19 +84,19 @@ We decompose the entire file system layer, from system calls to block
  more configurable, extensible, and easier to understand.
 %
 \Kudos\ \modules\ are built around a new fundamental data type called a
- \emph{change descriptor}.
+ \emph{\chdesc}.
 %
-A change descriptor represents both a change to disk data and any
+A \chdesc\ represents both a change to disk data and any
  \emph{dependencies} between that change and other changes.
 %
-Change descriptors were inspired by the dependency abstraction from BSD's
+\Chdescs\ were inspired by the dependency abstraction from BSD's
  soft updates~\cite{ganger00soft}, but whereas the soft updates implementation
- is specific to the UFS file system, change descriptors are fully general.
+ is specific to the UFS file system, \chdescs\ are fully general.
 %
-Any file system can generate change descriptors, and those change
- descriptors are obeyed by all other file system layers.
+Any file system can generate \chdescs, and those \chdescs\
+are obeyed by all other file system layers.
 %
-Change descriptors may be examined and modified by other modules
+\Chdescs\ may be examined and modified by other modules
  as well, and even passed through layers such as loop-back file systems.
 %
 As a result, the loosely-coupled \modules\ that make up a file system
@@ -104,49 +104,46 @@ As a result, the loosely-coupled \modules\ that make up a file system
  consistency guarantees, even though each individual \module\ does a
  relatively small part of the work.
 
-% We use "change descriptor" here on purpose. An abbreviated form, if necessary,
-% will only be introduced in the change descriptor section.
-
 %% We propose a new file system implementation architecture, called \emph{\Kudos},
-%% where \emph{change descriptor} structures represent any and all changes to
-%% stable storage. File systems generate change descriptors for all writes, then
+%% where \emph{\chdesc} structures represent any and all changes to
+%% stable storage. File systems generate \chdescs\ for all writes, then
 %% send them to block devices for eventual commit. Explicit dependencies between
-%% change descriptors let \Kudos\ \modules\ preserve necessary file system
+%% \chdescs\ let \Kudos\ \modules\ preserve necessary file system
 %% invariants without understanding the file system itself. 
 
-Change descriptors can implement many consistency mechanisms, including
+\Chdescs\ can implement many consistency mechanisms, including
  soft updates and journaling.
 %
-Our file system modules impose soft updates-style change descriptor
+Our file system modules impose soft updates-style \chdesc\
  requirements by default.
 %
 A single module placed downstream of any file system can analyze these
- change descriptor layouts and transform them into dependencies that
+ \chdesc\ layouts and transform them into dependencies that
  implement a journal.
 %
-Additionally, we give user-level applications controlled access to change
- descriptors, allowing applications to impose their own limited consistency
+Additionally, we give user-level applications controlled access to \chdescs,
+allowing applications to impose their own limited consistency
  policies.
 %
 Modifying an IMAP mail server to use this interface requires only localized
  changes; the resulting server follows IMAP's consistency
  requirements while writing fewer blocks to disk.
 %
-Although implementation experience is preliminary, and change descriptors
+Although implementation experience is preliminary, and \chdescs\
  do not yet support all consistency policies (for instance, not ACID
  transactions: transactions should be independent, but any file system
- client can observe all active change descriptors), we believe the \Kudos\
+ client can observe all active \chdescs), we believe the \Kudos\
  architecture will allow the construction of consistent, modular,
  extensible file systems that are much easier to understand.
 
 
 
-Our contributions include the generalized change descriptor design,
+Our contributions include the generalized \chdesc\ design,
  \Kudos's module interfaces (a particular innovation is the separation of
  the low-level specification of on-disk layout from higher-level
  file-system-independent code), particular modules including the journal
  module and the write-back cache, and the changegroup interface that
- exports change descriptors to userspace.
+ exports \chdescs\ to userspace.
 
 
 \begin{comment}
@@ -173,7 +170,7 @@ Our contributions include the generalized change descriptor design,
 
 %
 %% All \Kudos\ \modules\ obey the ordering restrictions implied 
-%% Thus, arrangements of change descriptors, by enforcing 
+%% Thus, arrangements of \chdescs, by enforcing 
 %% \Kudos's lower level layers 
 
 
@@ -204,15 +201,12 @@ system would be able to work with them. In this way, the loosely-coupled
 cooperate to implement strong and often complex consistency guarantees, even
 though each individual \module\ does only a small and simple part of the work.
 
-% We use "change descriptor" here on purpose. An abbreviated form, if necessary,
-% will only be introduced in the change descriptor section.
-
 We propose a new file system implementation architecture, called \emph{\Kudos},
-where \emph{change descriptor} structures represent any and all changes to
-stable storage. File systems generate change descriptors for all writes, then
+where \emph{\chdesc} structures represent any and all changes to
+stable storage. File systems generate \chdescs\ for all writes, then
 send them to block devices for eventual commit. Explicit dependencies between
-change descriptors let \Kudos\ \modules\ preserve necessary file system
-invariants without understanding the file system itself. Change descriptors can
+\chdescs\ let \Kudos\ \modules\ preserve necessary file system
+invariants without understanding the file system itself. \Chdescs\ can
 implement many consistency mechanisms, including soft updates and journaling.
 They can also be extended, in a carefully controlled way, into userspace --
 enabling applications with custom consistency and performance requirements to
@@ -224,7 +218,7 @@ guarantee data consistency (soft updates, for example, ensures metadata
 consistency only).
 
 \Kudos\ is decomposed into fine-grained \modules\ which generate, consume,
-forward, and manipulate change descriptors. A particular innovation of the
+forward, and manipulate \chdescs. A particular innovation of the
 \module\ design is the separation of the low-level specification of on-disk
 layout from higher-level file system-independent code, which operates on
 abstract disk structures. Our journaling \module\ can automatically add
