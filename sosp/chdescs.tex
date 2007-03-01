@@ -1,10 +1,10 @@
 % -*- mode: latex; tex-main-file: "paper.tex" -*-
 
-\subsection{Block Descriptors}
+\subsection{\BDescs}
 
-Disk blocks are represented by objects called \emph{block descriptors}.
-\Kudos\ maintains a block descriptor object for each cached block, and tracks
-pointers to the block descriptors using reference counting. In addition to the
+Disk blocks are represented by objects called \emph{\bdescs}.
+\Kudos\ maintains a \bdesc\ object for each cached block, and tracks
+pointers to the \bdescs\ using reference counting. In addition to the
 ``retain'' and ``release'' operations which increment and decrement the
 reference counts, \Kudos\ also provides an ``autorelease'' operation which
 decrements the usage count after the calling system call completes. This is
@@ -12,7 +12,7 @@ useful for simulating garbage collection.
 
 \Kudos\ expects to be able to write blocks atomically. Thus, the modules that
 interface with the disk return blocks that are 512 bytes long (the sector
-size). However, a single block descriptor can correspond to a range of
+size). However, a single \bdesc\ can correspond to a range of
 contiguous blocks. This feature is used by the \Kudos\ block resizer module to
 ``join'' sector-sized blocks into a more convenient size for the relevant file
 system, such as 2048 or 4096 bytes.
@@ -348,8 +348,8 @@ of the previous block data.
 %
 While these copies are needed to rollback byte \chdescs, many
 \chdescs\ are actually never rolledback (e.g. file data blocks) and
-previous data copies nearly double the memory usage of change and
-block descriptors.
+previous data copies nearly double the memory usage of \chdescs\ and
+\bdescs.
 %
 \Kudos\ makes use of invariant~\ref{cdinvar:add-before} and
 conservative heuristics to identify \chdescs\ that will never need to
