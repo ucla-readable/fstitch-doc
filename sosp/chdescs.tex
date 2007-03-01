@@ -238,7 +238,8 @@ Let \(\pset{B} = \{a\ |\ \inset{a}{\psetinflight{t}} \land \blockof{a} = \block{
 \label{action:write}
 
 \item \(\deps{t+1} := \deps{t} \cup\ \pset{X}\) where
-\(\notinset{a}{\psetall{t}} \land \pset{X} \subset \{\depends{a}{b}\}\)
+\(\notinset{a}{\psetall{t}} \land \pset{X} \subset \{\depends{a}{b}\}\)\\
+\(\psetall{t+1} := \psetall{t} \cup\ \{a\}\)
 \label{action:create}
 
 \item \(\psetinflight{t+1} := \psetinflight{t} \cup \{a\}\) for some
