@@ -1,5 +1,3 @@
-% -*- mode: latex; tex-main-file: "paper.tex" -*-
-
 \subsection{\BDescs}
 
 Disk blocks are represented by objects called \emph{\bdescs}.
@@ -23,7 +21,7 @@ system, such as 2048 or 4096 bytes.
 \begin{tabular}{@{\hskip0.58in}p{2in}@{}}
 \begin{scriptsize}
 \begin{verbatim}
-struct chdesc {
+struct patch {
     BD_t *device;
     bdesc_t *block;
     enum {BIT, BYTE, NOOP} type;
@@ -37,10 +35,10 @@ struct chdesc {
             uint8_t *data;
         } byte;
     };
-    struct chdesc_queue *dependencies;
+    struct patch_queue *dependencies;
     uint32_t nbefores[NBDLEVEL];
-    chdesc_t * ddesc_ready_next;
-    chdesc_t ** ddesc_ready_prev;
+    patch_t * ddesc_ready_next;
+    patch_t ** ddesc_ready_prev;
 /* ... */ };
 \end{verbatim}
 \end{scriptsize}
@@ -53,9 +51,6 @@ struct chdesc {
 \subsection {\ChDescs}
 \label{sec:design:chdescs}
 
-%%\subsubsection {Overview}
-
-
 Each in-memory modification to a cached disk block has an associated
 \chdesc.
 %
@@ -65,6 +60,7 @@ the cached block's state between old and new.
 
 Figure~\ref{fig:chdesc} gives a simplified version of the structure, and
 Figure~\ref{fig:chdapi} shows much of the API for working with them.
+\todo{The API has changed...}
 %
 The ability
 to revert and re-apply \chdescs\ is inspired by soft updates dependencies, but
@@ -87,27 +83,27 @@ afters are rolledback\todo{Be more precise to be correct.}.}
 \begin{tabular}{@{\hskip0.25in}p{2in}@{}}
 \begin{scriptsize}
 \begin{alltt}
-int \textbf{chdesc_create_byte}(
+int \textbf{patch_create_byte}(
     bdesc_t *block, BD_t *owner,
     uint16_t offset, uint16_t length,
-    const void *data, chdesc_t **head);
-chdesc_t *\textbf{chdesc_create_bit}(
+    const void *data, patch_t **head);
+patch_t *\textbf{patch_create_bit}(
     bdesc_t *block, BD_t *owner,
     uint16_t offset, uint32_t xor);
-chdesc_t *\textbf{chdesc_create_noop}(
-    BD_t *owner, chdesc_t *tail, ...);
-int \textbf{chdesc_create_diff}(
+patch_t *\textbf{patch_create_noop}(
+    BD_t *owner, patch_t *tail, ...);
+int \textbf{patch_create_diff}(
     bdesc_t *block, BD_t *owner,
     uint16_t offset, uint16_t length,
-    const void *newdata, chdesc_t **head);
-int \textbf{chdesc_add_depend}(
-    chdesc_t *depender, chdesc_t *dependee);
-void \textbf{chdesc_remove_depend}(
-    chdesc_t *depender, chdesc_t *dependee);
-int \textbf{chdesc_apply}(chdesc_t *chdesc);
-int \textbf{chdesc_rollback}(chdesc_t *chdesc);
-int \textbf{chdesc_satisfy}(chdesc_t *chdesc);
-int \textbf{chdesc_push_down}(
+    const void *newdata, patch_t **head);
+int \textbf{patch_add_depend}(
+    patch_t *depender, patch_t *dependee);
+void \textbf{patch_remove_depend}(
+    patch_t *depender, patch_t *dependee);
+int \textbf{patch_apply}(patch_t *patch);
+int \textbf{patch_rollback}(patch_t *patch);
+int \textbf{patch_satisfy}(patch_t *patch);
+int \textbf{patch_push_down}(
     BD_t *current_bd, bdesc_t *current_block,
     BD_t *target_bd, bdesc_t *target_block);
 \end{alltt}
@@ -117,59 +113,93 @@ int \textbf{chdesc_push_down}(
 \caption{\label{fig:chdapi} Partial \chdesc\ API.}
 \end{figure}
 
-\Kudos\ \modules\ change blocks by attaching \chdescs\ to them,
-using functions such as \texttt{chdesc\_create\_byte}.
+\Kudos\ \modules\ change blocks by attaching \chdescs\ to them, using functions
+such as \texttt{patch\_create\_byte}.
 %
-Most file system modules initially generate \chdescs\ whose
-dependencies impose soft-update-like ordering requirements (see
-\S\ref{sec:consistency:softupdate}).  These \chdescs\ are then passed down,
-through other modules, in the general direction of the disk.  The
-intervening \modules\ can
-inspect, delay, and even modify them before passing them on further. For
-instance, the write-back cache \module\ (\S\ref{sec:modules:wbcache}),
-essentially a buffer cache, holds
-on to blocks and their \chdescs\ instead of forwarding them
-immediately. Each delay-inducing \module\ increases its \module\
-level by one over the module(s) it uses, starting at zero.
+Most file system modules initially generate \chdescs\ whose dependencies impose
+soft-update-like ordering requirements (see \S\ref{sec:consistency:softupdate}).
+These \chdescs\ are then passed down, through other modules, in the general
+direction of the disk. The intervening \modules\ can inspect, delay, and even
+modify them before passing them on further. For instance, the write-back cache
+\module\ (\S\ref{sec:modules:wbcache}), essentially a buffer cache, holds on to
+blocks and their \chdescs\ instead of forwarding them immediately. Each
+delay-inducing \module\ increases its \module\ level by one over the module(s)
+it uses, starting at zero.
 %
-When evicting a block and associated \chdescs, the write-back
-cache enforces an order consistent with the \chdesc\ dependency
-information. Specifically,
-\cdinvar{before-levels}{The befores of a \chdesc\ at level $l$ are at levels $\leq l$.}
+When writing a block and associated \chdescs, the write-back cache enforces an
+order consistent with the \chdesc\ dependency information. Specifically,
+\cdinvar{before-levels}{The befores of a \chdesc\ at level $l$ are at levels
+$\leq l$.}
 
-When a \module\ asynchronously writes the data associated with a set
-of \chdescs\ to stable storage it marks the \chdescs\ as
-\emph{in flight} to indicate that the \chdescs\ are considered to still
-have the above level. Afters will thus remain at the above level (or
-higher), preserving the \chdescs{}'s dependencies.
-%
-A \chdesc\ is \emph{satisfied} when its associated data reaches stable
-storage.
+When a \module\ asynchronously writes the data associated with a set of
+\chdescs\ to stable storage it marks the \chdescs\ as \emph{in flight} to
+indicate that the \chdescs\ are considered to still have the above level. Afters
+will thus remain at the above level (or higher), preserving the \chdescs's
+dependencies. A \chdesc\ is \emph{satisfied} when its associated data reaches
+stable storage.
 
-%% Since many \modules\ may be stacked on top of one another in \Kudos, and since
-%% many of them may want to refer to the same block at the same time, 
 Each \chdesc\ on a block may or may not be visible to a given \module.
 %
 For example, modules that respond to user requests generally view the most
- current state of every block -- the block with all \chdescs\ applied.
+current state of every block -- the block with all \chdescs\ applied.
 %
 However, a write-back cache may choose to write some \chdescs\ on a block
- while reverting others, since those others currently have unsatisfiable
- dependencies.
+while reverting others, since those others currently have unsatisfiable
+dependencies.
 %
 In this case, \modules\ below the write-back cache should view the
- unsatisfied \chdescs\ in the reverted state.
+unsatisfied \chdescs\ in the reverted state.
 %
 %% If this \module\ is the disk, it will need to be able to write a version of
 %%  the block's data that does not include the \chdescs\ that have not yet
 %%  been sent to it.
 %
-\Kudos\ provides a block revisioning library function that automatically rolls back those
- \chdescs\ that should not be visible at a particular \module, and then
- rolls them forward again after that \module\ is done with the block.
+\Kudos\ provides a block revisioning library function that automatically
+rolls back those \chdescs\ that should not be visible at a particular \module,
+and then rolls them forward again after that \module\ is done with the block.
 
+\subsubsection{Bit \ChDescs}
+\label{sec:design:chdescs:bit}
+A bit \chdesc\ is a specialized \chdesc\ that expresses small changes
+more efficiently than than the general byte \chdesc\, using an inline
+mask instead of a pointer to a copy of previous data to support rollbacks.
 
-%% \paragraph{Manipulations and Transformations}
+\subsubsection{\Noop\ \ChDescs}
+\label{sec:design:chdescs:noop}
+The prototypical \chdesc\ corresponds to some change on disk, but \Kudos\
+also supports a \emph{\noop} \chdesc\ type, which doesn't change the disk
+at all. \Noop\ \chdescs\ can have dependencies, like any other
+\chdesc, but they don't need to be written to disk:  they are trivially
+satisfied when all of their dependencies are satisfied.
+%
+Thus, they can be used to ``stand for'' entire sets of other changes.
+%
+This capability is extremely useful, and is used by most operations on disk
+structures so that a single \chdesc\ can be returned that depends on the whole
+change. Likewise, \anoop\ \chdesc\ can be passed in as a parameter to a disk
+operation to make the whole operation depend on a set of other changes. \Noop\
+\chdescs\ allow dependencies between sets without a quadratic number
+of dependency edges in the \chdesc\ graph, and without having to pass around
+arrays of \chdescs.
+%
+The cost is that some functions may have to traverse trees of \noop\ \chdescs\
+to determine true dependencies.
+%
+\Anoop\ \chdesc's level is defined to be the max level of its befores;
+in effect, propagating \anoop\ \chdesc's befores to its afters.
+
+Modules can also use \noop\ \chdescs\ to \emph{prevent} changes from being
+written.
+%
+A \emph{managed} \noop\ \chdesc\ must be explicitly satisfied; any changes that
+depend on that \noop\ \chdesc\ are delayed until the owning module explicitly
+satisfies it.
+%
+This is used, for instance, by the journal \module\
+(\S\ref{sec:consistency:journal}) to prevent a transaction's \chdescs\
+from being written before the journal commits.
+
+%% \subsubsection{Manipulations and Transformations}
 % FIXME: add concrete details here
 
 %% \Chdescs\ play a central role in \Kudos, and therefore many parts of the system
@@ -216,7 +246,7 @@ moved down by one level.
 %
 Each block has a list of \chdescs\ that are not entirely overlaped.
 
-\paragraph{Initial formalisms}
+\subsubsection{Initial formalisms}
 
 \noindent\\ Invariants:
 \cdinvar{a}{If \indirdepends{a}{b} then \notindirdepends{b}{a}.}
@@ -279,74 +309,28 @@ imply that invariant~\ref{cdinvar:c} holds.
 \(\psethard{t+1} := \psethard{t} \setminus \pset{X}\)
 \end{enumerate}
 
-\paragraph{Bit \ChDescs}
-\label{sec:design:chdescs:bit}
-A bit \chdesc\ is a specialized \chdesc\ that expresses small changes
-more efficiently than than the general byte \chdesc\, using an inline
-mask instead of a pointer to a copy of previous data to support rollbacks.
-
-\paragraph{\Noop\ \ChDescs}
-\label{sec:design:chdescs:noop}
-The prototypical \chdesc\ corresponds to some change on disk, but \Kudos\
- also supports a \emph{\noop} \chdesc\ type, which doesn't change the disk
- at all.
-%
-%% An important type of \chdesc\ is actually one that doesn't change the disk at
-%% all: the \noop\ \chdesc. 
-%
-\Noop\ \chdescs\ can have dependencies, like any other
-\chdesc, but they don't need to be written to disk:  they are trivially satisfied when all of their dependencies are
-satisfied.
-%
-Thus, they can be used to ``stand for'' entire sets of other changes.
-%
-This capability is extremely useful, and is used by most operations on disk
-structures so that a single \chdesc\ can be returned that depends on the whole
-change. Likewise, \anoop\ \chdesc\ can be passed in as a parameter to a disk
-operation to make the whole operation depend on a set of other changes. \Noop\
-\chdescs\ allow dependencies between sets without a quadratic number
-of dependency edges in the \chdesc\ graph, and without having to pass around
-arrays of \chdescs.
-%
-The cost is that some functions may have to traverse trees of \noop\ \chdescs\
-to determine true dependencies.
-%
-\Anoop\ \chdesc's level is defined to be the max level of its befores;
-in effect, propagating \anoop\ \chdesc's befores to its afters.
-
-Modules can also use \noop\ \chdescs\ to \emph{prevent} changes from being
- written.
-%
-A \emph{managed} \noop\ \chdesc\ must be explicitly satisfied; any changes that
- depend on that \noop\ \chdesc\ are delayed until the owning module explicitly
- satisfies it.
-%
-This is used, for instance, by the journal \module\
- (\S\ref{sec:consistency:journal}) to prevent a transaction's \chdescs\
- from being written before the journal commits.
-
-\paragraph{Scalable Dependency-Preserving Writes}
+\subsubsection{Scalable Dependency-Preserving Writes}
 For a \module\ like the write back cache to forward \chdescs\ in a
 dependency-preserving order, the \module\ must find \chdescs\ whose
 befores are on a lower block device (or are part of the block write
 and on the current block device). Because the write back cache
-frequently searches for and writes many ready \chdescs{}, redundant
+frequently searches for and writes many ready \chdescs, redundant
 before traversals to calculate \chdesc\ ready state would severly
 limit cache size scalabity.
 %
 \Kudos\ therefore
 %
-1) explictly tracks a \chdesc{}'s before counts through incremental
+1) explictly tracks a \chdesc's before counts through incremental
 dependency updates
 %
 and 2) uses these counts to maintain a \chdesc\ ready list for each
 block.
 
-A \chdesc{}'s before counts are incrementally updated
+A \chdesc's before counts are incrementally updated
 %
 as befores are added and removed
 %
-and as before \chdesc{}'s change levels.
+and as before \chdesc's change levels.
 %
 
 Due to invariant~\ref{cdinvar:before-levels}, only directly reachable
@@ -367,7 +351,7 @@ empty.
 TODO: Include invariants that the max before level computation is
 $O(1)$ or that ready \chdescs\ can be moved in $\sim\! O(r)$ time?
 
-\paragraph{\ChDesc\ Merging}
+\subsubsection{\ChDesc\ Merging}
 \Kudos\ drastically reduces the number of \chdescs\ created to
 describe a system of changes by (conservatively) identifying when a
 second \chdesc\ may safely be written at the same time as an existing
@@ -390,7 +374,7 @@ overlapping mergeable \chdescs\ as data is appended to a file.
 %
 Many of these and similar \chdescs\ are mergeable and have
 dependencies that allow simple (and fast) reasoning to identify many
-of the mergeable pairs: two \chdescs\ that overlap no other \chdescs{}
+of the mergeable pairs: two \chdescs\ that overlap no other \chdescs\
 and which have no dependency path from the new to the existing \chdesc\
 will not induce a block-level cycle and so are writeable together.
 We know that \textit{later} changes will not cause them to induce a block-level cycle due to
@@ -405,7 +389,7 @@ Rule: exactly one overlap and new before does not depend on overlap.
 Overlapping makes it easy (but could extend chdescs so that they do overlap).
 Gain new before (if not the overlap).
 
-\paragraph{\Nrb\ \ChDescs}
+\subsubsection{\Nrb\ \ChDescs}
 To enable byte \chdesc\ rollback, each byte \chdesc\ contains a copy
 of the previous block data.
 %
@@ -431,7 +415,7 @@ rollback:
 \cdinvar{add-before}{All block-level cycles induced through
 \chdesc\ $C$'s befores exist when $C$ is
 created\todo{Change this phrasing? ``Once created, a \chdesc\ will not
-  gain any befores that induce block-level cycles.''}.}
+gain any befores that induce block-level cycles.''}.}
 %
 \Kudos\ ensures this invariant by restricting before additions to
 \chdesc\ creation, \noop\ \chdescs\ with no afters, or when the invariant
@@ -445,7 +429,7 @@ with external (on a different block\todo{Descriptive enough? Mention
 external afters through incremental updates as afters are added and
 removed.
 
-\paragraph{\Nrb\ \ChDesc\ Merging}
+\subsubsection{\Nrb\ \ChDesc\ Merging}
 \label{sec:design:chdesc-opts:nrb-merge}
 Notice that two \nrb\ \chdescs\ on a block must be committed
 in the same revision slice; neither can (or will need to) be rolled
@@ -453,26 +437,26 @@ back. This illustrates the underlying reason why two \nrb\
 \chdescs\ can be merged into a single \nrb\ \chdesc.
 %
 While no block-level dependency cycles can be induced by a merge,
-without sufficient care a merge could induce \chdesc{}-level
+without sufficient care a merge could induce \chdesc-level
 dependency cycles. A trivial example is merging \nrbof{B} into \nrbof{A}
 when \nrbof{B} has an explicit dependency on \nrbof{A}; the combined
 \nrbof{(A+B)} should not and need not depend on itself. The dependency
 addition and \nrb\ \chdesc\ creation rules restrict the
 possible dependencies involving \nrbof{A} and \nrbof{B} to \textit{only}
 those shown in Figure~\ref{fig:nrb-merge}\todo{Should we give these
-  deductions or a flavor?}. From these possible dependencies follows
+deductions or a flavor?}. From these possible dependencies follows
 an algorithm that recurses \nrbof{B}'s before dependency chains until an
 external \chdesc\ is encountered and that for each \ncd{C} along the
 chain with a before path to \nrbof{A}, moves all of \ncd{C}'s befores
 without before paths to be befores of \nrbof{A}\todo{This could be more
-  lucid.} This graph manipulation preserves the system's \chdesc\
+lucid.} This graph manipulation preserves the system's \chdesc\
 dependencies.
 
 \Nrb\ \chdescs, \Rb\ \chdescs, and ready lists:
 %
-all post-NRB created chdescs depend on NRB because of overlaps.
+all post-NRB created \chdescs\ depend on NRB because of overlaps.
 %
-no NRB-prior created chdescs exist (RB->NRB).
+no NRB-prior created \chdescs\ exist (RB->NRB).
 %
 single NRB.
 
@@ -500,13 +484,59 @@ internal and semantic file system descriptions.
 simplicity and depend add to \noop\ \chdescs\ with afters bug catching.)}
 
 \cdinvar{extern-after}{Each block tracks the total number of
-  external afters for \chdescs\ on that block.}
+external afters for \chdescs\ on that block.}
 
 \cdinvar{one-nrb}{Each block has at most one \nrb\ \chdesc.}
 
-%% \subsubsection{Block Revisions}
-% FIXME maybe make an analogy to packets flowing through a network? -LZ
+\subsubsection{Unnecessary \ChDesc\ Dependencies}
+Even with \Kudos\ dynamically optimizing \chdesc\ graphs, there is only so much
+that can be done while preserving the semantics of the dependencies specified by
+the \module\ which created the \chdescs. It is obvious that having too few
+dependencies compromises the correctness of the system; it is perhaps less
+obvious but no less true that having too many dependencies can nontrivially
+degrade the performance of the system.
 
-% Should end with an example -- a little diagram, perhaps
-% borrowed from soft updates -- and then perhaps discussion, with things like
-% the last paragraph of optimizations above
+In Figure~\ref{fig:chdescarrange}, we have two possible arrangements for three
+byte \chdescs. The \noop\ \chdesc\ represents a root node that can reach all
+other \chdescs. In the parallel arrangement on the right, \Kudos\ has the
+freedom to write \chdescs\ $C_1$, $C_2$, and $C_3$ to disk in any order. In the
+serial arrangement on the left, there exists only one valid write ordering.
+Depending on the arrangement of other change descriptors, \Kudos\ may have to
+perform additional rollbacks and write some blocks more times than would
+otherwise be necessary in order to write these \chdescs\ to disk. Even if that
+is not necessary, \Kudos\ will still have less flexibility in choosing an order
+to write the blocks, potentially increasing disk seek times due to suboptimal
+ordering.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=192pt]{fig/figures_6}
+  \caption{\label{fig:chdescarrange} \Chdesc\ dependencies, when
+  not strictly needed, restrict the possible choices for write ordering.
+  This results in suboptimal write ordering and more scans through the
+  \chdescs\ for \Kudos. On the right, \chdescs\ C1, C2, and C3 can be written
+  in any order. Only one ordering is possible on the left.}
+\end{figure}
+
+Even when no unnecessary dependencies are explicitly created, they can still be
+created implicitly and care must be taken to avoid them. When \chdescs\ overlap,
+the later \chdesc\ is made to depend on the first so that it cannot precede the
+change it is changing further to disk. As a result, however, unnecessary
+dependencies may result if the \chdescs\ are larger than the data they are
+actually changing. In Figure~\ref{fig:overlap}, to update a field in an inode
+structure on disk, a \chdesc\ spanning the entire inode could be created even
+though only a single field changed. A later change to a different field would
+appear to overlap the first, creating an unnecessary dependency. Creating
+\chdescs\ which correspond more precisely to the changes being made avoids this
+problem, so a utility function is provided by \Kudos\ to make this operation as
+convenient as creating a single \chdesc\ for an entire large structure.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=64pt]{fig/figures_5}
+  \caption{\label{fig:overlap} On inode 17, the gray regions represent
+  modified fields that do not overlap. If \chdesc\ A and \chdesc\ B are
+  exactly the size of the gray regions, then there is no implicit dependency.
+  However, making \chdescs\ for the entire inode data structure will make
+  one \chdesc\ depend on the other because they overlap.}
+\end{figure}

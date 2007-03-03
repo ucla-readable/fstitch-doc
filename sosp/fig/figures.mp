@@ -224,11 +224,11 @@ beginfig(4);
 endfig;
 
 beginfig(5);
-  label.top(btex Chdesc A etex, (15,25));
+  label.top(btex Patch A etex, (15,25));
   boxjoin(a.width = b.width; a.height = b.height; a.s - b.n = (0,20));
   elementit.a(btex \quad Inode 17 \quad etex, 0, 0, pull);
   elementit.b(btex \quad Inode 17 \quad etex, 0, 0, pull);
-  label.bot(btex Chdesc B etex, (50,-55));
+  label.bot(btex Patch B etex, (50,-55));
 
   fixelement(a,b);
 
@@ -270,13 +270,13 @@ beginfig(6);
     drawconnarrow (b.c -- a.c) cutbefore bpath.b cutafter bpath.a
   enddef;
 
-  ffff(a,b);
-  ffff(a,c);
-  ffff(a,d);
-
+  ffff(e,f);
+  ffff(e,g);
   ffff(e,h);
-  ffff(h,g);
-  ffff(g,f);
+
+  ffff(a,d);
+  ffff(d,c);
+  ffff(c,b);
 
 endfig;
 
