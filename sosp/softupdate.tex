@@ -11,7 +11,7 @@ by avoiding \emph{fsck}.
 %
 Not all invariants can be preserved, so soft updates relaxes the least
 critical: a crash or sudden reboot can leak blocks or other disk
-structures, but can never create more serious inconsistencies.
+structures, but will never create more serious inconsistencies.
 %
 %% It is not generally possible to maintain this invariant,
 %% so in the ``soft updates''~\cite{ganger00soft} system this definition is
@@ -27,7 +27,7 @@ structures, but can never create more serious inconsistencies.
 %% while a reference to a structure still exists on the disk, accomplishes this
 %% easily. 
 
-In the FFS implementation of soft updates, each file system operation is
+In the BSD implementation of soft updates, each file system operation is
 represented by a structure in memory encapsulating the structural changes to the
 disk image necessary to implement that operation. As a result, there exist many
 specialized data structures to represent the different possible file system
@@ -62,7 +62,7 @@ depicted in Figure~\ref{fig:softupdate}.
 %% are specific to the file system in use (which, in practice, is FFS), while
 %% \Kudos\ represents the changes in a file system independent way.
 
-The \Kudos\ approach certainly takes more memory than the soft updates approach,
+The \Kudos\ approach certainly takes more memory than the BSD soft updates approach,
 which limits the state required by any individual file system operation; we do
 not yet address the issue of memory exhaustion.
 %

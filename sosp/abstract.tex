@@ -1,7 +1,7 @@
 \begin{abstract}
 
 We propose a file system implementation architecture, called \emph{\Kudos},
-where \emph{\chdesc} structures represent any and all changes to
+where structures called \emph{\chdescs} represent any and all changes to
 stable storage.
 %
 %%  File systems generate \chdescs\ for all writes, then
@@ -13,7 +13,7 @@ stable storage.
 \Kudos\ is decomposed into fine-grained \modules\ which generate, consume,
  forward, and manipulate \chdescs.
 %
-The uniform \chdesc\ abstraction allows modules to impose and
+The uniform abstraction of \chdescs\ allows modules to impose and
  follow arbitrary file system consistency policies: a collection of
  loosely-coupled modules cooperates to implement strong and possibly
  complex guarantees, even though each individual module does a relatively

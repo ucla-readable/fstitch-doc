@@ -60,8 +60,8 @@ quadratic time to linear time.
 
 % \subsection {Features}
 For the \Kudos\ UFS module, we want to add more features to make the
-implementation complete. Currently, we do not support symbolic links, triple
-indirect blocks, or sparse files. The first two can easily be implemented
+implementation complete. Currently, we do not support triple
+indirect blocks or sparse files. The first can easily be implemented
 given time. Sparse file support will require the \LFS\ interface to be aware of
 files with holes. This also means the layer immediately above the \LFS\ interface
 may need to adjust some of the assumptions it currently makes about files and
@@ -73,5 +73,5 @@ structures that assist resource allocation algorithms. We currently ignore many
 of them, partially because our basic algorithms do not use them, and partially
 due to the lack of documentation to explain the purpose of some data
 structures. Over time, we hope to better understand UFS and improve our UFS
-implementation.
+implementation. \todo{ext2, ext3 journal format compatibility}
 

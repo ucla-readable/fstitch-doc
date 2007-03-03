@@ -4,27 +4,23 @@
 \label{sec:modules:ufs}
 
 \Kudos\ supports a version of UFS (Unix File System), the modern incarnation of
-the Fast File System~\cite{mckusick84fast} used in 4.2 BSD. We describe UFS as
+the Fast File System~\cite{mckusick84fast} used in 4.2 BSD. UFS is of particular
+interest because it is the only file system that has been extended with both
+soft updates and journaling. ~\cite{seltzer00journaling} We chose UFS1 over
+UFS2, as UFS1 is well established and more widely supported. We describe UFS as
 an example of a complete and relatively complex file system.
-
-The general concepts for UFS, such as inodes, cylinder groups, and
-indirect blocks, are well understood.  In \Kudos, we implemented the UFS1
-file system as an \LFS\ \module. UFS is of particular interest because it is
-the only file system that has been extended with both soft updates and
-journaling. ~\cite{seltzer00journaling} We chose UFS1 over UFS2, as UFS1 is
-well established and more widely supported.
 
 The UFS \module\ is implemented at the \LFS\ interface. This keeps properties
 specific to UFS (such as the UFS on-disk format and rules governing block
 allocation) hidden within the file system \module. For instance, UFS uses
 2KB \emph{fragments} to store small files efficiently. Once a file gets big
-enough to require the use of indirect blocks, then UFS changes its allocation
+enough to require the use of indirect blocks, UFS changes its allocation
 policy and starts allocating 16KB \emph{blocks}, where a block is made up of 8
 aligned and contiguous fragments. Our UFS \module\ implements this by using
-fragments as the basic block size. For large files, our UFS \module\ internally
+fragments as the basic block size. For large files, the UFS \module\ internally
 allocates a block, but returns only the first fragment in that block at the \LFS\
-level. The next 7 allocation calls will be no-ops that simply return the
-subsequent fragments in the allocated block. In this way, UFS can stay
+level. The next 7 allocation calls will simply return the
+subsequent fragments in the already allocated block. In this way, UFS can stay
 consistent internally without special support from other \Kudos\ modules.
 
 The UFS \module\ creates \chdescs\ for all its changes to the disk, and
@@ -36,7 +32,7 @@ created. The block device subsystem will track and enforce the
 
 In order to implement soft update ordering, we examined the places where UFS
 created \chdescs. With the consistency rules for soft updates in mind, we
-carefully connected the \chdescs created within an \LFS\ call. Assured that
+carefully connected the \chdescs\ created within an \LFS\ call. Assured that
 all \LFS\ calls in the UFS \module\ followed soft updates ordering, we then made
 sure that the combinations of \LFS\ calls do not violate soft updates
 consistency.
@@ -174,7 +170,7 @@ modified copy of a data structure to the original, and creates a minimal set of
 \chdescs\ accordingly. Due to the frequent use of inodes, one simple use of
 \texttt{chdesc\_create\_diff()} in the UFS inode functions reduced \chdesc\
 graph traversal time significantly. This does introduce a slight
-overhead, due to the need to \emph{diff} the two structures.
+overhead, due to the need to compare the two structures.
 
 \begin{figure}[htb]
   \centering

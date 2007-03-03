@@ -13,9 +13,9 @@ using them.
 
 Our first benchmark test is to untar the Linux 2.6.15 source code from
 \texttt{linux-2.6.15.tar}, which is already decompressed and cached in RAM. We
-did this test on identical machines running Linux 2.6.12 (using ext3), FreeBSD
+did this test on identical machines running Linux 2.6.20.1 (using ext3), FreeBSD
 5.4 (using UFS, with and without soft updates), and \Kudos\ running as a Linux
-2.6.12 kernel module (using UFS, with and without soft updates). As a second
+2.6.20.1 kernel module (using UFS, with and without soft updates). As a second
 test, we then delete the resulting source tree. The times below include time to
 fully sync the changes to disk.
 
@@ -29,7 +29,7 @@ System & Untar (sec) & Delete (sec) \\ \hline\hline
 FreeBSD 5.4 (SU) & 20.47 & 4.71 \\ \hline
 FreeBSD 5.4 (async) & 9.63 & 3.72 \\ \hline\hline
 % double line to separate linux
-Linux 2.6.12 (journaling) & 12.90 & 4.90 \\ \hline
+Linux 2.6.20.1 (journaling) & 12.90 & 4.90 \\ \hline
 \end{tabular}
 }
 \caption{\label{fig:macro} Untar/delete times for \Kudos, FreeBSD, and Linux,
@@ -40,7 +40,7 @@ with soft updates (SU) and with async mode.}
 writes, and a little over a factor of two slower for deletions. This
 shows that, although it is slow, \Kudos\ is close to running in
 acceptable time. While we do have CPU usage and I/O delay problems, we
-have only focused on performance for a few weeks, in which we were
+have only focused on performance for a few weeks\todo{and a year}, in which we were
 able to speed up the system enormously.  There are more optimization
 opportunities that can likely bring us very close in performance to
 existing implementations of soft updates (see \S\ref{sec:discussion}).

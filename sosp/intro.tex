@@ -6,7 +6,7 @@
 
 Ongoing massive growth in both disk capacities and user and application
  storage requirements, combined with the increasing
- disparity between disk and processor speeds, have led to ongoing
+ disparity between disk and processor speeds, has led to ongoing
  innovation in file system design.
 %
 File systems are expected to do more things: they can automatically encrypt
@@ -97,7 +97,7 @@ Any file system can generate \chdescs, and those \chdescs\
 are obeyed by all other file system layers.
 %
 \Chdescs\ may be examined and modified by other modules
- as well, and even passed through layers such as loop-back file systems.
+ as well, and even passed through layers such as loop-back block devices.
 %
 As a result, the loosely-coupled \modules\ that make up a file system
  implementation can cooperate to implement strong and often complex
@@ -133,7 +133,7 @@ Although implementation experience is preliminary, and \chdescs\
  do not yet support all consistency policies (for instance, not ACID
  transactions: transactions should be independent, but any file system
  client can observe all active \chdescs), we believe the \Kudos\
- architecture will allow the construction of consistent, modular,
+ design will allow the construction of consistent, modular,
  extensible file systems that are much easier to understand.
 
 
@@ -142,7 +142,7 @@ Our contributions include the generalized \chdesc\ design,
  \Kudos's module interfaces (a particular innovation is the separation of
  the low-level specification of on-disk layout from higher-level
  file-system-independent code), particular modules including the journal
- module and the write-back cache, and the changegroup interface that
+ module and the write-back cache, and the \opgroup\ interface that
  exports \chdescs\ to userspace.
 
 

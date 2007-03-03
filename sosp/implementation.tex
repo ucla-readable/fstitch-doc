@@ -42,15 +42,16 @@ passes the request to Linux via \texttt{generic\_make\_request()}. The block is
 of course not written immediately upon making this call, so \Kudos\ does not
 satisfy the \chdescs\ on the block that are being written until it receives
 notification that the block has made it to the disk controller (or, with
-sufficient hardware support like SCSI TCQ or ATA NCQ, to the physical disk). As
-a result of this mechanism, block writes coming out of \Kudos\ may safely be reordered
-and/or merged at will by Linux (or the hardware), since \Kudos\ will not
-consider the \chdescs\ which depend on these in flight blocks to be ready to
-be written themselves.
+sufficient hardware support like SCSI TCQ or ATA NCQ, to the physical disk,
+though a small patch to the Linux kernel is necessary to allow this). As a
+result of this mechanism, block writes coming out of \Kudos\ may safely be
+reordered and/or merged at will by Linux (or the hardware), since \Kudos\ will
+not consider the \chdescs\ which depend on these \emph{in flight} blocks to be
+ready to be written themselves.
 
 The \module\ also implements rudimentary read-ahead. When a read call needs to
 be made to the physical device, the \module\ checks to see if any of the
-following nine blocks are in memory already. If any of them are not, they are
+following several blocks are in memory already. If any of them are not, they are
 also requested at the same time. After all blocks are read in, the read call is
 complete.
 
@@ -64,4 +65,4 @@ problems that we would like to solve in a future version. For instance, we
 would like to be able to insert read and write requests to different sides of
 the I/O queue. Right now a read request will be satisfied only after all the
 pending writes are completed, but a better queue design would allow reads to
-``cut the line'' since they are more urgent.
+``cut the line'' since they are more urgent. \todo{is this still true?}

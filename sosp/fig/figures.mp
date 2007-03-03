@@ -240,12 +240,12 @@ endfig;
 
 beginfig(6);
   boxjoin(a.width = b.width; a.height = b.height);
-  elementit.a(btex Noop etex scaled 0.8, 0, 0, pull);
+  elementit.a(btex Empty etex scaled 0.8, 0, 0, pull);
   elementit.b(btex C1 etex scaled 0.8, 0, 0, pull);
   elementit.c(btex C2 etex scaled 0.8, 0, 0, pull);
   elementit.d(btex C3 etex scaled 0.8, 0, 0, pull);
 
-  elementit.e(btex Noop etex scaled 0.8, 0, 0, pull);
+  elementit.e(btex Empty etex scaled 0.8, 0, 0, pull);
   elementit.f(btex C1 etex scaled 0.8, 0, 0, pull);
   elementit.g(btex C2 etex scaled 0.8, 0, 0, pull);
   elementit.h(btex C3 etex scaled 0.8, 0, 0, pull);

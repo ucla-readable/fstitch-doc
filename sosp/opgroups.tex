@@ -1,13 +1,13 @@
-\section{Changegroups}
+\section{\Opgroups}
 \label{sec:opgroup}
 
-\newcommand{\opgroupCreate}{\texttt{change\-group\_create()}}
-\newcommand{\opgroupSync}{\texttt{change\-group\_sync()}}
-\newcommand{\opgroupAddDepend}{\texttt{change\-group\_add\_depend()}}
-\newcommand{\opgroupEngage}{\texttt{change\-group\_engage()}}
-\newcommand{\opgroupDisengage}{\texttt{change\-group\_disengage()}}
-\newcommand{\opgroupRelease}{\texttt{change\-group\_release()}}
-\newcommand{\opgroupAbandon}{\texttt{change\-group\_abandon()}}
+\newcommand{\opgroupCreate}{\texttt{patch\-group\_create()}}
+\newcommand{\opgroupSync}{\texttt{patch\-group\_sync()}}
+\newcommand{\opgroupAddDepend}{\texttt{patch\-group\_add\_depend()}}
+\newcommand{\opgroupEngage}{\texttt{patch\-group\_engage()}}
+\newcommand{\opgroupDisengage}{\texttt{patch\-group\_disengage()}}
+\newcommand{\opgroupRelease}{\texttt{patch\-group\_release()}}
+\newcommand{\opgroupAbandon}{\texttt{patch\-group\_abandon()}}
 
 \Kudos\ \modules\ use \chdescs\ to express internal file system
 consistency protocols, such as soft updates and journaling
@@ -54,16 +54,16 @@ interface functions.
 \begin{tabular}{@{\hskip0.22in}p{2in}@{}}
 \begin{scriptsize}
 \begin{alltt}
-typedef int changegroup_id_t;
-changegroup_id_t \textbf{changegroup_create}(int type);
-int \textbf{changegroup_sync}(changegroup_id_t cg);
-int \textbf{changegroup_add_depend}(
-    changegroup_id_t depender,
-    changegroup_id_t dependee);
-int \textbf{changegroup_engage}(changegroup_id_t cg);
-int \textbf{changegroup_disengage}(changegroup_id_t cg);
-int \textbf{changegroup_release}(changegroup_id_t cg);
-int \textbf{changegroup_abandon}(changegroup_id_t cg);
+typedef int \opgroup_id_t;
+\opgroup_id_t \textbf{\opgroup_create}(int type);
+int \textbf{\opgroup_sync}(\opgroup_id_t g);
+int \textbf{\opgroup_add_depend}(
+    \opgroup_id_t depender,
+    \opgroup_id_t dependee);
+int \textbf{\opgroup_engage}(\opgroup_id_t g);
+int \textbf{\opgroup_disengage}(\opgroup_id_t g);
+int \textbf{\opgroup_release}(\opgroup_id_t g);
+int \textbf{\opgroup_abandon}(\opgroup_id_t g);
 \end{alltt}
 \end{scriptsize}
 \end{tabular}
