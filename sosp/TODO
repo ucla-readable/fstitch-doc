@@ -8,13 +8,12 @@ USENIX wants us to show that we:
 
 - look at BSD implementation of soft updates; how does it work?
 - ascii art at the top of journal_bd.c that could be made into a diagram
-- ascii art in chdesc_util.c that could be made into a diagram
 - ufs implementation becomes a diagram
 
 Things to work on:
 
 Change the name of "dependencies" to something else?
-Change the name of NOOP change descriptors?
+- Leaders and followers?
 
 Introduction:
 	* Implementation experience is preliminary?
