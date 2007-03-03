@@ -68,7 +68,7 @@ int \textbf{\opgroup_abandon}(\opgroup_id_t g);
 \end{scriptsize}
 \end{tabular}
 \vspace{-10pt}
-\caption{\label{fig:opgroup-interface} \Opgroup\ Interface}
+\caption{\label{fig:opgroup-interface} \Opgroup\ API.}
 \end{figure}
 
 %% New \opgroups\ are created using \opgroupCreate. 
@@ -150,8 +150,8 @@ cannot be added when the \opgroup\ contains any \chdescs\ or has any
 \includegraphics[width=\hsize]{opgroup_transitions}
 }
 \vspace{-0.5\baselineskip}
-\caption{\label{fig:opgroup-transitions-states} \Opgroup\ State
-  Transitions. Edges represent \opgroup\ operations: \textbf{A}dd
+\caption{\label{fig:opgroup-transitions-states} \Opgroup\ state
+  transitions. Edges represent \opgroup\ operations: \textbf{A}dd
   \textbf{L}eader, \textbf{A}dd \textbf{F}ollower, \textbf{R}elease,
   \textbf{E}ngage, and \textbf{D}isengage. Not drawn: every state
   connects to the end node via abandon.}
@@ -161,7 +161,7 @@ cannot be added when the \opgroup\ contains any \chdescs\ or has any
 \centering{
 \begin{small}
 \begin{tabular}{l l}
-State Requirement & State Change\\ \hline
+State requirement & State change\\ \hline
 none & released\\
 none & abandoned (end)\\
 no \afters\ and released & engaged\\
@@ -171,8 +171,8 @@ disengaged & has \afters\
 \end{tabular}
 \end{small}
 }
-\caption{\label{fig:opgroup-transitions-intuition} \Opgroup\ State
-  Transitions --- alternative view of
+\caption{\label{fig:opgroup-transitions-intuition} \Opgroup\ state
+  transitions --- alternative view of
   Figure~\ref{fig:opgroup-transitions-states}. A fresh \opgroup\ is
   not released, is not abandoned, is disengaged, and has no \befores\
   or \afters.}
@@ -216,7 +216,7 @@ being hooked up to \anopgroup.
 \centering{
 \includegraphics[width=0.5\hsize]{fig/figures_7}
 }
-\caption{\label{fig:opgroup-chdescs} \Opgroup\ \ChDescs. H and T are the head
+\caption{\label{fig:opgroup-chdescs} \Opgroup\ \chdescs. H and T are the head
 and tail of the \opgroup; HK and TK are the head keep and tail keep. The three
 \chdescs\ labeled 1 occurred during one file system operation, and the \chdesc\
 labeled 2 occurred during a second operation that depended on the first.}
