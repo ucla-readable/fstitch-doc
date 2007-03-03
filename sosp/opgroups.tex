@@ -58,8 +58,8 @@ typedef int \opgroup_id_t;
 \opgroup_id_t \textbf{\opgroup_create}(int type);
 int \textbf{\opgroup_sync}(\opgroup_id_t g);
 int \textbf{\opgroup_add_depend}(
-    \opgroup_id_t depender,
-    \opgroup_id_t dependee);
+    \opgroup_id_t \after,
+    \opgroup_id_t \before);
 int \textbf{\opgroup_engage}(\opgroup_id_t g);
 int \textbf{\opgroup_disengage}(\opgroup_id_t g);
 int \textbf{\opgroup_release}(\opgroup_id_t g);
@@ -135,13 +135,14 @@ depend on the previous argument, can do just this:
 
 With an application's ability to create dependencies among \opgroups,
 cyclic dependencies could arise. The \opgroup\ interface ensures that
-cycles can only arise in \opgroup\ operations, ensuring file system
-operations cannot fail due to cycles. The \opgroup\ interface limits
-cycle creation opportunity through the allowed \opgroup\ state
+cycles (which are not allowed and therefore abort the current operation
+before being formed) can only arise during \opgroup\ operations, ensuring
+file system operations cannot fail due to cycles. The \opgroup\ interface
+limits cycle creation opportunity through the allowed \opgroup\ state
 transitions, shown in Figures~\ref{fig:opgroup-transitions-states}
-and~\ref{fig:opgroup-transitions-intuition}, which ensure that
-dependees cannot be added when the \opgroup\ contains any \chdescs\
-or has any dependers.
+and~\ref{fig:opgroup-transitions-intuition}, which ensure that \befores\
+cannot be added when the \opgroup\ contains any \chdescs\ or has any
+\afters.
 
 \begin{figure}[htb]
 \vspace{-0.5\baselineskip}
@@ -151,7 +152,7 @@ or has any dependers.
 \vspace{-0.5\baselineskip}
 \caption{\label{fig:opgroup-transitions-states} \Opgroup\ State
   Transitions. Edges represent \opgroup\ operations: \textbf{A}dd
-  depende\textbf{E}, \textbf{A}dd depende\textbf{R}, \textbf{R}elease,
+  \textbf{L}eader, \textbf{A}dd \textbf{F}ollower, \textbf{R}elease,
   \textbf{E}ngage, and \textbf{D}isengage. Not drawn: every state
   connects to the end node via abandon.}
 \end{figure}
@@ -163,18 +164,18 @@ or has any dependers.
 State Requirement & State Change\\ \hline
 none & released\\
 none & abandoned (end)\\
-no dependers and released & engaged\\
+no \afters\ and released & engaged\\
 engaged & disengaged\\
-no dependers and not released & has dependees\\
-disengaged & has dependers
+no \afters\ and not released & has \befores \\
+disengaged & has \afters\
 \end{tabular}
 \end{small}
 }
 \caption{\label{fig:opgroup-transitions-intuition} \Opgroup\ State
   Transitions --- alternative view of
   Figure~\ref{fig:opgroup-transitions-states}. A fresh \opgroup\ is
-  not released, is not abandoned, is disengaged, and has no dependees
-  or dependers.}
+  not released, is not abandoned, is disengaged, and has no \befores\
+  or \afters.}
 \end{figure}
 
 % FIXME: Mention simplicity using opgroups vs fsync?
@@ -193,11 +194,11 @@ dependencies.  Figure~\ref{fig:opgroup-chdescs} shows this arrangement: a
 ``head'' \chdesc\ depends upon a ``tail'' \chdesc\ and a ``head keep'' \chdesc,
 while the tail \chdesc\ depends on a ``tail keep'' \chdesc. The purpose of the
 ``keep'' \chdescs\ is to prevent the head and tail \chdescs\ from being
-satisfied should all their other dependencies be satisfied (for instance, by
+satisfied should all their other \befores\ be satisfied (for instance, by
 being written to disk). An \LFS\ \module\ in the \module\ graph is responsible for
 connecting all operations performed while \anopgroup\ is \engaged\ to its head
 and tail \chdescs, so that an entire \opgroup\ can be made to depend on another
-\opgroup\ by adding a dependency from the depender's tail to the dependee's
+\opgroup\ by adding a dependency from the \after's tail to the \before's
 head.
 
 \Opgroups\ are created and managed almost exactly like file descriptors. Handles

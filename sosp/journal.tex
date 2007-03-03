@@ -35,7 +35,7 @@ transaction, the journal \module\ satisfies this \chdesc, allowing all the
 changes to be written to disk.
 
 To accomplish the second task, a special flag is used to override the normal
-rule prohibiting the addition of new dependencies to a \chdesc\ after it is
+rule prohibiting the addition of new \befores\ to a \chdesc\ after it is
 created. The condition for using this flag is a static proof that no cycle can
 result from its use (immediately or in the future); we have determined this to
 be the case for the journal \module\ by hand.

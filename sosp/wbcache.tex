@@ -5,10 +5,8 @@ Write-back cache modules act as the system's primary cache, and are
 responsible for holding on to the \chdescs\ sent to them until they can be
 safely sent on towards the disk.
 %
-%
 There can be many write-back caches in a configuration at once (for
 instance, one for each block device).
-%
 %
 To a write-back cache, the complex consistency protocols that
 other \modules\ want to enforce are nothing more than sets of dependencies among
@@ -24,7 +22,7 @@ for writing dirty blocks, and an LRU policy for evicting clean blocks (upon
 being written, a dirty block becomes clean and may then be evicted). However,
 blocks can't be written unless all the \chdescs\ on them are ready to be sent to
 the next \module\ (for example, the disk). A \chdesc\ is ready if all of its
-dependencies are at least as close to the disk as it is. So, when looking for a
+\befores\ are at least as close to the disk as it is. So, when looking for a
 block to write, the cache may not be able to write any block it chooses -- but
 it writes the oldest dirty block that it can.
 

@@ -35,8 +35,8 @@ struct patch {
             uint8_t *data;
         } byte;
     };
-    struct patch_queue *dependencies;
-    uint32_t nbefores[NBDLEVEL];
+    struct patch_queue *leaders;
+    uint32_t nleaders[NBDLEVEL];
     patch_t * ddesc_ready_next;
     patch_t ** ddesc_ready_prev;
 /* ... */ };
@@ -54,9 +54,9 @@ struct patch {
 Each in-memory modification to a cached disk block has an associated
 \chdesc.
 %
-A \chdesc's \emph{dependencies} point to other \chdescs\ that must
-precede it to stable storage. A \chdesc\ can be applied or reverted to switch
-the cached block's state between old and new.
+A \chdesc's \emph{\befores} point to other \chdescs\ that must precede it to
+stable storage; the \chdesc\ is then one of their \emph{\afters}. A \chdesc\ can
+be applied or reverted to switch the cached block's state between old and new.
 
 Figure~\ref{fig:chdesc} gives a simplified version of the structure, and
 Figure~\ref{fig:chdapi} shows much of the API for working with them.
@@ -76,7 +76,7 @@ To break block-level cycles, some \chdescs\ may need to be rolled
 back, or reverted, in order to first write other \chdescs. To ensure a
 rollback operation results in a well-defined block state, we have our
 second \chdesc\ invariant: \cdinvar{rollback}{A rolledback \chdesc{}'s
-afters are rolledback\todo{Be more precise to be correct.}.}
+\afters\ are rolledback\todo{Be more precise to be correct.}.}
 
 \begin{figure}[t]
 \vskip-14pt
@@ -97,9 +97,9 @@ int \textbf{patch_create_diff}(
     uint16_t offset, uint16_t length,
     const void *newdata, patch_t **head);
 int \textbf{patch_add_depend}(
-    patch_t *depender, patch_t *dependee);
+    patch_t *\after, patch_t *\before);
 void \textbf{patch_remove_depend}(
-    patch_t *depender, patch_t *dependee);
+    patch_t *\after, patch_t *\before);
 int \textbf{patch_apply}(patch_t *patch);
 int \textbf{patch_rollback}(patch_t *patch);
 int \textbf{patch_satisfy}(patch_t *patch);
@@ -128,15 +128,15 @@ it uses, starting at zero.
 %
 When writing a block and associated \chdescs, the write-back cache enforces an
 order consistent with the \chdesc\ dependency information. Specifically,
-\cdinvar{before-levels}{The befores of a \chdesc\ at level $l$ are at levels
+\cdinvar{before-levels}{The \befores\ of a \chdesc\ at level $l$ are at levels
 $\leq l$.}
 
 When a \module\ asynchronously writes the data associated with a set of
 \chdescs\ to stable storage it marks the \chdescs\ as \emph{in flight} to
-indicate that the \chdescs\ are considered to still have the above level. Afters
-will thus remain at the above level (or higher), preserving the \chdescs's
-dependencies. A \chdesc\ is \emph{satisfied} when its associated data reaches
-stable storage.
+indicate that the \chdescs\ are considered to still have their previous,
+higher, level. Their \afters\ will therefore remain at that level (or higher),
+thus correctly implementing the dependency structure. A \chdesc\ is
+\emph{satisfied} when its associated data reaches stable storage.
 
 Each \chdesc\ on a block may or may not be visible to a given \module.
 %
@@ -144,8 +144,8 @@ For example, modules that respond to user requests generally view the most
 current state of every block -- the block with all \chdescs\ applied.
 %
 However, a write-back cache may choose to write some \chdescs\ on a block
-while reverting others, since those others currently have unsatisfiable
-dependencies.
+while reverting others, since those others currently have unsatisfied
+\befores.
 %
 In this case, \modules\ below the write-back cache should view the
 unsatisfied \chdescs\ in the reverted state.
@@ -168,9 +168,9 @@ mask instead of a pointer to a copy of previous data to support rollbacks.
 \label{sec:design:chdescs:noop}
 The prototypical \chdesc\ corresponds to some change on disk, but \Kudos\
 also supports a \emph{\noop} \chdesc\ type, which doesn't change the disk
-at all. \Noop\ \chdescs\ can have dependencies, like any other
+at all. \Noop\ \chdescs\ can have \befores, like any other
 \chdesc, but they don't need to be written to disk:  they are trivially
-satisfied when all of their dependencies are satisfied.
+satisfied when all of their \befores\ are satisfied.
 %
 Thus, they can be used to ``stand for'' entire sets of other changes.
 %
@@ -185,8 +185,8 @@ arrays of \chdescs.
 The cost is that some functions may have to traverse trees of \noop\ \chdescs\
 to determine true dependencies.
 %
-\Anoop\ \chdesc's level is defined to be the max level of its befores;
-in effect, propagating \anoop\ \chdesc's befores to its afters.
+\Anoop\ \chdesc's level is defined to be the max level of its \befores;
+in effect, propagating \anoop\ \chdesc's \befores\ to its \afters.
 
 Modules can also use \noop\ \chdescs\ to \emph{prevent} changes from being
 written.
@@ -229,7 +229,7 @@ queries through incremental cache updates
 %
 and lower \chdesc\ memory overhead by
 %
-providing specialized change descriptions,
+providing specialized \chdescs,
 %
 expressing dependencies more efficiently,
 %
@@ -312,43 +312,43 @@ imply that invariant~\ref{cdinvar:c} holds.
 \subsubsection{Scalable Dependency-Preserving Writes}
 For a \module\ like the write back cache to forward \chdescs\ in a
 dependency-preserving order, the \module\ must find \chdescs\ whose
-befores are on a lower block device (or are part of the block write
+\befores\ are on a lower block device (or are part of the block write
 and on the current block device). Because the write back cache
 frequently searches for and writes many ready \chdescs, redundant
-before traversals to calculate \chdesc\ ready state would severly
+\before\ traversals to calculate \chdesc\ ready state would severly
 limit cache size scalabity.
 %
 \Kudos\ therefore
 %
-1) explictly tracks a \chdesc's before counts through incremental
+1) explictly tracks a \chdesc's \before\ counts through incremental
 dependency updates
 %
 and 2) uses these counts to maintain a \chdesc\ ready list for each
 block.
 
-A \chdesc's before counts are incrementally updated
+A \chdesc's \before\ counts are incrementally updated
 %
-as befores are added and removed
+as \befores\ are added and removed
 %
-and as before \chdesc's change levels.
+and as \beforing\ \chdesc's change levels.
 %
 
 Due to invariant~\ref{cdinvar:before-levels}, only directly reachable
-before \chdescs\ need to be included in a \chdesc's before counts.
+\beforing\ \chdescs\ need to be included in a \chdesc's \before\ counts.
 %
-Note that because \anoop\ \chdesc's level is a function of its befores,
+Note that because \anoop\ \chdesc's level is a function of its \befores,
 %
-\anoop\ \chdesc\ before count update that changes the \noop\ \chdesc's level
-must propagate the level change to the \noop\ \chdesc's afters.
+\anoop\ \chdesc\ \before\ count update that changes the \noop\ \chdesc's level
+must propagate the level change to the \noop\ \chdesc's \afters.
 %
-When a before count update changes whether a \chdesc\ is ready to
+When a \before\ count update changes whether a \chdesc\ is ready to
 write, the \chdesc's inclusion in its block's ready list is updated.
 %
 To write a block, an owner thus iterates through the block's ready
 list, moving \chdescs\ to the target block device, until the list is
 empty.
 
-TODO: Include invariants that the max before level computation is
+TODO: Include invariants that the max \before\ level computation is
 $O(1)$ or that ready \chdescs\ can be moved in $\sim\! O(r)$ time?
 
 \subsubsection{\ChDesc\ Merging}
@@ -381,13 +381,13 @@ We know that \textit{later} changes will not cause them to induce a block-level 
 invariant~\ref{cdinvar:add-before}.
 %
 While path existance testing is expensive, testing only whether the new
-\chdesc\ has a before with a before identifies most mergeable
+\chdesc\ has a \before\ with a \before\ identifies most mergeable
 \chdescs. \ldots
 
 This section's key points:
-Rule: exactly one overlap and new before does not depend on overlap.
+Rule: exactly one overlap and new \before\ does not depend on overlap.
 Overlapping makes it easy (but could extend chdescs so that they do overlap).
-Gain new before (if not the overlap).
+Gain new \before\ (if not the overlap).
 
 \subsubsection{\Nrb\ \ChDescs}
 To enable byte \chdesc\ rollback, each byte \chdesc\ contains a copy
@@ -413,20 +413,20 @@ and also that later \chdesc\ graph changes will not induce a forced
 rollback:
 %
 \cdinvar{add-before}{All block-level cycles induced through
-\chdesc\ $C$'s befores exist when $C$ is
+\chdesc\ $C$'s \befores\ exist when $C$ is
 created\todo{Change this phrasing? ``Once created, a \chdesc\ will not
-gain any befores that induce block-level cycles.''}.}
+gain any \befores\ that induce block-level cycles.''}.}
 %
-\Kudos\ ensures this invariant by restricting before additions to
-\chdesc\ creation, \noop\ \chdescs\ with no afters, or when the invariant
+\Kudos\ ensures this invariant by restricting \before\ additions to
+\chdesc\ creation, \noop\ \chdescs\ with no \afters, or when the invariant
 is statically proven to hold.
 
 To avoid a costly dependency traversal to determine whether a new
 \chdesc\ will need to be rolledback, \Kudos\ conservatively identifies
 a new \chdesc\ as \nrb\ only if the block has no \chdescs\
 with external (on a different block\todo{Descriptive enough? Mention
-\noop\ \chdesc\ after recursion?}) afters. Each block tracks the number of
-external afters through incremental updates as afters are added and
+\noop\ \chdesc\ \after\ recursion?}) \afters. Each block tracks the number of
+external \afters\ through incremental updates as \afters\ are added and
 removed.
 
 \subsubsection{\Nrb\ \ChDesc\ Merging}
@@ -445,10 +445,10 @@ addition and \nrb\ \chdesc\ creation rules restrict the
 possible dependencies involving \nrbof{A} and \nrbof{B} to \textit{only}
 those shown in Figure~\ref{fig:nrb-merge}\todo{Should we give these
 deductions or a flavor?}. From these possible dependencies follows
-an algorithm that recurses \nrbof{B}'s before dependency chains until an
+an algorithm that recurses \nrbof{B}'s \before\ dependency chains until an
 external \chdesc\ is encountered and that for each \ncd{C} along the
-chain with a before path to \nrbof{A}, moves all of \ncd{C}'s befores
-without before paths to be befores of \nrbof{A}\todo{This could be more
+chain with a \before\ path to \nrbof{A}, moves all of \ncd{C}'s \befores\
+without \before\ paths to be \befores\ of \nrbof{A}\todo{This could be more
 lucid.} This graph manipulation preserves the system's \chdesc\
 dependencies.
 
@@ -481,10 +481,10 @@ internal and semantic file system descriptions.
 
 \todo{Should we include memory/performance improvement numbers?}
 \todo{Should we talk about why we allow NRBs to be disabled? (Debugging
-simplicity and depend add to \noop\ \chdescs\ with afters bug catching.)}
+simplicity and depend add to \noop\ \chdescs\ with \afters\ bug catching.)}
 
 \cdinvar{extern-after}{Each block tracks the total number of
-external afters for \chdescs\ on that block.}
+external \afters\ for \chdescs\ on that block.}
 
 \cdinvar{one-nrb}{Each block has at most one \nrb\ \chdesc.}
 
@@ -501,11 +501,11 @@ byte \chdescs. The \noop\ \chdesc\ represents a root node that can reach all
 other \chdescs. In the parallel arrangement on the right, \Kudos\ has the
 freedom to write \chdescs\ $C_1$, $C_2$, and $C_3$ to disk in any order. In the
 serial arrangement on the left, there exists only one valid write ordering.
-Depending on the arrangement of other change descriptors, \Kudos\ may have to
-perform additional rollbacks and write some blocks more times than would
-otherwise be necessary in order to write these \chdescs\ to disk. Even if that
-is not necessary, \Kudos\ will still have less flexibility in choosing an order
-to write the blocks, potentially increasing disk seek times due to suboptimal
+Depending on the arrangement of other \chdescs, \Kudos\ may have to perform
+additional rollbacks and write some blocks more times than would otherwise be
+necessary in order to write these \chdescs\ to disk. Even if that is not
+necessary, \Kudos\ will still have less flexibility in choosing an order to
+write the blocks, potentially increasing disk seek times due to suboptimal
 ordering.
 
 \begin{figure}[htb]
