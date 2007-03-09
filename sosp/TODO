@@ -1,4 +1,6 @@
 Refocus paper
+Review OSDI reviews
+- common general feedback: "I cannot tell whether kudos reached its goals"
 
 Change the name of "dependencies" to something else?
 - Leaders and followers?
@@ -18,12 +20,13 @@ Design, Change Descriptors:
 - Describe merging and hard patches
 
 Modules:
-	* We say that we will describe the modules that contribute most to
-	  change descriptor functionality, but the only such module here is the
-	  write-back cache. We should probably rethink this section heading, and
-	  add information about the revisioning code and how change descriptor
-	  states are propagated. Some of this gets close to information you'd
-	  find in the change descriptor section though.
+- Explore modules not possible within a stackable file system (reviewer)
+- We say that we will describe the modules that contribute most to
+  change descriptor functionality, but the only such module here is the
+  write-back cache. We should probably rethink this section heading, and
+  add information about the revisioning code and how change descriptor
+  states are propagated. Some of this gets close to information you'd
+  find in the change descriptor section though.
 
 Write ext2 section.
 
@@ -31,7 +34,10 @@ Make directory synchronous module.
 
 Opgroups:
 - Simplify interface? (Since we do not do transacations)
-- Improve imap evaluation? (Review reviews)
+- Improve imap evaluation re reviews?
+  - Add macro benchmarks
+  - Show more types of consistency requirements (eg CVS [check], database)
+  - Compare data journaling (unnecessarily strict) vs minimal opgroups
 - Write about gzip
 - Write about svn+opgroups including svn's two assumptions and a crash test (?)
   - Figure out: how does MacOSX HFS+ journaling work?
@@ -41,7 +47,9 @@ Implementation:
 - Get us to pass fsck.ext2?
 
 Evaluation:
+- Really improve compared to OSDI submission. Figure out how.
 - Add postmark?
+- Show how patches make file system writing simpler? (One reviewer asked?)
 - Update numbers for current systems and add full/metadata-only journaling
 - Understand and describe why re our current numbers
 - Improve our current numbers
@@ -55,6 +63,7 @@ Related workd:
 - Cite type-safe disks
 - Cite rethink the sync
 - Cite Burnett's asynchronous graph (45D3C85B.3060903@cs.ucla.edu)
+- Cite "forder" primitive in the Echo file system by Mann et al (reviewer)
 
 Misc:
 - look at BSD implementation of soft updates; how does it work?
