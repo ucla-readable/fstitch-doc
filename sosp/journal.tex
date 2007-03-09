@@ -64,15 +64,16 @@ there is a commit record which applies to the whole set.
 A particularly nice property of this arrangement is that the journal \module\ is
 completely independent of any specific file system. It is a block device
 \module\ that automatically journals whatever file system is stored on it.
-Further, by changing our journal \module\ to journal only \chdescs\ that modify
-file system metadata -- and by adding additional dependencies to prevent
-premature reuse of blocks -- we could even obtain metadata-only journaling (as
-opposed to the full data journaling described here). The extra \chdesc\
-dependencies would serve the same purpose as the special hooks and corner cases
-surrounding reuse of blocks discussed in \cite{tweedie00ext3}. The journal
-\module\ can automatically identify metadata \chdescs\ because of the \LFS\
-interface described in \S\ref{sec:design:interfaces}, and the UHFS module which
-is responsible for writing to all non-metadata blocks. Other block device
+Further, our journal \module\ can also selectively journal only \chdescs\ that
+modify file system metadata -- thus achieving metadata-only journaling (as
+opposed to the full data journaling described here). (There are at least two
+major variants of metadata-only journaling, depending on when the non-journaled
+data is written relative to the commit record. Our journal module writes it
+after the commit record; writing it before the commit record requires very
+careful checks to avoid premature reuse of blocks~\cite{tweedie00ext3}.) The
+journal \module\ can automatically identify metadata \chdescs\ because of the
+\LFS\ interface described in \S\ref{sec:design:interfaces}, and the UHFS module
+which is responsible for writing to all non-metadata blocks. Other block device
 layering systems, like GEOM~\cite{geom} or JBD in Linux, would or do need
 special hooks into file system code to determine what disk changes represent
 metadata in order to do metadata-only journaling. \Chdescs\ and the \LFS\
