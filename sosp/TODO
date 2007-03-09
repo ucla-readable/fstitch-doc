@@ -1,16 +1,4 @@
-USENIX wants us to show that we:
-* are attacking a significant problem,
-* have devised an interesting, compelling solution,
-* have demonstrated the practicality and benefits of the solution,
-* have drawn appropriate conclusions,
-* have clearly described what they have done, and
-* have clearly articulated the advances beyond previous work.
-
-- look at BSD implementation of soft updates; how does it work?
-- ascii art at the top of journal_bd.c that could be made into a diagram
-- ufs implementation becomes a diagram
-
-Things to work on:
+Refocus paper
 
 Change the name of "dependencies" to something else?
 - Leaders and followers?
@@ -22,7 +10,12 @@ Related Work, Applications:
 	* If they're so easy, why haven't we done them?
 
 Design, Change Descriptors:
-	* Do we want to jump right into "definition" without a mini-introduction?
+- Do we want to jump right into "definition" without a mini-introduction?
+- Add formalisms for merge and hard patch optimizations
+- Prove theorems?
+- Integrate formals into the paper
+- Figure out how to introduce
+- Describe merging and hard patches
 
 Modules:
 	* We say that we will describe the modules that contribute most to
@@ -33,14 +26,46 @@ Modules:
 	  find in the change descriptor section though.
 
 Write ext2 section.
+
 Make directory synchronous module.
-Cite type-safe disks.
-Cite rethink the sync.
 
-More uses:
-	* gzip/bzip2
-	* tar, then rm: shell or utility depend
+Opgroups:
+- Simplify interface? (Since we do not do transacations)
+- Improve imap evaluation? (Review reviews)
+- Write about gzip
+- Write about svn+opgroups including svn's two assumptions and a crash test (?)
+  - Figure out: how does MacOSX HFS+ journaling work?
+- Do tar, then rm: shell or utility depend?
 
-Contrast with:
-	* Linux 2.6.17 sync_file_range range system call
-	* fdatasync?
+Implementation:
+- Get us to pass fsck.ext2?
+
+Evaluation:
+- Add postmark?
+- Update numbers for current systems and add full/metadata-only journaling
+- Understand and describe why re our current numbers
+- Improve our current numbers
+  - Are unnecessarily strict dependencies hurting speed?
+  - Should we improve our disk write notification usage?
+  - Complete helpful ext2 optimizations?
+
+Related workd:
+- Linux 2.6.17 sync_file_range range system call
+- fdatasync?
+- Cite type-safe disks
+- Cite rethink the sync
+- Cite Burnett's asynchronous graph (45D3C85B.3060903@cs.ucla.edu)
+
+Misc:
+- look at BSD implementation of soft updates; how does it work?
+- ascii art at the top of journal_bd.c that could be made into a diagram
+- ufs implementation becomes a diagram
+
+
+ACM wants us to show that we:
+* are attacking a significant problem,
+* have devised an interesting, compelling solution,
+* have demonstrated the practicality and benefits of the solution,
+* have drawn appropriate conclusions,
+* have clearly described what they have done, and
+* have clearly articulated the advances beyond previous work.
