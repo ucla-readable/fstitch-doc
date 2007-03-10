@@ -211,6 +211,7 @@ moved down by one level.
 %
 Each block has a list of \chdescs\ that are not entirely overlaped.
 
+% {{{ formalisms
 \subsubsection{Initial formalisms}
 
 \noindent\\ Invariants:
@@ -274,7 +275,9 @@ imply that invariant~\ref{cdinvar:c} holds.
 (\inset{b}{\psetinflight{t}} \land \blockof{a} = \blockof{b})\)\\
 \(\psethard{t+1} := \psethard{t} \setminus \pset{X}\)
 \end{enumerate}
+% }}}
 
+% {{{ precalculation
 \subsubsection{Scalable Dependency-Preserving Writes}
 For a \module\ like the write back cache to forward \chdescs\ in a
 dependency-preserving order, the \module\ must find \chdescs\ whose
@@ -316,7 +319,9 @@ empty.
 
 TODO: Include invariants that the max \before\ level computation is
 $O(1)$ or that ready \chdescs\ can be moved in $\sim\! O(r)$ time?
+% }}}
 
+% {{{ nrb chdescs
 \subsubsection{\Nrb\ \ChDescs}
 To enable byte \chdesc\ rollback, each byte \chdesc\ contains a copy
 of the previous block data.
@@ -355,7 +360,9 @@ with external (on a different block\todo{Descriptive enough? Mention
 \noop\ \chdesc\ \after\ recursion?}) \afters. Each block tracks the number of
 external \afters\ through incremental updates as \afters\ are added and
 removed.
+% }}}
 
+% {{{ overlap merging
 \subsubsection{\ChDesc\ Merging}
 \Kudos\ drastically reduces the number of \chdescs\ created to
 describe a system of changes by (conservatively) identifying when a
@@ -393,7 +400,9 @@ This section's key points:
 Rule: exactly one overlap and new \before\ does not depend on overlap.
 Overlapping makes it easy (but could extend chdescs so that they do overlap).
 Gain new \before\ (if not the overlap).
+% }}}
 
+% {{{ nrb merging
 \subsubsection{\Nrb\ \ChDesc\ Merging}
 \label{sec:chdescs:optimizations:nrb-merge}
 Notice that two \nrb\ \chdescs\ on a block must be committed
@@ -452,6 +461,7 @@ simplicity and depend add to \noop\ \chdescs\ with \afters\ bug catching.)}
 external \afters\ for \chdescs\ on that block.}
 
 \cdinvar{one-nrb}{Each block has at most one \nrb\ \chdesc.}
+% }}}
 % }}}
 
 % {{{ sec:chdescs:discussion
