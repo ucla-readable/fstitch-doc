@@ -42,7 +42,6 @@ be applied or reverted to switch the cached block's state between old and new.
 
 Figure~\ref{fig:chdesc} gives a simplified version of the structure, and
 Figure~\ref{fig:chdapi} shows much of the API for working with them.
-\todo{The API has changed...}
 %
 The ability
 to revert and re-apply \chdescs\ is inspired by soft updates dependencies, but
@@ -69,15 +68,17 @@ int \textbf{patch_create_byte}(
     bdesc_t *block, BD_t *owner,
     uint16_t offset, uint16_t length,
     const void *data, patch_t **head);
-patch_t *\textbf{patch_create_bit}(
+int \textbf{patch_create_bit}(
     bdesc_t *block, BD_t *owner,
-    uint16_t offset, uint32_t xor);
-patch_t *\textbf{patch_create_noop}(
-    BD_t *owner, patch_t *tail, ...);
+    uint16_t offset, uint32_t xor,
+    patch_t **head);
+int \textbf{patch_create_empty}(
+    BD_t *owner, patch_t **tail,
+    size_t nheads, patch_t * heads[]);
 int \textbf{patch_create_diff}(
     bdesc_t *block, BD_t *owner,
     uint16_t offset, uint16_t length,
-    const void *newdata, patch_t **head);
+    const void *data, patch_t **head);
 int \textbf{patch_add_depend}(
     patch_t *\after, patch_t *\before);
 void \textbf{patch_remove_depend}(
