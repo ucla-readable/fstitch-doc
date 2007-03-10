@@ -20,36 +20,36 @@ beginfig(1);
   velementit.ufsa(btex ext2-1\strut etex, 1, 1, 7);
   ufsa.outpers[0] := push;
   velementit.journal(btex \raise0.8ex\hbox{journal\strut}\strut etex, 1, 2, push);
-  velementit.loopj(btex \raise0.8ex\hbox{loop\strut}\strut etex, 1, 1, push);
   velementit.loopd(btex \raise0.8ex\hbox{loop\strut}\strut etex, 1, 1, push);
+  velementit.loopj(btex \raise0.8ex\hbox{loop\strut}\strut etex, 1, 1, push);
   velementit.ufsb(btex ext2-0\strut etex, 1, 1, 7);
   ufsb.outpers[0] := push;
   velementit.wbcache(btex wb cache\strut etex, 1, 1, push);
   velementit.resizer(btex block resizer\strut etex, 1, 1, push);
-  velementit.ide(btex IDE hda\strut etex, 1, 0, push);
+  velementit.ide(btex SATA sda\strut etex, 1, 0, push);
   boxjoin();
 
   uhfsb.s - ufsa.n = ufsa.s - journal.n
   = uhfsa.s - ufsb.n = ufsb.s - wbcache.n = wbcache.s - resizer.n
   = resizer.s - ide.n
   = (0,20);
-  loopd.w - loopj.e = (10,0);
+  loopj.w - loopd.e = (10,0);
   uhfsb.w - uhfsa.e = (60,0);
-  %ypart(loopj.n - resizer.n) = ypart(loopd.n - resizer.n) = 0;
-  journal.s - .5[loopj.n,loopd.n] = (0,20);
+  %ypart(loopd.n - resizer.n) = ypart(loopj.n - resizer.n) = 0;
+  journal.s - .5[loopd.n,loopj.n] = (0,20);
   vfsiface.s - .5[uhfsa.n,uhfsb.n] = (0,25);
 
-  fixelement (resizer,ide,wbcache,ufsa,ufsb,uhfsa,uhfsb,journal,loopj,loopd,vfsiface);
-  drawelement(resizer,ide,wbcache,ufsa,ufsb,uhfsa,uhfsb,journal,loopj,loopd,vfsiface);
+  fixelement (resizer,ide,wbcache,ufsa,ufsb,uhfsa,uhfsb,journal,loopd,loopj,vfsiface);
+  drawelement(resizer,ide,wbcache,ufsa,ufsb,uhfsa,uhfsb,journal,loopd,loopj,vfsiface);
   drawconnect(uhfsa,0,0,ufsb) dashed evenly;
   drawconnect(uhfsb,0,0,ufsa) dashed evenly;
   drawconnect(ufsa,0,0,journal);
-  drawconnect(journal,0,0,loopj);
-  drawconnect(journal,1,0,loopd);
-%  drawconnarrow loopj.out[1]{down} .. ufsa.nw - (10,0) .. ufsa.sw - (10,0) .. {down}jqueue.in[0] withcolor 0.7white;
+  drawconnect(journal,0,0,loopd);
+  drawconnect(journal,1,0,loopj);
+%  drawconnarrow loopd.out[1]{down} .. ufsa.nw - (10,0) .. ufsa.sw - (10,0) .. {down}jqueue.in[0] withcolor 0.7white;
 % These loop -> ufs connection arraows are crazy
-%  drawconnect(loopj,0,0,ufsb) dashed evenly;
 %  drawconnect(loopd,0,0,ufsb) dashed evenly;
+%  drawconnect(loopj,0,0,ufsb) dashed evenly;
   drawconnect(ufsb,0,0,wbcache);
   drawconnect(wbcache,0,0,resizer);
   drawconnect(resizer,0,0,ide);
@@ -58,16 +58,16 @@ beginfig(1);
   drawconnect(vfsiface,1,0,uhfsb) dashed evenly scaled 0.5;
   label.top(btex application etex, vfsiface.in[0]+(0,15));
 % Slightly better loop -> ufs connections
-  drawconnarrowna loopj.out[0] {down}
-  .. loopj.out[0] - (24,15) {left}
-  .. .5[loopj.sw,resizer.se] {up}
-  .. (xpart .5[loopj.w,resizer.e], ypart ufsb.n) {up}
+  drawconnarrowna loopd.out[0] {down}
+  .. loopd.out[0] - (24,15) {left}
+  .. .5[loopd.sw,resizer.se] {up}
+  .. (xpart .5[loopd.w,resizer.e], ypart ufsb.n) {up}
   .. .5[uhfsa.ne,ufsb.s] {left}
   .. {down}ufsb.in[0]
   dashed evenly;
-  drawconnarrowna loopd.out[0] {down}
-  .. loopd.out[0] - (24,15) {left}
-  .. {left} loopj.out[0] - (17,15)
+  drawconnarrowna loopj.out[0] {down}
+  .. loopj.out[0] - (24,15) {left}
+  .. {left} loopd.out[0] - (17,15)
   dashed evenly;
 
 
@@ -85,10 +85,10 @@ beginfig(1);
   label.lrt(btex BD etex scaled 0.5, ufsa.out[0]);
   label.ulft(btex L2FS etex scaled 0.5, ufsb.in[0]);
   label.lrt(btex BD etex scaled 0.5, ufsb.out[0]);
-  label.ulft(btex BD etex scaled 0.5, loopj.in[0]);
-  label.lrt(btex L2FS etex scaled 0.5, loopj.out[0]);
-  label.urt(btex BD etex scaled 0.5, loopd.in[0]);
+  label.ulft(btex BD etex scaled 0.5, loopd.in[0]);
   label.lrt(btex L2FS etex scaled 0.5, loopd.out[0]);
+  label.urt(btex BD etex scaled 0.5, loopj.in[0]);
+  label.lrt(btex L2FS etex scaled 0.5, loopj.out[0]);
   label.urt(btex BD etex scaled 0.5, wbcache.in[0]);
   label.lrt(btex BD etex scaled 0.5, wbcache.out[0]);
   label.urt(btex BD etex scaled 0.5, resizer.in[0]);
@@ -98,8 +98,8 @@ beginfig(1);
   label.top(btex \texttt{/loop\strut} etex scaled 0.5, vfsiface.out[1] + (0,2));
   label.top(btex journal\strut etex scaled 0.5, journal.out[0] + (0,2));
   label.top(btex data\strut etex scaled 0.5, journal.out[1] + (0,2));
-  label.top(btex \texttt{/fs.journal\strut} etex scaled 0.5, loopj.out[0] + (0,2));
   label.top(btex \texttt{/fs.img\strut} etex scaled 0.5, loopd.out[0] + (0,2));
+  label.top(btex \texttt{/fs.journal\strut} etex scaled 0.5, loopj.out[0] + (0,2));
 endfig;
 
 

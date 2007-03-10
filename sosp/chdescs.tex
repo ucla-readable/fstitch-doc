@@ -7,7 +7,7 @@
 \begin{scriptsize}
 \begin{verbatim}
 struct patch {
-    BD_t *device;
+    bdev_t *device;
     bdesc_t *block;
     enum {BIT, BYTE, NOOP} type;
     union {
@@ -65,18 +65,18 @@ second \chdesc\ invariant: \cdinvar{rollback}{A rolledback \chdesc{}'s
 \begin{scriptsize}
 \begin{alltt}
 int \textbf{patch_create_byte}(
-    bdesc_t *block, BD_t *owner,
+    bdesc_t *block, bdev_t *owner,
     uint16_t offset, uint16_t length,
     const void *data, patch_t **head);
 int \textbf{patch_create_bit}(
-    bdesc_t *block, BD_t *owner,
+    bdesc_t *block, bdev_t *owner,
     uint16_t offset, uint32_t xor,
     patch_t **head);
 int \textbf{patch_create_empty}(
-    BD_t *owner, patch_t **tail,
+    bdev_t *owner, patch_t **tail,
     size_t nheads, patch_t * heads[]);
 int \textbf{patch_create_diff}(
-    bdesc_t *block, BD_t *owner,
+    bdesc_t *block, bdev_t *owner,
     uint16_t offset, uint16_t length,
     const void *data, patch_t **head);
 int \textbf{patch_add_depend}(
@@ -87,8 +87,8 @@ int \textbf{patch_apply}(patch_t *patch);
 int \textbf{patch_rollback}(patch_t *patch);
 int \textbf{patch_satisfy}(patch_t *patch);
 int \textbf{patch_push_down}(
-    BD_t *current_bd, bdesc_t *current_block,
-    BD_t *target_bd, bdesc_t *target_block);
+    bdev_t *current_bd, bdesc_t *current_block,
+    bdev_t *target_bd, bdesc_t *target_block);
 \end{alltt}
 \end{scriptsize}
 \end{tabular}
