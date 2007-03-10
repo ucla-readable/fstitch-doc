@@ -1,5 +1,5 @@
 \section {\ChDescs}
-\label{sec:design:chdescs}
+\label{sec:chdescs}
 
 \begin{figure}[t]
 \vskip-14pt
@@ -141,13 +141,13 @@ rolls back those \chdescs\ that should not be visible at a particular \module,
 and then rolls them forward again after that \module\ is done with the block.
 
 \subsection{Bit \ChDescs}
-\label{sec:design:chdescs:bit}
+\label{sec:chdescs:bit}
 A bit \chdesc\ is a specialized \chdesc\ that expresses small changes
 more efficiently than than the general byte \chdesc\, using an inline
 mask instead of a pointer to a copy of previous data to support rollbacks.
 
 \subsection{\Noop\ \ChDescs}
-\label{sec:design:chdescs:noop}
+\label{sec:chdescs:noop}
 The prototypical \chdesc\ corresponds to some change on disk, but \Kudos\
 also supports a \emph{\noop} \chdesc\ type, which doesn't change the disk
 at all. \Noop\ \chdescs\ can have \befores, like any other
@@ -204,7 +204,7 @@ from being written before the journal commits.
 %% \modules\ need to do similar things, the functionality will already be available.
 
 \subsection{\ChDesc\ Optimizations}
-\label{sec:design:chdesc-opts}
+\label{sec:chdescs:optimizations}
 
 Here we describe \chdesc\ optimizations that speed \chdesc\ state
 queries through incremental cache updates
@@ -412,7 +412,7 @@ external \afters\ through incremental updates as \afters\ are added and
 removed.
 
 \subsubsection{\Nrb\ \ChDesc\ Merging}
-\label{sec:design:chdesc-opts:nrb-merge}
+\label{sec:chdescs:optimizations:nrb-merge}
 Notice that two \nrb\ \chdescs\ on a block must be committed
 in the same revision slice; neither can (or will need to) be rolled
 back. This illustrates the underlying reason why two \nrb\
@@ -469,6 +469,9 @@ simplicity and depend add to \noop\ \chdescs\ with \afters\ bug catching.)}
 external \afters\ for \chdescs\ on that block.}
 
 \cdinvar{one-nrb}{Each block has at most one \nrb\ \chdesc.}
+
+\subsection{Discussion}
+\label{sec:chdescs:discussion}
 
 \subsubsection{Unnecessary \ChDesc\ Dependencies}
 Even with \Kudos\ dynamically optimizing \chdesc\ graphs, there is only so much
