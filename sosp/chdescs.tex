@@ -1,20 +1,5 @@
-\subsection{\BDescs}
-
-Disk blocks are represented by objects called \emph{\bdescs}.
-\Kudos\ maintains a \bdesc\ object for each cached block, and tracks
-pointers to the \bdescs\ using reference counting. In addition to the
-``retain'' and ``release'' operations which increment and decrement the
-reference counts, \Kudos\ also provides an ``autorelease'' operation which
-decrements the usage count after the calling system call completes. This is
-useful for simulating garbage collection.
-
-\Kudos\ expects to be able to write blocks atomically. Thus, the modules that
-interface with the disk return blocks that are 512 bytes long (the sector
-size). However, a single \bdesc\ can correspond to a range of
-contiguous blocks. This feature is used by the \Kudos\ block resizer module to
-``join'' sector-sized blocks into a more convenient size for the relevant file
-system, such as 2048 or 4096 bytes.
-
+\section {\ChDescs}
+\label{sec:design:chdescs}
 
 \begin{figure}[t]
 \vskip-14pt
@@ -47,9 +32,6 @@ struct patch {
 \caption{\label{fig:chdesc} Partial \chdesc\ structure.}
 \end{figure}
 
-
-\subsection {\ChDescs}
-\label{sec:design:chdescs}
 
 Each in-memory modification to a cached disk block has an associated
 \chdesc.
@@ -158,13 +140,13 @@ unsatisfied \chdescs\ in the reverted state.
 rolls back those \chdescs\ that should not be visible at a particular \module,
 and then rolls them forward again after that \module\ is done with the block.
 
-\subsubsection{Bit \ChDescs}
+\subsection{Bit \ChDescs}
 \label{sec:design:chdescs:bit}
 A bit \chdesc\ is a specialized \chdesc\ that expresses small changes
 more efficiently than than the general byte \chdesc\, using an inline
 mask instead of a pointer to a copy of previous data to support rollbacks.
 
-\subsubsection{\Noop\ \ChDescs}
+\subsection{\Noop\ \ChDescs}
 \label{sec:design:chdescs:noop}
 The prototypical \chdesc\ corresponds to some change on disk, but \Kudos\
 also supports a \emph{\noop} \chdesc\ type, which doesn't change the disk
@@ -199,7 +181,7 @@ This is used, for instance, by the journal \module\
 (\S\ref{sec:consistency:journal}) to prevent a transaction's \chdescs\
 from being written before the journal commits.
 
-%% \subsubsection{Manipulations and Transformations}
+%% \subsection{Manipulations and Transformations}
 % FIXME: add concrete details here
 
 %% \Chdescs\ play a central role in \Kudos, and therefore many parts of the system
