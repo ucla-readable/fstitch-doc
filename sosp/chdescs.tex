@@ -363,7 +363,7 @@ removed.
 % }}}
 
 % {{{ overlap merging
-\subsubsection{\ChDesc\ Merging}
+\subsubsection{Overlap \ChDesc\ Merging}
 \Kudos\ drastically reduces the number of \chdescs\ created to
 describe a system of changes by (conservatively) identifying when a
 second \chdesc\ may safely be written at the same time as an existing
@@ -386,20 +386,22 @@ overlapping mergeable \chdescs\ as data is appended to a file.
 %
 Many of these and similar \chdescs\ are mergeable and have
 dependencies that allow simple (and fast) reasoning to identify many
-of the mergeable pairs: two \chdescs\ that overlap no other \chdescs\
+of the mergeable pairs: two \chdescs\ that overlap no other in-memory\todo{Have we introduced this terminology?} \chdescs\
 and which have no dependency path from the new to the existing \chdesc\
 will not induce a block-level cycle and so are writeable together.
 We know that \textit{later} changes will not cause them to induce a block-level cycle due to
+invariant~\ref{cdinvar:add-before} and by not merging if the new \chdesc{}
+has a before and the before is marked as allowed to violate
 invariant~\ref{cdinvar:add-before}.
 %
-While path existance testing is expensive, testing only whether the new
-\chdesc\ has a \before\ with a \before\ identifies most mergeable
-\chdescs. \ldots
-
-This section's key points:
-Rule: exactly one overlap and new \before\ does not depend on overlap.
-Overlapping makes it easy (but could extend chdescs so that they do overlap).
-Gain new \before\ (if not the overlap).
+While path existance testing is expensive, a conservative path test
+of only a depth of two identifies most mergeable \chdescs. If the new
+\chdesc{} has an explicit \before\ that is not the existing \chdesc\ and
+this \before\ has a \before, then there may be a path to the existing
+\chdesc.
+%
+To merge two such overlapping \chdescs, add the new \chdesc{}'s explicit
+before to the existing \chdesc\ (if any and if not the existing \chdesc).
 % }}}
 
 % {{{ nrb merging
