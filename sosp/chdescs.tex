@@ -1,6 +1,7 @@
 \section {\ChDescs}
 \label{sec:chdescs}
 
+% {{{ fig:chdesc
 \begin{figure}[t]
 \vskip-14pt
 \begin{tabular}{@{\hskip0.58in}p{2in}@{}}
@@ -31,7 +32,7 @@ struct patch {
 \vspace{-10pt}
 \caption{\label{fig:chdesc} Partial \chdesc\ structure.}
 \end{figure}
-
+% }}}
 
 Each in-memory modification to a cached disk block has an associated
 \chdesc.
@@ -59,6 +60,7 @@ rollback operation results in a well-defined block state, we have our
 second \chdesc\ invariant: \cdinvar{rollback}{A rolledback \chdesc{}'s
 \afters\ are rolledback\todo{Be more precise to be correct.}.}
 
+% {{{ fig:chdapi
 \begin{figure}[t]
 \vskip-14pt
 \begin{tabular}{@{\hskip0.25in}p{2in}@{}}
@@ -95,6 +97,7 @@ int \textbf{patch_push_down}(
 \vspace{-10pt}
 \caption{\label{fig:chdapi} Partial \chdesc\ API.}
 \end{figure}
+% }}}
 
 \Kudos\ \modules\ change blocks by attaching \chdescs\ to them, using functions
 such as \texttt{patch\_create\_byte}.
@@ -133,20 +136,19 @@ while reverting others, since those others currently have unsatisfied
 In this case, \modules\ below the write-back cache should view the
 unsatisfied \chdescs\ in the reverted state.
 %
-%% If this \module\ is the disk, it will need to be able to write a version of
-%%  the block's data that does not include the \chdescs\ that have not yet
-%%  been sent to it.
-%
 \Kudos\ provides a block revisioning library function that automatically
 rolls back those \chdescs\ that should not be visible at a particular \module,
 and then rolls them forward again after that \module\ is done with the block.
 
+% {{{ sec:chdescs:bit
 \subsection{Bit \ChDescs}
 \label{sec:chdescs:bit}
 A bit \chdesc\ is a specialized \chdesc\ that expresses small changes
 more efficiently than than the general byte \chdesc\, using an inline
 mask instead of a pointer to a copy of previous data to support rollbacks.
+% }}}
 
+% {{{ sec:chdescs:noop
 \subsection{\Noop\ \ChDescs}
 \label{sec:chdescs:noop}
 The prototypical \chdesc\ corresponds to some change on disk, but \Kudos\
@@ -181,29 +183,9 @@ satisfies it.
 This is used, for instance, by the journal \module\
 (\S\ref{sec:consistency:journal}) to prevent a transaction's \chdescs\
 from being written before the journal commits.
+% }}}
 
-%% \subsection{Manipulations and Transformations}
-% FIXME: add concrete details here
-
-%% \Chdescs\ play a central role in \Kudos, and therefore many parts of the system
-%% need to generate, consume, forward, and manipulate them. Obviously there are many
-%% simple block devices like partitioners will need to simply forward \chdescs\ on
-%% to the next block device after adjusting the block number being written. The
-%% write-back cache (\S\ref{sec:modules:wbcache}) needs to determine whether
-%% \chdescs\ are ready to send to the next block device or not.
-
-%% A collection of simple operations, such as shifting a \chdesc\ from one block
-%% to another, checking whether a \chdesc\ has unsatisfiable dependencies, and
-%% copying a \chdesc\ (useful for modules such as RAID), are handled by common
-%% library functions available to any module.
-
-%% Additionally, there are some more complex transformations which are useful for
-%% devices like the journaling \module (\S\ref{sec:consistency:journal}). The
-%% journal must copy entire blocks into a journal area, and overwrite that journal
-%% area efficiently when the blocks are changed again during the same transaction.
-%% This \chdesc\ transformation is handled by a library function, so that if other
-%% \modules\ need to do similar things, the functionality will already be available.
-
+% {{{ sec:chdescs:optimizations
 \subsection{\ChDesc\ Optimizations}
 \label{sec:chdescs:optimizations}
 
@@ -240,7 +222,7 @@ then \(\inset{b}{\psetsat{t}} \lor (\inset{b}{\psetinflight{t}}
 
 \noindent Want invariant:
 \cdinvar{c}{If \(\inset{a}{\psetsat{t}} \land \indirdepends{a}{b}\)
-then \inset{b}{\psetsat{t}}}
+then \inset{b}{\psetsat{t}} }
 
 \noindent At any time $t$, one of the following transformations may be applied:
 \begin{enumerate}
@@ -471,7 +453,9 @@ simplicity and depend add to \noop\ \chdescs\ with \afters\ bug catching.)}
 external \afters\ for \chdescs\ on that block.}
 
 \cdinvar{one-nrb}{Each block has at most one \nrb\ \chdesc.}
+% }}}
 
+% {{{ sec:chdescs:discussion
 \subsection{Discussion}
 \label{sec:chdescs:discussion}
 
@@ -527,3 +511,4 @@ convenient as creating a single \chdesc\ for an entire large structure.
   However, making \chdescs\ for the entire inode data structure will make
   one \chdesc\ depend on the other because they overlap.}
 \end{figure}
+% }}}
