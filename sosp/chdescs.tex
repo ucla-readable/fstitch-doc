@@ -328,15 +328,16 @@ previous data copies nearly double the memory usage of \chdescs\ and
 %
 \Kudos\ addresses this issue by identifying those \chdescs\ which will
 never need to be rolled back, and omitting the previous data copies for
-them. We call these \emph{\nrb} \chdescs.
+them. We call these \emph{\nrb} \chdescs. (The opposite naturally being
+a \emph{\rb} \chdesc, when necessary to differentiate them.)
 
-To identify potential \nrb \chdescs, \Kudos\ uses a conservative algorithm
-based on a \chdesc\ graph invariant. Merely detecting that given the
-current \chdesc\ graph can be written without rolling back a particular
-\chdesc\ is not sufficient, as the graph may change in the future. Thus we
-need an invariant which will guarantee that future changes to the graph
-will not require \nrb\ \chdescs\ to be rolled back, where \nrb\ \chdescs\
-are selected based on some property of the current graph.
+To identify potential \nrb\ \chdescs, \Kudos\ uses a conservative algorithm
+based on a \chdesc\ graph invariant. Merely detecting that the current
+\chdesc\ graph can be written without rolling back a particular \chdesc\ is
+not sufficient, as the graph may change in the future. Thus we need an
+invariant which will guarantee that future changes to the graph will not
+require \nrb\ \chdescs\ to be rolled back, where \nrb\ \chdescs\ are
+selected based on some property of the current graph.
 
 \cdinvar{add-before}{All block-level cycles induced through
 \chdesc\ $C$'s \befores\ exist when $C$ is
