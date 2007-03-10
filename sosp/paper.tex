@@ -3,6 +3,7 @@
 \usepackage{amsmath,amssymb,alltt,comment,times,mathptmx,verbatim}
 \usepackage[square,comma,numbers,sort&compress]{natbib}
 \usepackage{multirow}
+\usepackage{amsthm}
 \frenchspacing
 
 % The names of commonly referenced things in our work which
@@ -61,14 +62,9 @@
 
 \newcommand{\LFS}{L2FS}
 
-\newcounter{cdinvari}
+\newtheorem{cdinvarthm}{Patch Invariant}
 % TODO: reduce pre and post \cdinvar vspace
-\newcommand{\cdinvar}[2]{
-  \begin{enumerate}
-    \setcounter{enumi}{\value{cdinvari}}
-    \item #2\label{cdinvar:#1}
-    \setcounter{cdinvari}{\value{enumi}}
-  \end{enumerate}}
+\newcommand{\cdinvar}[2]{\begin{cdinvarthm}\label{cdinvar:#1}#2\end{cdinvarthm}}
 
 % patch notation
 
