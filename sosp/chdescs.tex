@@ -57,8 +57,8 @@ this is the first \chdesc\ invariant:
 To break block-level cycles, some \chdescs\ may need to be rolled
 back, or reverted, in order to first write other \chdescs. To ensure a
 rollback operation results in a well-defined block state, we have our
-second \chdesc\ invariant: \cdinvar{rollback}{A rolledback \chdesc{}'s
-\afters\ are rolledback\todo{Be more precise to be correct.}.}
+second \chdesc\ invariant: \cdinvar{rollback}{A rolled back \chdesc{}'s
+\afters\ are rolled back\todo{Be more precise to be correct.}.}
 
 % {{{ fig:chdapi
 \begin{figure}[t]
@@ -321,25 +321,23 @@ $O(1)$ or that ready \chdescs\ can be moved in $\sim\! O(r)$ time?
 To enable byte \chdesc\ rollback, each byte \chdesc\ contains a copy
 of the previous block data.
 %
-While these copies are needed to rollback byte \chdescs, many
-\chdescs\ are actually never rolledback (e.g. file data blocks) and
+While these copies are needed to roll back byte \chdescs, many
+\chdescs\ are never actually rolled back (e.g. file data blocks) and
 previous data copies nearly double the memory usage of \chdescs\ and
 \bdescs.
 %
-\Kudos\ makes use of invariant~\ref{cdinvar:add-before} and
-conservative heuristics to identify \chdescs\ that will never need to
-be rolledback. We call these \emph{\nrb} \chdescs.
-\Nrb\ \chdescs\ can safely omit their previous data copies and
-can safely be merged together.
+\Kudos\ addresses this issue by identifying those \chdescs\ which will
+never need to be rolled back, and omitting the previous data copies for
+them. We call these \emph{\nrb} \chdescs.
 
-To not store the previous block data when creating a \chdesc\ one must know
-%
-that the \chdesc\ need not be rolledback to write the existing
-\chdesc\ graph
-%
-and also that later \chdesc\ graph changes will not induce a forced
-rollback:
-%
+To identify potential \nrb \chdescs, \Kudos\ uses a conservative algorithm
+based on a \chdesc\ graph invariant. Merely detecting that given the
+current \chdesc\ graph can be written without rolling back a particular
+\chdesc\ is not sufficient, as the graph may change in the future. Thus we
+need an invariant which will guarantee that future changes to the graph
+will not require \nrb\ \chdescs\ to be rolled back, where \nrb\ \chdescs\
+are selected based on some property of the current graph.
+
 \cdinvar{add-before}{All block-level cycles induced through
 \chdesc\ $C$'s \befores\ exist when $C$ is
 created\todo{Change this phrasing? ``Once created, a \chdesc\ will not
@@ -350,7 +348,7 @@ gain any \befores\ that induce block-level cycles.''}.}
 is statically proven to hold.
 
 To avoid a costly dependency traversal to determine whether a new
-\chdesc\ will need to be rolledback, \Kudos\ conservatively identifies
+\chdesc\ will need to be rolled back, \Kudos\ conservatively identifies
 a new \chdesc\ as \nrb\ only if the block has no \chdescs\
 with external (on a different block\todo{Descriptive enough? Mention
 \noop\ \chdesc\ \after\ recursion?}) \afters. Each block tracks the number of
@@ -369,7 +367,7 @@ In this section we describe overlapping \chdesc\ merging; after
 introducing \nrb\ \chdescs\ in the next section we describe
 two additional merge opportunties.
 %
-All three merge rules build on invariant~\ref{cdinvar:add-before}\todo{Introduce invariant~\ref{cdinvar:add-before} sooner than with \nrb\ \chdescs}
+All three merge rules build on invariant~\ref{cdinvar:add-before}
 and use fast, conservative checks during \chdesc\ creation to identify
 \chdescs\ that will be possible to write together;
 %
