@@ -270,7 +270,8 @@ imply that invariant~\ref{cdinvar:c} holds.
 \begin{enumerate}
 \item \(\deps{t+1}\ := \deps{t} \cup\ \pset{X}\) for
 \(\notinset{a}{\psetall{t}} \land \pset{X}\! \subset\!
-\{\depends{a}{b}\ |\ \inset{b}{\psetall{t}}\}\)
+\{\depends{a}{b}\ |\ \inset{b}{\psetall{t}}\}\)\\
+\(\psetall{t+1} := \psetall{t} \cup\ \{a\}\)
 
 \item \(\psethard{t+1}\ := \psethard{t} \cup \{a\}\) where \(\forall b\!:
 \indirdepends{b}{a},\ \blockof{b} = \blockof{a}\)
@@ -334,44 +335,6 @@ empty.
 TODO: Include invariants that the max \before\ level computation is
 $O(1)$ or that ready \chdescs\ can be moved in $\sim\! O(r)$ time?
 
-\subsubsection{\ChDesc\ Merging}
-\Kudos\ drastically reduces the number of \chdescs\ created to
-describe a system of changes by (conservatively) identifying when a
-second \chdesc\ may safely be written at the same time as an existing
-\chdesc\ and, instead of creating the second \chdesc, updating the
-existing \chdesc's disk change and dependencies; in effect, merging
-the two \chdescs.
-%
-In this section we describe overlapping \chdesc\ merging; after
-introducing \nrb\ \chdescs\ in the next section we describe
-two additional merge opportunties.
-%
-All three merge rules build on invariant~\ref{cdinvar:add-before}\todo{Introduce invariant~\ref{cdinvar:add-before} sooner than with \nrb\ \chdescs}
-and use fast, conservative checks during \chdesc\ creation to identify
-\chdescs\ that will be possible to write together;
-%
-the merge rules differ in their conservatively applicable conditions.
-
-Bitmap blocks and inode size fields accumulate many nearby and
-overlapping mergeable \chdescs\ as data is appended to a file.
-%
-Many of these and similar \chdescs\ are mergeable and have
-dependencies that allow simple (and fast) reasoning to identify many
-of the mergeable pairs: two \chdescs\ that overlap no other \chdescs\
-and which have no dependency path from the new to the existing \chdesc\
-will not induce a block-level cycle and so are writeable together.
-We know that \textit{later} changes will not cause them to induce a block-level cycle due to
-invariant~\ref{cdinvar:add-before}.
-%
-While path existance testing is expensive, testing only whether the new
-\chdesc\ has a \before\ with a \before\ identifies most mergeable
-\chdescs. \ldots
-
-This section's key points:
-Rule: exactly one overlap and new \before\ does not depend on overlap.
-Overlapping makes it easy (but could extend chdescs so that they do overlap).
-Gain new \before\ (if not the overlap).
-
 \subsubsection{\Nrb\ \ChDescs}
 To enable byte \chdesc\ rollback, each byte \chdesc\ contains a copy
 of the previous block data.
@@ -411,6 +374,44 @@ with external (on a different block\todo{Descriptive enough? Mention
 \noop\ \chdesc\ \after\ recursion?}) \afters. Each block tracks the number of
 external \afters\ through incremental updates as \afters\ are added and
 removed.
+
+\subsubsection{\ChDesc\ Merging}
+\Kudos\ drastically reduces the number of \chdescs\ created to
+describe a system of changes by (conservatively) identifying when a
+second \chdesc\ may safely be written at the same time as an existing
+\chdesc\ and, instead of creating the second \chdesc, updating the
+existing \chdesc's disk change and dependencies; in effect, merging
+the two \chdescs.
+%
+In this section we describe overlapping \chdesc\ merging; after
+introducing \nrb\ \chdescs\ in the next section we describe
+two additional merge opportunties.
+%
+All three merge rules build on invariant~\ref{cdinvar:add-before}\todo{Introduce invariant~\ref{cdinvar:add-before} sooner than with \nrb\ \chdescs}
+and use fast, conservative checks during \chdesc\ creation to identify
+\chdescs\ that will be possible to write together;
+%
+the merge rules differ in their conservatively applicable conditions.
+
+Bitmap blocks and inode size fields accumulate many nearby and
+overlapping mergeable \chdescs\ as data is appended to a file.
+%
+Many of these and similar \chdescs\ are mergeable and have
+dependencies that allow simple (and fast) reasoning to identify many
+of the mergeable pairs: two \chdescs\ that overlap no other \chdescs\
+and which have no dependency path from the new to the existing \chdesc\
+will not induce a block-level cycle and so are writeable together.
+We know that \textit{later} changes will not cause them to induce a block-level cycle due to
+invariant~\ref{cdinvar:add-before}.
+%
+While path existance testing is expensive, testing only whether the new
+\chdesc\ has a \before\ with a \before\ identifies most mergeable
+\chdescs. \ldots
+
+This section's key points:
+Rule: exactly one overlap and new \before\ does not depend on overlap.
+Overlapping makes it easy (but could extend chdescs so that they do overlap).
+Gain new \before\ (if not the overlap).
 
 \subsubsection{\Nrb\ \ChDesc\ Merging}
 \label{sec:chdescs:optimizations:nrb-merge}
