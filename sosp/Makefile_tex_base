@@ -1,8 +1,8 @@
 LATEX=latex
-LATEX_OPTS=
+LATEX_OPTS=-halt-on-error
 
 PDFLATEX=pdflatex
-PDFLATEX_OPTS=
+PDFLATEX_OPTS=-halt-on-error
 
 BIBTEX=bibtex
 BIBTEX_OPTS=-min-crossrefs=100
