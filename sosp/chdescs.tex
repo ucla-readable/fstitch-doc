@@ -34,28 +34,6 @@ struct patch {
 \end{figure}
 % }}}
 
-Each in-memory modification to a cached disk block has an associated \chdesc. A
-\chdesc's \emph{\befores} point to other \chdescs\ that must precede it to
-stable storage; the \chdesc\ is then one of their \emph{\afters}. A \chdesc\ can
-be applied or reverted to switch the cached block's state between old and new.
-
-Figure~\ref{fig:chdesc} gives a simplified version of the structure, and
-Figure~\ref{fig:chdapi} shows much of the API for working with them. The ability
-to revert and re-apply \chdescs\ is inspired by soft updates dependencies, but
-generalized so that it is not specific to any particular file system.
-%
-\Chdesc\ dependencies can create cyclic dependencies among blocks. \Chdescs\
-themselves are not allowed to form cycles to ensure that they can always be
-written to disk in an order which does not violate the dependency graph. This
-property is the first \chdesc\ invariant:
-\cdinvar{acyclic}{\Chdesc\ dependency graphs are acyclic.}
-%
-To break block-level cycles, some \chdescs\ may need to be reverted, or ``rolled
-back,'' in order to first write other \chdescs\ on the same block. To ensure a
-rollback operation results in a well-defined block state, we have our second
-\chdesc\ invariant: \cdinvar{rollback}{A rolled back \chdesc{}'s \afters\ are
-rolled back\todo{Be more precise to be correct.}.}
-
 % {{{ fig:chdapi
 \begin{figure}[t]
 \vskip-14pt
@@ -95,25 +73,79 @@ int \textbf{patch_push_down}(
 \end{figure}
 % }}}
 
-\Kudos\ \modules\ change blocks by attaching \chdescs\ to them, using functions
-such as \texttt{patch\_create\_byte}.
-%
-Most file system modules initially generate \chdescs\ whose dependencies impose
-soft-update-like ordering requirements (see \S\ref{sec:using:softupdate}).
-These \chdescs\ are then passed down, through other modules, in the general
-direction of the disk. The intervening \modules\ can inspect, delay, and even
-modify them before passing them on further. For instance, the write-back cache
-\module\ (\S\ref{sec:modules:wbcache}), essentially a buffer cache, holds on to
-blocks and their \chdescs\ instead of forwarding them immediately.
-% Each delay-inducing \module\ increases its \module\ level by one over the
-% module(s) it uses, starting at zero.
-%
-When writing a block and associated \chdescs, the write-back cache enforces an
-order consistent with the \chdesc\ dependency information. Specifically,
-\cdinvar{before-levels}{The \befores\ of a \chdesc\ at level $l$ are at levels
-$\leq l$.\todo{we have not yet defined levels, and probably should never define
-or mention them}}
+The fundamental new abstraction in \Kudos\ is called a \chdesc. Each in-memory
+modification to a cached disk block has an associated \chdesc. A \chdesc's
+\emph{\befores} point to other \chdescs\ that must precede it to stable storage;
+the other \chdescs\ which point to it as a \before\ are its \emph{\afters}. A
+\chdesc\ can be applied or reverted to switch the cached block's state between
+old and new.
 
+Figure~\ref{fig:chdesc} gives a simplified version of the structure, and
+Figure~\ref{fig:chdapi} shows much of the API for working with them. The ability
+to revert and re-apply \chdescs\ is inspired by soft updates dependencies, but
+generalized so that it is not specific to any particular file system. \Chdesc\
+dependencies can create cyclic dependencies among blocks. \Chdescs\ themselves
+are not allowed to form cycles to ensure that they can always be written to disk
+in an order which does not violate the dependency graph. To break block-level
+cycles, some \chdescs\ may need to be reverted, or ``rolled back,'' in order to
+first write other \chdescs\ on the same block, just as in soft updates.
+
+\Kudos\ \modules\ change blocks by attaching \chdescs\ to them, using functions
+such as \texttt{patch\_create\_byte}. Most file system \modules\ initially
+generate \chdescs\ whose dependencies impose soft-update-like ordering
+requirements (see \S\ref{sec:using:softupdate}). These \chdescs\ are then passed
+down, through other \modules, in the general direction of the disk. The
+intervening \modules\ can inspect, delay, and even modify them before passing
+them on further. For instance, the write-back cache \module\
+(\S\ref{sec:modules:wbcache}), essentially a buffer cache, holds on to blocks
+and their \chdescs\ instead of forwarding them immediately.
+
+\subsection{Notation and Model}
+\label{sec:chdescs:notation}
+
+\newcommand{\ChAll}{\ensuremath{All}}
+\newcommand{\ChAllB}[1]{\ensuremath{All[#1]}}
+\newcommand{\ChMem}{\ensuremath{Mem}}
+\newcommand{\ChMemB}[1]{\ensuremath{Mem[#1]}}
+\newcommand{\ChDisk}{\ensuremath{Disk}}
+\newcommand{\ChDiskB}[1]{\ensuremath{Disk[#1]}}
+\newcommand{\ChInf}{\ensuremath{Inf}}
+\newcommand{\ChInfB}[1]{\ensuremath{Inf[#1]}}
+
+\newcommand{\statenone}{\ensuremath{none}}
+\newcommand{\stateinf}{\ensuremath{inflight}}
+\newcommand{\statedisk}{\ensuremath{ondisk}}
+
+It will be convenient to introduce some notation for dealing with \chdescs.
+First we will define a set \ChAll\ of all \chdescs. Although in the actual
+implementation we destroy \chdescs\ when they are no longer necessary (i.e. when
+they have successfully been written to the disk), \ChAll\ contains all \chdescs,
+written to disk or not. We also define sets \ChMem\ and \ChDisk, which contain
+all \chdescs\ only in memory or already on the disk, respectively. Next, we
+define a set \ChInf\ which contains all \chdescs\ that are currently ``in
+flight'' to the disk: block data reflecting their contents has been sent to the
+disk controller but has not yet been written to the disk media itself. Finally,
+we will also write \ChAllB{b}, \ChMemB{b}, \ChDiskB{b}, and \ChInfB{b} to
+succinctly represent the subsets of these four sets on some block $b$.
+
+If we have some \chdesc\ \p{p}, we can also refer to its block or state using a
+``member'' notation as in many programming languages: \p{p}.block is the block
+modified by \p{p}, and \p{p}.state is its state (one of \statenone, \stateinf,
+or \statedisk). We write \depends{\p{p}}{\p{q}} if \p{q} is listed as a \before\
+of \p{p} (that is, if \p{p} directly depends on \p{q}), and
+\indirdepends{\p{p}}{\p{q}} if there is some path of \befores\ from \p{p} to
+\p{q} (that is, if \p{p} indirectly depends on \p{q}).
+
+We can model the interaction between the disk (and its controller) and the
+software maintaining the \chdesc\ graph by a set of randomly occurring events
+that change the state of \chdescs\ according to simple rules. By stipulating
+that each event may occur at any time when its preconditions are met, we can
+reason about all possible hardware behavior and all possible software
+algorithms. The first event corresponds to creating a new \chdesc:
+
+% FIXME
+
+\subsection{Crap}
 When a \module\ asynchronously writes the data associated with a set of
 \chdescs\ to stable storage it marks the \chdescs\ as \emph{in flight} to
 indicate that the \chdescs\ are considered to still have their previous,
@@ -123,7 +155,7 @@ thus correctly implementing the dependency structure. A \chdesc\ is
 \todo{mention NCQ and FUA/wtcache, safe reordering, remove levels}
 
 Each \chdesc\ on a block may or may not be visible to a given \module. For
-example, modules that respond to user requests generally view the most current
+example, \modules\ that respond to user requests generally view the most current
 state of every block -- the block with all \chdescs\ applied. However, a
 write-back cache may choose to write some \chdescs\ on a block while reverting
 others, since those others currently have unsatisfied \befores. In this case,
@@ -168,7 +200,7 @@ to determine true dependencies.
 
 Modules can also use \noop\ \chdescs\ to \emph{prevent} changes from being
 written. A \emph{managed} \noop\ \chdesc\ must be explicitly satisfied; any
-changes that depend on that \noop\ \chdesc\ are delayed until the owning module
+changes that depend on that \noop\ \chdesc\ are delayed until the owning \module\
 explicitly satisfies it. This is used, for instance, by the journal \module\
 (\S\ref{sec:using:journal}) to prevent a transaction's \chdescs\ from
 being written before the journal commits.
@@ -178,6 +210,13 @@ being written before the journal commits.
 \subsection{Initial Formalisms}
 
 \noindent\\ Invariants:
+
+\cdinvar{acyclic}{\Chdesc\ dependency graphs are acyclic.}
+%
+To ensure a rollback operation results in a well-defined block state, we have
+our second \chdesc\ invariant: \cdinvar{rollback}{A rolled back \chdesc{}'s
+\afters\ are rolled back\todo{Be more precise to be correct.}.}
+
 \cdinvar{a}{If \indirdepends{a}{b} then \notindirdepends{b}{a}.}
 
 \cdinvar{b}{If \(\indirdepends{a}{b} \land \inset{a}{\psetinflight{t}}\)
