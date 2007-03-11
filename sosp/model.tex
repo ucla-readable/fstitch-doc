@@ -1,4 +1,4 @@
-\subsection{Notation and Model}
+\subsection{Notation}
 \label{sec:chdescs:notation}
 
 It will be convenient to introduce some notation for dealing with \chdescs.
@@ -29,6 +29,9 @@ all \chdescs\ \p{q} such that \depends{q}{p}, and \AfterS{p} is the set of all
 \chdescs\ \p{q} such that \indirdepends{q}{p}. These four operators can also be
 applied to sets of \chdescs: in that case, the resulting set is the union of the
 results of applying the same operator to each element of the operand set.
+
+\subsection{Formal Model}
+\label{sec:chdescs:model}
 
 We can model the interaction between the disk (and its controller) and the
 software maintaining the \chdesc\ graph by a set of randomly occurring events
@@ -79,3 +82,21 @@ access'' (FUA) setting. In these configurations, \Kudos\ is notified of command
 success only when the data has actually been written to the disk media. \Kudos\
 can be run in any of these configurations, including the first, though obviously
 the safety of the system is compromised in that case.
+
+\subsection{Invariants}
+
+\cdinvar{acyclic}{\Chdesc\ dependency graphs are acyclic.}
+%
+To ensure a rollback operation results in a well-defined block state, we have
+our second \chdesc\ invariant: \cdinvar{rollback}{A rolled back \chdesc{}'s
+\afters\ are rolled back\todo{Be more precise to be correct.}.}
+
+\cdinvar{a}{If \indirdepends{a}{b} then \notindirdepends{b}{a}.}
+
+\cdinvar{b}{If \(\indirdepends{a}{b} \land \inset{a}{\psetinflight{t}}\)
+then \(\inset{b}{\psetsat{t}} \lor (\inset{b}{\psetinflight{t}}
+\land \blockof{a} = \blockof{b})\).}
+
+\noindent Want invariant:
+\cdinvar{c}{If \(\inset{a}{\psetsat{t}} \land \indirdepends{a}{b}\)
+then \inset{b}{\psetsat{t}} }

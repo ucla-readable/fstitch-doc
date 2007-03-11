@@ -1,43 +1,36 @@
-\subsection{Scalable Dependency-Preserving Writes}
-For a \module\ like the write back cache to forward \chdescs\ in a
-dependency-preserving order, the \module\ must find \chdescs\ whose
-\befores\ are on a lower block device (or are part of the block write
-and on the current block device). Because the write back cache
-frequently searches for and writes many ready \chdescs, redundant
-\before\ traversals to calculate \chdesc\ ready state would severly
-limit cache size scalabity.
-%
-\Kudos\ therefore
-%
-1) explictly tracks a \chdesc's \before\ counts through incremental
-dependency updates
-%
-and 2) uses these counts to maintain a \chdesc\ ready list for each
-block.
+\subsection{Ready \ChDesc\ Lists}
 
-A \chdesc's \before\ counts are incrementally updated
-%
-as \befores\ are added and removed
-%
-and as \beforing\ \chdesc's change levels.
-%
+For a \module\ like the write-back cache to forward \chdescs\ in a
+dependency-preserving order, the \module\ must find \chdescs\ whose \befores\
+are all ``closer to the disk'' (or are also being forwarded as part of the same
+block write). We say that such \chdescs\ are \emph{ready}. Because the
+write-back cache frequently searches for and writes many ready \chdescs,
+redundant \chdesc\ graph traversals to calculate \chdesc\ readiness would
+severly limit cache size scalabity. \Kudos\ therefore explictly tracks a
+\chdesc's \before\ counts through incremental dependency updates, and uses these
+counts to maintain a \chdesc\ ready list for each block.
 
-Due to an invariant, only directly reachable \beforing\ \chdescs\ need to be
-included in a \chdesc's \before\ counts. \todo{get rid of the level}
-%
-% \Anoop\ \chdesc's level is defined to be the max level of its \befores;
-% in effect, propagating \anoop\ \chdesc's \befores\ to its \afters.
-Note that because \anoop\ \chdesc's level is a function of its \befores,
-%
-\anoop\ \chdesc\ \before\ count update that changes the \noop\ \chdesc's level
-must propagate the level change to the \noop\ \chdesc's \afters.
-%
-When a \before\ count update changes whether a \chdesc\ is ready to
-write, the \chdesc's inclusion in its block's ready list is updated.
-%
-To write a block, an owner thus iterates through the block's ready
-list, moving \chdescs\ to the target block device, until the list is
-empty.
+Each \chdesc\ has a count of the number of \befores\ it has at block device
+modules just as close to the disk as it currently is, and a count of the number
+of \befores\ it has which are in flight. When these counts are both zero, it is
+ready. A \chdesc's \before\ counts are incrementally updated as \befores\ are
+added and removed and as \beforing\ \chdescs\ are moved closer to the disk.
 
-TODO: Include invariants that the max \before\ level computation is
-$O(1)$ or that ready \chdescs\ can be moved in $\sim\! O(r)$ time?
+Because \Kudos\ makes sure that the \befores\ of a \chdesc\ are at least as
+close to the disk as it is, only directly reachable \beforing\ \chdescs\ need to
+be included in a \chdesc's \before\ counts. \Noop\ \chdescs, with the exception
+of managed \noop\ \chdescs\ (which have an explicit owning block device), add a
+wrinkle to this simplifying rule, however. They are considered to be as close to
+the disk as their \before\ which is the farthest from the disk, in effect,
+propagating the distance to the disk metric through them.
+
+When a \before\ count update changes whether a \chdesc\ is ready to write, the
+\chdesc's inclusion in its block's ready list is updated. To write a block, a
+\module\ thus iterates through the block's ready list, sending \chdescs\ to the
+target block device, until the list is empty. Thus instead of having to
+repeatedly traverse \chdesc\ graphs to determine readiness on demand, we have
+this information maintained automatically as it changes. This automatic
+maintenance adds some cost to forwarding \chdescs\ and changing the graph
+structure, but since it saves so much duplicate work\footnote{The amount of
+duplicate work saved is actually superlinear in the size of the write-back
+cache.} it is much more efficient.

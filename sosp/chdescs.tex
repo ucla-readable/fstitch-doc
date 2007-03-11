@@ -121,25 +121,6 @@ are \emph{satisfied} when their associated data reaches stable storage.
 
 \input{model}
 \input{noop}
-
-\subsection{Invariants}
-
-\cdinvar{acyclic}{\Chdesc\ dependency graphs are acyclic.}
-%
-To ensure a rollback operation results in a well-defined block state, we have
-our second \chdesc\ invariant: \cdinvar{rollback}{A rolled back \chdesc{}'s
-\afters\ are rolled back\todo{Be more precise to be correct.}.}
-
-\cdinvar{a}{If \indirdepends{a}{b} then \notindirdepends{b}{a}.}
-
-\cdinvar{b}{If \(\indirdepends{a}{b} \land \inset{a}{\psetinflight{t}}\)
-then \(\inset{b}{\psetsat{t}} \lor (\inset{b}{\psetinflight{t}}
-\land \blockof{a} = \blockof{b})\).}
-
-\noindent Want invariant:
-\cdinvar{c}{If \(\inset{a}{\psetsat{t}} \land \indirdepends{a}{b}\)
-then \inset{b}{\psetsat{t}} }
-
 \input{readylist}
 \input{nrb}
 \input{overlapmerge}
