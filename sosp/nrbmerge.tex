@@ -28,13 +28,13 @@ Mention?:
 %
 \Nrb\ \chdescs, \rb\ \chdescs, and ready lists:
 %
-all post-NRB created \chdescs\ depend on NRB because of overlaps.
+all post-\nrb\ created \chdescs\ depend on \nrb\ because of overlaps.
 %
-no NRB-prior created \chdescs\ exist (RB->NRB).
+no \nrb-prior created \chdescs\ exist (\rb{}\(\rightarrow\)\nrb{}).
 %
-single NRB.
+single \nrb.
 
-\subsubsection{\Nrb{}-\Nrb{} \ChDesc\ Merging}
+\subsubsection{\Nrb-\Nrb\ \ChDesc\ Merging}
 \label{sec:chdescs:nrb-merge:hard-hard}
 % Although merging two \chdescs\ will not induce block-level dependency
 % cycles, without sufficient care merging could induce \chdesc-level
@@ -67,16 +67,18 @@ TODO: explain further?
   \caption{Possible dependencies when merging \nrb\ \chdesc\ \p{q}
     into existing \nrb\ \chdesc\ \p{p}.}
   \label{fig:nrb-merge}
-\end{figure}
+\end{figure}\todo{Show Figure~\ref{fig:nrb-merge} without \nrb{}-\rb\ merging's results?}
 
 \noindent Algorithm called on \p{q} and \p{p}:\\
-Input: \chdesc\ \p{a} and existing \nrb\ \chdesc\ \p{p}.
+Input: \chdesc\ \p{a} and existing \nrb\ \chdesc\ \p{p}.\\
+Returns: whether \indirdepends{a}{p} exists. \(\forall\! \p{b}\!: \indirdepends{a}{b}\) and \notindirdepends{b}{p}, creates \indirdepends{p}{b}.
+
 \begin{itemize}
 \item If \p{a} is external, return ``no path to \p{p}.''
 \item If \p{a} equals \p{p}, return ``path to \p{p}.''
 \item Call self on \p{a} and \p{p}.
 \item If \p{a} has no path to \p{p}, return ``no path to \p{p}.''
-\item For each \p{a} \befores\ \p{b}:
+\item For each \p{a} \before\ \p{b}:
   \begin{itemize}
     \item If \p{b} has no path to \p{p}:
       \begin{itemize}
@@ -85,13 +87,45 @@ Input: \chdesc\ \p{a} and existing \nrb\ \chdesc\ \p{p}.
   \end{itemize}
 \end{itemize}
 
-\subsubsection{\Nrb{}-\Rb{} \ChDesc\ Merging}
-\label{sec:chdescs:nrb-merge:hard-soft}
-TODO: talk about why \nrb\ \chdescs\ slow down revision slice creation or talk
-about how we detect RB$\rightarrow$NRB changes and then do \nrb\ \chdesc\ merges
-to avoid this slowdown.
+\cdinvar{one-nrb}{Each block has at most one \nrb\ \chdesc\todo{Introduce}.}
 
-Say something along the lines:
+\subsubsection{\Nrb-\Rb\ \ChDesc\ Merging}
+\label{sec:chdescs:nrb-merge:hard-soft}
+A block \block{b} may contain a \nrb\ \chdesc\ that depends on \rb\ \chdescs\
+(also on \block{b}).
+%
+For example, the block may gain an initial (\nrb{}) \chdesc, gain
+external \afters\ on its \chdesc, accumulate additional (\rb{})
+\chdescs, write the subset of its \chdescs\ with external \afters\
+(leaving some \rb\ \chdescs\ on the block), and then gain a \nrb\
+\chdesc.
+%
+These \rb\ and \nrb\ \chdescs\ must be written together to satisfy
+their (explicit and implicit) dependencies.
+%
+As in Section~\ref{sec:chdescs:nrb-merge:hard-hard}, \Kudos\ merges
+such \chdescs\ to avoid the complications of such implicit
+dependencies.  When a new \nrb\ \chdesc\ is to be created, any
+existing \rb\ \chdescs\ are first merged into a \nrb\ \chdesc\
+and the new \nrb\ \chdesc\ is merged into it.
+
+\noindent Algorithm:
+\begin{itemize}
+\item Choose some (\rb{}) \chdesc\ \p{a} such that
+\(\forall\! b\!: \indirdepends{a}{b}, \blockof{b} \ne \blockof{a}\).
+The oldest \chdesc\ on the block will be such a block.
+\item Call \nrb-\nrb\ \before\ move algorithm on each \chdesc\ \p{b}
+on the block s.t. \(b \ne a\) and convert \p{b} into \anoop\ \chdesc.
+\item Convert \p{a} into a \nrb\ \chdesc\ (free it's previous data copy)
+that directly depends on only \p{a}.
+\end{itemize}
+
+TODO: explain why this preserves dependency semantics? Show possible
+dependencies? For the paper, free \chdescs\ instead of convert them
+into \noop{}s? (Must modify \nrb-\nrb\ algo usage.)
+
+
+At the end of \chdesc\ optimizations, say something along the lines:
 %
 The dynamic optimizations facilitated through \nrb\
 \chdescs\ implement the efficiency in systems using soft updates or
@@ -99,11 +133,6 @@ journaling\todo{Actually do this for journaling} while expressing
 changes modularly through structural descriptions rather than through
 internal and semantic file system descriptions.
 
-\todo{Should we include memory/performance improvement numbers?}
-\todo{Should we talk about why we allow NRBs to be disabled? (Debugging
-simplicity and depend add to \noop\ \chdescs\ with \afters\ bug catching.)}
-
-\cdinvar{extern-after}{Each block tracks the total number of
-external \afters\ for \chdescs\ on that block.}
-
-\cdinvar{one-nrb}{Each block has at most one \nrb\ \chdesc.}
+\todo{Should we talk about why we allow NRBs and merging to be
+  disabled? (Debugging simplicity and depend add to \noop\ \chdescs\
+  with \afters\ bug catching.)}
