@@ -66,7 +66,7 @@ first event again, eventually we can get to a state where \ChDisk\ $=$ \ChAll.
 This is a liveness property; namely, that eventually all the \chdescs\ will make
 it to disk.
 
-\Kudos\ controls when the first two events occur, and is notified of the third
+\Kudos\ controls when the first two events occur, but is notified of the third
 event by the disk driver when it occurs. Depending on the hardware
 configuration, the third event may actually represent one of two real-world
 situations: first, the data may merely be in the volatile disk cache, so that a
