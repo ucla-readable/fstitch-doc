@@ -375,28 +375,33 @@ before to the existing \chdesc\ (if any and if not the existing \chdesc).
 % {{{ sec:chdescs:nrb-merge
 \subsection{\Nrb\ \ChDesc\ Merging}
 \label{sec:chdescs:nrb-merge}
-Notice that two \nrb\ \chdescs\ on a block must be committed
-in the same revision slice; neither can (or will need to) be rolled
-back. This illustrates the underlying reason why two \nrb\
-\chdescs\ can be merged into a single \nrb\ \chdesc.
+Recall from FOO\todo{Name FOO} that to write any \chdesc\ on a given block,
+all \nrb\ \chdescs\ on the block must also be written. 
 %
-While no block-level dependency cycles can be induced by a merge,
-without sufficient care a merge could induce \chdesc-level
-dependency cycles. A trivial example is merging \nrbof{B} into \nrbof{A}
-when \nrbof{B} has an explicit dependency on \nrbof{A}; the combined
-\nrbof{(A+B)} should not and need not depend on itself. The dependency
-addition and \nrb\ \chdesc\ creation rules restrict the
-possible dependencies involving \nrbof{A} and \nrbof{B} to \textit{only}
-those shown in Figure~\ref{fig:nrb-merge}\todo{Should we give these
-deductions or a flavor?}. From these possible dependencies follows
-an algorithm that recurses \nrbof{B}'s \before\ dependency chains until an
-external \chdesc\ is encountered and that for each \ncd{C} along the
-chain with a \before\ path to \nrbof{A}, moves all of \ncd{C}'s \befores\
-without \before\ paths to be \befores\ of \nrbof{A}\todo{This could be more
-lucid.} This graph manipulation preserves the system's \chdesc\
-dependencies.
+These implicit dependencies complicate determining whether a block can
+be written, requiring a search for non-ready \nrb\ \chdescs.
+%
+By merging \nrb\ \chdescs\ together and by merging existing \rb\
+\chdescs\ into the block's \nrb\ \chdesc\ when the \nrb\ \chdesc\ is
+created,
+%
+\Kudos\ ensures that there is at most one \nrb\ \chdesc\ per block and
+that all \chdescs\ on the same block depend on the \nrb\
+\chdesc\,
+%
+and so avoids dependency complication and further reduces \chdesc\
+memory overhead.
 
-\Nrb\ \chdescs, \Rb\ \chdescs, and ready lists:
+While any two \nrb\ \chdescs\ on the same block will be written
+together, to merge the \chdescs\ the dependencies involving the merged
+\chdescs\ must be transformed to preserve the non-merged system's
+semantics.  Sections~\ref{sec:chdescs:nrb-merge:hard-hard}
+and~\ref{sec:chdescs:nrb-merge:hard-soft} discuss these
+transformations.
+
+Mention?:
+%
+\Nrb\ \chdescs, \rb\ \chdescs, and ready lists:
 %
 all post-NRB created \chdescs\ depend on NRB because of overlaps.
 %
@@ -404,13 +409,59 @@ no NRB-prior created \chdescs\ exist (RB->NRB).
 %
 single NRB.
 
+\subsubsection{\Nrb{}-\Nrb{} \ChDesc\ Merging}
+\label{sec:chdescs:nrb-merge:hard-hard}
+% Although merging two \chdescs\ will not induce block-level dependency
+% cycles, without sufficient care merging could induce \chdesc-level
+% dependency cycles.  A trivial example is merging \p{q} into \p{p} when
+% \p{q} has an explicit dependency on \p{p}; the combined \p{(p+q)}
+% should not and need not depend on itself.
+To preserve the non-merged dependency semantics when merging a new
+\nrb\ \chdesc\ \p{q} into an existing \nrb\ \chdesc\ \p{p}, the merged
+\p{(p+q)} must depend on the union of \p{p} and \p{q}'s transitive
+\befores.
+%
+From \chdesc\ invariant~\ref{cdinvar:add-before} and the \nrb\
+\chdesc\ creation rule, the only possible dependencies involving \p{p}
+and \p{q} are those show in Figure~\ref{fig:nrb-merge}\todo{Should we
+  give these deductions or a flavor?}.
+%
+An algorithm to transform dependencies for \nrb\ \chdesc\ merges
+follows from these possible dependencies.
+%
+Notice, for example, that the dependency paths that could become a
+cycle upon the merge of \p{p} of \p{q} involve only \noop\ \chdescs\
+and that \chdesc\ invariant~\ref{cdinvar:add-before} ensures these
+\noop\ \chdesc\ will not gain data \chdesc\ \befores.
+%
+TODO: explain further?
+
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\columnwidth]{nrb_merge}
-  \caption{Possible dependencies when merging \nrbof{B} into \nrbof{A}.}
+  \caption{Possible dependencies when merging \nrb\ \chdesc\ \p{q}
+    into existing \nrb\ \chdesc\ \p{p}.}
   \label{fig:nrb-merge}
 \end{figure}
 
+\noindent Algorithm called on \p{q} and \p{p}:\\
+Input: \chdesc\ \p{a} and existing \nrb\ \chdesc\ \p{p}.
+\begin{itemize}
+\item If \p{a} is external, return ``no path to \p{p}.''
+\item If \p{a} equals \p{p}, return ``path to \p{p}.''
+\item Call self on \p{a} and \p{p}.
+\item If \p{a} has no path to \p{p}, return ``no path to \p{p}.''
+\item For each \p{a} \befores\ \p{b}:
+  \begin{itemize}
+    \item If \p{b} has no path to \p{p}:
+      \begin{itemize}
+      \item Move \p{b} from a \before\ of \p{a} to a \before\ of \p{p}.
+      \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\subsubsection{\Nrb{}-\Rb{} \ChDesc\ Merging}
+\label{sec:chdescs:nrb-merge:hard-soft}
 TODO: talk about why \nrb\ \chdescs\ slow down revision slice creation or talk
 about how we detect RB$\rightarrow$NRB changes and then do \nrb\ \chdesc\ merges
 to avoid this slowdown.
