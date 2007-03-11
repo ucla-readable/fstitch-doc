@@ -1,20 +1,15 @@
 \subsection{Write-Back Cache}
 \label{sec:modules:wbcache}
 
-Write-back cache modules act as the system's primary cache, and are
-responsible for holding on to the \chdescs\ sent to them until they can be
-safely sent on towards the disk.
-%
-There can be many write-back caches in a configuration at once (for
-instance, one for each block device).
-%
-To a write-back cache, the complex consistency protocols that
-other \modules\ want to enforce are nothing more than sets of dependencies among
-\chdescs\ -- it has no idea what consistency protocols it is implementing, if
-any at all.
-%
-Yet it is the \module\ that ends up doing most of the work to make
-sure that \chdescs\ are written in an acceptable order.
+Write-back cache modules act as the system's primary cache, and are responsible
+for holding on to the \chdescs\ sent to them until they can be safely sent on
+towards the disk. There can be many write-back caches in a configuration at once
+(for instance, one for each block device). To a write-back cache, the complex
+consistency protocols that other \modules\ want to enforce are nothing more than
+sets of dependencies among \chdescs\ -- it has no idea what consistency
+protocols it is implementing, if any at all. Yet it is the \module\ that ends up
+doing most of the work to make sure that \chdescs\ are written in an acceptable
+order.
 
 Despite this, write-back caches are relatively simple -- only about 630 lines of
 code, including comments. The current write-back cache uses a simple FIFO policy

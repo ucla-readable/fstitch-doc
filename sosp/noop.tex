@@ -11,8 +11,9 @@ To solve this problem, we introduce an additional type of \chdesc. The
 prototypical \chdesc\ corresponds to some change on disk, but \Kudos\ also
 supports \aemphnoop\ \chdesc\ type, which doesn't change the disk at all.
 \Noop\ \chdescs\ can have \befores, like other \chdescs, but they don't need to
-be written to disk: they are trivially satisfied when all of their \befores\ are
-satisfied. Thus, they can be used to ``stand for'' entire sets of other changes.
+be written to disk (nor are they associated with a cached disk block): they are
+trivially satisfied when all of their \befores\ are satisfied. Thus, they can be
+used to ``stand for'' entire sets of other changes.
 %
 This capability is extremely useful, and is used by most operations on disk
 structures so that a single \chdesc\ can be returned that depends on the whole
@@ -24,10 +25,6 @@ of \chdescs.
 %
 The cost is that some functions may have to traverse trees of \noop\ \chdescs\
 to determine true dependencies.
-%
-% FIXME: move this into the precalculation section?
-% \Anoop\ \chdesc's level is defined to be the max level of its \befores;
-% in effect, propagating \anoop\ \chdesc's \befores\ to its \afters.
 
 Modules can also use \noop\ \chdescs\ to \emph{prevent} changes from being
 written. A \emph{managed} \noop\ \chdesc\ must be explicitly satisfied; any
@@ -35,3 +32,7 @@ changes that depend on that \noop\ \chdesc\ are delayed until the owning \module
 explicitly satisfies it. This is used, for instance, by the journal \module\
 (\S\ref{sec:using:journal}) to prevent a transaction's \chdescs\ from
 being written before the journal commits.
+
+\Noop\ \chdescs\ are not included in our formal model of \chdescs\ in
+\S\ref{sec:chdescs:notation} for simplicity; they add some additional complexity
+but do not change the basic ideas.

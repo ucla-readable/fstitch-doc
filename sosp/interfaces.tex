@@ -90,4 +90,15 @@ blocks to files, allocate file names, and other file system micro-ops. A
 the disk, but doesn't have to know how to combine the micro-ops into larger,
 more familiar file system operations. A generic CFS-to-\LFS\ \module\ decomposes
 the larger file write, read, append, and other standard operations into \LFS\
-micro-ops. This module, called UHFS, is described next.
+micro-ops. This module, called UHFS, is described in the next section.
+
+Each \chdesc\ on a cached block may or may not be visible to a given \module.
+For example, \modules\ that respond to user requests generally view the most
+current state of every block -- the block with all \chdescs\ applied. However, a
+write-back cache may choose to write some \chdescs\ on a block while reverting
+others, since those others currently have unsatisfied \befores. In this case,
+\modules\ below the write-back cache (i.e. closer to the disk) should view the
+unsatisfied \chdescs\ in the reverted state. \Kudos\ provides a block
+revisioning library function that automatically rolls back those \chdescs\ that
+should not be visible at a particular \module, and then rolls them forward again
+after that \module\ is done with the block.

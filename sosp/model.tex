@@ -21,83 +21,61 @@ of \p{p} (that is, if \p{p} directly depends on \p{q}), and
 \indirdepends{\p{p}}{\p{q}} if there is some path of \befores\ from \p{p} to
 \p{q} (that is, if \p{p} indirectly depends on \p{q}).
 
+The last bit of notation we'll need is for representing sets of \chdescs\
+related by the dependency graph. We'll write \Before{p} to represent the set of
+all \chdescs\ \p{q} such that \depends{p}{q}, and \BeforeS{p} for the set of all
+\chdescs\ \p{q} such that \indirdepends{p}{q}. Likewise, \After{p} is the set of
+all \chdescs\ \p{q} such that \depends{q}{p}, and \AfterS{p} is the set of all
+\chdescs\ \p{q} such that \indirdepends{q}{p}. These four operators can also be
+applied to sets of \chdescs: in that case, the resulting set is the union of the
+results of applying the same operator to each element of the operand set.
+
 We can model the interaction between the disk (and its controller) and the
 software maintaining the \chdesc\ graph by a set of randomly occurring events
 that change the state of \chdescs\ according to simple rules. By stipulating
 that each event may occur at any time when its preconditions are met, we can
 reason about all possible hardware behavior and all possible software
-algorithms. The first event corresponds to creating a new \chdesc:
+algorithms. Here are the three possible events:
 
-% FIXME
+\paragraph{Create new \chdesc}
+For some \chdesc\ \p{p} $\not\in$ \ChAll\: \\
+Let \p{p}.state $:=$ \statenone \\
+Let \depends{\p{p}}{\p{q}} for all \p{q} $\in Q$ where $Q \subseteq$ \ChAll %\\
+% Let \ChAll\ $:=$ \ChAll\ $\cup$ \{\p{p}\}
 
-\noindent At any time $t$, one of the following transformations may be applied:
-\begin{enumerate}
-\item For some \block{w}:\\
-Let \(\pset{B} = \{a\ |\ \inset{a}{\psetinflight{t}} \land \blockof{a} = \block{w} \}\) in\\
-\(\psetsat{t+1} := \psetsat{t} \cup \pset{B}\)\\
-\(\psetinflight{t+1} := \psetinflight{t} \setminus \pset{B}\)
-\label{action:write}
+\paragraph{Write block to disk controller}
+For some block $b$: \\
+Let $P \subseteq$ \ChMemB{b} such that \BeforeS{P} $\subseteq$ \ChDisk\ $\cup\ P$ \\
+Let \p{p}.state $:=$ \stateinf\ for all \p{p} $\in$ $P$
 
-\item \(\deps{t+1} := \deps{t} \cup\ \pset{X}\) where
-\(\notinset{a}{\psetall{t}} \land \pset{X} \subset \{\depends{a}{b}\}\)\\
-\(\psetall{t+1} := \psetall{t} \cup\ \{a\}\)
-\label{action:create}
+\paragraph{Disk writes block to media}
+For some block $b$: \\
+Let \p{p}.state $:=$ \statedisk\ for all \p{p} $\in$ \ChInfB{b}
 
-\item \(\psetinflight{t+1} := \psetinflight{t} \cup \{a\}\) for some
-\notinset{a}{\psetsat{t}} s.t. \(\forall b: \indirdepends{a}{b},\
-\inset{b}{\psetsat{t}} \lor (\inset{b}{\psetinflight{t}} \land
-\blockof{a} = \blockof{b}\)
-\label{action:fly}
-\end{enumerate}
+\paragraph{} It is not difficult to prove based on the events above that a
+fundamentally important safety property is maintained, namely that
+\BeforeS{\ChDisk} $\subseteq$ \ChDisk. In essence, the system honors the
+dependency information correctly. A second, and related, safety property is that
+\BeforeS{\ChInfB{b_1}} $\cap$ \ChInfB{b_2} $= \emptyset$ for all $b_1 \neq b_2$.
+This means that none of the currently in-flight blocks depend on any of the
+other currently in-flight blocks, so the disk, disk controller, and disk driver
+are all free to reorder them any way they see fit.
 
-We can prove that invariants~\ref{cdinvar:a} and~\ref{cdinvar:b}
-with actions~\ref{action:write}, \ref{action:create}, and~\ref{action:fly}
-imply that invariant~\ref{cdinvar:c} holds.
+A third property of the events above is that if at some point we never see the
+first event again, eventually we can get to a state where \ChDisk\ $=$ \ChAll.
+This is a liveness property; namely, that eventually all the \chdescs\ will make
+it to disk.
 
-\noindent Action~\ref{action:create} replacements for hard patches:
-\begin{enumerate}
-\item \(\deps{t+1}\ := \deps{t} \cup\ \pset{X}\) for
-\(\notinset{a}{\psetall{t}} \land \pset{X}\! \subset\!
-\{\depends{a}{b}\ |\ \inset{b}{\psetall{t}}\}\)\\
-\(\psetall{t+1} := \psetall{t} \cup\ \{a\}\)
-
-\item \(\psethard{t+1}\ := \psethard{t} \cup \{a\}\) where \(\forall b\!:
-\indirdepends{b}{a},\ \blockof{b} = \blockof{a}\)
-\end{enumerate}
-
-\noindent Action~\ref{action:fly} replacements for hard patches:
-\begin{enumerate}
-\item \(\psetinflight{t+1} := \psetinflight{t} \cup \{a\}\) for
-\notinset{a}{\psetall{t} \cup \psethard{t}}\\
-\(\forall b\!: \indirdepends{a}{b},\ \inset{b}{\psetsat{t}} \lor (\inset{b}{\psetinflight{t}} \land \blockof{a} = \blockof{b})\)\\
-\(\not\exists\inset{b}{\psethard{t}}\ \mbox{s.t.}\ \blockof{b} = \blockof{a}\)
-
-\item For some \block{w}:\\
-\(\psetinflight{t+1} := \psetinflight{t} \cup \pset{X}\) for
-\(\pset{X} = \{\inset{a}{\psethard{t}}\ |\ \blockof{a} = \block{w}\}\)\\
-\(\forall \notinset{b}{\pset{X}}\!: \forall \inset{a}{\pset{X}}\!:
-\indirdepends{a}{b},\ \inset{b}{\psetsat{t}} \lor
-(\inset{b}{\psetinflight{t}} \land \blockof{a} = \blockof{b})\)\\
-\(\psethard{t+1} := \psethard{t} \setminus \pset{X}\)
-\end{enumerate}
-
-\subsection{Crap}
-When a \module\ asynchronously writes the data associated with a set of
-\chdescs\ to stable storage it marks the \chdescs\ as \emph{in flight} to
-indicate that the \chdescs\ are considered to still have their previous,
-higher, level. Their \afters\ will therefore remain at that level (or higher),
-thus correctly implementing the dependency structure. A \chdesc\ is
-\emph{satisfied} when its associated data reaches stable storage.
-\todo{mention NCQ and FUA/wtcache, safe reordering, remove levels}
-
-Each \chdesc\ on a block may or may not be visible to a given \module. For
-example, \modules\ that respond to user requests generally view the most current
-state of every block -- the block with all \chdescs\ applied. However, a
-write-back cache may choose to write some \chdescs\ on a block while reverting
-others, since those others currently have unsatisfied \befores. In this case,
-\modules\ below the write-back cache should view the unsatisfied \chdescs\ in
-the reverted state.
-%
-\Kudos\ provides a block revisioning library function that automatically rolls
-back those \chdescs\ that should not be visible at a particular \module, and
-then rolls them forward again after that \module\ is done with the block.
+\Kudos\ controls when the first two events occur, and is notified of the third
+event by the disk driver when it occurs. Depending on the hardware
+configuration, the third event may actually represent one of two real-world
+situations: first, the data may merely be in the volatile disk cache, so that a
+power outage may cause it to be lost. This can be a catastrophic disaster, as
+shown in~\cite{nightingale06rethink}. The second possible situation is that the
+data is truly on the disk media, which can be arranged by disabling the drive's
+write-back cache or by using hardware features like SCSI tagged command queueing
+(TCQ) or SATA native command queueing (NCQ) together with their ``force unit
+access'' (FUA) setting. In these configurations, \Kudos\ is notified of command
+success only when the data has actually been written to the disk media. \Kudos\
+can be run in any of these configurations, including the first, though obviously
+the safety of the system is compromised in that case.
