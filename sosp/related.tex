@@ -34,7 +34,7 @@ also guarantees a strong level of consistency after a crash, enough so that the
 system can avoid time-consuming file system consistency checks using a utility
 like \emph{fsck}. 
 
-%% Section \ref{sec:consistency:softupdate}
+%% Section \ref{sec:using:softupdate}
 %% explains soft updates in greater detail.
 
 Another approach to protecting the integrity of the file system is to write
@@ -42,7 +42,7 @@ upcoming operations to a journal first. The content and the layout of the
 journal varies in each implementation, but in all cases, the system can use
 the journal to play out or roll back the operations that did not complete
 as a result of a crash. Thus, \emph{fsck} can be avoided by consulting the
-journal when recovering from a crash. Section \ref{sec:consistency:journal}
+journal when recovering from a crash. Section \ref{sec:using:journal}
 explains journaling with \chdescs. \cite{seltzer00journaling} compares
 journaling and soft updates in practice.
 

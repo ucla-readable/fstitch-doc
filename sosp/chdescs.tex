@@ -99,7 +99,7 @@ int \textbf{patch_push_down}(
 such as \texttt{patch\_create\_byte}.
 %
 Most file system modules initially generate \chdescs\ whose dependencies impose
-soft-update-like ordering requirements (see \S\ref{sec:consistency:softupdate}).
+soft-update-like ordering requirements (see \S\ref{sec:using:softupdate}).
 These \chdescs\ are then passed down, through other modules, in the general
 direction of the disk. The intervening \modules\ can inspect, delay, and even
 modify them before passing them on further. For instance, the write-back cache
@@ -120,6 +120,7 @@ indicate that the \chdescs\ are considered to still have their previous,
 higher, level. Their \afters\ will therefore remain at that level (or higher),
 thus correctly implementing the dependency structure. A \chdesc\ is
 \emph{satisfied} when its associated data reaches stable storage.
+\todo{mention NCQ and FUA/wtcache, safe reordering, remove levels}
 
 Each \chdesc\ on a block may or may not be visible to a given \module. For
 example, modules that respond to user requests generally view the most current
@@ -169,12 +170,12 @@ Modules can also use \noop\ \chdescs\ to \emph{prevent} changes from being
 written. A \emph{managed} \noop\ \chdesc\ must be explicitly satisfied; any
 changes that depend on that \noop\ \chdesc\ are delayed until the owning module
 explicitly satisfies it. This is used, for instance, by the journal \module\
-(\S\ref{sec:consistency:journal}) to prevent a transaction's \chdescs\ from
+(\S\ref{sec:using:journal}) to prevent a transaction's \chdescs\ from
 being written before the journal commits.
 % }}}
 
 % {{{ formalisms
-\subsection{Initial formalisms}
+\subsection{Initial Formalisms}
 
 \noindent\\ Invariants:
 \cdinvar{a}{If \indirdepends{a}{b} then \notindirdepends{b}{a}.}
@@ -295,7 +296,7 @@ most \chdescs\ are not of this type.}
 While these copies are needed to roll back \chdescs, many
 \chdescs\ are never actually rolled back (e.g. file data blocks) and
 previous data copies nearly double the memory usage of \chdescs\ and
-\bdescs.
+cached blocks.
 %
 \Kudos\ addresses this issue by identifying those \chdescs\ which will
 never need to be rolled back, and omitting the previous data copies for

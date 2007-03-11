@@ -1,0 +1,24 @@
+\subsection{UHFS}
+\label{sec:modules:uhfs}
+
+This one \module, called the ``universal high-level file system'' or
+UHFS, can be used with many different \LFS\ \modules\ implementing different file
+systems. (There is also a generic VFS-to-CFS layer, to interface with Linux. See
+\S\ref{sec:implementation} for details.)
+\todo{fix this intro paragraph}
+
+The UHFS \module\ encompasses all logic for decomposing higher level CFS calls
+into lower level \LFS\ calls, and for connecting the resulting \chdescs\
+together. The finer granularity of \LFS\ calls divides the problem space into
+smaller chunks. Since the issue of how to tie the \LFS\ micro-ops together has
+already been solved, file system \module\ developers can give more attention to
+the particulars of the file system, such as how to allocate a new filename or
+how to look up the Nth data block for a file. To see how this simplifies the
+development process, consider the VFS \texttt{write()} call, which has the task
+of writing some amount of data to a file at a given offset. In \Kudos, the logic
+to determine the correct offsets within blocks and whether new blocks must be
+allocated is built into UHFS. A file system \module\ need only implement four
+\LFS\ calls: \texttt{get\_file\_block()}, \texttt{allocate\_block()},
+\texttt{append\_block()}, and \texttt{write\_block()}. Additionally, the
+granularity of calls at the \LFS\ layer makes it an appropriate layer for
+inserting test harnesses and developing file system unit tests.

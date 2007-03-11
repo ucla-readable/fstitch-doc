@@ -7,6 +7,7 @@ already improved the performance by literally several orders of magnitude, since
 we only recently began examining performance in addition to correctness, but the
 system is not as fast as it could be -- and not quite as fast as it needs to be
 to be a viable option for most computer systems.
+\todo{we have an additional year now}
 
 We would also like to identify places where \Kudos\ can be made more flexible,
 by adding more features to the system and changing the existing parts that make
@@ -33,6 +34,7 @@ early prototypes, these sets were often calculated by doing large traversals of
 the \chdesc\ dependency graph. However, these traversals are in practice
 extremely expensive, and optimizing them has improved and will likely continue
 to improve the performance of \Kudos.
+\todo{we address this to some extent in the chdesc section now}
 
 We have worked on both of these approaches, especially the second, but we
 believe further improvements can be made. One simple change which helped
@@ -45,6 +47,7 @@ end of the list. (Since they had been added longest ago, and often changes are
 written in an order similar to the order in which they were made.) This
 converted a linear time search into one which would usually execute in constant
 time.
+\todo{we also address this in the chdesc section now}
 
 Another example is that when examining a block and deciding which \chdescs\ must
 be rolled back in order for the block's data to be safe to write to the disk,
@@ -55,23 +58,22 @@ proper dependency order. Once again, we discovered that we were examining the
 rolled back in -- for the same reason as the previous example. By simply
 changing the direction of the loop, we were able to improve the loop from
 quadratic time to linear time.
-
-% FIXME: better cache eviction algorithm
+\todo{this too is addressed in the chdesc section these days}
 
 % \subsection {Features}
 For the \Kudos\ UFS module, we want to add more features to make the
-implementation complete. Currently, we do not support triple
-indirect blocks or sparse files. The first can easily be implemented
-given time. Sparse file support will require the \LFS\ interface to be aware of
-files with holes. This also means the layer immediately above the \LFS\ interface
-may need to adjust some of the assumptions it currently makes about files and
-block allocation.
+implementation complete. Currently, we do not support triple indirect blocks or
+sparse files. The first can easily be implemented given time. Sparse file
+support will require the \LFS\ interface to be aware of files with holes. This
+also means the layer immediately above the \LFS\ interface may need to adjust
+some of the assumptions it currently makes about files and block allocation.
 
 We have not taken advantage of the UFS \module's infrastructure for supporting
 more sophisticated allocation algorithms. There are auxiliary on-disk data
 structures that assist resource allocation algorithms. We currently ignore many
 of them, partially because our basic algorithms do not use them, and partially
-due to the lack of documentation to explain the purpose of some data
-structures. Over time, we hope to better understand UFS and improve our UFS
-implementation. \todo{ext2, ext3 journal format compatibility}
+due to the lack of documentation to explain the purpose of some data structures.
+Over time, we hope to better understand UFS and improve our UFS implementation.
+\todo{we have ext2 now, and we don't really care about UFS this much now}
 
+\todo{ext2, ext3 journal format compatibility}

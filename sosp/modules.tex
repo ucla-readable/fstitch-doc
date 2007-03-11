@@ -1,8 +1,6 @@
 \section{\Modules}
 \label{sec:modules}
 
-% FIXME: decide how to hyphenate -related and -independent
-
 This section describes some \Kudos\ \modules\ which contribute most to
 the \chdesc\ related functionality of the system. There are several other
 block device \modules, like the write-through cache, partitioner, memory
@@ -10,7 +8,48 @@ block device, and loop-back block device, which perform more traditional
 functions, and a handful of CFS and \LFS\ \modules\ like the block device
 file system \module, file hiding \module, and whole disk access \module,
 which demonstrate various other abilities of the \module\ system.
+\todo{this is a dumb paragraph}
 
-\input{wbcache}
-\input{ext2}
-\input{ufs}
+\input{interfaces}
+
+\input{uhfs}
+
+\subsection{Loopback Block Device}
+\label{sec:modules:loop}
+
+The loopback block device is a BD module which uses a file in an LFS module as
+its underlying data store. It is very similar to the device of the same name in
+Linux, however it has one critical difference. The \Kudos\ loopback device is
+aware of \chdescs, and therefore when a filesystem stored on a loopback device
+sets up \chdesc\ dependencies, they will be correctly forwarded to and honored
+by the rest of the system.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[height=3in]{fig/figures_1}
+  \caption{A running \Kudos\ configuration. {\it/} is a soft updated
+    file system on an IDE drive; {\it/loop} is an externally journaled
+    file system on loop devices.}
+  \label{fig:kfs-graph}
+\end{figure}
+
+Figure~\ref{fig:kfs-graph} shows an example configuration taking advantage of
+this ability. A file system image is mounted with an external journal, both of
+which are loopback block devices stored on the root file system, (which uses
+soft updates). The journaled file system's ordering requirements are sent
+through the loopback device as \chdescs, allowing dependency information to be
+maintained across boundaries that might otherwise lose that information. In
+contrast, without \chdescs\ and the ability to forward \chdescs\ through
+loopback devices, BSD cannot express soft updates' consistency requirements
+through loopback devices. The \modules\ in Figure~\ref{fig:kfs-graph} are a
+complete and working \Kudos\ configuration, and although the use of a loopback
+device is somewhat contrived in the example, they are increasingly being used in
+conventional operating systems. For instance, Mac OS X uses them in order to
+allow users to encrypt their home directories.
+
+\subsection{Case Insensitivity}
+\label{sec:modules:icase}
+
+\todo{case insensitivity}
+\todo{umsdos}
+\todo{sync directory}

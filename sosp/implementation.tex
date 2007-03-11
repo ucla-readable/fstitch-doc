@@ -47,7 +47,7 @@ though a small patch to the Linux kernel is necessary to allow this). As a
 result of this mechanism, block writes coming out of \Kudos\ may safely be
 reordered and/or merged at will by Linux (or the hardware), since \Kudos\ will
 not consider the \chdescs\ which depend on these \emph{in flight} blocks to be
-ready to be written themselves.
+ready to be written themselves.\todo{in-flight is mentioned earlier}
 
 The \module\ also implements rudimentary read-ahead. When a read call needs to
 be made to the physical device, the \module\ checks to see if any of the

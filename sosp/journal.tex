@@ -1,5 +1,5 @@
 \subsection{Journaling}
-\label{sec:consistency:journal}
+\label{sec:using:journal}
 
 Although \chdescs\ might initially seem to be specifically designed to implement
 soft updates-like consistency semantics, they are in fact much more flexible and
@@ -72,9 +72,9 @@ data is written relative to the commit record. Our journal module writes it
 after the commit record; writing it before the commit record requires very
 careful checks to avoid premature reuse of blocks~\cite{tweedie00ext3}.) The
 journal \module\ can automatically identify metadata \chdescs\ because of the
-\LFS\ interface described in \S\ref{sec:design:interfaces}, and the UHFS module
-which is responsible for writing to all non-metadata blocks. Other block device
-layering systems, like GEOM~\cite{geom} or JBD in Linux, would or do need
-special hooks into file system code to determine what disk changes represent
-metadata in order to do metadata-only journaling. \Chdescs\ and the \LFS\
-interface allow us to do this automatically.
+\LFS\ interface described in \S\ref{sec:modules:interfaces}, and the UHFS
+module~(\S\ref{sec:modules:uhfs}) which is responsible for writing to all
+non-metadata blocks. Other block device layering systems, like GEOM~\cite{geom}
+or JBD in Linux, would or do need special hooks into file system code to
+determine what disk changes represent metadata in order to do metadata-only
+journaling. \Chdescs\ and the \LFS\ interface allow us to do this automatically.
