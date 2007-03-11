@@ -1,0 +1,75 @@
+\subsection{Discussion}
+\label{sec:chdescs:discussion}
+
+\subsubsection{Unnecessary \ChDesc\ Dependencies}
+Even with \Kudos\ dynamically optimizing \chdesc\ graphs, there is only so much
+that can be done while preserving the semantics of the dependencies specified by
+the \module\ which created the \chdescs. It is obvious that having too few
+dependencies compromises the correctness of the system; it is perhaps less
+obvious but no less true that having too many dependencies can nontrivially
+degrade the performance of the system.
+
+In Figure~\ref{fig:chdescarrange}, we have two possible arrangements for three
+\chdescs. The \noop\ \chdesc\ represents a root node that can reach all
+other \chdescs. In the parallel arrangement on the right, \Kudos\ has the
+freedom to write \chdescs\ $C_1$, $C_2$, and $C_3$ to disk in any order. In the
+serial arrangement on the left, there exists only one valid write ordering.
+Depending on the arrangement of other \chdescs, \Kudos\ may have to perform
+additional rollbacks and write some blocks more times than would otherwise be
+necessary in order to write these \chdescs\ to disk. Even if that is not
+necessary, \Kudos\ will still have less flexibility in choosing an order to
+write the blocks, potentially increasing disk seek times due to suboptimal
+ordering.
+
+% {{{ fig:chdescarrange
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=192pt]{fig/figures_6}
+  \caption{\label{fig:chdescarrange} \Chdesc\ dependencies, when
+  not strictly needed, restrict the possible choices for write ordering.
+  This results in suboptimal write ordering and more scans through the
+  \chdescs\ for \Kudos. On the right, \chdescs\ C1, C2, and C3 can be written
+  in any order. Only one ordering is possible on the left.}
+\end{figure}
+% }}}
+
+Even when no unnecessary dependencies are explicitly created, they can still be
+created implicitly and care must be taken to avoid them. When \chdescs\ overlap,
+the later \chdesc\ is made to depend on the first so that it cannot precede the
+change it is changing further to disk. As a result, however, unnecessary
+dependencies may result if the \chdescs\ are larger than the data they are
+actually changing. In Figure~\ref{fig:overlap}, to update a field in an inode
+structure on disk, a \chdesc\ spanning the entire inode could be created even
+though only a single field changed. A later change to a different field would
+appear to overlap the first, creating an unnecessary dependency. Creating
+\chdescs\ which correspond more precisely to the changes being made avoids this
+problem, so a utility function is provided by \Kudos\ to make this operation as
+convenient as creating a single \chdesc\ for an entire large structure.
+
+% {{{ fig:overlap
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=64pt]{fig/figures_5}
+  \caption{\label{fig:overlap} On inode 17, the gray regions represent
+  modified fields that do not overlap. If \chdesc\ A and \chdesc\ B are
+  exactly the size of the gray regions, then there is no implicit dependency.
+  However, making \chdescs\ for the entire inode data structure will make
+  one \chdesc\ depend on the other because they overlap.}
+\end{figure}
+% }}}
+
+\subsubsection{\ChDesc\ List Ordering}
+Several functions in \Kudos\ iterate over lists of \chdescs\ looking for either
+a single \chdesc\ or set of \chdescs\ satisfying some property, or trying to
+process all the \chdescs\ in the list in some order determined by the dependency
+graph. It is generally the case that the \chdescs\ satisfying the property or
+the order in which the \chdescs\ should be processed can be determined very
+quickly by keeping the lists sorted. For instance, the library function which
+rolls \chdescs\ back needs to perform the rollbacks essentially in inverse
+creation order, so that rolling back a \chdesc\ which has since been overwritten
+by a later \chdesc\ does the right thing. Keeping the list of all \chdescs\ on a
+block sorted in creation order (which is very easy) makes this an efficient
+operation, while it might otherwise take $O(n^2)$ time to execute. Similarly,
+many \chdesc\ merging functions need to find for a given block some \chdesc\
+which has no \befores\ on the same block, and the oldest \chdesc\ on a block
+always satisfies this requirement.

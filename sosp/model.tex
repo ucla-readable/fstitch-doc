@@ -1,0 +1,103 @@
+\subsection{Notation and Model}
+\label{sec:chdescs:notation}
+
+It will be convenient to introduce some notation for dealing with \chdescs.
+First we will define a set \ChAll\ of all \chdescs. Although in the actual
+implementation we destroy \chdescs\ when they are no longer necessary (i.e. when
+they have successfully been written to the disk), \ChAll\ contains all \chdescs,
+written to disk or not. We also define sets \ChMem\ and \ChDisk, which contain
+all \chdescs\ only in memory or already on the disk, respectively. Next, we
+define a set \ChInf\ which contains all \chdescs\ that are currently ``in
+flight'' to the disk: block data reflecting their contents has been sent to the
+disk controller but has not yet been written to the disk media itself. Finally,
+we will also write \ChAllB{b}, \ChMemB{b}, \ChDiskB{b}, and \ChInfB{b} to
+succinctly represent the subsets of these four sets on some block $b$.
+
+If we have some \chdesc\ \p{p}, we can also refer to its block or state using a
+``member'' notation as in many programming languages: \p{p}.block is the block
+modified by \p{p}, and \p{p}.state is its state (one of \statenone, \stateinf,
+or \statedisk). We write \depends{\p{p}}{\p{q}} if \p{q} is listed as a \before\
+of \p{p} (that is, if \p{p} directly depends on \p{q}), and
+\indirdepends{\p{p}}{\p{q}} if there is some path of \befores\ from \p{p} to
+\p{q} (that is, if \p{p} indirectly depends on \p{q}).
+
+We can model the interaction between the disk (and its controller) and the
+software maintaining the \chdesc\ graph by a set of randomly occurring events
+that change the state of \chdescs\ according to simple rules. By stipulating
+that each event may occur at any time when its preconditions are met, we can
+reason about all possible hardware behavior and all possible software
+algorithms. The first event corresponds to creating a new \chdesc:
+
+% FIXME
+
+\noindent At any time $t$, one of the following transformations may be applied:
+\begin{enumerate}
+\item For some \block{w}:\\
+Let \(\pset{B} = \{a\ |\ \inset{a}{\psetinflight{t}} \land \blockof{a} = \block{w} \}\) in\\
+\(\psetsat{t+1} := \psetsat{t} \cup \pset{B}\)\\
+\(\psetinflight{t+1} := \psetinflight{t} \setminus \pset{B}\)
+\label{action:write}
+
+\item \(\deps{t+1} := \deps{t} \cup\ \pset{X}\) where
+\(\notinset{a}{\psetall{t}} \land \pset{X} \subset \{\depends{a}{b}\}\)\\
+\(\psetall{t+1} := \psetall{t} \cup\ \{a\}\)
+\label{action:create}
+
+\item \(\psetinflight{t+1} := \psetinflight{t} \cup \{a\}\) for some
+\notinset{a}{\psetsat{t}} s.t. \(\forall b: \indirdepends{a}{b},\
+\inset{b}{\psetsat{t}} \lor (\inset{b}{\psetinflight{t}} \land
+\blockof{a} = \blockof{b}\)
+\label{action:fly}
+\end{enumerate}
+
+We can prove that invariants~\ref{cdinvar:a} and~\ref{cdinvar:b}
+with actions~\ref{action:write}, \ref{action:create}, and~\ref{action:fly}
+imply that invariant~\ref{cdinvar:c} holds.
+
+\noindent Action~\ref{action:create} replacements for hard patches:
+\begin{enumerate}
+\item \(\deps{t+1}\ := \deps{t} \cup\ \pset{X}\) for
+\(\notinset{a}{\psetall{t}} \land \pset{X}\! \subset\!
+\{\depends{a}{b}\ |\ \inset{b}{\psetall{t}}\}\)\\
+\(\psetall{t+1} := \psetall{t} \cup\ \{a\}\)
+
+\item \(\psethard{t+1}\ := \psethard{t} \cup \{a\}\) where \(\forall b\!:
+\indirdepends{b}{a},\ \blockof{b} = \blockof{a}\)
+\end{enumerate}
+
+\noindent Action~\ref{action:fly} replacements for hard patches:
+\begin{enumerate}
+\item \(\psetinflight{t+1} := \psetinflight{t} \cup \{a\}\) for
+\notinset{a}{\psetall{t} \cup \psethard{t}}\\
+\(\forall b\!: \indirdepends{a}{b},\ \inset{b}{\psetsat{t}} \lor (\inset{b}{\psetinflight{t}} \land \blockof{a} = \blockof{b})\)\\
+\(\not\exists\inset{b}{\psethard{t}}\ \mbox{s.t.}\ \blockof{b} = \blockof{a}\)
+
+\item For some \block{w}:\\
+\(\psetinflight{t+1} := \psetinflight{t} \cup \pset{X}\) for
+\(\pset{X} = \{\inset{a}{\psethard{t}}\ |\ \blockof{a} = \block{w}\}\)\\
+\(\forall \notinset{b}{\pset{X}}\!: \forall \inset{a}{\pset{X}}\!:
+\indirdepends{a}{b},\ \inset{b}{\psetsat{t}} \lor
+(\inset{b}{\psetinflight{t}} \land \blockof{a} = \blockof{b})\)\\
+\(\psethard{t+1} := \psethard{t} \setminus \pset{X}\)
+\end{enumerate}
+
+\subsection{Crap}
+When a \module\ asynchronously writes the data associated with a set of
+\chdescs\ to stable storage it marks the \chdescs\ as \emph{in flight} to
+indicate that the \chdescs\ are considered to still have their previous,
+higher, level. Their \afters\ will therefore remain at that level (or higher),
+thus correctly implementing the dependency structure. A \chdesc\ is
+\emph{satisfied} when its associated data reaches stable storage.
+\todo{mention NCQ and FUA/wtcache, safe reordering, remove levels}
+
+Each \chdesc\ on a block may or may not be visible to a given \module. For
+example, \modules\ that respond to user requests generally view the most current
+state of every block -- the block with all \chdescs\ applied. However, a
+write-back cache may choose to write some \chdescs\ on a block while reverting
+others, since those others currently have unsatisfied \befores. In this case,
+\modules\ below the write-back cache should view the unsatisfied \chdescs\ in
+the reverted state.
+%
+\Kudos\ provides a block revisioning library function that automatically rolls
+back those \chdescs\ that should not be visible at a particular \module, and
+then rolls them forward again after that \module\ is done with the block.

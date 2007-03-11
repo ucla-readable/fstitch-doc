@@ -1,0 +1,41 @@
+\subsection{Scalable Dependency-Preserving Writes}
+For a \module\ like the write back cache to forward \chdescs\ in a
+dependency-preserving order, the \module\ must find \chdescs\ whose
+\befores\ are on a lower block device (or are part of the block write
+and on the current block device). Because the write back cache
+frequently searches for and writes many ready \chdescs, redundant
+\before\ traversals to calculate \chdesc\ ready state would severly
+limit cache size scalabity.
+%
+\Kudos\ therefore
+%
+1) explictly tracks a \chdesc's \before\ counts through incremental
+dependency updates
+%
+and 2) uses these counts to maintain a \chdesc\ ready list for each
+block.
+
+A \chdesc's \before\ counts are incrementally updated
+%
+as \befores\ are added and removed
+%
+and as \beforing\ \chdesc's change levels.
+%
+
+Due to an invariant, only directly reachable \beforing\ \chdescs\ need to be
+included in a \chdesc's \before\ counts. \todo{get rid of the level}
+%
+Note that because \anoop\ \chdesc's level is a function of its \befores,
+%
+\anoop\ \chdesc\ \before\ count update that changes the \noop\ \chdesc's level
+must propagate the level change to the \noop\ \chdesc's \afters.
+%
+When a \before\ count update changes whether a \chdesc\ is ready to
+write, the \chdesc's inclusion in its block's ready list is updated.
+%
+To write a block, an owner thus iterates through the block's ready
+list, moving \chdescs\ to the target block device, until the list is
+empty.
+
+TODO: Include invariants that the max \before\ level computation is
+$O(1)$ or that ready \chdescs\ can be moved in $\sim\! O(r)$ time?

@@ -1,0 +1,37 @@
+\subsection{\Noop\ \ChDescs}
+\label{sec:chdescs:noop}
+\Chdescs\ as so far described can be tedious and inefficient to manage when
+dealing with large sets of them corresponding to file system operations. For
+instance, if writing some file \texttt{\after.txt} is to depend on writing some
+other file \texttt{\before.txt}, it will be inconvenient to keep arrays of all
+the \chdescs\ corresponding to the two operations and inefficient to store the
+potentially quadratic number of edges in the \chdesc\ graph.
+
+To solve this problem, we introduce an additional type of \chdesc. The
+prototypical \chdesc\ corresponds to some change on disk, but \Kudos\ also
+supports \aemphnoop\ \chdesc\ type, which doesn't change the disk at all.
+\Noop\ \chdescs\ can have \befores, like other \chdescs, but they don't need to
+be written to disk: they are trivially satisfied when all of their \befores\ are
+satisfied. Thus, they can be used to ``stand for'' entire sets of other changes.
+%
+This capability is extremely useful, and is used by most operations on disk
+structures so that a single \chdesc\ can be returned that depends on the whole
+change. Likewise, \anoop\ \chdesc\ can be passed in as a parameter to a disk
+operation to make the whole operation depend on a set of other changes. \Noop\
+\chdescs\ allow dependencies between sets with only a linear number of
+dependency edges in the \chdesc\ graph, and without having to pass around arrays
+of \chdescs.
+%
+The cost is that some functions may have to traverse trees of \noop\ \chdescs\
+to determine true dependencies.
+%
+% FIXME: move this into the precalculation section?
+% \Anoop\ \chdesc's level is defined to be the max level of its \befores;
+% in effect, propagating \anoop\ \chdesc's \befores\ to its \afters.
+
+Modules can also use \noop\ \chdescs\ to \emph{prevent} changes from being
+written. A \emph{managed} \noop\ \chdesc\ must be explicitly satisfied; any
+changes that depend on that \noop\ \chdesc\ are delayed until the owning \module\
+explicitly satisfies it. This is used, for instance, by the journal \module\
+(\S\ref{sec:using:journal}) to prevent a transaction's \chdescs\ from
+being written before the journal commits.

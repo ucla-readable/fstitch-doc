@@ -1,0 +1,42 @@
+\subsection{\Nrb\ \ChDescs}
+\label{sec:chdescs:nrb}
+To enable \chdesc\ rollback, each \chdesc\ contains a copy of the
+previous block data.\footnote{Actually, \Kudos\ supports a specialized
+type of \chdesc\ for efficiently flipping individual bits using an
+inline exclusive-or mask instead of a copy of the previous data, but
+most \chdescs\ are not of this type.}
+%
+While these copies are needed to roll back \chdescs, many
+\chdescs\ are never actually rolled back (e.g. file data blocks) and
+previous data copies nearly double the memory usage of \chdescs\ and
+cached blocks.
+%
+\Kudos\ addresses this issue by identifying those \chdescs\ which will
+never need to be rolled back, and omitting the previous data copies for
+them. We call these \emph{\nrb} \chdescs. (The opposite naturally being
+a \emph{\rb} \chdesc, when necessary to differentiate them.)
+
+To identify potential \nrb\ \chdescs, \Kudos\ uses a conservative algorithm
+based on a \chdesc\ graph invariant. Merely detecting that the current
+\chdesc\ graph can be written without rolling back a particular \chdesc\ is
+not sufficient, as the graph may change in the future. Thus we need an
+invariant which will guarantee that future changes to the graph will not
+require \nrb\ \chdescs\ to be rolled back, where \nrb\ \chdescs\ are
+selected based on some property of the current graph.
+
+\cdinvar{add-before}{All block-level cycles induced through
+\chdesc\ $C$'s \befores\ exist when $C$ is
+created\todo{Change this phrasing? ``Once created, a \chdesc\ will not
+gain any \befores\ that induce block-level cycles.''}.}
+%
+\Kudos\ ensures this invariant by restricting \before\ additions to
+\chdesc\ creation, \noop\ \chdescs\ with no \afters, or when the invariant
+is statically proven to hold.
+
+To avoid a costly dependency traversal to determine whether a new
+\chdesc\ will need to be rolled back, \Kudos\ conservatively identifies
+a new \chdesc\ as \nrb\ only if the block has no \chdescs\
+with external (on a different block\todo{Descriptive enough? Mention
+\noop\ \chdesc\ \after\ recursion?}) \afters. Each block tracks the number of
+external \afters\ through incremental updates as \afters\ are added and
+removed.

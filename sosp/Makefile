@@ -16,11 +16,13 @@ OUTPUT_FILES = paper.dvi paper.ps paper.pdf paper.txt $(TMP_DVI_IMAGES)
 TMP_FILES = $(TMP_PDF_IMAGES)
 
 paper.dvi paper.pdf paper.txt: \
-	abstract.tex chdescs.tex conclusion.tex discussion.tex \
-	evaluation.tex ext2.tex implementation.tex interfaces.tex \
-	intro.tex journal.tex modules.tex opgroups.tex paper.tex \
-	related.tex softupdate.tex ufs.tex uhfs.tex using.tex \
-	wbcache.tex paper.bib kmaster.bib
+	abstract.tex chdescdiscuss.tex chdescs.tex conclusion.tex \
+	discussion.tex evaluation.tex ext2.tex implementation.tex \
+	interfaces.tex intro.tex journal.tex model.tex \
+	modules.tex noop.tex nrbmerge.tex nrb.tex \
+	opgroups.tex overlapmerge.tex paper.tex readylist.tex \
+	related.tex softupdate.tex ufs.tex uhfs.tex \
+	using.tex wbcache.tex paper.bib kmaster.bib
 
 bib:
 	latex paper
