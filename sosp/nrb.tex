@@ -1,30 +1,39 @@
 \subsection{\Nrb\ \ChDescs}
 \label{sec:chdescs:nrb}
-To enable \chdesc\ rollback, each \chdesc\ contains a copy of the
-previous block data.\footnote{Actually, \Kudos\ supports a specialized
-type of \chdesc\ for efficiently flipping individual bits using an
-inline exclusive-or mask instead of a copy of the previous data, but
-most \chdescs\ are not of this type.}
+To enable \chdesc\ rollback, each \chdesc\ contains a copy of the previous block
+data.\footnote{Actually, \Kudos\ supports a specialized type of \chdesc\ for
+efficiently flipping individual bits using an inline exclusive-or mask instead
+of a copy of the previous data, but most \chdescs\ are not of this type.}
 %
-While these copies are needed to roll back \chdescs, many
-\chdescs\ are never actually rolled back (e.g. file data blocks) and
-previous data copies nearly double the memory usage of \chdescs\ and
-cached blocks.
+While these copies are needed to roll back \chdescs, many \chdescs\ are never
+actually rolled back (e.g. file data blocks) and previous data copies nearly
+double the memory usage of \chdescs\ and cached blocks.
 %
 \Kudos\ addresses this issue by identifying those \chdescs\ which will never
 need to be rolled back, and omitting the previous data copies for them. We call
 these \emph{\nrb} \chdescs. (The opposite naturally being a \emph{\rb} \chdesc,
 when necessary to differentiate them.) Since \nrb\ \chdescs\ cannot be rolled
-back, whenever a block containing one is written, it must be written with the
-block. If there is more than one, all of them must be written.
+back, whenever a block containing \nrb\ \chdescs\ is written, they must all be
+written with the block. This means that our formal model needs some revision.
+First we define a new set of \chdescs, \ChNrb, which contains all \nrb\
+\chdescs. We will write \ChNrbB{B} to restrict the set to a single block. Now we
+can add an additional requirement to the second event from the model, the event
+corresponding to writing blocks to the disk controller, to enforce the condition
+that all \nrb\ \chdescs\ are written when the block is written:
 
-To identify potential \nrb\ \chdescs, \Kudos\ uses a conservative algorithm
-based on a \chdesc\ graph invariant. Merely detecting that the current
-\chdesc\ graph can be written without rolling back a particular \chdesc\ is
-not sufficient, as the graph may change in the future. Thus we need an
-invariant which will guarantee that future changes to the graph will not
-require \nrb\ \chdescs\ to be rolled back, where \nrb\ \chdescs\ are
-selected based on some property of the current graph.
+\paragraph{Write block to disk controller}
+For some block $B$: \\
+Let $P \subseteq$ \ChMemB{B} such that \BeforeS{P} $\subseteq$ \ChDisk\ $\cup\ P$,
+and such that \ChNrbB{B} $\subseteq\ P$ \\
+Let \p{p}.state $:=$ \stateinf\ for all \p{p} $\in$ $P$
+
+\paragraph{} To identify potential \nrb\ \chdescs, \Kudos\ uses a conservative
+algorithm based on a \chdesc\ graph invariant. Merely detecting that the current
+\chdesc\ graph can be written without rolling back a particular \chdesc\ is not
+sufficient, as the graph may change in the future. Thus we need an invariant
+which will guarantee that future changes to the graph will not require \nrb\
+\chdescs\ to be rolled back, where \nrb\ \chdescs\ are selected based on some
+property of the current graph.
 
 \cdinvar{add-before}{All block-level cycles induced through
 \chdesc\ $C$'s \befores\ exist when $C$ is

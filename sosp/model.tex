@@ -63,7 +63,7 @@ dependency information correctly. A second, and related, safety property is that
 \BeforeS{\ChInfB{B_1}} $\cap$ \ChInfB{B_2} $= \emptyset$ for all $B_1 \neq B_2$.
 This means that none of the currently in-flight blocks depend on any of the
 other currently in-flight blocks, so the disk, disk controller, and disk driver
-are all free to reorder them any way they see fit.
+are all free to reorder and/or merge them any way they see fit.
 
 A third property of the events above is that if at some point we never see the
 first event again (i.e. no more changes to the file system are made), eventually
@@ -76,11 +76,10 @@ configuration, the third event may actually represent one of two real-world
 situations: first, the data may merely be in the volatile disk cache, so that a
 power outage may cause it to be lost. This can be a catastrophic disaster, as
 shown in~\cite{nightingale06rethink}. The second possible situation is that the
-data is truly on the disk media, which can be arranged by disabling the drive's
-write-back cache or by using hardware features like SCSI tagged command queueing
-(TCQ) or SATA native command queueing (NCQ) together with their ``force unit
-access'' (FUA) setting. In these configurations, \Kudos\ is notified of command
-success only when the data has actually been written to the disk media. (Though
-a small patch to the Linux kernel is required to support using FUA.) \Kudos\ can
-be run in any of these four configurations, including the first, though
-obviously the safety of the system is compromised in that case.
+data is truly on the disk media, which can be accomplished in several different
+ways depending on what hardware support is available (see \S\ref{sec:implementation}).
+\Kudos\ can run in either configuration, though obviously the safety of the
+system is compromised in the first. In that case, \ChDisk\ is actually the
+combination of the disk's volatile cache and the physical media -- so the safety
+property, while still provable, no longer corresponds to the desired real-world
+guarantee.

@@ -37,21 +37,29 @@ to be notified when processes fork or exit.
 At the other end of the \Kudos\ \module\ graph, the terminal block device
 \modules\ are wrappers for Linux's normal block devices. By using Linux's
 generic block layer, \Kudos\ can interface with any existing block device (e.g.
-RAM disk, IDE disk, etc.). When the \module\ receives a read or write call, it
-passes the request to Linux via \texttt{generic\_make\_request()}. The block is
-of course not written immediately upon making this call, so \Kudos\ does not
-satisfy the \chdescs\ on the block that are being written until it receives
-notification that the block has been successfully written to the disk (see
-\S\ref{sec:chdescs:model}). As a result of this mechanism, block writes coming
-out of \Kudos\ may safely be reordered and/or merged at will by Linux (or the
-hardware), since \Kudos\ will not consider the \chdescs\ which depend on the
-in-flight blocks to be ready to be written themselves.
-
-The \module\ also implements rudimentary read-ahead. When a read call needs to
-be made to the physical device, the \module\ checks to see if any of the
-following several blocks are in memory already. If any of them are not, they are
-also requested at the same time. After all blocks are read in, the read call is
-complete.
+RAM disk, IDE disk, etc.). When the \module\ receives read or write calls, it
+passes the requests to Linux via \texttt{generic\_make\_request()}. Linux may
+then reorder or merge them, and eventually they are sent to the disk controller.
+%
+When a request is complete, the disk controller notifies Linux, which in turn
+notifies \Kudos. As pointed out in \S\ref{sec:chdescs:model}, a request being
+``complete'' might mean either that the data is merely in the drive's volatile
+cache, or that it has been successfully stored on the physical media. The latter
+situation, which is necessary for the strong guarantee \Kudos\ aims to provide,
+can be arranged either by disabling the drive's write-back cache, or by using
+the ``force unit access'' (FUA) mode when writing to the disk (though a small
+patch to the Linux kernel is required to support this mode). Both of these
+approaches significantly degrade performance when used alone; additionally,
+traditional FUA mode is supported by very few drives\todo{cite something?}.
+%
+However, using a write-through cache or FUA mode in conjunction with SCSI tagged
+command queueing (TCQ) or SATA native command queueing (NCQ) only slightly slows
+write performance compared to using the write-back cache without FUA\todo{give
+figures to support this claim}, since many write requests may be outstanding at
+a time and the drive can choose how to service them in a manner not unlike how
+it would choose to write data stored in its volatile cache. Additionally, FUA is
+a required part of the SATA NCQ specification\todo{cite SATA spec}, so all SATA
+disks support it when using NCQ.
 
 Our interfaces bypass all Linux caches, because \Kudos\ provides its own
 \chdesc-aware caches (\S\ref{sec:using:wbcache}) in order to provide its
