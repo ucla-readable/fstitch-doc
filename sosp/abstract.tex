@@ -12,8 +12,8 @@ Previous file systems have enforced write orderings in system-dependent
 We present a general \emph{patch} abstraction that can represent any write
  ordering independent of the underlying file system.
 %
-A patch-based file system expresses dependencies among writes, but not how
- those dependencies should be enforced.
+A patch-based file system implementation expresses dependencies among
+ writes, but not how those dependencies should be enforced.
 %
 A file system module can examine, preserve, and even modify write
  orderings, as we demonstrate with a module that automatically changes
