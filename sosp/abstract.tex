@@ -1,5 +1,40 @@
 \begin{abstract}
 
+File system data consistency inherently relies on careful write ordering,
+ where one block cannot be written until another is safely committed to
+ stable storage.
+%
+Previous file systems have enforced write orderings in system-dependent
+ ways, either with rules specialized for each file system
+ structure~\cite{softupdateimpl} or with a journal, which enforces a
+ particular consistency protocol~\cite{xxx}.
+%
+We present a general \emph{patch} abstraction that can represent any write
+ ordering independent of the underlying file system.
+%
+A patch-based file system expresses dependencies among writes, but not how
+ those dependencies should be enforced.
+%
+A file system module can examine, preserve, and even modify write
+ orderings, as we demonstrate with a module that automatically changes
+ soft-updates orderings into journal transactions.
+%
+Generalized file system dependencies are naturally exportable to user
+ level, allowing applications to define their own consistency protocols.
+%
+We present the patch abstraction, describe a number of important
+ optimizations for patch-based file systems, and present a Linux kernel
+ implementation of a storage subsystem that uses patches to enforce
+ consistency.
+%
+Our prototype is competitive with FreeBSD soft updates and ext3 journaling
+ [[??]] for number of blocks written, and allows several novel
+ configurations, such as ext2 with soft updates or correct dependency
+ enforcement within a file system image file.
+
+
+\begin{comment}
+
 We propose a file system implementation architecture, called \emph{\Kudos},
 where structures called \emph{\chdescs} represent any and all changes to
 stable storage.
@@ -36,5 +71,7 @@ We have implemented \Kudos\ as a Linux kernel module. Our current
 implementation is competitive with FreeBSD soft updates for number of
 blocks written, and allows several novel configurations like ext2 with
 soft updates or correct UFS soft updates over a loopback device.
+
+\end{comment}
 
 \end{abstract}
