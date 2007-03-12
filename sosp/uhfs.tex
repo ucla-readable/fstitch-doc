@@ -1,11 +1,11 @@
 \subsection{UHFS}
 \label{sec:modules:uhfs}
 
-This one \module, called the ``universal high-level file system'' or
-UHFS, can be used with many different \LFS\ \modules\ implementing different file
-systems. (There is also a generic VFS-to-CFS layer, to interface with Linux. See
-\S\ref{sec:implementation} for details.)
-\todo{fix this intro paragraph}
+The ``universal high-level file system'' \module, or UHFS, implements a generic
+translation from high-level CFS calls (essentially the familiar file system API)
+to the \LFS\ interface. It can be used with many different \LFS\ \modules\
+implementing different file systems. (There is also a generic VFS-to-CFS layer,
+to interface with Linux. See \S\ref{sec:implementation} for details.)
 
 The UHFS \module\ encompasses all logic for decomposing higher level CFS calls
 into lower level \LFS\ calls, and for connecting the resulting \chdescs\

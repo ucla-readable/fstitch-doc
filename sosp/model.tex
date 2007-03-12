@@ -10,8 +10,9 @@ all \chdescs\ only in memory or already on the disk, respectively. Next, we
 define a set \ChInf\ which contains all \chdescs\ that are currently ``in
 flight'' to the disk: block data reflecting their contents has been sent to the
 disk controller but has not yet been written to the disk media itself. Finally,
-we will also write \ChAllB{b}, \ChMemB{b}, \ChDiskB{b}, and \ChInfB{b} to
-succinctly represent the subsets of these four sets on some block $b$.
+we will also write \ChAllB{B}, \ChMemB{B}, \ChDiskB{B}, and \ChInfB{B} to
+succinctly represent the subsets of these four sets specifically associated with
+disk block $B$.
 
 If we have some \chdesc\ \p{p}, we can also refer to its block or state using a
 ``member'' notation as in many programming languages: \p{p}.block is the block
@@ -47,19 +48,19 @@ Let \depends{\p{p}}{\p{q}} for all \p{q} $\in Q$ where $Q \subseteq$ \ChAll %\\
 % Let \ChAll\ $:=$ \ChAll\ $\cup$ \{\p{p}\}
 
 \paragraph{Write block to disk controller}
-For some block $b$: \\
-Let $P \subseteq$ \ChMemB{b} such that \BeforeS{P} $\subseteq$ \ChDisk\ $\cup\ P$ \\
+For some block $B$: \\
+Let $P \subseteq$ \ChMemB{B} such that \BeforeS{P} $\subseteq$ \ChDisk\ $\cup\ P$ \\
 Let \p{p}.state $:=$ \stateinf\ for all \p{p} $\in$ $P$
 
 \paragraph{Disk writes block to media}
-For some block $b$: \\
-Let \p{p}.state $:=$ \statedisk\ for all \p{p} $\in$ \ChInfB{b}
+For some block $B$: \\
+Let \p{p}.state $:=$ \statedisk\ for all \p{p} $\in$ \ChInfB{B}
 
 \paragraph{} It is not difficult to prove based on the events above that a
 fundamentally important safety property is maintained, namely that
 \BeforeS{\ChDisk} $\subseteq$ \ChDisk. In essence, the system honors the
 dependency information correctly. A second, and related, safety property is that
-\BeforeS{\ChInfB{b_1}} $\cap$ \ChInfB{b_2} $= \emptyset$ for all $b_1 \neq b_2$.
+\BeforeS{\ChInfB{B_1}} $\cap$ \ChInfB{B_2} $= \emptyset$ for all $B_1 \neq B_2$.
 This means that none of the currently in-flight blocks depend on any of the
 other currently in-flight blocks, so the disk, disk controller, and disk driver
 are all free to reorder them any way they see fit.
@@ -82,21 +83,3 @@ access'' (FUA) setting. In these configurations, \Kudos\ is notified of command
 success only when the data has actually been written to the disk media. \Kudos\
 can be run in any of these four configurations, including the first, though
 obviously the safety of the system is compromised in that case.
-
-\subsection{Invariants}
-
-\cdinvar{acyclic}{\Chdesc\ dependency graphs are acyclic.}
-%
-To ensure a rollback operation results in a well-defined block state, we have
-our second \chdesc\ invariant: \cdinvar{rollback}{A rolled back \chdesc{}'s
-\afters\ are rolled back\todo{Be more precise to be correct.}.}
-
-\cdinvar{a}{If \indirdepends{a}{b} then \notindirdepends{b}{a}.}
-
-\cdinvar{b}{If \(\indirdepends{a}{b} \land \inset{a}{\psetinflight{t}}\)
-then \(\inset{b}{\psetsat{t}} \lor (\inset{b}{\psetinflight{t}}
-\land \blockof{a} = \blockof{b})\).}
-
-\noindent Want invariant:
-\cdinvar{c}{If \(\inset{a}{\psetsat{t}} \land \indirdepends{a}{b}\)
-then \inset{b}{\psetsat{t}} }

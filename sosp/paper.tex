@@ -67,23 +67,14 @@
 \newcommand{\ncd}[1]{\ensuremath{\p{#1}^\mathrm{n}}} % noop chdesc
 \newcommand{\nrbof}[1]{\ensuremath{\p{#1}^\mathrm{nrb}}} % NRB chdesc
 
-\newcommand{\depends}[2]{\ensuremath{#1\! \rightarrow\! #2}} % depends (right)
-\newcommand{\ldepends}[2]{\ensuremath{#1\! \leftarrow\! #2}} % depends (left)
-\newcommand{\indirdepends}[2]{\ensuremath{#1\! \leadsto\! #2}} % indirect depends
-\newcommand{\notindirdepends}[2]{\ensuremath{#1\! \not\leadsto\! #2}} % does not indirectly depend
-\newcommand{\cycledepends}[2]{\ensuremath{#1\! \leftrightarrow\! #2}} % cycle
-
-% patch sets
-\newcommand{\pset}[1]{\ensuremath{\mathcal{#1}}}
-\newcommand{\psettime}[2]{\ensuremath{\mathcal{#1}_{#2}}}
-\newcommand{\psetall}[1]{\psettime{P}{#1}} % all patches
-\newcommand{\psetinflight}[1]{\psettime{F}{#1}} % inflight patches
-\newcommand{\psetsat}[1]{\psettime{S}{#1}} % satisfied patches
-\newcommand{\psethard}[1]{\psettime{H}{#1}} % hard patches
+\newcommand{\depends}[2]{\ensuremath{#2\! \rightarrow\! #1}} % depends (right)
+\newcommand{\ldepends}[2]{\ensuremath{#2\! \leftarrow\! #1}} % depends (left)
+\newcommand{\indirdepends}[2]{\ensuremath{#2\! \leadsto\! #1}} % indirect depends
+\newcommand{\notindirdepends}[2]{\ensuremath{#2\! \not\leadsto\! #1}} % does not indirectly depend
+\newcommand{\cycledepends}[2]{\ensuremath{#2\! \leftrightarrow\! #1}} % cycle
 
 \newcommand{\block}[1]{\ensuremath{B_{#1}}}
-\newcommand{\blockof}[1]{\ensuremath{B(#1)}} % the block of
-\newcommand{\deps}[1]{\ensuremath{\rightarrow_{#1}}}
+\newcommand{\blockof}[1]{\ensuremath{#1}.block} % the block of
 
 \newcommand{\inset}[2]{\ensuremath{#1\! \in\! #2}} % in set
 \newcommand{\notinset}[2]{\ensuremath{#1\! \notin\! #2}} % not in set
