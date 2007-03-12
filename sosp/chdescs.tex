@@ -111,13 +111,13 @@ first write other \chdescs\ on the same block, just as in soft updates.
 \Kudos\ \modules\ change blocks by attaching \chdescs\ to them, using functions
 such as \texttt{patch\_create\_byte}. Most file system \modules\ initially
 generate \chdescs\ whose dependencies impose soft-update-like ordering
-requirements (see \S\ref{sec:using:softupdate}). These \chdescs\ are then
-passed down, through other \modules, in the general direction of the disk. The
+requirements (see \S\ref{sec:using:softupdate}). These \chdescs\ are then passed
+down, through other \modules, in the general direction of the disk. The
 intervening \modules\ can inspect, delay, and even modify them before passing
 them on further. For instance, the write-back cache \module\
-(\S\ref{sec:modules:wbcache}), essentially a buffer cache, holds on to blocks
-and their \chdescs\ instead of forwarding them immediately. Finally, \chdescs\
-are \emph{satisfied} when their associated data reaches stable storage.
+(\S\ref{sec:using:wbcache}), essentially a buffer cache, holds on to blocks and
+their \chdescs\ instead of forwarding them immediately. Finally, \chdescs\ are
+\emph{satisfied} when their associated data reaches stable storage.
 
 \input{model}
 \input{noop}

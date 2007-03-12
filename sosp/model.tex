@@ -66,9 +66,9 @@ other currently in-flight blocks, so the disk, disk controller, and disk driver
 are all free to reorder them any way they see fit.
 
 A third property of the events above is that if at some point we never see the
-first event again, eventually we can get to a state where \ChDisk\ $=$ \ChAll.
-This is a liveness property; namely, that eventually all the \chdescs\ will make
-it to disk.
+first event again (i.e. no more changes to the file system are made), eventually
+we can get to a state where \ChDisk\ $=$ \ChAll. This is a liveness property;
+namely, that eventually all the \chdescs\ will make it to disk.
 
 \Kudos\ controls when the first two events occur, but is notified of the third
 event by the disk driver when it occurs. Depending on the hardware

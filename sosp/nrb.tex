@@ -11,10 +11,12 @@ While these copies are needed to roll back \chdescs, many
 previous data copies nearly double the memory usage of \chdescs\ and
 cached blocks.
 %
-\Kudos\ addresses this issue by identifying those \chdescs\ which will
-never need to be rolled back, and omitting the previous data copies for
-them. We call these \emph{\nrb} \chdescs. (The opposite naturally being
-a \emph{\rb} \chdesc, when necessary to differentiate them.)
+\Kudos\ addresses this issue by identifying those \chdescs\ which will never
+need to be rolled back, and omitting the previous data copies for them. We call
+these \emph{\nrb} \chdescs. (The opposite naturally being a \emph{\rb} \chdesc,
+when necessary to differentiate them.) Since \nrb\ \chdescs\ cannot be rolled
+back, whenever a block containing one is written, it must be written with the
+block. If there is more than one, all of them must be written.
 
 To identify potential \nrb\ \chdescs, \Kudos\ uses a conservative algorithm
 based on a \chdesc\ graph invariant. Merely detecting that the current
