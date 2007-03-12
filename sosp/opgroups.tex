@@ -251,7 +251,7 @@ performing a minimal number of disk writes.
 The original IMAP server conservatively preserved command ordering by
 syncing the mailbox file after each CHECK on it or COPY into it. With
 \opgroups, each command's file system updates are executed under a
-distinct \opgroup and, through the \opgroup, made to depend on the
+distinct \opgroup\ and, through the \opgroup, made to depend on the
 previous command's updates. This is necessary, for example, so that
 moving a message to another folder (accomplished by copying to the
 destination file and then removing from the source file) can not lose
@@ -291,3 +291,101 @@ difficulty~\cite[maildir-save.c]{dovecot}:
 
 The performance of the \opgroup{}-enabled UW IMAP mail server is
 evaluated in \S\ref{sec:evaluation:uwimap}.
+
+\subsection{Subversion Case Study}
+\label{sec:opgroup:svn}
+
+TODO: decide on having a case study subsection that introduces UW IMAP
+and Subversion or contrast the two studies here or elsewhere.
+%
+UW IMAP case study (faster, same safety, server) vs
+Subversion case study (about same speed, additional safety on non-ext3
+ordered, client).
+
+Subversion~\cite{svn} is a version control system designed to be an
+improved, more modern replacement for CVS~\cite{cvs}. In this case
+study we take interest in Subversion's working copy library, used by
+the Subversion client to manipulate a local checkout, and its file
+system usage.
+%
+The working copy library is designed to avoid corruption or loss
+should the library's host process exit at any point during a working
+copy operation. The working copy library achieves using
+application-level write ahead journaling.
+%
+First, new versions of any updates files are created in a temporary
+location. Second, the log file is created in a temporary location;
+each log file entry manipulates the new and/or existing files and is
+either idempotent or atomic. Third, the journal is moved into its
+official location. Prior to this rename no non-temporary files have
+been modified and following this rename all actions can be replayed
+until the journal's entries are successfully played in full. Fourth,
+the journal entries are executed.  And fifth, the journal file is
+removed.
+
+Although this part of the working copy library's design protects
+against premature application exit, it does not protect against an
+operating system or hardware crash. For example, the journal file
+rename may go to disk before all the data for a temporary file used in
+a journal entry.
+%
+The working copy library could sync files and directories as necessary
+to ensure safe disk write orderings, as UW IMAP and the Subversion
+repository library do, but the Subversion developers deemed this
+approach too slow to be worthwhile for client use\todo{Cite public
+  communication?}.
+%
+Instead, it achieves the same ordering safety against system crashes
+by,
+%
+one, taking advantage of the \texttt{rename()} system call's on an
+Linux ext3 file system in ordered data mode and,
+%
+two, by taking advantage the linear metadata update ordering
+guaranteed by metadata journaling.
+%
+In ordered journal mode, to write a transaction to disk ext3 first
+writes block deallocations\todo{Is this exactly correct?}, then writes
+file data in place, and lastly writes other metadata to the journal.
+This implies that data writes to a file that is later renamed will be
+committed if the rename is committed, allowing atomic file creation by
+writing data to a temporary file and then renaming to the file's
+desired name.
+%
+The working copy library is thus able to atomically create files like the
+journal and know that the journal file will be created only if its
+associated temporary files exist with their data in full.
+%
+In addition to being an obtuse approach, file renaming does not
+ensure such ordering on many other systems, for example NTFS or BSD UFS.
+And systems such as BSD UFS do not ensure the strong linear metadata
+ordering supported by metadata journaling.
+%
+\todo{The last two thirds of this paragraph's phrasing is important and
+  should be drastically improved. Perhaps explain the concepts elsewhere?}
+
+We updated Subversion to use \opgroups\ to express Subversion's file
+consistency protocol\todo{Note that we had to find actual dependencies
+  since the working copy assumed linear order?}.
+Figure~\ref{fig:svn-order} shows the \opgroups\ created to update a
+file with conflicts.
+%
+Subversion first updates its checkout metadata to note the update
+operation, then creates the new files to be installed (e.g. updated
+pristine copy, the user's copy with conflicts, and a copy at each of
+the involved versions), creates the journal, plays the journal to
+install the new files, updates the checkout metadata, and finally
+removes the journal to complete the transaction.
+%
+The updated version of Subversion continues to atomically create live
+files (e.g. entries and logs, but a rename depends the temporary
+file's data\todo{Note that renames for files used by logs are no
+  longer necessary since a log rename depends on its files? We keep
+  the renames since not changing this is easy.}.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\columnwidth]{svn_opgroups}
+  \caption{\Opgroups\ to update a file in a Subversion working copy.}
+  \label{fig:svn-order}
+\end{figure}
