@@ -41,13 +41,11 @@ RAM disk, IDE disk, etc.). When the \module\ receives a read or write call, it
 passes the request to Linux via \texttt{generic\_make\_request()}. The block is
 of course not written immediately upon making this call, so \Kudos\ does not
 satisfy the \chdescs\ on the block that are being written until it receives
-notification that the block has made it to the disk controller (or, with
-sufficient hardware support like SCSI TCQ or ATA NCQ, to the physical disk,
-though a small patch to the Linux kernel is necessary to allow this). As a
-result of this mechanism, block writes coming out of \Kudos\ may safely be
-reordered and/or merged at will by Linux (or the hardware), since \Kudos\ will
-not consider the \chdescs\ which depend on these \emph{in flight} blocks to be
-ready to be written themselves.\todo{in-flight is mentioned earlier}
+notification that the block has been successfully written to the disk (see
+\S\ref{sec:chdescs:model}). As a result of this mechanism, block writes coming
+out of \Kudos\ may safely be reordered and/or merged at will by Linux (or the
+hardware), since \Kudos\ will not consider the \chdescs\ which depend on the
+in-flight blocks to be ready to be written themselves.
 
 The \module\ also implements rudimentary read-ahead. When a read call needs to
 be made to the physical device, the \module\ checks to see if any of the
@@ -61,8 +59,12 @@ write-ordering guarantees.
 
 Our current implementation uses Linux's queuing structures for queuing I/O
 requests for block devices. Although this is working, there are a couple subtle
-problems that we would like to solve in a future version. For instance, we
-would like to be able to insert read and write requests to different sides of
-the I/O queue. Right now a read request will be satisfied only after all the
-pending writes are completed, but a better queue design would allow reads to
-``cut the line'' since they are more urgent. \todo{is this still true?}
+problems that we would like to solve in a future version. For instance, we would
+like to be able to give more priority to read requests, potentially even
+reserving a SCSI TCQ or SATA NCQ command tag for reads only. In the current
+implementation, read delay increases noticeably when there are many writes; we
+suspect that a factor in this behavior is that the command tags are typically
+all used for outstanding writes (since we request that the commands complete
+only after the physical media has been written), while the Linux queues are
+designed for a different situation: writes complete quickly (to the disk's
+cache) and only reads take a long time.

@@ -1,14 +1,14 @@
 \section{\Modules}
 \label{sec:modules}
 
-This section describes some \Kudos\ \modules\ which contribute most to
-the \chdesc\ related functionality of the system. There are several other
-block device \modules, like the write-through cache, partitioner, memory
-block device, and loop-back block device, which perform more traditional
-functions, and a handful of CFS and \LFS\ \modules\ like the block device
-file system \module, file hiding \module, and whole disk access \module,
-which demonstrate various other abilities of the \module\ system.
-\todo{this is a dumb paragraph}
+This section describes several \Kudos\ \modules\ which contribute significantly
+to the overall functionality of \Kudos, or which demonstrate unique or
+important capabilities of \chdescs\ and the \module\ system. Some \modules,
+like the journal \module\ and the write-back cache, have already been described
+(see \S\ref{sec:using:journal} and \S\ref{sec:using:wbcache}), while others
+like the write-through cache, partitioner, and memory block device, have
+functions which are fairly obvious from their names and need no further
+description.
 
 \input{interfaces}
 
@@ -53,3 +53,4 @@ allow users to encrypt their home directories.
 \todo{case insensitivity}
 \todo{umsdos}
 \todo{sync directory}
+\todo{file hiding}
