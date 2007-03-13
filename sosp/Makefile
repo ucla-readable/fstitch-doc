@@ -5,6 +5,7 @@ FIG2DEV = fig2dev
 GNUPLOT = gnuplot
 DVIPS = dvips -j0
 PS2PDF = ps2pdf14
+EPS2PDF = epstopdf
 PDFLATEX = pdflatex
 
 MAINFILE = paper.tex
@@ -51,11 +52,11 @@ bib: $(MAINFILE:.tex=.aux) always
 	$(DVIPS) $< -o $@
 
 %.pdf: %.ps
-	$(PS2PDF) $< $@
+	$(EPS2PDF) $< -o $@
 %.pdf: %.eps
-	$(PS2PDF) $< $@
-$(PDF_PRIMARY): %.eps: %.pdf
-	epstopdf $< > $@
+	$(EPS2PDF) $< -o $@
+# $(PDF_PRIMARY): %.eps: %.pdf
+#	epstopdf $< > $@
 
 %.eps: %.gif
 	giftopnm $< | pnmtops -noturn -nosetpage > $@
