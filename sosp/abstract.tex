@@ -10,7 +10,7 @@ Previous file systems have enforced write orderings in system-dependent
  particular consistency protocol~\cite{xxx}.
 %
 We present a general \emph{\chdesc} abstraction that can represent any
- write ordering independent of the underlying file system.
+ write ordering in a file system agnostic manner.
 %
 A \chdesc-based file system implementation expresses dependencies among
  writes, but not how those dependencies should be enforced.
@@ -20,7 +20,8 @@ Each file system \module\ can examine, preserve, and even modify write
  soft-updates orderings into journal transactions.
 %
 Generalized file system dependencies are naturally exportable to user
- level, allowing applications to define their own consistency protocols.
+ level, allowing applications to specify their own consistency protocols
+ for the file system to follow.
 %
 We present the \chdesc\ abstraction, describe a number of important
  optimizations for \chdesc-based file systems, and present a Linux kernel
