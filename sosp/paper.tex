@@ -56,7 +56,11 @@
 
 \newcommand{\LFS}{L2FS}
 
-\newtheorem{cdinvarthm}{\ChDesc\ Invariant}
+% TODO: Give the safety properties names? (But how to display the name?)
+\newcommand{\cdsafety}[3]{\begin{equation}#3\end{equation}\label{cdsafety:#1}}
+%\newcommand{\cdsafety}[3]{\(#3\).}
+
+\newtheorem{cdinvarthm}{Invariant}
 % TODO: reduce pre and post \cdinvar vspace
 \newcommand{\cdinvar}[2]{\begin{cdinvarthm}\label{cdinvar:#1}#2\end{cdinvarthm}}
 

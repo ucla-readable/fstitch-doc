@@ -42,26 +42,31 @@ reason about all possible hardware behavior and all possible software
 algorithms. Here are the three possible events:
 
 \paragraph{Create new \chdesc}
-For some \chdesc\ \p{p} $\not\in$ \ChAll\: \\
+For some \chdesc\ \notinset{p}{\ChAll}: \\
 Let \p{p}.state $:=$ \statenone \\
-Let \depends{\p{p}}{\p{q}} for all \p{q} $\in Q$ where $Q \subseteq$ \ChAll %\\
+Let \depends{\p{p}}{\p{q}} for all \inset{q}{Q} where $Q \subseteq$ \ChAll %\\
 % Let \ChAll\ $:=$ \ChAll\ $\cup$ \{\p{p}\}
 
 \paragraph{Write block to disk controller}
 For some block $B$: \\
 Let $P \subseteq$ \ChMemB{B} such that \BeforeS{P} $\subseteq$ \ChDisk\ $\cup\ P$ \\
-Let \p{p}.state $:=$ \stateinf\ for all \p{p} $\in$ $P$
+Let \p{p}.state $:=$ \stateinf\ for all \inset{p}{P}
 
 \paragraph{Disk writes block to media}
 For some block $B$: \\
-Let \p{p}.state $:=$ \statedisk\ for all \p{p} $\in$ \ChInfB{B}
+Let \p{p}.state $:=$ \statedisk\ for all \inset{p}{\ChInfB{B}}
 
 \paragraph{} It is not difficult to prove based on the events above that a
-fundamentally important safety property is maintained, namely that
-\BeforeS{\ChDisk} $\subseteq$ \ChDisk. In essence, the system honors the
-dependency information correctly. A second, and related, safety property is that
-\BeforeS{\ChInfB{B_1}} $\cap$ \ChInfB{B_2} $= \emptyset$ for all $B_1 \neq B_2$.
-This means that none of the currently in-flight blocks depend on any of the
+fundamentally important safety property is maintained:
+%
+\cdsafety{disk}{Disk \Befores}{\BeforeS{\ChDisk} \subseteq\ \ChDisk}
+%
+\noindent In essence, the system honors the
+dependency information correctly. A second, and related, safety property:
+%
+\cdsafety{inflight}{In Flight \Befores}{\BeforeS{\ChInfB{\block{1}}} \cap \ChInfB{\block{2}} = \emptyset\ \mbox{for all}\ \block{1} \neq \block{2}}
+%
+\noindent This means that none of the currently in-flight blocks depend on any of the
 other currently in-flight blocks, so the disk, disk controller, and disk driver
 are all free to reorder and/or merge them any way they see fit.
 
