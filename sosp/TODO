@@ -72,6 +72,7 @@ Related work:
 - Cite rethink the sync
 - Cite Burnett's asynchronous graph (45D3C85B.3060903@cs.ucla.edu)
 - Cite "forder" primitive in the Echo file system by Mann et al (reviewer)
+- Cite ext2? http://web.mit.edu/tytso/www/linux/ext2intro.html
 
 Misc:
 - look at BSD implementation of soft updates; how does it work?
