@@ -1,4 +1,24 @@
-\subsection{\Nrb\ \ChDesc\ Merging}
+\subsection{\ChDesc\ Merging}
+\label{sec:chdescs:merge}
+
+\Kudos\ drastically reduces the number of \chdescs\ created to
+describe a system of changes by (conservatively) identifying when a
+second \chdesc\ may safely be written at the same time as an existing
+\chdesc\ and, instead of creating the second \chdesc, updating the
+existing \chdesc's disk change and dependencies; in effect, merging
+the two \chdescs.
+%
+In this section we describe overlapping \chdesc\ merging; after
+introducing \nrb\ \chdescs\ in the next section we describe
+two additional merge opportunties.
+%
+All three merge rules build on invariant~\ref{cdinvar:add-before}
+and use fast, conservative checks during \chdesc\ creation to identify
+\chdescs\ that will be possible to write together;
+%
+the merge rules differ in their conservatively applicable conditions.
+
+\subsubsection{\Nrb\ \ChDesc\ Merging}
 \label{sec:chdescs:nrb-merge}
 Recall from \S\ref{sec:chdescs:nrb} that to write any \chdesc\ on a given
 block, all \nrb\ \chdescs\ on the block must also be written. 
@@ -34,7 +54,7 @@ no \nrb-prior created \chdescs\ exist (\rb{}\(\rightarrow\)\nrb{}).
 %
 single \nrb.
 
-\subsubsection{\Nrb-\Nrb\ \ChDesc\ Merging}
+\paragraph{\Nrb-\Nrb\ \ChDesc\ Merging}
 \label{sec:chdescs:nrb-merge:hard-hard}
 % Although merging two \chdescs\ will not induce block-level dependency
 % cycles, without sufficient care merging could induce \chdesc-level
@@ -89,7 +109,7 @@ Returns: whether \indirdepends{a}{p} exists. \(\forall\! \p{b}\!: \indirdepends{
 
 \cdinvar{one-nrb}{Each block has at most one \nrb\ \chdesc\todo{Introduce}.}
 
-\subsubsection{\Nrb-\Rb\ \ChDesc\ Merging}
+\paragraph{\Nrb-\Rb\ \ChDesc\ Merging}
 \label{sec:chdescs:nrb-merge:hard-soft}
 A block \block{b} may contain a \nrb\ \chdesc\ that depends on \rb\ \chdescs\
 (also on \block{b}).
@@ -136,3 +156,28 @@ internal and semantic file system descriptions.
 \todo{Should we talk about why we allow NRBs and merging to be
   disabled? (Debugging simplicity and depend add to \noop\ \chdescs\
   with \afters\ bug catching.)}
+
+\subsubsection{Overlap \ChDesc\ Merging}
+\label{sec:chdescs:overlap-merge}
+Bitmap blocks and inode size fields accumulate many nearby and
+overlapping mergeable \chdescs\ as data is appended to or truncated
+from a file.
+%
+Many of these and similar \chdescs\ are mergeable and have
+dependencies that allow simple (and fast) reasoning to identify many
+of the mergeable pairs: two \chdescs\ on block $B$ that overlap no other \chdescs\ in \ChMemB{B}
+and which have no dependency path from the new to the existing \chdesc\
+will not induce a block-level cycle and so are writeable together.
+We know that \textit{later} changes will not cause them to induce a block-level cycle due to
+invariant~\ref{cdinvar:add-before} and by not merging if the new \chdesc\
+has a before and the before is marked as allowed to violate
+invariant~\ref{cdinvar:add-before}.
+%
+While path existence testing is expensive, a conservative path test
+of only a depth of two identifies most mergeable \chdescs. If the new
+\chdesc\ has an explicit \before\ that is not the existing \chdesc\ and
+this \before\ has a \before, then there may be a path to the existing
+\chdesc.
+%
+To merge two such overlapping \chdescs, add the new \chdesc's explicit
+before to the existing \chdesc\ (if any and if not the existing \chdesc).
