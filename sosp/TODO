@@ -65,7 +65,7 @@ Evaluation:
   - Should we improve our disk write notification usage?
   - Complete helpful ext2 optimizations?
 
-Related workd:
+Related work:
 - Linux 2.6.17 sync_file_range range system call
 - fdatasync?
 - Cite type-safe disks
