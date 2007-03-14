@@ -71,9 +71,13 @@ Notice, for example, that any \p{r} such that
 %
 Our algorithm to transform dependencies for \nrb-\nrb\ \chdesc\ merges
 (Figure~\ref{algo:merge:hard-hard}) follows from these possible
-dependencies to efficently update \p{p}'s transitive \befores\ to
-ensure \(\BeforeS{p}\todo{Incorrect! Only the non-\noop{}s.} \subseteq \BeforeS{q}\)\todo{Note that Invariant~\ref{cdinvar:add-before} ensures that
-\noop\ \chdescs\ reachable from \p{q} will not gain data \chdesc\ \befores?}
+dependencies.
+%
+It updates \p{p}'s transitive \befores\ to ensure
+\(\BeforeS{q}\todo{Incorrect! Only the non-\noop{}s.} \subseteq
+\BeforeS{p}\)\todo{Note that Invariant~\ref{cdinvar:add-before}
+  ensures that \noop\ \chdescs\ reachable from \p{q} will not gain
+  data \chdesc\ \befores?}\todo{Note that it only needs to move dependencies?}.
 
 \begin{figure}[htb]
   \centering
@@ -81,7 +85,7 @@ ensure \(\BeforeS{p}\todo{Incorrect! Only the non-\noop{}s.} \subseteq \BeforeS{
   \caption{Possible dependencies when merging \nrb\ \chdesc\ \p{q}
     into existing \nrb\ \chdesc\ \p{p}.}
   \label{fig:nrb-merge}
-\end{figure}\todo{Show Figure~\ref{fig:nrb-merge} without \nrb{}-\rb\ merging's results?}
+\end{figure}
 
 \noindent Algorithm called on \p{q} and \p{p}:\\
 Input: \chdesc\ \p{a} and existing \nrb\ \chdesc\ \p{p}.\\
