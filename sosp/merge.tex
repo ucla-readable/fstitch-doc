@@ -44,7 +44,22 @@ preserve dependency semantics in this section.
 
 \emph{\Nrb-\nrb\ \chdesc\ merging} merges a new \nrb\ \chdesc\ \p{q}
 into an existing \nrb\ \chdesc\ \p{p} instead of creating \p{q}.
+%
 Any two \nrb\ \chdescs\ on the same block may be (and are) merged.
+%
+Merging all \nrb\ \chdescs\ ensures:
+%
+\cdinvar{one-nrb}{\(\forall\! B\!: |\ChNrbB{B}| \leq 1\)}
+%
+\noindent
+%
+Invariant~\ref{cdinvar:one-nrb} simplifies \nrb\ \chdesc\ handling by
+%
+removing the implicit dependencies that ensure all \nrb\ \chdescs\
+are written together
+%
+and by removing the need to scan for an existing \nrb\ \chdesc\ when
+\nrb-\nrb\ \chdesc\ merging.
 %
 % Although merging two \chdescs\ will not induce block-level dependency
 % cycles, without sufficient care merging could induce \chdesc-level
@@ -104,9 +119,6 @@ Returns: whether \indirdepends{a}{p} exists. \(\forall\! \p{b}\!: \indirdepends{
       \end{itemize}
   \end{itemize}
 \end{itemize}
-
-TODO: Explain why Invariant~\ref{cdinvar:one-nrb} holds and what it gets us.
-\cdinvar{one-nrb}{Each block has at most one \nrb\ \chdesc.}
 
 \paragraph{\Nrb-\Rb\ \ChDesc\ Merging}
 \label{sec:chdescs:merge:nrb:hard-soft}
