@@ -178,12 +178,16 @@ and ensure \depends{q}{p}.
 \item Convert \p{p} into a \nrb\ \chdesc\ (free it's previous data copy).
 \end{itemize}
 
+\todo{Note that \nrb-\rb\ merging is rare? Note why it is helpful even though
+it is rare?}
+
 \todo{Explain why this preserves dependency semantics? Show possible
 dependencies? For the paper, free \chdescs\ instead of convert them
 into \noop{}s? (Must modify \nrb-\nrb\ algo usage.)}
 
 \subsubsection{Overlap \ChDesc\ Merging}
 \label{sec:chdescs:merge:overlap}
+\todo{Note as useful when new may need to be rolled back.}
 Bitmap blocks and inode size fields accumulate many nearby and
 overlapping mergeable \chdescs\ as data is appended to or truncated
 from a file.
