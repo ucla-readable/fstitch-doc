@@ -1,0 +1,201 @@
+% -*- tex-main-file: "paper.tex" -*-
+
+\section{Patch Model}
+\label{sec:patch}
+
+\emph{Patches} represent any and all changes to stable storage in a \Kudos\
+system.
+%
+Patches encapsulate both the data to be written and any dependencies among
+writes.
+%
+This section describes the basic patch model, and the optimizations we have
+found important so far, using a simple notation that allows us to prove the
+correctness of several transformations.
+%
+However, patches are not merely theoretical objects; each active patch
+corresponds to an object in the \Kudos\ implementation.
+
+
+\subsection{Basics}
+
+Kudos's job is simply to write patches to one or more disks.
+%
+(The same ideas would apply to any other stable medium, or to network file
+systems, but to simplify our terminology, we use the term ``disk''
+throughout.)
+
+\makeatletter
+\newcommand{\PState}[1]{\ensuremath{#1.\textit{state}}}
+\newcommand{\PBlock}[1]{\ensuremath{#1.\textit{block}}}
+\newcommand{\PMemst}{\ensuremath{\textit{mem}}}
+\newcommand{\PInfst}{\ensuremath{\textit{flight}}}
+\newcommand{\PDiskst}{\ensuremath{\textit{disk}}}
+\newcommand{\PSetlim}[1]{\def\@next{#1}\ifx\@next\@empty\else[\@next]\fi}
+\newcommand{\PMem}[1][]{\ensuremath{\textit{Mem}\PSetlim{#1}}}
+\newcommand{\PInf}[1][]{\ensuremath{\textit{Flight}\PSetlim{#1}}}
+\newcommand{\PDisk}[1][]{\ensuremath{\textit{Disk}\PSetlim{#1}}}
+\newcommand{\PDDepset}[1]{\ensuremath{#1.\textit{ddeps}}}
+\newcommand{\PDepend}{\ensuremath{\leadsto}}
+\newcommand{\PDDepend}{\ensuremath{\rightarrow}}
+\newcommand{\PDepset}[1]{\ensuremath{\textit{Dep}[#1]}}
+\makeatother
+
+Patches begin in memory.
+%
+They are eventually written to a disk controller, a state we call \emph{in
+flight} because the processor has lost control over when the patches are
+committed (the controller might service requests in any order).
+%
+At some point thereafter, patches are committed to the disk itself; the
+disk reports success after the write has committed.
+%
+Thus, each patch $p$ has a state:
+%
+\[ \PState{p} \in \{ \PMemst, \PInfst, \PDiskst \}. \]
+%
+The set $\PMem$ is defined as $\PMem = \{p \mid \PState{p} = \PMemst\}$,
+and similarly for $\PInf$ and $\PDisk$.
+
+Patches are written in units called \emph{blocks}, which may cover one or
+more sectors.
+%
+Each patch applies to a single block, written $\PBlock{p}$.
+%
+For a given block $b$, we define $\PMem[b] = \{p \in \PMem \mid \PBlock{p}
+= b \}$, and similarly for $\PInf[b]$ and $\PDisk[b]$.
+%
+The disk's behavior is encapsulated in the following asynchronous action,
+which might happen at any time:
+
+\begin{tabbing}
+\quad \textbf{Commit block.} \\
+\qquad Pick some block $b$ with $\PInf[b] \neq \emptyset$. \\
+\qquad For each $p \in \PInf[b]$, set $\PState{p} \gets \PDiskst$.
+\end{tabbing}
+
+
+We note that soft updates-like consistency protocols demand more from disks
+than many journal protocols.
+%
+Neither type of protocol assumes that data is committed until the disk
+reports success.
+%
+However, soft updates inherently assumes that blocks are written
+\emph{atomically}, except in the case of catastrophic media error.
+%
+In particular, if the disk fails while a block $b$ is in flight, then $b$'s
+value on recovery must equal either the old value or the new value.
+%
+Most journal designs also handle the case where in-flight blocks might be
+corrupted on recovery---for instance, perhaps because the memory holding
+the new value of the block lost its coherence before the disk stopped
+writing~\cite{tso}.
+%
+However, some disks actually do provide an atomicity guarantee, for
+instance by using non-volatile memory to store blocks before they make it
+onto disk~\cite{???}.
+%
+The Kudos core makes no assumptions about block atomicity, instead relying
+on software above it to implement a consistency protocol that makes sense
+for the given disk.
+
+
+\paragraph{Dependencies}
+%
+Each patch $p$ also has a set of \emph{direct dependencies}, $\PDDepset{p}$.
+%
+These are other patches on which $p$ depends: every $q \in \PDDepset{p}$
+must be written to disk before $p$, or the file system's consistency is at
+risk.
+%
+We say $p$ \emph{directly depends on} $q$ and write $p \PDDepend q$ when $q
+\in \PDDepset{p}$.
+%
+The \emph{depends on} relation, written $p \PDepend q$, is $\PDDepend$'s
+transitive closure: $p \PDepend q$ iff there exists a path of direct
+dependencies $p \PDDepend p_1 \PDDepend \cdots \PDDepend p_n \PDDepend q$.
+%
+The set $\PDepset{p}$ consists of $p$'s dependencies $\{q \mid p \PDepend
+q \}$.
+%
+Given a set of patches $P$, $\PDepset{P}$ equals the union of the
+dependencies of $P$'s elements.
+%
+In summary, with the addition of dependencies, patches form a directed
+graph; $\PDepset{p}$ is just the set of $p$'s successors in the graph.
+
+
+The \textbf{disk safety property} is simply written
+%
+\[ \PDepset{\PDisk} \subseteq \PDisk. \]
+%
+That is, the dependencies of all patches on disk are also on disk.
+%
+Since the disk can write in-flight blocks in any order, a related
+\textbf{in-flight safety property} must also hold: For any block $b$ with
+$\PInf[b] \neq \emptyset$,
+%
+\[ \PDepset{\PInf[b]} \subseteq \PInf[b] \cup \PDisk . \]
+%
+The file system's job is to set up dependencies so that the disk safety
+property implies file system correctness.
+%
+The buffer cache's job is to write patches in an order that obeys the
+in-flight safety property.
+
+
+\paragraph{Rollback}
+%
+A simplistic implementation of patches might just keep track of
+dependencies; all changes would be applied directly to a block's in-memory
+copy.
+%
+After all, disks write \emph{blocks}---arrays of memory---not patches.
+%
+However, soft updates-like orderings may require that the buffer cache
+\emph{not} write one or more patches on some block.
+%
+In particular, a series of file system operations may create dependencies
+that enforce a circular order among blocks, even though the dependencies
+themselves do not form a cycle~\cite{ganger00soft}.
+%
+This is problematic since blocks with circular dependencies can never be
+written: no block can be written first since each block depends on another.
+
+
+For this reason, each patch carries \emph{rollback} information that gives
+the previous version of the data altered by the patch.
+%
+If a patch $p$ is not written with its containing block, the system rolls
+back the patch, which swaps the new data and the previous version.
+%
+Once the block is written, the system will roll the patch forward and, when
+allowed, write the block again, this time including the patch.
+%
+Rollback information adds greatly to memory and CPU utilization, but it can
+often be optimized away, as we show below.
+
+
+The buffer cache's required behavior is then encapsulated in the following
+asynchronous action:
+
+\begin{tabbing}
+\quad \textbf{Write block.} \\
+\qquad Pick some block $b$ with $\PMem[b] \neq \emptyset$. \\
+\qquad Pick some $P \subseteq \PMem[b]$ with $\PDepset{P} \subseteq P \cup
+\PDisk$. \\
+\qquad For each $p \in P$, set $\PState{p} \gets \PInfst$. \\
+\qquad For each $p \in \PMem[b]-P$, set $\PDDepset{p} \gets \PDDepset{p}
+\cup P$.
+\end{tabbing}
+
+\noindent
+%
+The last step forces any rolled-back patches to wait in memory at least
+until the current version of the block is written.  (Our implementation
+achieves this property without using dependencies.)
+%
+It is easy to show that this action preserves the in-flight safety property
+and, thus, the disk safety property.
+
