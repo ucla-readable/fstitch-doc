@@ -113,60 +113,74 @@ Returns: whether \indirdepends{a}{p} exists. \(\forall\! \p{b}\!: \indirdepends{
 \item If \p{a} has no path to \p{p}, return ``no path to \p{p}.''
 \item For each \p{a} \before\ \p{b}:
   \begin{itemize}
-    \item If \p{b} has no path to \p{p}:
-      \begin{itemize}
-      \item Move \p{b} from a \before\ of \p{a} to a \before\ of \p{p}.
-      \end{itemize}
+  \item If \p{b} has no path to \p{p}:
+    \begin{itemize}
+    \item Move \p{b} from a \before\ of \p{a} to a \before\ of \p{p}.
+    \end{itemize}
   \end{itemize}
 \end{itemize}
 
 \paragraph{\Nrb-\Rb\ \ChDesc\ Merging}
 \label{sec:chdescs:merge:nrb:hard-soft}
-A block \block{b} may contain a \nrb\ \chdesc\ that depends on \rb\ \chdescs\
-(also on \block{b}).
+
+When creating the first \nrb\ \chdesc\ on a block, \emph{\nrb-\rb\
+  \chdesc\ merging} merges all existing (\rb) \chdescs\ into the new
+\nrb\ \chdesc.
 %
-For example, the block may gain an initial (\nrb{}) \chdesc, gain
-external \afters\ on its \chdesc, accumulate additional (\rb{})
-\chdescs, write the subset of its \chdescs\ with external \afters\
-(leaving some \rb\ \chdescs\ on the block), and then gain a \nrb\
-\chdesc.
+Such an arrangement can arise through a combination of \chdesc\ creates
+and block writes; 
 %
-These \rb\ and \nrb\ \chdescs\ must be written together to satisfy
-their (explicit and implicit) dependencies.
+for example, the block may first obtain an initial (\nrb{}) \chdesc,
 %
-As in \S\ref{sec:chdescs:merge:nrb:hard-hard}, \Kudos\ merges
-such \chdescs\ to avoid the complications of such implicit
-dependencies.  When a new \nrb\ \chdesc\ is to be created, any
-existing \rb\ \chdescs\ are first merged into a \nrb\ \chdesc\
-and the new \nrb\ \chdesc\ is merged into it.
+then gain external \afters\ on its \chdesc,
+%
+accumulate additional (\rb{}) \chdescs,
+%
+write the subset of its \chdescs\ with external \afters\ (leaving some
+\rb\ \chdescs\ on the block),
+%
+and then gain a \nrb\ \chdesc.
+%
+In addition to reducing the number of data \chdescs, \nrb-\rb\
+\chdesc\ merging removes the second implicit \nrb\ \chdesc\
+dependency, that \rb\ \chdescs\ not explicitly dependent on the
+block's \nrb\ \chdesc\ implicitly depend on it.
+%
+As in \nrb-\nrb\ \chdesc\ merging, \Kudos\ merges such \chdescs\ to
+avoid the complications of their implicit dependencies.
+
+\Nrb-\rb\ \chdesc\ merging's implementation first merges all \rb\ \chdescs\
+into a \nrb\ \chdesc\ and then \nrb-\nrb\ \chdesc\ merges the new \nrb\
+\chdesc\ into the now-existing \nrb\ \chdesc.
+%
+Our algorithm to transform the dependencies for \nrb-\rb\ \chdesc\
+merges (Figure~\ref{algo:merge:hard-soft}) for block $B$
+%
+chooses a \chdesc\ \p{p} such that
+\(\notexists \inset{q}{\ChMemB{B}}\!: \indirdepends{p}{q}\)
+%
+and updates its transitive \befores\ to ensure
+\(\BeforeS{\ChRbB{B}} \subseteq \BeforeS{p}\).
+%
+Because any \(\inset{q}{\ChMemB{B} - p}\) may have \afters, to
+preserve dependencies we convert such a \p{q} into \anoop\ \chdesc\
+and ensure \depends{q}{p}.
 
 \noindent Algorithm:
 \begin{itemize}
-\item Choose some (\rb{}) \chdesc\ \p{a} such that
-\(\forall\! b\!: \indirdepends{a}{b}, \blockof{b} \ne \blockof{a}\).
-The oldest \chdesc\ on the block will be such a block.
-\item Call \nrb-\nrb\ \before\ move algorithm on each \chdesc\ \p{b}
-on the block s.t. \(b \ne a\) and convert \p{b} into \anoop\ \chdesc.
-\item Convert \p{a} into a \nrb\ \chdesc\ (free it's previous data copy)
-that directly depends on only \p{a}.
+\item Choose a \(\inset{p}{\ChMemB{B}}\!:\
+\notexists\! \inset{q}{\ChMemB{B}}\!:\ \indirdepends{p}{q}\).
+\item For each \inset{q}{\ChMemB{B} - p}:
+  \begin{itemize}
+  \item Call the \nrb-\nrb\ \before\ move algorithm on \p{q} and \p{p}.
+  \item Convert \p{q} into \anoop\ \chdesc.
+  \end{itemize}
+\item Convert \p{p} into a \nrb\ \chdesc\ (free it's previous data copy).
 \end{itemize}
 
-TODO: explain why this preserves dependency semantics? Show possible
+\todo{Explain why this preserves dependency semantics? Show possible
 dependencies? For the paper, free \chdescs\ instead of convert them
-into \noop{}s? (Must modify \nrb-\nrb\ algo usage.)
-
-
-At the end of \chdesc\ optimizations, say something along the lines:
-%
-The dynamic optimizations facilitated through \nrb\
-\chdescs\ implement the efficiency in systems using soft updates or
-journaling\todo{Actually do this for journaling} while expressing
-changes modularly through structural descriptions rather than through
-internal and semantic file system descriptions.
-
-\todo{Should we talk about why we allow NRBs and merging to be
-  disabled? (Debugging simplicity and depend add to \noop\ \chdescs\
-  with \afters\ bug catching.)}
+into \noop{}s? (Must modify \nrb-\nrb\ algo usage.)}
 
 \subsubsection{Overlap \ChDesc\ Merging}
 \label{sec:chdescs:merge:overlap}
@@ -192,3 +206,18 @@ this \before\ has a \before, then there may be a path to the existing
 %
 To merge two such overlapping \chdescs, add the new \chdesc's explicit
 before to the existing \chdesc\ (if any and if not the existing \chdesc).
+
+
+%%
+
+At the end of \chdesc\ optimizations, say something along the lines:
+%
+The dynamic optimizations facilitated through \nrb\
+\chdescs\ implement the efficiency in systems using soft updates or
+journaling\todo{Actually do this for journaling} while expressing
+changes modularly through structural descriptions rather than through
+internal and semantic file system descriptions.
+
+\todo{Should we talk about why we allow NRBs and merging to be
+  disabled? (Debugging simplicity and depend add to \noop\ \chdescs\
+  with \afters\ bug catching.)}

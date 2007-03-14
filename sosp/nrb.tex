@@ -21,7 +21,7 @@ Since a \nrb\ \chdesc\ cannot be rolled back, a write of any \chdescs\
 on block $B$ must include all \nrb\ \chdescs\ on $B$. To accordingly
 update our formal model we define a new set of \chdescs, \ChNrb, which
 contains all \nrb\ \chdescs. We write \ChNrbB{B} to restrict the set
-to block $B$:
+to block $B$\todo{Introduce \ChRb\ and \ChRbB{B}.}:
 
 \paragraph{Write block to disk controller}
 For some block $B$: \\
