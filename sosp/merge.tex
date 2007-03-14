@@ -1,85 +1,79 @@
 \subsection{\ChDesc\ Merging}
 \label{sec:chdescs:merge}
 
-\Kudos\ drastically reduces the number of \chdescs\ created to
-describe a system of changes by (conservatively) identifying when a
-second \chdesc\ may safely be written at the same time as an existing
-\chdesc\ and, instead of creating the second \chdesc, updating the
-existing \chdesc's disk change and dependencies; in effect, merging
-the two \chdescs.
+The large number of small, distinct changes made for cases such as
+block allocations, inode updates, and directory updates use
+significant memory for their \chdesc\ structures and dependencies and
+increase the number of \chdescs\ the system processes.
 %
-In this section we describe overlapping \chdesc\ merging; after
-introducing \nrb\ \chdescs\ in the next section we describe
-two additional merge opportunties.
+\Kudos\ drastically reduces the number of such \chdescs, and thus
+\chdesc\ memory usage, by conservatively identifying when a new and an
+existing \chdesc\ pair can be written to disk together, which \Kudos\
 %
-All three merge rules build on invariant~\ref{cdinvar:add-before}
-and use fast, conservative checks during \chdesc\ creation to identify
-\chdescs\ that will be possible to write together;
+\emph{merges} together into the existing \chdesc\ (updating its disk
+change and dependencies) instead of creating the new \chdesc.
 %
-the merge rules differ in their conservatively applicable conditions.
+In this section we present three \chdesc\ merge algorithms. All three
+use Invariant~\ref{cdinvar:add-before} to reason about future graph
+changes and use fast, conservative checks during \chdesc\ creation; they
+differ in their applicable conditions.
 
 \subsubsection{\Nrb\ \ChDesc\ Merging}
-\label{sec:chdescs:nrb-merge}
-Recall from \S\ref{sec:chdescs:nrb} that to write any \chdesc\ on a given
-block, all \nrb\ \chdescs\ on the block must also be written. 
-%
-These implicit dependencies complicate determining whether a block can
-be written, requiring a search for non-ready \nrb\ \chdescs.
-%
-By merging \nrb\ \chdescs\ together and by merging existing \rb\
-\chdescs\ into the block's \nrb\ \chdesc\ when the \nrb\ \chdesc\ is
-created,
-%
-\Kudos\ ensures that there is at most one \nrb\ \chdesc\ per block and
-that all \chdescs\ on the same block depend on the \nrb\
-\chdesc\,
-%
-and so avoids dependency complication and further reduces \chdesc\
-memory overhead.
+\label{sec:chdescs:merge:nrb}
 
-While any two \nrb\ \chdescs\ on the same block will be written
-together, to merge the \chdescs\ the dependencies involving the merged
-\chdescs\ must be transformed to preserve the non-merged system's
-semantics.  Sections~\ref{sec:chdescs:nrb-merge:hard-hard}
-and~\ref{sec:chdescs:nrb-merge:hard-soft} discuss these
-transformations.
-
-Mention?:
+Recall from \S\ref{sec:chdescs:nrb} that a write of any \chdescs\ on block
+$B$ must include all \nrb\ \chdescs\ on $B$.
 %
-\Nrb\ \chdescs, \rb\ \chdescs, and ready lists:
+This additional requirement is in fact an exquisite optimization
+opportunity; it implies that all \nrb\ \chdescs\ on a given block can
+merged.
 %
-all post-\nrb\ created \chdescs\ depend on \nrb\ because of overlaps.
+Further, merging can remove the need for the \nrb\ \chdesc\ implicit
+dependency rules by ensuring that
 %
-no \nrb-prior created \chdescs\ exist (\rb{}\(\rightarrow\)\nrb{}).
+there is at most one \nrb\ \chdesc\ per block (\nrb-\nrb\ merging)
 %
-single \nrb.
+and that all \rb\ \chdescs\ on a given block depend on the \nrb\ \chdesc\
+(\nrb-\rb\ merging).
+%
+We describe these two \chdesc\ merging algorithms and how they
+preserve dependency semantics in this section.
 
 \paragraph{\Nrb-\Nrb\ \ChDesc\ Merging}
-\label{sec:chdescs:nrb-merge:hard-hard}
+\label{sec:chdescs:merge:nrb:hard-hard}
+
+\emph{\Nrb-\nrb\ \chdesc\ merging} merges a new \nrb\ \chdesc\ \p{q}
+into an existing \nrb\ \chdesc\ \p{p} instead of creating \p{q}.
+Any two \nrb\ \chdescs\ on the same block may be (and are) merged.
+%
 % Although merging two \chdescs\ will not induce block-level dependency
 % cycles, without sufficient care merging could induce \chdesc-level
 % dependency cycles.  A trivial example is merging \p{q} into \p{p} when
 % \p{q} has an explicit dependency on \p{p}; the combined \p{(p+q)}
 % should not and need not depend on itself.
-To preserve the non-merged dependency semantics when merging a new
-\nrb\ \chdesc\ \p{q} into an existing \nrb\ \chdesc\ \p{p}, the merged
-\p{(p+q)} must depend on the union of \p{p} and \p{q}'s transitive
-\befores.
 %
-From \chdesc\ invariant~\ref{cdinvar:add-before} and the \nrb\
-\chdesc\ creation rule, the only possible dependencies involving \p{p}
-and \p{q} are those show in Figure~\ref{fig:nrb-merge}\todo{Should we
-  give these deductions or a flavor?}.
+To preserve dependency semantics, the merged \p{(p+q)} must depend on
+the union of \p{p} and \p{q}'s transitive \befores. Additionally, while the
+\chdescs\ can be merged without forming a \chdesc-level dependency cycle,
+the merge must ensure that it does not introduce a needless cycle, e.g.
+through \anoop\ \chdesc\ \p{e} in \depends{q}{\depends{e}{p}}
+\todo{Is cycle avoidance worth mentioning? Is this a good way to mention it?}.
+
+From Invariant~\ref{cdinvar:add-before} and the \nrb\ \chdesc\
+creation condition (no external \afters), the only possible
+dependencies involving \p{p} and \p{q} are those show in
+Figure~\ref{fig:nrb-merge}\todo{Should we give these deductions or a
+  flavor?}.
 %
-An algorithm to transform dependencies for \nrb\ \chdesc\ merges
-follows from these possible dependencies.
+Notice, for example, that any \p{r} such that
+\indirdepends{q}{\indirdepends{r}{p}} is \anoop\ \chdesc\todo{This is
+  a strong statement. Expand on its implications?}.
 %
-Notice, for example, that the dependency paths that could become a
-cycle upon the merge of \p{p} of \p{q} involve only \noop\ \chdescs\
-and that \chdesc\ invariant~\ref{cdinvar:add-before} ensures these
-\noop\ \chdesc\ will not gain data \chdesc\ \befores.
-%
-TODO: explain further?
+Our algorithm to transform dependencies for \nrb-\nrb\ \chdesc\ merges
+(Figure~\ref{algo:merge:hard-hard}) follows from these possible
+dependencies to efficently update \p{p}'s transitive \befores\ to
+ensure \(\BeforeS{p}\todo{Incorrect! Only the non-\noop{}s.} \subseteq \BeforeS{q}\)\todo{Note that Invariant~\ref{cdinvar:add-before} ensures that
+\noop\ \chdescs\ reachable from \p{q} will not gain data \chdesc\ \befores?}
 
 \begin{figure}[htb]
   \centering
@@ -107,10 +101,11 @@ Returns: whether \indirdepends{a}{p} exists. \(\forall\! \p{b}\!: \indirdepends{
   \end{itemize}
 \end{itemize}
 
-\cdinvar{one-nrb}{Each block has at most one \nrb\ \chdesc\todo{Introduce}.}
+TODO: Explain why Invariant~\ref{cdinvar:one-nrb} holds and what it gets us.
+\cdinvar{one-nrb}{Each block has at most one \nrb\ \chdesc.}
 
 \paragraph{\Nrb-\Rb\ \ChDesc\ Merging}
-\label{sec:chdescs:nrb-merge:hard-soft}
+\label{sec:chdescs:merge:nrb:hard-soft}
 A block \block{b} may contain a \nrb\ \chdesc\ that depends on \rb\ \chdescs\
 (also on \block{b}).
 %
@@ -123,7 +118,7 @@ external \afters\ on its \chdesc, accumulate additional (\rb{})
 These \rb\ and \nrb\ \chdescs\ must be written together to satisfy
 their (explicit and implicit) dependencies.
 %
-As in Section~\ref{sec:chdescs:nrb-merge:hard-hard}, \Kudos\ merges
+As in \S\ref{sec:chdescs:merge:nrb:hard-hard}, \Kudos\ merges
 such \chdescs\ to avoid the complications of such implicit
 dependencies.  When a new \nrb\ \chdesc\ is to be created, any
 existing \rb\ \chdescs\ are first merged into a \nrb\ \chdesc\
@@ -158,7 +153,7 @@ internal and semantic file system descriptions.
   with \afters\ bug catching.)}
 
 \subsubsection{Overlap \ChDesc\ Merging}
-\label{sec:chdescs:overlap-merge}
+\label{sec:chdescs:merge:overlap}
 Bitmap blocks and inode size fields accumulate many nearby and
 overlapping mergeable \chdescs\ as data is appended to or truncated
 from a file.
