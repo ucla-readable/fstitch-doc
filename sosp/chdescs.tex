@@ -17,7 +17,7 @@
 \newcommand{\After}[1]{\ensuremath{\textit{Post}[#1]}}
 \newcommand{\AfterS}[1]{\ensuremath{\textit{Post}^*[#1]}}
 
-\newcommand{\statenone}{\ensuremath{\textit{cached}}}
+\newcommand{\statenone}{\ensuremath{\textit{inmem}}}
 \newcommand{\stateinf}{\ensuremath{\textit{inflight}}}
 \newcommand{\statedisk}{\ensuremath{\textit{ondisk}}}
 
@@ -30,7 +30,7 @@
 struct patch {
     bdev_t *device;
     bdesc_t *block;
-    enum {BIT, BYTE, NOOP} type;
+    enum {BIT, BYTE, EMPTY} type;
     union {
         struct {
             uint16_t offset;
@@ -42,9 +42,9 @@ struct patch {
         } byte;
     };
     struct patch_queue *leaders;
-    uint32_t nleaders[NBDLEVEL];
-    patch_t * ddesc_ready_next;
-    patch_t ** ddesc_ready_prev;
+    uint32_t nleaders[NBDLEVEL]; FIXME
+    patch_t * block_ready_next;
+    patch_t ** block_ready_pprev;
 /* ... */ };
 \end{verbatim}
 \end{scriptsize}

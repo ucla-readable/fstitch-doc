@@ -9,7 +9,7 @@ potentially quadratic number of edges in the \chdesc\ graph.
 
 To solve this problem, we introduce an additional type of \chdesc. The
 prototypical \chdesc\ corresponds to some change on disk, but \Kudos\ also
-supports \aemphnoop\ \chdesc\ type, which doesn't change the disk at all.
+supports \aemphnoop\ \chdesc\ type\todo{We often refer to non-\noop\ \chdescs. A name for ``prototypical'' \chdescs\ should probably not be defined indirectly as the non-prototypical type.}, which doesn't change the disk at all.
 \Noop\ \chdescs\ can have \befores, like other \chdescs, but they don't need to
 be written to disk (nor are they associated with a cached disk block): they are
 trivially satisfied when all of their \befores\ are satisfied. Thus, they can be
