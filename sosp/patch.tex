@@ -17,9 +17,9 @@ However, patches are not merely theoretical objects; each active patch
 corresponds to an object in the \Kudos\ implementation.
 
 
-\subsection{Basics}
+%% \subsection{Basics}
 
-Kudos's job is simply to write patches to one or more disks.
+\Kudos's job is simply to write patches to one or more disks.
 %
 (The same ideas would apply to any other stable medium, or to network file
 systems, but to simplify our terminology, we use the term ``disk''
@@ -35,7 +35,7 @@ throughout.)
 \newcommand{\PMem}[1][]{\ensuremath{\textit{Mem}\PSetlim{#1}}}
 \newcommand{\PInf}[1][]{\ensuremath{\textit{Flight}\PSetlim{#1}}}
 \newcommand{\PDisk}[1][]{\ensuremath{\textit{Disk}\PSetlim{#1}}}
-\newcommand{\PDDepset}[1]{\ensuremath{#1.\textit{ddeps}}}
+\newcommand{\PDDepset}[1]{\ensuremath{\def\@next{#1}\ifx\@next\@empty\else\@next.\fi\textit{ddeps}}}
 \newcommand{\PDepend}{\ensuremath{\leadsto}}
 \newcommand{\PDDepend}{\ensuremath{\rightarrow}}
 \newcommand{\PDepset}[1]{\ensuremath{\textit{Dep}[#1]}}
@@ -96,7 +96,7 @@ However, some disks actually do provide an atomicity guarantee, for
 instance by using non-volatile memory to store blocks before they make it
 onto disk~\cite{???}.
 %
-The Kudos core makes no assumptions about block atomicity, instead relying
+The \Kudos\ core makes no assumptions about block atomicity, instead relying
 on software above it to implement a consistency protocol that makes sense
 for the given disk.
 
@@ -181,12 +181,12 @@ The buffer cache's required behavior is then encapsulated in the following
 asynchronous action:
 
 \begin{tabbing}
-\quad \textbf{Write block.} \\
-\qquad Pick some block $b$ with $\PMem[b] \neq \emptyset$. \\
-\qquad Pick some $P \subseteq \PMem[b]$ with $\PDepset{P} \subseteq P \cup
+\textbf{Write block.} \\
+\quad Pick some block $b$ with $\PMem[b] \neq \emptyset$. \\
+\quad Pick some $P \subseteq \PMem[b]$ with $\PDepset{P} \subseteq P \cup
 \PDisk$. \\
-\qquad For each $p \in P$, set $\PState{p} \gets \PInfst$. \\
-\qquad For each $p \in \PMem[b]-P$, set $\PDDepset{p} \gets \PDDepset{p}
+\quad For each $p \in P$, set $\PState{p} \gets \PInfst$. \\
+\quad For each $p \in \PMem[b]-P$, set $\PDDepset{p} \gets \PDDepset{p}
 \cup P$.
 \end{tabbing}
 
@@ -199,3 +199,73 @@ achieves this property without using dependencies.)
 It is easy to show that this action preserves the in-flight safety property
 and, thus, the disk safety property.
 
+
+\subsection{Challenges}
+
+A naive implementation of this model would scale extremely poorly,
+particularly with cache size.
+%
+Challenges in a patch-based file system implementation include:
+
+\textbf{Buffer cache graph traversal.}
+%
+In order to evict and write a block, the buffer cache must choose a block
+$b$,
+%
+and then find a set of \patches\ $P_b \subseteq \PMem[b]$ whose dependencies
+satisfy a graph property, namely that $\PDepset{P_b} \subseteq P_b \cup
+\PDisk$.
+%
+It usually makes sense to define $P_b$ maximally---that is, as the
+\emph{largest} corresponding set of \patches.
+%
+In the ideal (and common) case $P_b = \PMem[b]$, which lets the cache reuse
+$b$'s memory once $P_b$ is committed to disk.  However, in some cases there
+may be no block for which $P_b = \PMem[b]$.
+
+A naive implementation might calculate, for each in-memory block $b$, the
+largest set of patches $P_b \subseteq \PMem[b]$ with $\PDepset{P_b}
+\subseteq P_b \cup \PDisk$, then evict some block with few rolled-back
+\patches\ (where $\PMem[b] - P_b$ is small).
+%
+This, however, would be extraordinarily expensive.
+%
+Finding $P_b$ requires traversing a dependency graph which might contain
+thousands and thousands of nodes.
+%
+Doing so for each block, once per eviction, would take huge amounts of CPU
+time.
+
+
+\textbf{Rollback memory usage.}
+%
+Only a small fraction of patches will ever need to be rolled back.
+%
+For example, a soft updates system will never create dependencies that
+require a data block to be rolled back.
+%
+If a patch won't be rolled back under any circumstances, the memory and
+CPU time spent to preserve the old version is wasted.
+
+
+\textbf{\Patch\ memory usage.}
+%
+Patches themselves take up memory and require time to allocate, free, and
+traverse.
+%
+If two patches have redundant dependencies, it would be faster to combine
+them.
+
+
+\textbf{Dependency memory usage.}
+%
+The $\PDDepset{}$ sets are stored as doubly linked lists; each individual
+dependency takes up memory.
+%
+Important and common dependency relations require many dependencies to
+express; for example, if patches $p_1,\dots,p_n$ depend, as a group, on
+patches $q_1,\dots,q_n$, expressing this constraint would require $n^2$
+total dependencies.
+
+
+The next section tackles all of these challenges.
