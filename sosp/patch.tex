@@ -119,8 +119,8 @@ dependencies $p \PDDepend p_1 \PDDepend \cdots \PDDepend p_n \PDDepend q$.
 The set $\PDepset{p}$ consists of $p$'s dependencies $\{q \mid p \PDepend
 q \}$.
 %
-Given a set of patches $P$, $\PDepset{P}$ equals the union of the
-dependencies of $P$'s elements.
+Given a set of patches $P = \{p_i\}$, $\PDepset{P} = \bigcup_i
+\PDepset{p_i}$.
 %
 Dependencies link patches into a directed graph; $\PDepset{p}$ is just the
 set of $p$'s successors in the graph.
@@ -255,8 +255,8 @@ time.
 %
 Only a small fraction of patches will ever need to be rolled back.
 %
-For example, a soft updates system will never create dependencies that
-require a data block to be rolled back.
+For example, most data writes never need to be rolled back in any file
+system.
 %
 If a patch won't be rolled back under any circumstances, the memory and
 CPU time spent to preserve the old version is wasted.
