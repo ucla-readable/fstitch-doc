@@ -106,8 +106,8 @@ for the given disk.
 Each patch $p$ also has a set of \emph{direct dependencies}, $\PDDepset{p}$.
 %
 These are other patches on which $p$ depends: every $q \in \PDDepset{p}$
-must be written to disk before $p$, or the file system's consistency is at
-risk.
+must be written to disk before $p$, or atomically with $p$, or the file
+system's consistency is at risk.
 %
 We say $p$ \emph{directly depends on} $q$ and write $p \PDDepend q$ when $q
 \in \PDDepset{p}$.
@@ -122,24 +122,38 @@ q \}$.
 Given a set of patches $P$, $\PDepset{P}$ equals the union of the
 dependencies of $P$'s elements.
 %
-In summary, with the addition of dependencies, patches form a directed
-graph; $\PDepset{p}$ is just the set of $p$'s successors in the graph.
+Dependencies link patches into a directed graph; $\PDepset{p}$ is just the
+set of $p$'s successors in the graph.
 
 
 The \textbf{disk safety property} is simply written
 %
 \[ \PDepset{\PDisk} \subseteq \PDisk. \]
 %
-That is, the dependencies of all patches on disk are also on disk.
+That is, the dependencies of all patches on disk are always also on disk,
+and
 %
-Since the disk can write in-flight blocks in any order, a related
-\textbf{in-flight safety property} must also hold: For any block $b$ with
-$\PInf[b] \neq \emptyset$,
-%
-\[ \PDepset{\PInf[b]} \subseteq \PInf[b] \cup \PDisk . \]
+no matter when the system crashes, the disk is consistent in terms of
+dependencies.
 %
 The file system's job is to set up dependencies so that the disk safety
 property implies file system correctness.
+%
+(This might involve compensating for the possibility that in-flight blocks
+can be corrupted on recovery.)
+
+
+The storage system cannot control when the disk controller commits blocks;
+instead, it controls when blocks are released to the controller.
+%
+It therefore maintains the disk safety property by enforcing, instead, the
+\textbf{in-flight safety property}: For any block $b$ with $\PInf[b] \neq
+\emptyset$,
+%
+\[ \PDepset{\PInf[b]} \subseteq \PInf[b] \cup \PDisk . \]
+%
+This, combined with the disk's ``commit block'' behavior above, implies the
+disk safety property.
 %
 The buffer cache's job is to write patches in an order that obeys the
 in-flight safety property.
@@ -202,7 +216,7 @@ and, thus, the disk safety property.
 
 \subsection{Challenges}
 
-A naive implementation of this model would scale extremely poorly,
+A naive implementation of this model scales extremely poorly,
 particularly with cache size.
 %
 Challenges in a patch-based file system implementation include:
