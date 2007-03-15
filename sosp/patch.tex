@@ -236,11 +236,15 @@ It usually makes sense to define $P_b$ maximally---that is, as the
 In the ideal (and common) case $P_b = \PMem[b]$, which lets the cache reuse
 $b$'s memory once $P_b$ is committed to disk.  However, in some cases there
 may be no block for which $P_b = \PMem[b]$.
+%
+It would also be nice if the blocks chosen for writing also maximized the
+disk's commit rate, by minimizing seeks and so forth.
 
 A naive implementation might calculate, for each in-memory block $b$, the
 largest set of patches $P_b \subseteq \PMem[b]$ with $\PDepset{P_b}
-\subseteq P_b \cup \PDisk$, then evict some block with few rolled-back
-\patches\ (where $\PMem[b] - P_b$ is small).
+\subseteq P_b \cup \PDisk$, then evict some block close to previously
+written blocks and with few rolled-back \patches\ (where $\PMem[b] - P_b$
+is small).
 %
 This, however, would be extraordinarily expensive.
 %
