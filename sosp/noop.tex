@@ -1,5 +1,16 @@
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
 \subsection{\Noop\ \ChDescs}
 \label{sec:chdescs:noop}
+
+We first address dependency convenience and memory usage with \emph{empty
+\patches}, which have no associated data or block.
+%
+This makes it just a means for tracking dependencies.
+
+
+For example, imagine writing two files \texttt{before.txt}
+The dependencies 
 \Chdescs\ as so far described can be tedious and inefficient to manage when
 dealing with large sets of them corresponding to file system operations. For
 instance, if writing some file \texttt{\after.txt} is to depend on writing some

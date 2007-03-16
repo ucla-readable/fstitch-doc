@@ -65,7 +65,7 @@ Each patch applies to a single block, written $\PBlock{p}$.
 For a given block $b$, we define $\PMem[b] = \{p \in \PMem \mid \PBlock{p}
 = b \}$, and similarly for $\PInf[b]$ and $\PDisk[b]$.
 %
-The disk's behavior is encapsulated in the following asynchronous action,
+The disk's behavior is encapsulated in the following action,
 which might happen at any time:
 
 \begin{tabbing}
@@ -192,7 +192,7 @@ often be optimized away, as we show below.
 
 
 The buffer cache's required behavior is then encapsulated in the following
-asynchronous action:
+action:
 
 \begin{tabbing}
 \textbf{Write block.} \\
@@ -212,6 +212,9 @@ achieves this property without using dependencies.)
 %
 It is easy to show that this action preserves the in-flight safety property
 and, thus, the disk safety property.
+
+
+\input{noop}
 
 
 \subsection{Challenges}
@@ -275,15 +278,20 @@ If two patches have redundant dependencies, it would be faster to combine
 them.
 
 
-\textbf{Dependency memory usage.}
-%
-The $\PDDepset{}$ sets are stored as doubly linked lists; each individual
-dependency takes up memory.
-%
-Important and common dependency relations require many dependencies to
-express; for example, if patches $p_1,\dots,p_n$ depend, as a group, on
-patches $q_1,\dots,q_n$, expressing this constraint would require $n^2$
-total dependencies.
+%% \textbf{Dependency memory usage.}
+%% %
+%% The $\PDDepset{}$ sets are stored as doubly linked lists; each individual
+%% dependency takes up memory.
+%% %
+%% Important and common dependency relations require many dependencies to
+%% express; for example, if patches $p_1,\dots,p_n$ depend, as a group, on
+%% patches $q_1,\dots,q_n$, expressing this constraint would require $n^2$
+%% total dependencies.
 
 
 The next section tackles all of these challenges.
+
+
+\section{Patch Optimizations}
+
+\input{readylist}

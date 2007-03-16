@@ -3,6 +3,7 @@
 %
 % Copyright (c) 1999-2001 Massachusetts Institute of Technology
 % Copyright (c) 2001-2003 International Computer Science Institute
+% Copyright (c) 2006 Regents of the University of California
 %
 % Permission is hereby granted, free of charge, to any person obtaining a
 % copy of this software and associated documentation files (the "Software"),
@@ -17,7 +18,6 @@
 input rboxes;
 prologues := 1;
 string defaultelementfont;
-defaultelementfont := defaultfont;
 defaultscale := 1;
 linejoin := mitered;
 
@@ -73,7 +73,14 @@ _normal_output := ((-.5,0.5output_length) -- (-output_width,0.5output_length)
     -- (-output_width,-0.5output_length) -- (-.5,-0.5output_length) -- cycle);
 
 
-%% make
+%% redefine 'drawboxes' to allow extra text
+
+vardef drawboxes(text t) text rest =         % Draw boundary path for each box
+  forsuffixes s=t: draw bpath.s rest; endfor
+enddef;
+
+
+%%
 
 vardef _make_element_ports(suffix $, port, side)(expr n, length, isout) =
   save i, sc; pair sc.adj;
@@ -115,10 +122,6 @@ vardef clearelement_(suffix $) =
   generic_redeclare(numeric) _n;
   _n_ := "elemdraw_." & str $;
   generic_redeclare(numeric) _n;
-enddef;
-
-def drawelemboxed(suffix $) =
-  draw bpath.$
 enddef;
 
 vardef _elementit@#(expr label_str, ninputs, noutputs, personality, down_var, rev_var) =
@@ -168,7 +171,8 @@ vardef _elementit@#(expr label_str, ninputs, noutputs, personality, down_var, re
   @#.borderscale = defaultelementborderscale;
   @#.portscale = defaultelementportscale;
   
-  elemdraw_@# = "drawelemboxed";
+  elemdraw_@# = "drawboxes";
+  sproc_@# := "sizeelement_";
   
   expandafter def expandafter clearboxes expandafter =
     clearboxes clearelement_(@#);
@@ -211,6 +215,32 @@ vardef killoutput(suffix $)(expr p) =
   fi
 enddef;
 
+vardef portinteriorin(suffix $)(expr i) =
+  path _p_;
+  _p_ := if $.inpers[i] >= agnostic: _agnostic_input else: _normal_input fi
+    scaled $.portscale;
+  if $.down: _p_ := _p_ rotated -90 fi;
+  if $.rev: _p_ := _p_ rotated 180 fi;
+  _p_ := _p_ shifted $.in[i];
+  if $.down and $.rev: .5[ulcorner _p_,urcorner _p_]
+  elseif $.down: .5[llcorner _p_,lrcorner _p_]
+  elseif $.rev: .5[ulcorner _p_,llcorner _p_]
+  else: .5[urcorner _p_,lrcorner _p_] fi
+enddef;
+
+vardef portinteriorout(suffix $)(expr i) =
+  path _p_;
+  _p_ := if $.outpers[i] >= agnostic: _agnostic_output else: _normal_output fi
+    scaled $.portscale;
+  if $.down: _p_ := _p_ rotated -90 fi;
+  if $.rev: _p_ := _p_ rotated 180 fi;
+  _p_ := _p_ shifted $.out[i];
+  if $.down and $.rev: .5[llcorner _p_,lrcorner _p_]
+  elseif $.down: .5[ulcorner _p_,urcorner _p_]
+  elseif $.rev: .5[urcorner _p_,lrcorner _p_]
+  else: .5[ulcorner _p_,llcorner _p_] fi
+enddef;
+
 
 %% fix
 
@@ -247,17 +277,72 @@ vardef set_element_dy(suffix $) =
   $.dy = (y'' - y.h)/2;
 enddef;
 
-vardef fixelementsize(text t) =
+def sizeelement_(suffix $) =
+  if unknown $.dx: set_element_dx($); fi
+  if unknown $.dy: set_element_dy($); fi
+enddef;
+
+vardef fixelementsizeleft(text t) =
   forsuffixes $=t:
-    if not known $.dx: set_element_dx($); fi;
-    if not known $.dy: set_element_dy($); fi;
     fixsize($);
+    if $.dx > xpart element_offset: $.off := $.off - ($.dx - xpart element_offset, 0); fi;
   endfor;
 enddef;
 
 vardef fixelement(text elements) =
-  fixelementsize(elements);
+  fixsize(elements);
   fixpos(elements);
+enddef;
+
+vardef elementleftjustify(text elements) =
+  fixsize(elements);
+  forsuffixes $=elements:
+    if $.dx > xpart element_offset: $.off := $.off - ($.dx - xpart element_offset, 0); fi;
+  endfor;
+enddef;
+
+vardef fixrelations(suffix efirst)(text elements) =
+  forsuffixes $=elements:
+    if unknown xpart(efirst.off - $.off): xpart $.off = xpart efirst.off fi;
+    if unknown ypart(efirst.off - $.off): ypart $.off = ypart efirst.off fi;
+  endfor;
+enddef;
+
+vardef elementbbox(suffix efirst)(text elements) =
+  fixsize(efirst,elements);
+  fixrelations(efirst,elements);
+  save __t,__l,__r,__b,__p; picture __p;
+  __t = ypart(efirst.n - efirst.off);
+  __l = xpart(efirst.w - efirst.off);
+  __r = xpart(efirst.e - efirst.off);
+  __b = ypart(efirst.s - efirst.off);
+  forsuffixes $=elements:
+    if ypart($.n - efirst.off) > __t: __t := ypart($.n - efirst.off) fi;
+    if xpart($.w - efirst.off) < __l: __l := xpart($.w - efirst.off) fi;
+    if xpart($.e - efirst.off) > __r: __r := xpart($.e - efirst.off) fi;
+    if ypart($.s - efirst.off) < __b: __b := ypart($.s - efirst.off) fi;
+  endfor;
+  __p = nullpicture;
+  setbounds __p to ((__l,__t) -- (__r,__t) -- (__r,__b) -- (__l,__b) -- cycle)
+     if known efirst.off: shifted efirst.off fi;
+  __p
+enddef;
+
+vardef compoundelementlink@#(suffix efirst)(text elements) =
+  fixsize(efirst,elements);
+  fixrelations(efirst,elements);
+  save __t,__l,__r,__b,__p; picture __p;
+  __t = ypart(efirst.n - efirst.off);
+  __l = xpart(efirst.w - efirst.off);
+  __r = xpart(efirst.e - efirst.off);
+  __b = ypart(efirst.s - efirst.off);
+  forsuffixes $=elements:
+    if ypart($.n - efirst.off) > __t: __t := ypart($.n - efirst.off) fi;
+    if xpart($.w - efirst.off) < __l: __l := xpart($.w - efirst.off) fi;
+    if xpart($.e - efirst.off) > __r: __r := xpart($.e - efirst.off) fi;
+    if ypart($.s - efirst.off) < __b: __b := ypart($.s - efirst.off) fi;
+  endfor;
+  @#.c = efirst.off + .5[(__l,__t), (__r,__b)]
 enddef;
 
 
@@ -301,22 +386,24 @@ enddef;
 vardef drawelementbox(text elements) text rest =
   save $, oldpen; oldpen := savepen;
   interim linejoin := mitered;
-  fixelementsize(elements);
+  fixsize(elements);
   fixpos(elements);
   forsuffixes $ = elements:
-    pickup elementpen.port scaled $.portscale;
     if $.drawports:
+      pickup elementpen.port scaled $.portscale;
       if $.nin > 0: draw_element_inputs($); fi;
       if $.nout > 0: draw_element_outputs($); fi;
     fi;
-    pickup elementpen.border scaled $.borderscale;
-    scantokens elemdraw_$($) rest;
+    if $.borderscale > 0:
+      pickup elementpen.border scaled $.borderscale;
+      scantokens elemdraw_$($) rest;
+    fi;
   endfor;
   pickup oldpen;
 enddef;
 
 vardef fillelement(text elements)(text color) =
-  fixelementsize(elements);
+  fixsize(elements);
   fixpos(elements);
   forsuffixes $=elements:
     fill bpath.$ withcolor color;
