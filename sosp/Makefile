@@ -70,7 +70,7 @@ bib: $(MAINFILE:.tex=.aux) always
 %.eps: %.dia
 	dia --nosplash --export=$@ $<
 %.eps: %.dot
-	dot -Tps $< -o $@
+	dot -Tps $< > $@
 
 %.pdf: %.dot
 	dot -Tps2 $< | epstopdf -f > $@
@@ -92,7 +92,7 @@ fonts.sty:
 
 clean: cleanfig
 	/bin/rm -f *.log *.aux *.dvi *.bbl *.blg *.lof *.lot *.toc *~ \
-	grammar.tab.c grammar.output
+	grammar.tab.c grammar.output fonts.sty .fonts.sty paper.out paper.ps paper.pdf paper.dvi
 
 cleanfig:
 	/bin/rm -f $(TMP_PDF_IMAGES) $(TMP_DVI_IMAGES) \
