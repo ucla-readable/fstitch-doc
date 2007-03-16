@@ -12,6 +12,7 @@ vardef sizediamond_(suffix $) =
   if unknown $dy:
     $dy = b_ + circmargin * sqrt($squatness+1) + $squatness * a_;
   fi
+  sizeelement_($);
 enddef;
 
 vardef cleardiamond_(suffix $) =

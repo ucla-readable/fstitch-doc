@@ -2,90 +2,316 @@ input patches;
 verbatimtex %&latex
 \documentclass[12pt]{article}
 \usepackage{elemfig,amsmath}
-\def\subj{\setbox0\hbox{$_{\mbox{J}}$}\dp0=0pt\box0}
+
 \begin{document}
 etex;
 picture emptyqueue; emptyqueue := btex \phantom{\elementlabel{Queue}} etex;
 picture vemptyqueue; vemptyqueue := emptyqueue rotated 90 xscaled .4;
+hardborderscale = 3;
 
 beginfig(1);
-  boxjoin(a.width = b.width; a.s = b.n + (0,40));
-  patchit.sza(btex size\strut etex,0);
-  patchit.szb(btex size\strut etex,0);
-  patchit.szc(btex size\strut etex,0);
-  patchit.szd(btex size\strut etex,0);
+  boxjoin(a.width = b.width = a.height; a.s = b.n + (0,30));
+  patchit.sz1(btex $i_1'$\strut etex,0);
+  patchit.sz2(btex $i_2'$\strut etex,0);
+  patchit.sz3(btex $i_3'$\strut etex,0);
+  patchit.sz4(btex $i_4'$\strut etex,0);
   
-  boxjoin(a.width = b.width; a.s = b.n + (0,40));
-  patchit.bka(btex blockptr\strut etex,0);
-  patchit.bkb(btex blockptr\strut etex,0);
-  patchit.bkc(btex blockptr\strut etex,0);
-  patchit.bkd(btex blockptr\strut etex,0);
+  boxjoin(a.width = b.width = a.height; a.s = b.n + (0,30));
+  patchit.bk1(btex $i_1$\strut etex,0);
+  patchit.bk2(btex $i_2$\strut etex,0);
+  patchit.bk3(btex $i_3$\strut etex,0);
+  patchit.bk4(btex $i_4$\strut etex,0);
 
-  boxjoin(a.width = b.width);
-  patchit.da(btex data 1\strut etex, 1);
-  patchit.db(btex data 2\strut etex, 1);
-  patchit.dc(btex data 3\strut etex, 1);
-  patchit.dd(btex data 4\strut etex, 1);
-  patchit.ia(btex zero 1\strut etex, 1);
-  patchit.ib(btex zero 2\strut etex, 1);
-  patchit.ic(btex zero 3\strut etex, 1);
-  patchit.id(btex zero 4\strut etex, 1);
+  boxjoin(a.width = b.width = a.height);
+  patchit.d1(btex $d_1'$\strut etex, 0);
+  patchit.d2(btex $d_2'$\strut etex, 0);
+  patchit.d3(btex $d_3'$\strut etex, 0);
+  patchit.d4(btex $d_4'$\strut etex, 0);
+  patchit.i1(btex $d_1$\strut etex, 0);
+  patchit.i2(btex $d_2$\strut etex, 0);
+  patchit.i3(btex $d_3$\strut etex, 0);
+  patchit.i4(btex $d_4$\strut etex, 0);
+  d1.dx=10;
 
-  boxjoin(a.width = b.width);
-  patchit.bia(btex bitmap\strut etex, 2);
-  patchit.bib(btex bitmap\strut etex, 2);
-  patchit.bic(btex bitmap\strut etex, 2);
-  patchit.bid(btex bitmap\strut etex, 2);
-  bia.squatness=bib.squatness=bic.squatness=bid.squatness=0.6;
-  bia.dx=12;
+  boxjoin(a.width = b.width = a.height);
+  patchit.bi1(btex $a_1$\strut etex, 0);
+  patchit.bi2(btex $a_2$\strut etex, 0);
+  patchit.bi3(btex $a_3$\strut etex, 0);
+  patchit.bi4(btex $a_4$\strut etex, 0);
+  %bia.squatness=bib.squatness=bic.squatness=bid.squatness=0.6;
+  bi1.dx=4;
 
   boxjoin();
-  patchit.mtime(btex mtime\strut etex, 0);
-  patchit.group(btex group\strut etex, 3);
-  patchit.sblk(btex superblk\strut etex, 3);
+  patchit.mtime(btex $i''$\strut etex, 0);
+  patchit.group(btex $g$\strut etex, 0);
+  patchit.sblk(btex $s$\strut etex, 0);
+  group.dx=10;group.width=sblk.width;
 
-  mtime.n = .5[szd.c,bkd.c] - (0,40);
+  i4.height=i4.width;bk4.height=bk4.width;sz4.height=sz4.width;bi4.height=bi4.width;
+  mtime.height=mtime.width;group.height=group.width;sblk.height=sblk.width;
+
+  mtime.n = .5[sz4.c,bk4.c] - (0,40);
   ypart group.c = ypart mtime.c;
   sblk.w - group.e = (30,0);
-  xpart .5[sblk.c,group.c] = xpart .5[dd.c,bid.c];
+  xpart .5[sblk.c,group.c] = xpart .5[d4.c,bi4.c];
   
-  bka.width = sza.width = mtime.width; group.width=sblk.width;
-  bka.w = .3[sza.s,szb.n] + (20,0);
+  bk1.w = .5[sz1.s,sz2.n] + (20,0);
 
-  da.w-sza.e = db.w-szb.e = dc.w-szc.e = dd.w-szd.e = (70,0);
-  ia.w-da.e = ib.w-db.e = ic.w-dc.e = id.w-dd.e = (20,0);
-  bia.w-ia.e = bib.w-ib.e = bic.w-ic.e = bid.w-id.e = (30,0);
+  d1.w-sz1.e = d2.w-sz2.e = d3.w-sz3.e = d4.w-sz4.e = (70,0);
+  i1.w-d1.e = i2.w-d2.e = i3.w-d3.e = i4.w-d4.e = (20,0);
+  bi1.w-i1.e = bi2.w-i2.e = bi3.w-i3.e = bi4.w-i4.e = (40,0);
   
   
-  fixelement(bka,bkb,bkc,bkd,sza,szb,szc,szd,da,db,dc,dd,ia,ib,ic,id,bia,bib,bic,bid,mtime,sblk,group);
-  drawelement(bka,bkb,bkc,bkd,sza,szb,szc,szd,da,db,dc,dd,ia,ib,ic,id,bia,bib,bic,bid,mtime,group,sblk);
-  drawconnpatch(szb,sza)(..);
-  drawconnpatch(szc,szb)(..);
-  drawconnpatch(szd,szc)(..);
-  drawconnpatch(bkb,bka)(..);
-  drawconnpatch(bkc,bkb)(..);
-  drawconnpatch(bkd,bkc)(..);
-  drawconnpatch(sza,da)(..);
-  drawconnpatch(szb,db)(..);
-  drawconnpatch(szc,dc)(..);
-  drawconnpatch(szd,dd)(..);
-  drawconnpatch(da,ia)(..);
-  drawconnpatch(db,ib)(..);
-  drawconnpatch(dc,ic)(..);
-  drawconnpatch(dd,id)(..);
-  drawconnpatch(bka,ia)(..{right}(xpart ia.w,ypart bka.c).. {up});
-  drawconnpatch(bkb,ib)(..{right}(xpart ib.w,ypart bkb.c).. {up});
-  drawconnpatch(bkc,ic)(..{right}(xpart ic.w,ypart bkc.c).. {up});
-  drawconnpatch(bkd,id)(..{right}(xpart id.w,ypart bkd.c).. {up});
-  drawconnpatch(ia,bia)(..);
-  drawconnpatch(ib,bib)(..);
-  drawconnpatch(ic,bic)(..);
-  drawconnpatch(id,bid)(..);
+  fixelement(bk1,bk2,bk3,bk4,sz1,sz2,sz3,sz4,d1,d2,d3,d4,i1,i2,i3,i4,bi1,bi2,bi3,bi4,mtime,sblk,group);
+
+  d = 6;
+  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor .9white enddef;
+  z1 = sz1.nw+(-d,2d); z2 = (xpart bk4.se + 1.5d,ypart mtime.s - d);
+  blockbox(z1 -- (x2,y1) -- z2 -- (x1,y2) -- cycle);
+
+  blockbox(d1.nw+(-d,2d) -- i1.ne+(d,2d) -- i1.se+(d,-d) -- d1.sw+(-d,-d) -- cycle);
+  forsuffixes $=2,3,4:
+    blockbox(d$.nw+(-d,d) -- i$.ne+(d,d) -- i$.se+(d,-d) -- d$.sw+(-d,-d) -- cycle);
+  endfor
+
+  blockbox(bi1.nw+2(-d,d) -- bi1.ne+2(d,d) -- bi4.se+2(d,-d) -- bi4.sw+2(-d,-d) -- cycle);
+  forsuffixes $=sblk,group:
+    blockbox($.nw+(-1.2d,2d) -- $.ne+(1.2d,2d) -- $.se+(1.2d,-d) -- $.sw+(-1.2d,-d) -- cycle);
+  endfor
+  
+  drawelement(bk1,bk2,bk3,bk4,sz1,sz2,sz3,sz4,d1,d2,d3,d4,i1,i2,i3,i4,bi1,bi2,bi3,bi4,mtime,group,sblk);
+  drawconnpatch(sz2,sz1)(..);
+  drawconnpatch(sz3,sz2)(..);
+  drawconnpatch(sz4,sz3)(..);
+  drawconnpatch(bk2,bk1)(..);
+  drawconnpatch(bk3,bk2)(..);
+  drawconnpatch(bk4,bk3)(..);
+  drawconnpatch(sz1,d1)(..);
+  drawconnpatch(sz2,d2)(..);
+  drawconnpatch(sz3,d3)(..);
+  drawconnpatch(sz4,d4)(..);
+  drawconnpatch(d1,i1)(..);
+  drawconnpatch(d2,i2)(..);
+  drawconnpatch(d3,i3)(..);
+  drawconnpatch(d4,i4)(..);
+  drawconnpatch(bk1,i1)(..{right}(xpart i1.w,ypart bk1.c).. {up});
+  drawconnpatch(bk2,i2)(..{right}(xpart i2.w,ypart bk2.c).. {up});
+  drawconnpatch(bk3,i3)(..{right}(xpart i3.w,ypart bk3.c).. {up});
+  drawconnpatch(bk4,i4)(..{right}(xpart i4.w,ypart bk4.c).. {up});
+  drawconnpatch(i1,bi1)(..);
+  drawconnpatch(i2,bi2)(..);
+  drawconnpatch(i3,bi3)(..);
+  drawconnpatch(i4,bi4)(..);
   drawconnpatch(group,sblk)(..);
+
+  label.top(btex set size etex scaled 0.7, sz1.n);
+  label.top(btex add block etex scaled 0.7, bk1.n);
+  label.top(btex set mtime etex scaled 0.7, mtime.n);
+  label.top(btex write data etex scaled 0.7, d1.n);
+  label.top(btex zero data etex scaled 0.7, i1.n);
+  label.top(btex alloc block etex scaled 0.7, bi1.n);
+  label.top(btex group desc etex scaled 0.7, group.n);
+  label.top(btex superblock etex scaled 0.7, sblk.n);
 endfig;
 
 
+
 beginfig(2);
+  numeric d;
+  boxjoin(a.width = b.width = a.height; a.s = b.n + (0,30));
+  patchit.sz1(btex $i_1'$\strut etex,0);
+  patchit.sz2(btex $i_2'$\strut etex,0);
+  patchit.sz3(btex $i_3'$\strut etex,0);
+  patchit.sz4(btex $i_4'$\strut etex,0);
+  
+  boxjoin(a.width = b.width = a.height; a.s = b.n + (0,30));
+  patchit.bk1(btex $i_1$\strut etex,0);
+  patchit.bk2(btex $i_2$\strut etex,0);
+  patchit.bk3(btex $i_3$\strut etex,0);
+  patchit.bk4(btex $i_4$\strut etex,0);
+
+  boxjoin(a.width = b.width = a.height);
+  patchit.d1(btex $d_1'$\strut etex, 0);
+  patchit.d2(btex $d_2'$\strut etex, 0);
+  patchit.d3(btex $d_3'$\strut etex, 0);
+  patchit.d4(btex $d_4'$\strut etex, 0);
+  patchit.i1(btex $d_1$\strut etex, 0);
+  patchit.i2(btex $d_2$\strut etex, 0);
+  patchit.i3(btex $d_3$\strut etex, 0);
+  patchit.i4(btex $d_4$\strut etex, 0);
+  d1.dx=10;
+
+  boxjoin(a.width = b.width = a.height);
+  patchit.bi1(btex $a_1$\strut etex, 0);
+  patchit.bi2(btex $a_2$\strut etex, 0);
+  patchit.bi3(btex $a_3$\strut etex, 0);
+  patchit.bi4(btex $a_4$\strut etex, 0);
+  %bia.squatness=bib.squatness=bic.squatness=bid.squatness=0.6;
+  bi1.dx=4;
+
+  boxjoin();
+  patchit.mtime(btex $i''$\strut etex, 0);
+  patchit.group(btex $g$\strut etex, 0);
+  patchit.sblk(btex $s$\strut etex, 0);
+  group.dx=10;group.width=sblk.width;
+
+  i4.height=i4.width;bk4.height=bk4.width;sz4.height=sz4.width;bi4.height=bi4.width;
+  mtime.height=mtime.width;group.height=group.width;sblk.height=sblk.width;
+
+  mtime.n = .5[sz4.c,bk4.c] - (0,40);
+  ypart group.c = ypart mtime.c;
+  sblk.w - group.e = (30,0);
+  xpart .5[sblk.c,group.c] = xpart .5[d4.c,bi4.c];
+  
+  bk1.w = .5[sz1.s,sz2.n] + (20,0);
+
+  d1.w-sz1.e = d2.w-sz2.e = d3.w-sz3.e = d4.w-sz4.e = (70,0);
+  i1.w-d1.e = i2.w-d2.e = i3.w-d3.e = i4.w-d4.e = (20,0);
+  bi1.w-i1.e = bi2.w-i2.e = bi3.w-i3.e = bi4.w-i4.e = (40,0);
+
+
+  forsuffixes $=i1,i2,i3,i4,bi1,group,sblk,bk1,bk2,bk3,bk4,sz1,sz2,sz3,sz4,mtime:
+    $.borderscale = hardborderscale;
+  endfor
+  
+  
+  fixelement(bk1,bk2,bk3,bk4,sz1,sz2,sz3,sz4,d1,d2,d3,d4,i1,i2,i3,i4,bi1,bi2,bi3,bi4,mtime,sblk,group);
+
+  d = 6;
+  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor .9white enddef;
+  z1 = sz1.nw+(-d,d); z2 = (xpart bk4.se + 1.5d,ypart mtime.s - d);
+  blockbox(z1 -- (x2,y1) -- z2 -- (x1,y2) -- cycle);
+
+  forsuffixes $=1,2,3,4:
+    blockbox(d$.nw+(-d,d) -- i$.ne+(d,d) -- i$.se+(d,-d) -- d$.sw+(-d,-d) -- cycle);
+  endfor
+
+  blockbox(bi1.nw+2(-d,d) -- bi1.ne+2(d,d) -- bi4.se+2(d,-d) -- bi4.sw+2(-d,-d) -- cycle);
+  forsuffixes $=sblk,group:
+    blockbox($.nw+(-d,d) -- $.ne+(d,d) -- $.se+(d,-d) -- $.sw+(-d,-d) -- cycle);
+  endfor
+  
+  drawelement(bk1,bk2,bk3,bk4,sz1,sz2,sz3,sz4,d1,d2,d3,d4,i1,i2,i3,i4,bi1,bi2,bi3,bi4,mtime,group,sblk);
+  drawconnpatch(sz2,sz1)(..);
+  drawconnpatch(sz3,sz2)(..);
+  drawconnpatch(sz4,sz3)(..);
+  drawconnpatch(bk2,bk1)(..);
+  drawconnpatch(bk3,bk2)(..);
+  drawconnpatch(bk4,bk3)(..);
+  drawconnpatch(sz1,d1)(..);
+  drawconnpatch(sz2,d2)(..);
+  drawconnpatch(sz3,d3)(..);
+  drawconnpatch(sz4,d4)(..);
+  drawconnpatch(d1,i1)(..);
+  drawconnpatch(d2,i2)(..);
+  drawconnpatch(d3,i3)(..);
+  drawconnpatch(d4,i4)(..);
+  drawconnpatch(bk1,i1)(..{right}(xpart i1.w,ypart bk1.c).. {up});
+  drawconnpatch(bk2,i2)(..{right}(xpart i2.w,ypart bk2.c).. {up});
+  drawconnpatch(bk3,i3)(..{right}(xpart i3.w,ypart bk3.c).. {up});
+  drawconnpatch(bk4,i4)(..{right}(xpart i4.w,ypart bk4.c).. {up});
+  drawconnpatch(i1,bi1)(..);
+  drawconnpatch(i2,bi2)(..);
+  drawconnpatch(i3,bi3)(..);
+  drawconnpatch(i4,bi4)(..);
+  drawconnpatch(group,sblk)(..);
+  drawconnpatch(bi2,bi1)(..);
+  drawconnpatch(bi3,bi1)({dir 65}..{dir 120});
+  drawconnpatch(bi4,bi1)({dir 70}..{dir 130});
+endfig;
+
+
+
+beginfig(3);
+  numeric d;
+  patchit.in(btex $i_{\text{1--4}}+i'_{\text{1--4}}+i''$\strut etex,0);
+
+  boxjoin(a.width = b.width = a.height; a.s=b.n+(0,30));
+  patchit.d1(btex $d_1'$\strut etex, 0);
+  patchit.d2(btex $d_2'$\strut etex, 0);
+  patchit.d3(btex $d_3'$\strut etex, 0);
+  patchit.d4(btex $d_4'$\strut etex, 0);
+  boxjoin(a.width = b.width = a.height; a.s=b.n+(0,30));
+  patchit.i1(btex $d_1$\strut etex, 0);
+  patchit.i2(btex $d_2$\strut etex, 0);
+  patchit.i3(btex $d_3$\strut etex, 0);
+  patchit.i4(btex $d_4$\strut etex, 0);
+  d1.dx=10;
+
+  boxjoin(a.width = b.width = a.height);
+  patchit.bi1(btex $a_1$\strut etex, 0);
+  patchit.bi2(btex $a_2$\strut etex, 0);
+  patchit.bi3(btex $a_3$\strut etex, 0);
+  patchit.bi4(btex $a_4$\strut etex, 0);
+  %bia.squatness=bib.squatness=bic.squatness=bid.squatness=0.6;
+  bi1.dx=4;
+
+  boxjoin();
+  patchit.group(btex $g$\strut etex, 0);
+  patchit.sblk(btex $s$\strut etex, 0);
+  group.dx=10;group.width=sblk.width;
+
+  i4.height=i4.width=d4.height=d4.width;bi4.height=bi4.width;
+  group.height=group.width;sblk.height=sblk.width;
+
+  sblk.w - group.e = (30,0);
+  xpart .5[sblk.c,group.c] = xpart .5[in.w,bi4.e];
+  ypart d4.s = ypart group.n + 30;
+
+  in.e = .5[d1.w,d4.w] - (30,0);
+  
+  %bk1.w = .5[sz1.s,sz2.n] + (20,0);
+
+  %d1.w-sz1.e = d2.w-sz2.e = d3.w-sz3.e = d4.w-sz4.e = (70,0);
+  i1.w-d1.e = i2.w-d2.e = i3.w-d3.e = i4.w-d4.e = (20,0);
+  bi1.w-i1.e = bi2.w-i2.e = bi3.w-i3.e = bi4.w-i4.e = (40,0);
+
+
+  forsuffixes $=i1,i2,i3,i4,bi1,group,sblk,in:
+    $.borderscale = hardborderscale;
+  endfor
+  
+  
+  fixelement(in,d1,d2,d3,d4,i1,i2,i3,i4,bi1,bi2,bi3,bi4,sblk,group);
+
+  d = 6;
+  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor .9white enddef;
+  blockbox(in.nw+(-d,d) -- in.ne+(d,d) -- in.se+(d,-d) -- in.sw+(-d,-d) -- cycle);
+
+  forsuffixes $=1,2,3,4:
+    blockbox(d$.nw+(-d,d) -- i$.ne+(d,d) -- i$.se+(d,-d) -- d$.sw+(-d,-d) -- cycle);
+  endfor
+
+  blockbox(bi1.nw+2(-d,d) -- bi1.ne+2(d,d) -- bi4.se+2(d,-d) -- bi4.sw+2(-d,-d) -- cycle);
+  forsuffixes $=sblk,group:
+    blockbox($.nw+(-d,d) -- $.ne+(d,d) -- $.se+(d,-d) -- $.sw+(-d,-d) -- cycle);
+  endfor
+  
+  drawelement(in,d1,d2,d3,d4,i1,i2,i3,i4,bi1,bi2,bi3,bi4,group,sblk);
+  drawconnpatch(in,d1)(..);
+  drawconnpatch(in,d2)(..);
+  drawconnpatch(in,d3)(..);
+  drawconnpatch(in,d4)(..);
+  drawconnpatch(d1,i1)(..);
+  drawconnpatch(d2,i2)(..);
+  drawconnpatch(d3,i3)(..);
+  drawconnpatch(d4,i4)(..);
+  drawconnpatch(in,i1)(..);
+  drawconnpatch(in,i2)({dir 15}..{dir 45});
+  drawconnpatch(in,i3)({dir -15}..{dir -45});
+  drawconnpatch(in,i4)(..);
+  drawconnpatch(i1,bi1)(..);
+  drawconnpatch(i2,bi2)(..);
+  drawconnpatch(i3,bi3)(..);
+  drawconnpatch(i4,bi4)(..);
+  drawconnpatch(group,sblk)(..);
+  drawconnpatch(bi2,bi1)(..);
+  drawconnpatch(bi3,bi1)({dir 65}..{dir 120});
+  drawconnpatch(bi4,bi1)({dir 70}..{dir 130});
+endfig;
+
+
+beginfig(4);
   patchit.i(btex inode\strut etex,0);
   
   boxjoin(a.width = b.width; a.s - b.n = (0,10));
@@ -117,6 +343,60 @@ beginfig(2);
   drawconnpatch(db,bi)(..);
   drawconnpatch(dc,bi)(..);
   drawconnpatch(dd,bi)(..);
+  drawconnpatch(group,sblk)(..);
+endfig;
+
+
+beginfig(4);
+  numeric d;
+  patchit.in(btex $i_{\text{1--4}}+i'_{\text{1--4}}+i''$\strut etex,0);
+
+  boxjoin(a.width = b.width; b.height = a.height; a.s=b.n+(0,20));
+  patchit.d1(btex $d_1+d_1'$\strut etex, 0);
+  patchit.d2(btex $d_2+d_2'$\strut etex, 0);
+  patchit.d3(btex $d_3+d_3'$\strut etex, 0);
+  patchit.d4(btex $d_4+d_4'$\strut etex, 0);
+  d1.dx=10;
+
+  boxjoin();
+  patchit.bi(btex $a_{\text{1--4}}$\strut etex, 0);
+  bi1.dx=4;
+
+  patchit.group(btex $g$\strut etex, 0);
+  patchit.sblk(btex $s$\strut etex, 0);
+  group.dx=10;group.width=sblk.width;
+
+  group.height=group.width;sblk.height=sblk.width;
+
+  sblk.w - group.e = (30,0);
+  xpart .5[sblk.c,group.c] = xpart .5[in.w,bi.e];
+  ypart d4.s = ypart group.n + 30;
+
+  .5[d1.w,d4.w] - in.e = bi.w - .5[d1.e,d4.e] = (30,0);
+
+  forsuffixes $=d1,d2,d3,d4,bi,group,sblk,in:
+    $.borderscale = hardborderscale;
+  endfor
+  
+  
+  fixelement(in,d1,d2,d3,d4,bi,sblk,group);
+
+  d = 6;
+  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor .9white enddef;
+
+  forsuffixes $=d1,d2,d3,d4,in,bi,sblk,group:
+    blockbox($.nw+(-d,d) -- $.ne+(d,d) -- $.se+(d,-d) -- $.sw+(-d,-d) -- cycle);
+  endfor
+
+  drawelement(in,d1,d2,d3,d4,bi,group,sblk);
+  drawconnpatch(in,d1)(..);
+  drawconnpatch(in,d2)(..);
+  drawconnpatch(in,d3)(..);
+  drawconnpatch(in,d4)(..);
+  drawconnpatch(d1,bi)(..);
+  drawconnpatch(d2,bi)(..);
+  drawconnpatch(d3,bi)(..);
+  drawconnpatch(d4,bi)(..);
   drawconnpatch(group,sblk)(..);
 endfig;
 

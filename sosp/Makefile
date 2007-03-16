@@ -22,8 +22,8 @@ BIBS = paper.bib kmaster.bib
 
 TMP_PDF_IMAGES = fig/figures_1.pdf fig/figures_2.pdf fig/figures_3.pdf \
 	fig/figures_4.pdf fig/figures_5.pdf fig/figures_6.pdf \
-	fig/figures_7.pdf opgroup_transitions.pdf \
-	nrb_merge.pdf svn_opgroups.pdf
+	fig/figures_7.pdf fig/opt_1.pdf fig/opt_4.pdf \
+	opgroup_transitions.pdf nrb_merge.pdf svn_opgroups.pdf
 TMP_DVI_IMAGES = $(TMP_PDF_IMAGES:.pdf=.eps)
 
 PDF_IMAGES = $(TMP_PDF_IMAGES)
