@@ -115,7 +115,7 @@ beginfig(1);
   label.top(btex write data etex scaled 0.7, d1.n);
   label.top(btex zero data etex scaled 0.7, i1.n);
   label.top(btex alloc block etex scaled 0.7, bi1.n);
-  label.top(btex group desc etex scaled 0.7, group.n+(0,d));
+  label.top(btex group desc block etex scaled 0.7, group.n+(0,d));
   label.top(btex superblock etex scaled 0.7, sblk.n+(0,d));
 endfig;
 
