@@ -75,14 +75,11 @@
 
 \newcommand{\p}[1]{\ensuremath{#1}} % basic patch
 
-\newcommand{\ncd}[1]{\ensuremath{\p{#1}^\mathrm{n}}} % noop chdesc
-\newcommand{\nrbof}[1]{\ensuremath{\p{#1}^\mathrm{nrb}}} % NRB chdesc
-
-\newcommand{\depends}[2]{\ensuremath{#2\! \rightarrow\! #1}} % depends (right)
-\newcommand{\ldepends}[2]{\ensuremath{#2\! \leftarrow\! #1}} % depends (left)
-\newcommand{\indirdepends}[2]{\ensuremath{#2\! \leadsto\! #1}} % indirect depends
-\newcommand{\notindirdepends}[2]{\ensuremath{#2\! \not\leadsto\! #1}} % does not indirectly depend
-\newcommand{\cycledepends}[2]{\ensuremath{#2\! \leftrightarrow\! #1}} % cycle
+\newcommand{\depends}[2]{\ensuremath{#1\! \rightarrow\! #2}} % depends (right)
+\newcommand{\ldepends}[2]{\ensuremath{#1\! \leftarrow\! #2}} % depends (left)
+\newcommand{\indirdepends}[2]{\ensuremath{#1\! \leadsto\! #2}} % indirect depends
+\newcommand{\notindirdepends}[2]{\ensuremath{#1\! \not\leadsto\! #2}} % does not indirectly depend
+\newcommand{\cycledepends}[2]{\ensuremath{#1\! \leftrightarrow\! #2}} % cycle
 
 \newcommand{\block}[1]{\ensuremath{B_{#1}}}
 \newcommand{\blockof}[1]{\ensuremath{#1}.block} % the block of
