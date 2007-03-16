@@ -214,9 +214,6 @@ It is easy to show that this action preserves the in-flight safety property
 and, thus, the disk safety property.
 
 
-\input{noop}
-
-
 \subsection{Challenges}
 
 A naive implementation of this model scales extremely poorly,
@@ -294,18 +291,35 @@ The next section tackles all of these challenges.
 
 \section{Patch Optimizations}
 
-\begin{figure*}
+\begin{figure}
 \centering
-\begin{tabular}{@{}p{.5\hsize}p{.5\hsize}@{}}
-{\centering\includegraphics[scale=0.8]{fig/opt_1}\endgraf}&
-{\centering\includegraphics[scale=0.8]{fig/opt_2}\endgraf}\\
-{\centering\textbf{a)} Before optimizations\endgraf}&
-{\centering\textbf{b)} With hard patches\endgraf}\\
-{\centering\includegraphics[scale=0.8]{fig/opt_3}\endgraf}&
-{\centering\includegraphics[scale=0.8]{fig/opt_4}\endgraf}\\
-{\centering\textbf{c)} With hard--hard merging\endgraf}&
-{\centering\textbf{d)} With overlap merging\endgraf}\\
-\end{tabular}
-\end{figure*}
+
+\includegraphics[scale=0.62]{fig/opt_1}
+
+\textbf{a)} Before optimizations
+
+\vskip.5\baselineskip
+
+\includegraphics[scale=0.62]{fig/opt_2}
+
+\textbf{b)} With hard patches
+
+\vskip.5\baselineskip
+
+\includegraphics[scale=0.62]{fig/opt_3}
+
+\textbf{c)} With hard--hard merging
+
+\vskip.5\baselineskip
+
+\includegraphics[scale=0.62]{fig/opt_4}
+
+\textbf{d)} With overlap merging
+
+\caption{\Patches\ required to append 4 blocks to an existing file, without
+and with optimization.  Hard patches are shown with heavy borders.}
+\end{figure}
 
 \input{readylist}
+
+\input{noop}
