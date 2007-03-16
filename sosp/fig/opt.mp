@@ -66,7 +66,8 @@ beginfig(1);
 
   d = 6;
   def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor .9white enddef;
-  z1 = sz1.nw+(-d,2d); z2 = (xpart bk4.se + 1.5d,ypart mtime.s - d);
+  ylab = ypart i1.ne + 2d;
+  z1 = sz1.nw+(-d,2d); y1 := ylab; z2 = (xpart bk4.se + 1.5d,ypart mtime.s - d);
   blockbox(z1 -- (x2,y1) -- z2 -- (x1,y2) -- cycle);
 
   blockbox(d1.nw+(-d,2d) -- i1.ne+(d,2d) -- i1.se+(d,-d) -- d1.sw+(-d,-d) -- cycle);
@@ -74,10 +75,14 @@ beginfig(1);
     blockbox(d$.nw+(-d,d) -- i$.ne+(d,d) -- i$.se+(d,-d) -- d$.sw+(-d,-d) -- cycle);
   endfor
 
-  blockbox(bi1.nw+2(-d,d) -- bi1.ne+2(d,d) -- bi4.se+2(d,-d) -- bi4.sw+2(-d,-d) -- cycle);
+  blockbox((xpart bi1.nw-2d,ylab) -- (xpart bi1.ne+2d,ylab) -- bi4.se+2(d,-d) -- bi4.sw+2(-d,-d) -- cycle);
   forsuffixes $=sblk,group:
-    blockbox($.nw+(-1.2d,2d) -- $.ne+(1.2d,2d) -- $.se+(1.2d,-d) -- $.sw+(-1.2d,-d) -- cycle);
+    blockbox($.nw+(-d,d) -- $.ne+(d,d) -- $.se+(d,-d) -- $.sw+(-d,-d) -- cycle);
   endfor
+
+  label.top(btex \mlabel{inode block}\strut etex scaled 0.9, (.5[x1,x2],ylab));
+  label.top(btex \mlabel{data blocks}\strut etex scaled 0.9, (xpart .5[d1.nw,i1.ne],ylab));
+  label.top(btex \mlabel{bitmap block}\strut etex scaled 0.9, (xpart bi1.c,ylab));
   
   drawelement(bk1,bk2,bk3,bk4,sz1,sz2,sz3,sz4,d1,d2,d3,d4,i1,i2,i3,i4,bi1,bi2,bi3,bi4,mtime,group,sblk);
   drawconnpatch(sz2,sz1)(..);
@@ -110,8 +115,8 @@ beginfig(1);
   label.top(btex write data etex scaled 0.7, d1.n);
   label.top(btex zero data etex scaled 0.7, i1.n);
   label.top(btex alloc block etex scaled 0.7, bi1.n);
-  label.top(btex group desc etex scaled 0.7, group.n);
-  label.top(btex superblock etex scaled 0.7, sblk.n);
+  label.top(btex group desc etex scaled 0.7, group.n+(0,d));
+  label.top(btex superblock etex scaled 0.7, sblk.n+(0,d));
 endfig;
 
 
