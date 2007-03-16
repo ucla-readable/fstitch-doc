@@ -36,10 +36,16 @@ To avoid (expensive) dependency traversals to determine whether a new
 \Kudos\ conservatively identifies \nrb\ \chdescs\ using only local
 dependency information.
 %
-\Kudos\ detects that a new \chdesc\ may need to be rolled back if any
-\chdescs\ already on the block have external (on a different
-block\todo{Descriptive enough? Mention \noop\ \chdesc\ \after\ recursion?})
-\afters.
+\Kudos\ detects that a new \chdesc\ on block $b$ may need to be rolled back if:
+\todo{Which form is easier to read? Can we write \(\ChMem - \ChMem{b} - \ChNoop\) more concisely?}
+%
+\todo{Actually, our implementation also uses in flight \chdescs. Can we make
+it not?}
+%
+\[ \AfterS{\ChMemB{b}} \cap (\ChMem - \ChMemB{b} - \ChNoop) \ne \emptyset \]
+\[ \exists \inset{p}{\ChMemB{b}}\!:\
+   \exists c\!:\ \exists \inset{q}{\ChMemB{c}}\!:\
+   \indirdepends{q}{p} \]
 %
 This is both a safe and useful indicator because
 %
