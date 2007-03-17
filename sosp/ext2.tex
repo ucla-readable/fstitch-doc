@@ -2,8 +2,22 @@
 \label{sec:using:ext2}
 
 \Kudos\ currently has implementations of three base file system types: a simple
-file system without inodes called JOSFS, Linux ext2, and 4.2 BSD UFS.
+file system without inodes called JOSFS, Linux ext2, and 4.2 BSD UFS. We briefly
+describe ext2 as an example of a complete and relatively complex file system.
 
-Yay! We support ext2! And, with the journal, pseudo-ext3!
+The ext2 \module\ is implemented at the \LFS\ interface. This keeps properties
+specific to ext2 (such as the ext2 on-disk format and rules governing block
+allocation) hidden within the file system \module. The ext2 \module\ creates
+\chdescs\ for all its changes to the disk, and connects them to form
+configurations that achieve soft updates consistency. To the best of our
+knowledge, this is the first implementation of ext2 to provide soft updates
+consistency guarantees. Unlike FreeBSD's soft updates implementation, once the
+dependencies have been hooked up, the ext2 \module\ no longer needs to concern
+itself with the \chdescs\ it has created. The block device subsystem will track
+and enforce the \chdesc\ orderings.
 
-Describe ext2 in more detail here, and simplify the UFS section.
+In order to implement soft updates ordering, each \LFS\ call to the ext2
+\module\ must connect the \chdescs\ it creates according to the rules for soft
+updates~\cite{ganger00soft}. The UHFS \module\ (\S\ref{sec:modules:uhfs})
+connects the resulting \chdesc\ subgraphs together in soft updates order,
+completing the implementation of soft updates using \chdescs.

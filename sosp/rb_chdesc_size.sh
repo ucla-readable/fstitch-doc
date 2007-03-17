@@ -8,4 +8,6 @@ set xtics 4
 set xlabel "Soft patch size (bytes)"
 set ylabel "Number of patches"
 
+set logscale y
+
 plot "rb_chdesc_size.data" with points 2
