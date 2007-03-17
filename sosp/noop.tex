@@ -1,7 +1,31 @@
 % -*- mode: latex; tex-main-file: "paper.tex" -*-
 
-\subsection{\Noop\ \ChDescs}
+\subsection{Implementation and empty \patches}
 \label{sec:chdescs:noop}
+
+\Kudos\ file system implementations create \patches\ with one of the
+following functions:
+
+\begin{scriptsize}
+\begin{alltt}
+int \textbf{patch_create_byte}(\textit{block},
+    bdesc_t *block, bdev_t *owner,
+    uint16_t offset, uint16_t length,
+    const void *data, patch_t **head);
+int \textbf{patch_create_bit}(
+    bdesc_t *block, bdev_t *owner,
+    uint16_t offset, uint32_t xor,
+    patch_t **head);
+int \textbf{patch_create_empty}(
+    bdev_t *owner, patch_t **tail,
+    size_t nheads, patch_t * heads[]);
+int \textbf{patch_create_diff}(
+    bdesc_t *block, bdev_t *owner,
+    uint16_t offset, uint16_t length,
+    const void *data, patch_t **head);
+\end{alltt}
+\end{scriptsize}
+
 
 We first address dependency convenience and memory usage with \emph{empty
 \patches}, which have no associated data or block.

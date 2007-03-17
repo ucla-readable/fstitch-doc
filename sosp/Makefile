@@ -32,7 +32,7 @@ DVI_IMAGES = $(TMP_DVI_IMAGES)
 
 PDF_PRIMARY =
 
-all: paper.pdf
+all: paper.pdf paper.dvi
 
 paper.dvi: $(MAINFILE) $(MAINFILE:.tex=.bbl) $(DVI_IMAGES) always
 	$(LATEX) $<

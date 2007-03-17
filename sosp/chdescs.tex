@@ -1,29 +1,6 @@
 \section {\ChDescs}
 \label{sec:chdescs}
 
-\newcommand{\ChAll}{\ensuremath{\textit{All}}}
-\newcommand{\ChAllB}[1]{\ensuremath{\textit{All}[#1]}}
-\newcommand{\ChMem}{\ensuremath{\textit{Mem}}}
-\newcommand{\ChMemB}[1]{\ensuremath{\textit{Mem}[#1]}}
-\newcommand{\ChDisk}{\ensuremath{\textit{Disk}}}
-\newcommand{\ChDiskB}[1]{\ensuremath{\textit{Disk}[#1]}}
-\newcommand{\ChInf}{\ensuremath{\textit{Inf}}}
-\newcommand{\ChInfB}[1]{\ensuremath{\textit{Inf\/}[#1]}}
-\newcommand{\ChRb}{\ensuremath{\textit{\Rb}}}
-\newcommand{\ChRbB}[1]{\ensuremath{\textit{\Rb}[#1]}}
-\newcommand{\ChNrb}{\ensuremath{\textit{\Nrb}}}
-\newcommand{\ChNrbB}[1]{\ensuremath{\textit{\Nrb}[#1]}}
-\newcommand{\ChNoop}{\ensuremath{\textit{\Noop}}}
-
-\newcommand{\Before}[1]{\ensuremath{\textit{Pre}[#1]}}
-\newcommand{\BeforeS}[1]{\ensuremath{\textit{Pre}^*[#1]}}
-\newcommand{\After}[1]{\ensuremath{\textit{Post}[#1]}}
-\newcommand{\AfterS}[1]{\ensuremath{\textit{Post}^*[#1]}}
-
-\newcommand{\statenone}{\ensuremath{\textit{inmem}}}
-\newcommand{\stateinf}{\ensuremath{\textit{inflight}}}
-\newcommand{\statedisk}{\ensuremath{\textit{ondisk}}}
-
 % {{{ fig:chdesc
 \begin{figure}[t]
 \vskip-14pt
@@ -125,6 +102,5 @@ their \chdescs\ instead of forwarding them immediately. Finally, \chdescs\ are
 \emph{satisfied} when their associated data reaches stable storage.
 
 \input{model}
-\input{nrb}
 \input{merge}
 \input{chdescdiscuss}

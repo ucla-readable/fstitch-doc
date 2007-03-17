@@ -1,5 +1,30 @@
 % -*- tex-main-file: "paper.tex" -*-
 
+\newcommand{\ChAll}{\ensuremath{\textit{All}}}
+\newcommand{\ChAllB}[1]{\ensuremath{\textit{All}[#1]}}
+\newcommand{\ChMem}{\ensuremath{\textit{Mem}}}
+\newcommand{\ChMemB}[1]{\ensuremath{\textit{Mem}[#1]}}
+\newcommand{\ChDisk}{\ensuremath{\textit{Disk}}}
+\newcommand{\ChDiskB}[1]{\ensuremath{\textit{Disk}[#1]}}
+\newcommand{\ChInf}{\ensuremath{\textit{Inf}}}
+\newcommand{\ChInfB}[1]{\ensuremath{\textit{Inf\/}[#1]}}
+\newcommand{\ChRb}{\ensuremath{\textit{\Rb}}}
+\newcommand{\ChRbB}[1]{\ensuremath{\textit{\Rb}[#1]}}
+\newcommand{\ChNrb}{\ensuremath{\textit{\Nrb}}}
+\newcommand{\ChNrbB}[1]{\ensuremath{\textit{\Nrb}[#1]}}
+\newcommand{\ChNoop}{\ensuremath{\textit{\Noop}}}
+
+\newcommand{\Before}[1]{\ensuremath{\textit{Pre}[#1]}}
+\newcommand{\BeforeS}[1]{\ensuremath{\textit{Pre}^*[#1]}}
+\newcommand{\After}[1]{\ensuremath{\textit{Post}[#1]}}
+\newcommand{\AfterS}[1]{\ensuremath{\textit{Post}^*[#1]}}
+
+\newcommand{\statenone}{\ensuremath{\textit{inmem}}}
+\newcommand{\stateinf}{\ensuremath{\textit{inflight}}}
+\newcommand{\statedisk}{\ensuremath{\textit{ondisk}}}
+
+
+
 \section{Patch Model}
 \label{sec:patch}
 
@@ -214,6 +239,9 @@ It is easy to show that this action preserves the in-flight safety property
 and, thus, the disk safety property.
 
 
+\input{noop}
+
+
 \subsection{Challenges}
 
 A naive implementation of this model scales extremely poorly,
@@ -320,6 +348,6 @@ The next section tackles all of these challenges.
 and with optimization.  Hard patches are shown with heavy borders.}
 \end{figure}
 
+\input{nrb}
 \input{readylist}
 
-\input{noop}
