@@ -1,7 +1,7 @@
 \subsection{Write-Back Cache}
 \label{sec:using:wbcache}
 
-Write-back cache \modules\ act as the system's primary cache, and are responsible
+Write-back cache \modules\ act as the system's buffer cache, and are responsible
 for holding on to the \chdescs\ sent to them until they can be safely sent on
 towards the disk. There can be many write-back caches in a configuration at once
 (for instance, one for each block device). To a write-back cache, the complex
@@ -11,30 +11,34 @@ protocols it is implementing, if any at all. Yet it is the \module\ that ends up
 doing most of the work to make sure that \chdescs\ are written in an acceptable
 order.
 
-Despite this, write-back caches are relatively simple -- only about 630 lines of
-code, including comments. The current write-back cache uses a simple FIFO policy
-for writing dirty blocks, and an LRU policy for evicting clean blocks (upon
-being written, a dirty block becomes clean and may then be evicted). However,
-blocks can't be written unless all the \chdescs\ on them are ready to be sent to
-the next \module\ (for example, the disk). A \chdesc\ is ready if all of its
-\befores\ are at least as close to the disk as it is. So, when looking for a
-block to write, the cache may not be able to write any block it chooses -- but
-it writes the oldest dirty block that it can.
+Despite this, write-back caches are relatively simple; they are only slightly
+more complex than the naive implementation suggested in
+section~\ref{sec:patch:challenges}. The current write-back cache uses a FIFO
+policy for writing dirty blocks, and an LRU policy for evicting clean blocks
+(upon being written, a dirty block becomes clean and may then be evicted).
+%
+The FIFO policy for writing blocks is really only a heuristic to help the
+write-back cache find a block which can be written, however, since the in-flight
+safety property (\S\ref{sec:patch:dependencies}) must be maintained in order to
+provide the disk safety property. When attempting to evict a block $B$, the
+write-back cache finds the maximal set of \chdescs\ $P \subseteq \PMem[B]$
+satisfying
+%
+$\PDepset{P} \subseteq P \cup \PDisk$ and $\PHard[B] \subseteq P$.
+%
+This is efficient, because this $P$ is the ready \chdesc\ list discussed in
+section~\ref{sec:patch:readylist}.
+%
+Assuming $P \neq \emptyset$, all other \chdescs\ on $B$ (i.e., $\PMem[B] - P$)
+are rolled back, the resulting block data is sent to the disk driver, the
+\chdescs\ in $P$ are marked \PInfst, and the rolled-back \chdescs\ are rolled
+forward again. $B$ itself is also marked \PInfst, so that only one version of
+its data will be in flight at a time. (This whole procedure is basically the
+\textbf{Write block} action.)
 
-The write-back cache may, however, need to write a block which will stay dirty
-even after it is written. For instance, \chdescs\ may be arranged in a way that
-creates a dependency cycle at the level of blocks, even though the \chdesc\
-dependencies themselves are acyclic. The same solution as soft updates uses is
-employed to break the cycle: the write-back cache just holds on to the \chdescs\
-that cannot yet be written, and forwards the others on to the next \module\ as
-it writes the block. It cannot mark the block clean or evict it yet, since it is
-still dirty, but progress has been made that can make other blocks writable.
-
-The write-back cache has one other property that makes it useful in \Kudos: it
-respects dependencies between one cache and another, so that (for instance)
-dependencies between the changes on a file system and its external journal are
-properly respected. This is actually not a special case, nor does it require any
-extra code -- it is a property that just falls out of the way \chdesc\ graphs
-are processed in order to determine which \chdescs\ are ready to move towards
-the disk. This property also extends to \opgroups, which
-are explained in \S\ref{sec:opgroup}.
+The write-back cache also respects dependencies between one cache and another,
+so that (for instance) dependencies between the changes on a file system and its
+external journal are properly respected. This is actually not a special case,
+nor does it require any extra code -- it is a property that just falls out of
+the definition of $P$ above. This property also extends to \opgroups, which are
+explained in \S\ref{sec:opgroup}.

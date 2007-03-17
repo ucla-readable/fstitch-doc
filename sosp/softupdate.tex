@@ -44,12 +44,11 @@ reference to that block number in the file's list of blocks, and one that marks
 the block as free. By hooking up the second \chdesc\ to depend upon the first,
 we can implement the soft updates semantic straightforwardly. Another example is
 depicted in Figure~\ref{fig:softupdate}.
-\todo{Does Clear need to depend on Alloc? Does Size need to depend on anything?}
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=92pt]{fig/figures_3}
-  \caption{\label{fig:softupdate} Soft updates \chdesc\ graph,
+  \caption{\label{fig:softupdate} Soft updates \chdesc\ subgraph,
   including the dependencies for adding a newly allocated block to an
   inode. Writing the new block pointer to an inode (Attach) depends on
   initializing the block (Clear) and updating the free block map (Alloc).
@@ -66,7 +65,7 @@ The \Kudos\ approach certainly takes more memory than the BSD soft updates appro
 which limits the state required by any individual file system operation; we do
 not yet address the issue of memory exhaustion.
 %
-However, \Kudos\ does separate dependency enforcement from dependency
+However, \Kudos\ separates dependency enforcement from dependency
 specification. This makes the actual implementation easier to read, and allows
 the dependency structure to be examined and modified by other \modules\ of the
 system that may not have any idea what the changes are actually doing.

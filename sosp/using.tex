@@ -4,12 +4,20 @@
 Soft updates, journaling, and many application-specific consistency models all
 correspond to different \chdesc\ arrangements, so these features can be added to
 the system as \modules\ which appropriately connect or reconnect the \chdescs.
-For soft updates, the \chdescs\ created by the file system \module\ must be
-connected according to the rules in \cite{ganger00soft}, and the write-back
-cache will take it from there. For journaling, a journal \module\ is added above
-the write-back cache that rearranges the \chdescs\ to provide journaling. Other
-semantics could be supported by the addition of similar modules. In this
-section, we will discuss the soft updates and journaling support in \Kudos.
+%
+File system \modules\ in \Kudos\ generate soft updates dependencies by default,
+by connecting the \chdescs\ they create according to the rules
+in~\cite{ganger00soft}.
+%
+For journaling, a journal \module\ is added to the system that rearranges the
+\chdescs\ to provide journaling.
+%
+If no consistency is desired, a \module\ that disconnects \chdesc\ dependencies
+can be used.
+%
+Many other semantics could be supported by the addition of similar modules. In
+this section, we will discuss how \chdescs\ are used to implement different
+consistency semantics in \Kudos.
 
 \input{softupdate}
 

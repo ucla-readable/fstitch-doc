@@ -27,7 +27,7 @@ during the transaction (and thus before it) must be made to depend on it.
 Ordinarily this is not allowed, in order to prevent cycles.
 
 To accomplish the first of these tasks, the journal \module\ advertises a
-managed \noop\ \chdesc\ (\S\ref{sec:chdescs:noop}) to \modules\ above it,
+managed \noop\ \chdesc\ (\S\ref{sec:patch:noop}) to \modules\ above it,
 which they must make all changes they create depend on. This special \chdesc\ is
 not considered satisfied until the journal \module\ explicitly satisfies it, so
 no changes which depend on it will be written from the cache.  At the end of the
