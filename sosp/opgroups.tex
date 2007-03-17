@@ -54,16 +54,13 @@ interface functions.
 \begin{tabular}{@{\hskip0.22in}p{2in}@{}}
 \begin{scriptsize}
 \begin{alltt}
-typedef int \opgroup_id_t;
-\opgroup_id_t \textbf{\opgroup_create}(int type);
-int \textbf{\opgroup_sync}(\opgroup_id_t g);
-int \textbf{\opgroup_add_depend}(
-    \opgroup_id_t \after,
-    \opgroup_id_t \before);
-int \textbf{\opgroup_engage}(\opgroup_id_t g);
-int \textbf{\opgroup_disengage}(\opgroup_id_t g);
-int \textbf{\opgroup_release}(\opgroup_id_t g);
-int \textbf{\opgroup_abandon}(\opgroup_id_t g);
+typedef int pg_t;
+pg_t \textbf{pg_create}(void);
+int  \textbf{pg_depend}(pg_t \after, pg_t \before)
+int  \textbf{pg_engage}(pg_t pg);
+int  \textbf{pg_disengage}(pg_t pg);
+int  \textbf{pg_sync}(pg_t pg);
+int  \textbf{pg_close}(pg_t pg);
 \end{alltt}
 \end{scriptsize}
 \end{tabular}
@@ -139,10 +136,9 @@ cycles (which are not allowed and therefore abort the current operation
 before being formed) can only arise during \opgroup\ operations, ensuring
 file system operations cannot fail due to cycles. The \opgroup\ interface
 limits cycle creation opportunity through the allowed \opgroup\ state
-transitions, shown in Figures~\ref{fig:opgroup-transitions-states}
-and~\ref{fig:opgroup-transitions-intuition}, which ensure that \befores\
-cannot be added when the \opgroup\ contains any \chdescs\ or has any
-\afters.
+transitions, shown in Figure~\ref{fig:opgroup-transitions-states},
+which ensure that \befores\ cannot be added when the \opgroup\
+contains any \chdescs\ or has any \afters.
 
 \begin{figure}[htb]
 \vspace{-0.5\baselineskip}
@@ -152,30 +148,9 @@ cannot be added when the \opgroup\ contains any \chdescs\ or has any
 \vspace{-0.5\baselineskip}
 \caption{\label{fig:opgroup-transitions-states} \Opgroup\ state
   transitions. Edges represent \opgroup\ operations: \textbf{A}dd
-  \textbf{L}eader, \textbf{A}dd \textbf{F}ollower, \textbf{R}elease,
-  \textbf{E}ngage, and \textbf{D}isengage. Not drawn: every state
-  connects to the end node via abandon.}
-\end{figure}
-
-\begin{figure}[htb]
-\centering{
-\begin{small}
-\begin{tabular}{l l}
-State requirement & State change\\ \hline
-none & released\\
-none & abandoned (end)\\
-no \afters\ and released & engaged\\
-engaged & disengaged\\
-no \afters\ and not released & has \befores \\
-disengaged & has \afters\
-\end{tabular}
-\end{small}
-}
-\caption{\label{fig:opgroup-transitions-intuition} \Opgroup\ state
-  transitions --- alternative view of
-  Figure~\ref{fig:opgroup-transitions-states}. A fresh \opgroup\ is
-  not released, is not abandoned, is disengaged, and has no \befores\
-  or \afters.}
+  \textbf{L}eader, \textbf{A}dd \textbf{F}ollower,
+  \textbf{E}ngage, \textbf{D}isengage, and \textbf{C}lose.
+  Not drawn: every state connects to the finish node via close.}
 \end{figure}
 
 % FIXME: Mention simplicity using opgroups vs fsync?
