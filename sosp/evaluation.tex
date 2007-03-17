@@ -45,6 +45,8 @@ From this we gather that our UFS, soft updates, and journal
 implementations are correct, and this reinforces our case that we need
 to reduce CPU usage to be competitive.\todo{Is it I/O time now?}
 
+\todo{\# of writes/block, \# of blocks coalesced}
+
 \subsection {Macrobenchmarks}
 
 Our first benchmark test is to untar the Linux 2.6.15 source code from
@@ -94,6 +96,10 @@ in performance to Linux (see \S\ref{sec:discussion}).
 \subsection {Patchgroups}
 
 \subsubsection {Subversion Case Study}
+
+Complexity of implementation, reliance on specific FS semantics (i.e. ext3)
+even with all that jumping through hoops - broken on NTFS, for example.
+Straightforward to get correctness with \opgroups; counts only on a simple API.
 
 \subsubsection {UW IMAP Case Study}
 \label{sec:evaluation:uwimap}
