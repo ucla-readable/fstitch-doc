@@ -323,3 +323,15 @@ and with optimization.  Hard patches are shown with heavy borders.}
 \input{readylist}
 
 \input{noop}
+
+\begin{figure}[htb]
+\vspace{-0.5\baselineskip}
+\centering{
+\includegraphics[width=\hsize]{rb_chdesc_size}
+}
+\vspace{-0.5\baselineskip}
+\caption{\label{fig:patchsize-histo} \Rb\ \chdesc\ size histogram for a sample
+  workload (extracting a large archive into ext2). All the larger \chdescs\ have
+  been optimized into \nrb\ \chdescs. \Chdescs\ 4 bytes and smaller account for
+  about 51\% of all \chdescs.}
+\end{figure}

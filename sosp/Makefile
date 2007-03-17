@@ -23,7 +23,7 @@ BIBS = paper.bib kmaster.bib
 TMP_PDF_IMAGES = fig/figures_1.pdf fig/figures_2.pdf fig/figures_3.pdf \
 	fig/figures_4.pdf fig/figures_5.pdf fig/figures_6.pdf \
 	fig/figures_7.pdf fig/opt_1.pdf fig/opt_2.pdf fig/opt_3.pdf \
-	fig/opt_4.pdf \
+	fig/opt_4.pdf rb_chdesc_size.pdf \
 	opgroup_transitions.pdf nrb_merge.pdf svn_opgroups.pdf
 TMP_DVI_IMAGES = $(TMP_PDF_IMAGES:.pdf=.eps)
 
@@ -32,7 +32,7 @@ DVI_IMAGES = $(TMP_DVI_IMAGES)
 
 PDF_PRIMARY =
 
-all: paper.dvi
+all: paper.pdf
 
 paper.dvi: $(MAINFILE) $(MAINFILE:.tex=.bbl) $(DVI_IMAGES) always
 	$(LATEX) $<
@@ -65,8 +65,10 @@ bib: $(MAINFILE:.tex=.aux) always
 	pngtopnm $< | pnmtops -noturn -nosetpage > $@
 %.eps: %.jpg
 	jpegtopnm $< | pnmtops -noturn -nosetpage > $@
-%.ps: %.neato
+%.eps: %.neato
 	neato -Tps $< > $@
+%.eps: %.sh %.data
+	(cd `dirname "$<"`; ./$<)
 %.eps: %.dia
 	dia --nosplash --export=$@ $<
 %.eps: %.dot
