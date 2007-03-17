@@ -1,5 +1,5 @@
 \subsection{\ChDesc\ Merging}
-\label{sec:chdescs:merge}
+\label{sec:patch:merge}
 
 The large number of small, distinct changes made for cases such as
 block allocations, inode updates, and directory updates use
@@ -49,7 +49,7 @@ Any two \nrb\ \chdescs\ on the same block may be (and are) merged.
 %
 Merging all \nrb\ \chdescs\ ensures:
 %
-\cdinvar{one-nrb}{\(\forall\! B\!: |\ChNrbB{B}| \leq 1\)}
+\cdinvar{one-nrb}{\(\forall\! B\!: |\PHard[B]| \leq 1\)}
 %
 \noindent
 %
@@ -89,8 +89,8 @@ Our algorithm to transform dependencies for \nrb-\nrb\ \chdesc\ merges
 dependencies.
 %
 It updates \p{p}'s transitive \befores\ to ensure
-\(\BeforeS{q}\todo{Incorrect! Only the non-\noop{}s.} \subseteq
-\BeforeS{p}\)\todo{Note that Invariant~\ref{cdinvar:add-before}
+\(\PDepset{q}\todo{Incorrect! Only the non-\noop{}s.} \subseteq
+\PDepset{p}\)\todo{Note that Invariant~\ref{cdinvar:add-before}
   ensures that \noop\ \chdescs\ reachable from \p{q} will not gain
   data \chdesc\ \befores?}\todo{Note that it only needs to move dependencies?}.
 
@@ -157,20 +157,20 @@ Our algorithm to transform the dependencies for \nrb-\rb\ \chdesc\
 merges (Figure~\ref{algo:merge:hard-soft}) for block $B$
 %
 chooses a \chdesc\ \p{p} such that
-\(\notexists \inset{q}{\ChMemB{B}}\!: \indirdepends{p}{q}\)
+\(\notexists \inset{q}{\PMem[B]}\!: \indirdepends{p}{q}\)
 %
 and updates its transitive \befores\ to ensure
-\(\BeforeS{\ChRbB{B}} \subseteq \BeforeS{p}\).
+\(\PDepset{\PSoft[B]} \subseteq \PDepset{p}\).
 %
-Because any \(\inset{q}{\ChMemB{B} - p}\) may have \afters, to
+Because any \(\inset{q}{\PMem[B] - p}\) may have \afters, to
 preserve dependencies we convert such a \p{q} into \anoop\ \chdesc\
 and ensure \depends{q}{p}.
 
 \noindent Algorithm:
 \begin{itemize}
-\item Choose a \(\inset{p}{\ChMemB{B}}\!:\
-\notexists\! \inset{q}{\ChMemB{B}}\!:\ \indirdepends{p}{q}\).
-\item For each \inset{q}{\ChMemB{B} - p}:
+\item Choose a \(\inset{p}{\PMem[B]}\!:\
+\notexists\! \inset{q}{\PMem[B]}\!:\ \indirdepends{p}{q}\).
+\item For each \inset{q}{\PMem[B] - p}:
   \begin{itemize}
   \item Call the \nrb-\nrb\ \before\ move algorithm on \p{q} and \p{p}.
   \item Convert \p{q} into \anoop\ \chdesc.
@@ -193,7 +193,7 @@ from a file.
 %
 Many of these and similar \chdescs\ are mergeable and have
 dependencies that allow simple (and fast) reasoning to identify many
-of the mergeable pairs: two \chdescs\ on block $B$ that overlap no other \chdescs\ in \ChMemB{B}
+of the mergeable pairs: two \chdescs\ on block $B$ that overlap no other \chdescs\ in \PMem[B]
 and which have no dependency path from the new to the existing \chdesc\
 will not induce a block-level cycle and so are writeable together.
 We know that \textit{later} changes will not cause them to induce a block-level cycle due to

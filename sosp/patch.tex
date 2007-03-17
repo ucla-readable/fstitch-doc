@@ -1,50 +1,25 @@
 % -*- tex-main-file: "paper.tex" -*-
 
-\newcommand{\ChAll}{\ensuremath{\textit{All}}}
-\newcommand{\ChAllB}[1]{\ensuremath{\textit{All}[#1]}}
-\newcommand{\ChMem}{\ensuremath{\textit{Mem}}}
-\newcommand{\ChMemB}[1]{\ensuremath{\textit{Mem}[#1]}}
-\newcommand{\ChDisk}{\ensuremath{\textit{Disk}}}
-\newcommand{\ChDiskB}[1]{\ensuremath{\textit{Disk}[#1]}}
-\newcommand{\ChInf}{\ensuremath{\textit{Inf}}}
-\newcommand{\ChInfB}[1]{\ensuremath{\textit{Inf\/}[#1]}}
-\newcommand{\ChRb}{\ensuremath{\textit{\Rb}}}
-\newcommand{\ChRbB}[1]{\ensuremath{\textit{\Rb}[#1]}}
-\newcommand{\ChNrb}{\ensuremath{\textit{\Nrb}}}
-\newcommand{\ChNrbB}[1]{\ensuremath{\textit{\Nrb}[#1]}}
-\newcommand{\ChNoop}{\ensuremath{\textit{\Noop}}}
-
-\newcommand{\Before}[1]{\ensuremath{\textit{Pre}[#1]}}
-\newcommand{\BeforeS}[1]{\ensuremath{\textit{Pre}^*[#1]}}
-\newcommand{\After}[1]{\ensuremath{\textit{Post}[#1]}}
-\newcommand{\AfterS}[1]{\ensuremath{\textit{Post}^*[#1]}}
-
-\newcommand{\statenone}{\ensuremath{\textit{inmem}}}
-\newcommand{\stateinf}{\ensuremath{\textit{inflight}}}
-\newcommand{\statedisk}{\ensuremath{\textit{ondisk}}}
-
-
-
 \section{Patch Model}
 \label{sec:patch}
 
-\emph{Patches} represent any and all changes to stable storage in a \Kudos\
+\emph{\Patches} represent any and all changes to stable storage in a \Kudos\
 system.
 %
 Patches encapsulate both the data to be written and any dependencies among
 writes.
 %
-This section describes the basic patch model, and the optimizations we have
+This section describes the basic \patch\ model, and the optimizations we have
 found important so far, using a simple notation that allows us to prove the
 correctness of several transformations.
 %
-However, patches are not merely theoretical objects; each active patch
+However, \patches\ are not merely theoretical objects; each active \patch\
 corresponds to an object in the \Kudos\ implementation.
 
 
 %% \subsection{Basics}
 
-\Kudos's job is simply to write patches to one or more disks.
+\Kudos's job is simply to write \patches\ to one or more disks.
 %
 (The same ideas would apply to any other stable medium, or to network file
 systems, but to simplify our terminology, we use the term ``disk''
@@ -60,22 +35,27 @@ throughout.)
 \newcommand{\PMem}[1][]{\ensuremath{\textit{Mem}\PSetlim{#1}}}
 \newcommand{\PInf}[1][]{\ensuremath{\textit{Flight}\PSetlim{#1}}}
 \newcommand{\PDisk}[1][]{\ensuremath{\textit{Disk}\PSetlim{#1}}}
+\newcommand{\PHard}[1][]{\ensuremath{\textit{\Nrb}\PSetlim{#1}}}
+\newcommand{\PSoft}[1][]{\ensuremath{\textit{\Rb}\PSetlim{#1}}}
+\newcommand{\PEmpty}[1][]{\ensuremath{\textit{\Noop}\PSetlim{#1}}}
 \newcommand{\PDDepset}[1]{\ensuremath{\def\@next{#1}\ifx\@next\@empty\else\@next.\fi\textit{ddeps}}}
 \newcommand{\PDepend}{\ensuremath{\leadsto}}
 \newcommand{\PDDepend}{\ensuremath{\rightarrow}}
 \newcommand{\PDepset}[1]{\ensuremath{\textit{Dep}[#1]}}
+\newcommand{\PRDepset}[1]{\ensuremath{\textit{RDep}[#1]}}
 \makeatother
 
 Patches begin in memory.
 %
 They are eventually written to a disk controller, a state we call \emph{in
-flight} because the processor has lost control over when the patches are
+flight} because the processor has lost control over when the \patches\ are
 committed (the controller might service requests in any order).
 %
-At some point thereafter, patches are committed to the disk itself; the
-disk reports success after the write has committed.
+At some point thereafter, \patches\ are committed to the disk itself; the
+disk reports success after the write has committed. We say the \patches\
+are \emph{satisfied} when their associated data reaches stable storage.
 %
-Thus, each patch $p$ has a state:
+Thus, each \patch\ $p$ has a state:
 %
 \[ \PState{p} \in \{ \PMemst, \PInfst, \PDiskst \}. \]
 %
@@ -85,7 +65,7 @@ and similarly for $\PInf$ and $\PDisk$.
 Patches are written in units called \emph{blocks}, which may cover one or
 more sectors.
 %
-Each patch applies to a single block, written $\PBlock{p}$.
+Each \patch\ applies to a single block, written $\PBlock{p}$.
 %
 For a given block $b$, we define $\PMem[b] = \{p \in \PMem \mid \PBlock{p}
 = b \}$, and similarly for $\PInf[b]$ and $\PDisk[b]$.
@@ -128,9 +108,9 @@ for the given disk.
 
 \paragraph{Dependencies}
 %
-Each patch $p$ also has a set of \emph{direct dependencies}, $\PDDepset{p}$.
+Each \patch\ $p$ also has a set of \emph{direct dependencies}, $\PDDepset{p}$.
 %
-These are other patches on which $p$ depends: every $q \in \PDDepset{p}$
+These are other \patches\ on which $p$ depends: every $q \in \PDDepset{p}$
 must be written to disk before $p$, or atomically with $p$, or the file
 system's consistency is at risk.
 %
@@ -144,10 +124,10 @@ dependencies $p \PDDepend p_1 \PDDepend \cdots \PDDepend p_n \PDDepend q$.
 The set $\PDepset{p}$ consists of $p$'s dependencies $\{q \mid p \PDepend
 q \}$.
 %
-Given a set of patches $P = \{p_i\}$, $\PDepset{P} = \bigcup_i
+Given a set of \patches\ $P = \{p_i\}$, $\PDepset{P} = \bigcup_i
 \PDepset{p_i}$.
 %
-Dependencies link patches into a directed graph; $\PDepset{p}$ is just the
+Dependencies link \patches\ into a directed graph; $\PDepset{p}$ is just the
 set of $p$'s successors in the graph.
 
 
@@ -155,7 +135,7 @@ The \textbf{disk safety property} is simply written
 %
 \[ \PDepset{\PDisk} \subseteq \PDisk. \]
 %
-That is, the dependencies of all patches on disk are always also on disk,
+That is, the dependencies of all \patches\ on disk are always also on disk,
 and
 %
 no matter when the system crashes, the disk is consistent in terms of
@@ -180,20 +160,21 @@ It therefore maintains the disk safety property by enforcing, instead, the
 This, combined with the disk's ``commit block'' behavior above, implies the
 disk safety property.
 %
-The buffer cache's job is to write patches in an order that obeys the
+The buffer cache's job is to write \patches\ in an order that obeys the
 in-flight safety property.
+\todo{mention liveness property?}
 
 
 \paragraph{Rollback}
 %
-A simplistic implementation of patches might just keep track of
+A simplistic implementation of \patches\ might just keep track of
 dependencies; all changes would be applied directly to a block's in-memory
 copy.
 %
-After all, disks write \emph{blocks}---arrays of memory---not patches.
+After all, disks write \emph{blocks}---arrays of memory---not \patches.
 %
 However, soft updates-like orderings may require that the buffer cache
-\emph{not} write one or more patches on some block.
+\emph{not} write one or more \patches\ on some block.
 %
 In particular, a series of file system operations may create dependencies
 that enforce a circular order among blocks, even though the dependencies
@@ -203,14 +184,14 @@ This is problematic since blocks with circular dependencies can never be
 written: no block can be written first since each block depends on another.
 
 
-For this reason, each patch carries \emph{rollback} information that gives
-the previous version of the data altered by the patch.
+For this reason, each \patch\ carries \emph{rollback} information that gives
+the previous version of the data altered by the \patch.
 %
-If a patch $p$ is not written with its containing block, the system rolls
-back the patch, which swaps the new data and the previous version.
+If a \patch\ $p$ is not written with its containing block, the system rolls
+back the \patch, which swaps the new data and the previous version.
 %
-Once the block is written, the system will roll the patch forward and, when
-allowed, write the block again, this time including the patch.
+Once the block is written, the system will roll the \patch\ forward and, when
+allowed, write the block again, this time including the \patch.
 %
 Rollback information adds greatly to memory and CPU utilization, but it can
 often be optimized away, as we show below.
@@ -231,7 +212,7 @@ action:
 
 \noindent
 %
-The last step forces any rolled-back patches to wait in memory at least
+The last step forces any rolled-back \patches\ to wait in memory at least
 until the current version of the block is written.  (Our implementation
 achieves this property without using dependencies.)
 %
@@ -247,7 +228,7 @@ and, thus, the disk safety property.
 A naive implementation of this model scales extremely poorly,
 particularly with cache size.
 %
-Challenges in a patch-based file system implementation include:
+Challenges in a \patch-based file system implementation include:
 
 \textbf{Buffer cache graph traversal.}
 %
@@ -269,7 +250,7 @@ It would also be nice if the blocks chosen for writing also maximized the
 disk's commit rate, by minimizing seeks and so forth.
 
 A naive implementation might calculate, for each in-memory block $b$, the
-largest set of patches $P_b \subseteq \PMem[b]$ with $\PDepset{P_b}
+largest set of \patches\ $P_b \subseteq \PMem[b]$ with $\PDepset{P_b}
 \subseteq P_b \cup \PDisk$, then evict some block close to previously
 written blocks and with few rolled-back \patches\ (where $\PMem[b] - P_b$
 is small).
@@ -285,12 +266,12 @@ time.
 
 \textbf{Rollback memory usage.}
 %
-Only a small fraction of patches will ever need to be rolled back.
+Only a small fraction of \patches\ will ever need to be rolled back.
 %
 For example, most data writes never need to be rolled back in any file
 system.
 %
-If a patch won't be rolled back under any circumstances, the memory and
+If a \patch\ won't be rolled back under any circumstances, the memory and
 CPU time spent to preserve the old version is wasted.
 
 
@@ -299,7 +280,7 @@ CPU time spent to preserve the old version is wasted.
 Patches themselves take up memory and require time to allocate, free, and
 traverse.
 %
-If two patches have redundant dependencies, it would be faster to combine
+If two \patches\ have redundant dependencies, it would be faster to combine
 them.
 
 
@@ -309,8 +290,8 @@ them.
 %% dependency takes up memory.
 %% %
 %% Important and common dependency relations require many dependencies to
-%% express; for example, if patches $p_1,\dots,p_n$ depend, as a group, on
-%% patches $q_1,\dots,q_n$, expressing this constraint would require $n^2$
+%% express; for example, if \patches\ $p_1,\dots,p_n$ depend, as a group, on
+%% \patches\ $q_1,\dots,q_n$, expressing this constraint would require $n^2$
 %% total dependencies.
 
 
@@ -330,13 +311,13 @@ The next section tackles all of these challenges.
 
 \includegraphics[scale=0.62]{fig/opt_2}
 
-\textbf{b)} With hard patches
+\textbf{b)} With \nrb\ \patches
 
 \vskip.5\baselineskip
 
 \includegraphics[scale=0.62]{fig/opt_3}
 
-\textbf{c)} With hard--hard merging
+\textbf{c)} With \nrb--\nrb\ merging
 
 \vskip.5\baselineskip
 
@@ -345,9 +326,10 @@ The next section tackles all of these challenges.
 \textbf{d)} With overlap merging
 
 \caption{\Patches\ required to append 4 blocks to an existing file, without
-and with optimization.  Hard patches are shown with heavy borders.}
+and with optimization.  \Nrb\ \patches\ are shown with heavy borders.}
 \end{figure}
 
 \input{nrb}
 \input{readylist}
-
+\input{merge}
+\input{misc}

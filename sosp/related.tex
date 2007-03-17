@@ -1,27 +1,6 @@
 \section{Related Work}
 \label{sec:related}
 
-\paragraph{Stackable File Systems}
-
-% \cite{webber93portable}
-
-Stackable \module\ software for file systems continues to attract active
-research~\cite{rosenthal90evolving, heidemann91layered, skinner93stacking,
-heidemann94filesystem,zadok99extending,
-zadok00fist,wright03ncryptfs,wright06versatility}. Previous
-systems like FiST~\cite{zadok00fist} or GEOM~\cite{geom} generally focus on
-an individual portion of the system and thus restrict both what a \module\
-can do and how \modules\ can be arranged. FiST, for instance, does not
-provide a way to deal with structures on the disk directly -- it provides
-only ``wrapper'' functionality around existing file
-systems. %% (Wrapfs~\cite{zadok99stackable, zadok99extending} is similar.)
-GEOM, on the other hand, deals only with the block device layer, and has no
-way to work with the file systems stored on those block devices. Neither
-has a formal way of specifying or honoring complex write-ordering
-information, which is what \chdescs\ in \Kudos\ provide. We imagine that
-systems like these could be adapted to work with \chdescs, giving the
-benefits of both ideas.
-
 \paragraph{Consistency}
 
 Soft updates~\cite{ganger00soft} 
@@ -39,8 +18,8 @@ like \emph{fsck}.
 
 Another approach to protecting the integrity of the file system is to write
 upcoming operations to a journal first. The content and the layout of the
-journal varies in each implementation, but in all cases, the system can use
-the journal to play out or roll back the operations that did not complete
+journal vary in each implementation, but in all cases, the system can use
+the journal to play out (or roll back) the operations that did not complete
 as a result of a crash. Thus, \emph{fsck} can be avoided by consulting the
 journal when recovering from a crash. Section \ref{sec:using:journal}
 explains journaling with \chdescs. \cite{seltzer00journaling} compares
@@ -62,13 +41,35 @@ all applications, not just those using specialized distributed file systems.
 % "allow the kernel to safely and efficiently handle any metadata layout without understanding the layout itself"
 % \cite{kaashoek97application}
 
+\paragraph{Stackable File Systems}
+
+% \cite{webber93portable}
+
+Stackable \module\ software for file systems continues to attract active
+research~\cite{rosenthal90evolving, heidemann91layered, skinner93stacking,
+heidemann94filesystem,zadok99extending,
+zadok00fist,wright03ncryptfs,wright06versatility}. Previous
+systems like FiST~\cite{zadok00fist} or GEOM~\cite{geom} generally focus on
+an individual portion of the system and thus restrict both what a \module\
+can do and how \modules\ can be arranged. FiST, for instance, does not
+provide a way to deal with structures on the disk directly -- it provides
+only ``wrapper'' functionality around existing file
+systems. %% (Wrapfs~\cite{zadok99stackable, zadok99extending} is similar.)
+GEOM, on the other hand, deals only with the block device layer, and has no
+way to work with the file systems stored on those block devices. Neither
+has a formal way of specifying or honoring complex write-ordering
+information, which is what \chdescs\ in \Kudos\ provide. We imagine that
+systems like these could be adapted to work with \chdescs, giving the
+benefits of both ideas.
+
 \paragraph{Applications}
 
 A variety of extensions to file systems have been proposed in recent work, like
 the FS2 Free Space File System~\cite{huang05fs2} and encrypting file systems
 like NCryptfs~\cite{wright03ncryptfs}. Although we have not implemented \Kudos\
-\modules\ for these extensions, we believe that they would be relatively straightforward
-to implement. \todo{What evidence do we have of this?}
+\modules\ for these extensions, we believe that the \Kudos\ \module\ system is
+flexible enough to allow straightforward implementations of these ideas.
+\todo{Cite type-safe disks?}
 %%  NCryptfs has been written in a
 %% stackable way already, allowing it to be easily adapted for new underlying file
 %% systems -- but FS2 is currently specific to ext2, since it deals directly with

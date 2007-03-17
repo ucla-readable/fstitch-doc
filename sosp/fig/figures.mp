@@ -133,7 +133,7 @@ beginfig(2);
   drawelement(crc,cr,aj,crcn,a,b,c,d,fn,crn,bj,cj,dj);
 
   vardef ffff(suffix a,b) =
-    drawconnarrow (b.c -- a.c) cutbefore bpath.b cutafter bpath.a
+    drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
   enddef;
 
   %forsuffixes $ = crcn, fn, crn:
@@ -184,7 +184,7 @@ beginfig(3);
   drawelement(a,b,c,d);
 
   vardef ffff(suffix a,b) =
-    drawconnarrow (b.c -- a.c) cutbefore bpath.b cutafter bpath.a
+    drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
   enddef;
 
   ffff(c,a);
@@ -193,37 +193,6 @@ beginfig(3);
 endfig;
 
 beginfig(4);
-  boxjoin();
-  elementit.a(btex Base etex scaled 1.2, 0, 0, pull);
-  boxjoin(a.width = b.width; a.height = b.height);
-  elementit.b(btex Alloc etex scaled 0.8, 0, 0, pull);
-  elementit.c(btex DirEnt etex scaled 0.8, 0, 0, pull);
-  elementit.d(btex CylGrp etex scaled 0.8, 0, 0, pull);
-  elementit.e(btex Super etex scaled 0.8, 0, 0, pull);
-  a.width = 1.2a.height;
-
-  a.w - b.e = (12, -1.2*b.height);
-  a.w - c.e = (12, 1.2*b.height);
-  a.e - d.w = (-12, -1.2*b.height);
-  a.e - e.w = (-12, 1.2*b.height);
-
-  forsuffixes $ = a, b, c, d, e:
-    pproc_.$ := "thecirc_";
-  endfor;
-
-  drawelement(a,b,c,d,e);
-
-  vardef ffff(suffix a,b) =
-    drawconnarrow (b.c -- a.c) cutbefore bpath.b cutafter bpath.a
-  enddef;
-
-  ffff(b,a);
-  ffff(c,a);
-  ffff(d,a);
-  ffff(e,a);
-endfig;
-
-beginfig(5);
   label.top(btex Patch A etex, (15,25));
   boxjoin(a.width = b.width; a.height = b.height; a.s - b.n = (0,20));
   elementit.a(btex \quad Inode 17 \quad etex, 0, 0, pull);
@@ -238,7 +207,7 @@ beginfig(5);
   drawelement(a,b);
 endfig;
 
-beginfig(6);
+beginfig(5);
   boxjoin(a.width = b.width; a.height = b.height);
   elementit.a(btex Empty etex scaled 0.8, 0, 0, pull);
   elementit.b(btex C1 etex scaled 0.8, 0, 0, pull);
@@ -267,7 +236,7 @@ beginfig(6);
   drawelement(a,b,c,d,e,f,g,h);
 
   vardef ffff(suffix a,b) =
-    drawconnarrow (b.c -- a.c) cutbefore bpath.b cutafter bpath.a
+    drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
   enddef;
 
   ffff(e,f);
@@ -280,7 +249,7 @@ beginfig(6);
 
 endfig;
 
-beginfig(7);
+beginfig(6);
   boxjoin(a.width = b.width; a.height = b.height);
   elementit.hk(btex HK etex scaled 0.8, 0, 0, pull);
   elementit.tk(btex TK etex scaled 0.8, 0, 0, pull);
@@ -309,7 +278,7 @@ beginfig(7);
   drawelement(hk,tk,h,t,aa,ab,ac,b);
 
   vardef ffff(suffix a,b) =
-    drawconnarrow (b.c -- a.c) cutbefore bpath.b cutafter bpath.a
+    drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
   enddef;
 
   ffff(h,hk);

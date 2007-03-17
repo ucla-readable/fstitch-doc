@@ -1,5 +1,5 @@
-\subsection{Discussion}
-\label{sec:chdescs:discussion}
+\subsection{Miscellaneous}
+\label{sec:patch:misc}
 
 \subsubsection{Unnecessary \ChDesc\ Dependencies}
 Even with \Kudos\ dynamically optimizing \chdesc\ graphs, there is only so much
@@ -24,7 +24,7 @@ ordering.
 % {{{ fig:chdescarrange
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=192pt]{fig/figures_6}
+  \includegraphics[width=192pt]{fig/figures_5}
   \caption{\label{fig:chdescarrange} \Chdesc\ dependencies, when
   not strictly needed, restrict the possible choices for write ordering.
   This results in suboptimal write ordering and more scans through the
@@ -49,7 +49,7 @@ convenient as creating a single \chdesc\ for an entire large structure.
 % {{{ fig:overlap
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=64pt]{fig/figures_5}
+  \includegraphics[width=64pt]{fig/figures_4}
   \caption{\label{fig:overlap} On inode 17, the gray regions represent
   modified fields that do not overlap. If \chdesc\ A and \chdesc\ B are
   exactly the size of the gray regions, then there is no implicit dependency.

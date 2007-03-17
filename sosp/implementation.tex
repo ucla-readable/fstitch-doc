@@ -42,13 +42,15 @@ passes the requests to Linux via \texttt{generic\_make\_request()}. Linux may
 then reorder or merge them, and eventually they are sent to the disk controller.
 %
 When a request is complete, the disk controller notifies Linux, which in turn
-notifies \Kudos. As pointed out in \S\ref{sec:chdescs:model}, a request being
-``complete'' might mean either that the data is merely in the drive's volatile
-cache, or that it has been successfully stored on the physical media. The latter
-situation, which is necessary for the strong guarantee \Kudos\ aims to provide,
-can be arranged either by disabling the drive's write-back cache, or by using
-the ``force unit access'' (FUA) mode when writing to the disk (though a small
-patch to the Linux kernel is required to support this mode). Both of these
+notifies \Kudos. Depending on the hardware configuration, a request being
+``complete'' might mean one of two things: first, the data may merely be in the
+drive's volatile cache, so that a power outage might cause it to be lost. This
+can be a catastrophic disaster, as shown in~\cite{nightingale06rethink}.
+Alternately, the data may have been successfully stored on the physical media.
+This situation, which is necessary for the strong guarantee \Kudos\ aims to
+provide, can be arranged either by disabling the drive's write-back cache, or by
+using the ``force unit access'' (FUA) mode when writing to the disk (though a
+small patch to the Linux kernel is required to support this mode). Both of these
 approaches significantly degrade performance when used alone; additionally,
 traditional FUA mode is supported by very few drives\todo{cite something?}.
 %
@@ -58,7 +60,7 @@ write performance compared to using the write-back cache without FUA\todo{give
 figures to support this claim}, since many write requests may be outstanding at
 a time and the drive can choose how to service them in a manner not unlike how
 it would choose to write data stored in its volatile cache. Additionally, FUA is
-a required part of the SATA NCQ specification\todo{cite SATA spec}, so all SATA
+a standard part of the SATA NCQ specification\todo{cite SATA spec}, so all SATA
 disks support it when using NCQ.
 
 Our interfaces bypass all Linux caches, because \Kudos\ provides its own

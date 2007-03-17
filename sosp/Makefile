@@ -10,21 +10,19 @@ PDFLATEX = pdflatex
 
 MAINFILE = paper.tex
 
-TEXSRCS = abstract.tex chdescdiscuss.tex chdescs.tex conclusion.tex \
-	discussion.tex evaluation.tex ext2.tex implementation.tex \
-	interfaces.tex intro.tex journal.tex model.tex \
-	modules.tex noop.tex nrb.tex merge.tex \
-	opgroups.tex paper.tex readylist.tex \
-	related.tex softupdate.tex ufs.tex uhfs.tex \
-	using.tex wbcache.tex
+TEXSRCS = abstract.tex conclusion.tex discussion.tex evaluation.tex \
+	ext2.tex implementation.tex interfaces.tex intro.tex journal.tex \
+	modules.tex noop.tex nrb.tex merge.tex misc.tex opgroups.tex \
+	paper.tex readylist.tex related.tex softupdate.tex ufs.tex \
+	uhfs.tex using.tex wbcache.tex
 
 BIBS = paper.bib kmaster.bib
 
 TMP_PDF_IMAGES = fig/figures_1.pdf fig/figures_2.pdf fig/figures_3.pdf \
 	fig/figures_4.pdf fig/figures_5.pdf fig/figures_6.pdf \
-	fig/figures_7.pdf fig/opt_1.pdf fig/opt_2.pdf fig/opt_3.pdf \
-	fig/opt_4.pdf rb_chdesc_size.pdf \
-	opgroup_transitions.pdf nrb_merge.pdf svn_opgroups.pdf
+	fig/opt_1.pdf fig/opt_2.pdf fig/opt_3.pdf fig/opt_4.pdf \
+	opgroup_transitions.pdf nrb_merge.pdf svn_opgroups.pdf \
+	rb_chdesc_size.pdf
 TMP_DVI_IMAGES = $(TMP_PDF_IMAGES:.pdf=.eps)
 
 PDF_IMAGES = $(TMP_PDF_IMAGES)

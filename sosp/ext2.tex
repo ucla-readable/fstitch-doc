@@ -2,8 +2,11 @@
 \label{sec:using:ext2}
 
 \Kudos\ currently has implementations of three base file system types: a simple
-file system without inodes called JOSFS, Linux ext2, and 4.2 BSD UFS. We briefly
-describe ext2 as an example of a complete and relatively complex file system.
+file system without inodes called JOSFS, Linux ext2, and 4.2 BSD UFS. File
+system \modules\ in \Kudos\ are supposed to generate soft updates dependencies
+by default; other dependency arrangements can be achieved by transforming these.
+We briefly describe ext2 as an example of a complete and relatively complex file
+system.
 
 The ext2 \module\ is implemented at the \LFS\ interface. This keeps properties
 specific to ext2 (such as the ext2 on-disk format and rules governing block

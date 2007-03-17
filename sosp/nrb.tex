@@ -19,32 +19,36 @@ these \emph{\nrb} \chdescs. (The opposite naturally being a \emph{\rb}
 %
 Since a \nrb\ \chdesc\ cannot be rolled back, a write of any \chdescs\
 on block $B$ must include all \nrb\ \chdescs\ on $B$. To accordingly
-update our formal model we define a new set of \chdescs, \ChNrb, which
-contains all \nrb\ \chdescs. We write \ChNrbB{B} to restrict the set
-to block $B$\todo{Introduce \ChRb\ and \ChRbB{B}.}:
+update our formal model we define a new set of \chdescs, \PHard, which
+contains all \nrb\ \chdescs. We write \PHard[B] to restrict the set
+to block $B$\todo{Introduce \PSoft\ and \PSoft[B].}:
 
-\paragraph{Write block to disk controller}
-For some block $B$: \\
-Let \(P \subseteq \ChMemB{B}\) s.t.
-\(\BeforeS{P} \subseteq \ChDisk \cup P\) and \(\ChNrbB{B} \subseteq P\) \\
-Set \p{p}.state $:=$ \stateinf\ for all \inset{p}{P}
+\begin{tabbing}
+\textbf{Write block.} \\
+\quad Pick some block $b$ with $\PMem[b] \neq \emptyset$. \\
+\quad Pick some $P \subseteq \PMem[b]$ with $\PDepset{P} \subseteq P \cup
+\PDisk$ and $\PHard[B] \subseteq P$. \\
+\quad For each $p \in P$, set $\PState{p} \gets \PInfst$. \\
+\quad For each $p \in \PMem[b]-P$, set $\PDDepset{p} \gets \PDDepset{p}
+\cup P$.
+\end{tabbing}
 
 \paragraph{}
 To avoid (expensive) dependency traversals to determine whether a new
-\chdesc\ will need to be rolled back to write \ChAll,
+\chdesc\ will need to be rolled back,
 %
 \Kudos\ conservatively identifies \nrb\ \chdescs\ using only local
 dependency information.
 %
 \Kudos\ detects that a new \chdesc\ on block $b$ may need to be rolled back if:
-\todo{Which form is easier to read? Can we write \(\ChMem - \ChMem{b} - \ChNoop\) more concisely?}
+\todo{Which form is easier to read? Can we write \(\PMem - \PMem[b] - \PEmpty\) more concisely?}
 %
 \todo{Actually, our implementation also uses in flight \chdescs. Can we make
 it not?}
 %
-\[ \AfterS{\ChMemB{b}} \cap (\ChMem - \ChMemB{b} - \ChNoop) \ne \emptyset \]
-\[ \exists \inset{p}{\ChMemB{b}}\!:\
-   \exists c\!:\ \exists \inset{q}{\ChMemB{c}}\!:\
+\[ \PRDepset{\PMem[b]} \cap (\PMem - \PMem[b] - \PEmpty) \ne \emptyset \]
+\[ \exists \inset{p}{\PMem[b]}\!:\
+   \exists c\!:\ \exists \inset{q}{\PMem[c]}\!:\
    \indirdepends{q}{p} \]
 %
 This is both a safe and useful indicator because
@@ -56,8 +60,8 @@ and many blocks have no \chdescs\ with external \afters\ (e.g. most
 file data blocks).
 
 While this algorithm detects whether a \chdesc\ may need to be rolled
-back to write \ChAll, \Kudos\ must also be sure that no future
-dependency manipulation will cause the \chdesc\ to require a rollback.
+back, \Kudos\ must also be sure that no future dependency manipulation
+will cause the \chdesc\ to require a rollback.
 %
 We introduce Invariant~\ref{cdinvar:add-before} to support such reasoning:
 %

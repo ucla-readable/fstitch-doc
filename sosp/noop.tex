@@ -1,14 +1,14 @@
 % -*- mode: latex; tex-main-file: "paper.tex" -*-
 
-\subsection{Implementation and empty \patches}
+\subsection{Implementation and \noop\ \chdescs}
 \label{sec:chdescs:noop}
 
-\Kudos\ file system implementations create \patches\ with one of the
+\Kudos\ file system implementations create \chdescs\ with one of the
 following functions:
 
 \begin{scriptsize}
 \begin{alltt}
-int \textbf{patch_create_byte}(\textit{block},
+int \textbf{patch_create_byte}(
     bdesc_t *block, bdev_t *owner,
     uint16_t offset, uint16_t length,
     const void *data, patch_t **head);
@@ -16,7 +16,7 @@ int \textbf{patch_create_bit}(
     bdesc_t *block, bdev_t *owner,
     uint16_t offset, uint32_t xor,
     patch_t **head);
-int \textbf{patch_create_empty}(
+int \textbf{patch_create_\noop}(
     bdev_t *owner, patch_t **tail,
     size_t nheads, patch_t * heads[]);
 int \textbf{patch_create_diff}(
@@ -27,8 +27,8 @@ int \textbf{patch_create_diff}(
 \end{scriptsize}
 
 
-We first address dependency convenience and memory usage with \emph{empty
-\patches}, which have no associated data or block.
+We first address dependency convenience and memory usage with \emph{\noop\
+\chdescs}, which have no associated data or block.
 %
 This makes it just a means for tracking dependencies.
 
@@ -44,11 +44,10 @@ potentially quadratic number of edges in the \chdesc\ graph.
 
 To solve this problem, we introduce an additional type of \chdesc. The
 prototypical \chdesc\ corresponds to some change on disk, but \Kudos\ also
-supports \aemphnoop\ \chdesc\ type\todo{We often refer to non-\noop\ \chdescs. A name for ``prototypical'' \chdescs\ should probably not be defined indirectly as the non-prototypical type.}, which doesn't change the disk at all.
+supports \aemphnoop\ \chdesc\ type, which doesn't change the disk at all.
 \Noop\ \chdescs\ can have \befores, like other \chdescs, but they don't need to
-be written to disk (nor are they associated with a cached disk block): they are
-trivially satisfied when all of their \befores\ are satisfied. Thus, they can be
-used to ``stand for'' entire sets of other changes.
+be written to disk: they are trivially satisfied when all of their \befores\ are
+satisfied. Thus, they can be used to ``stand for'' entire sets of other changes.
 %
 This capability is extremely useful, and is used by most operations on disk
 structures so that a single \chdesc\ can be returned that depends on the whole
@@ -68,6 +67,6 @@ explicitly satisfies it. This is used, for instance, by the journal \module\
 (\S\ref{sec:using:journal}) to prevent a transaction's \chdescs\ from
 being written before the journal commits.
 
-\Noop\ \chdescs\ are not included in our formal model of \chdescs\ in
-\S\ref{sec:chdescs:model} for simplicity; they add some additional complexity
-but do not change the basic ideas.
+\Noop\ \chdescs\ are not included in our formal model of \chdescs\ for simplicity;
+they add some additional complexity but do not change the basic ideas.
+\todo{Well, they are now... the rules need updating since they have no blocks.}
