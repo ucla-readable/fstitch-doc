@@ -9,8 +9,43 @@ orderings in a variety of situations, demonstrating the effect and utility of
 \opgroups\ and the potential for them to improve the efficiency of applications
 using them.
 
-\subsection {Overall Performance}
+\subsection {Optimization Benefits}
 
+\begin{figure}[htb]
+\vspace{-0.5\baselineskip}
+\centering{
+\includegraphics[width=\hsize]{rb_chdesc_size}
+}
+\vspace{-0.5\baselineskip}
+\caption{\label{fig:patchsize-histo} \Rb\ \chdesc\ size histogram for a sample
+  workload (extracting a large archive into ext2). All the \chdescs\ larger than
+  63 bytes have been optimized into \nrb\ \chdescs. \Rb\ \chdescs\ 4 bytes and
+  smaller account for about 51\% of all \chdescs.}
+\end{figure}
+
+\subsection {Microbenchmarks}
+We have also looked at the number of block writes that \Kudos\ makes
+relative to other systems for several operations. In one test, we
+create 100 small files in a directory and measure the number of blocks
+written to disk. We do this with and without soft updates. \Kudos\
+writes 122 blocks, while FreeBSD writes 135 blocks.
+
+We also look at a very small benchmark: removing a file from a
+directory and adding a new file to it. We compare the number of blocks
+written by \Kudos\ with that of FreeBSD using soft updates. Here
+\Kudos\ writes 15 blocks, while FreeBSD writes 83 blocks.
+
+We ran the two small benchmarks with the journal module, in full
+data journaling mode. Creating 100 small files with the journal
+resulted in 245 blocks written to the disk, but only 126 blocks
+without the journal. Deleting and adding a file resulted in writing
+31 with the journal module and 18 without it.
+
+From this we gather that our UFS, soft updates, and journal
+implementations are correct, and this reinforces our case that we need
+to reduce CPU usage to be competitive.\todo{Is it I/O time now?}
+
+\subsection {Macrobenchmarks}
 Our first benchmark test is to untar the Linux 2.6.15 source code from
 \texttt{linux-2.6.15.tar}, which is already decompressed and cached in RAM. We
 did this test on identical machines running Linux 2.6.20.1 (using ext3), FreeBSD
@@ -45,29 +80,13 @@ able to speed up the system enormously.  There are more optimization
 opportunities that can likely bring us very close in performance to
 existing implementations of soft updates (see \S\ref{sec:discussion}).
 
-\subsection {Block Writes}
-We have also looked at the number of block writes that \Kudos\ makes
-relative to other systems for several operations. In one test, we
-create 100 small files in a directory and measure the number of blocks
-written to disk. We do this with and without soft updates. \Kudos\
-writes 122 blocks, while FreeBSD writes 135 blocks.
+\subsubsection {Postmark}
 
-We also look at a very small benchmark: removing a file from a
-directory and adding a new file to it. We compare the number of blocks
-written by \Kudos\ with that of FreeBSD using soft updates. Here
-\Kudos\ writes 15 blocks, while FreeBSD writes 83 blocks.
+\subsection {Patchgroups}
 
-We ran the two small benchmarks with the journal module, which does
-full data journaling. Creating 100 small files with the journal
-resulted in 245 blocks written to the disk, but only 126 blocks
-without the journal. Deleting and adding a file resulted in writing
-31 with the journal module and 18 without it.
+\subsubsection {gzip}
 
-From this we gather that our UFS, soft updates, and journal
-implementations are correct, and this reinforces our case that we need
-to reduce CPU usage to be competitive.
-
-\subsection {UW IMAP Case Study}
+\subsubsection {UW IMAP Case Study}
 \label{sec:evaluation:uwimap}
 To assess the \opgroup-enabled UW IMAP mail server
 (\S\ref{sec:opgroup:uwimap}) we compare the number of block writes
@@ -90,3 +109,5 @@ FreeBSD 5.4 & 2200 \\ \hline
 \caption{\label{fig:imap-compare} Number of block writes to move 100
   IMAP messages.}
 \end{figure}
+
+\subsubsection {Subversion Working Copies}
