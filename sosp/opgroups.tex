@@ -126,20 +126,34 @@ the user can instead run:
 \subsection{Implementation}
 \label{sec:opgroup:implementation}
 
-% This section would really benefit from knowing what figures we will have.
+\Opgroups\ are implemented in an \LFS\ module that imposes \opgroup\
+dependencies using additional \chdesc\ dependencies among \LFS\
+operations.
+%
+Figure~\ref{fig:opgroup-chdescs} shows \anopgroup's \chdesc\ arrangement.
+%
+The ``head'' \chdesc\ depends on the \opgroup's \chdescs, the ``tail''
+\chdesc, and the ``head keep'' \chdesc.
+%
+The \opgroup's \chdescs\ all depend on the ``tail'' \chdesc, which in
+turn depends on the ``tail keep'' \chdesc.
+%
+The ``keep'' \chdescs\ prevent the head and tail \chdescs\ from being
+prematurely satisfied should all their other \befores\ be satisfied
+(for instance, by being written to disk).
+%
+Using this \chdesc\ arrangement, \anopgroup\ dependency \depends{Q}{P}
+is implemented as \depends{\mbox{tail}_Q}{\mbox{head}_P}
 
-\Opgroups\ are implemented using an arrangement of \noop\ \chdescs\ which allows
-the \opgroup\ to be connected to other \opgroups\ using ordinary \chdesc\
-dependencies.  Figure~\ref{fig:opgroup-chdescs} shows this arrangement: a
-``head'' \chdesc\ depends upon a ``tail'' \chdesc\ and a ``head keep'' \chdesc,
-while the tail \chdesc\ depends on a ``tail keep'' \chdesc. The purpose of the
-``keep'' \chdescs\ is to prevent the head and tail \chdescs\ from being
-satisfied should all their other \befores\ be satisfied (for instance, by
-being written to disk). An \LFS\ \module\ in the \module\ graph is responsible for
-connecting all operations performed while \anopgroup\ is \engaged\ to its head
-and tail \chdescs, so that an entire \opgroup\ can be made to depend on another
-\opgroup\ by adding a dependency from the \after's tail to the \before's
-head.
+\begin{figure}[htb]
+\centering{
+\includegraphics[width=0.5\hsize]{fig/figures_6}
+}
+\caption{\label{fig:opgroup-chdescs} \Opgroup\ \chdescs. H and T are the head
+and tail of the \opgroup; HK and TK are the head keep and tail keep. The three
+\chdescs\ labeled 1 occurred during one file system operation, and the \chdesc\
+labeled 2 occurred during a second operation that depended on the first.}
+\end{figure}
 
 \Opgroups\ are created and managed almost exactly like file descriptors. Handles
 to them are copied across \texttt{fork()}, preserved across \texttt{exec()}, and
@@ -151,16 +165,6 @@ for the shell to connect them in a pipeline -- the parent process creates and
 \engages\ the \opgroups\ before calling \texttt{exec()}, and then the process
 does its file system operations without knowing or needing to know that they are
 being hooked up to \anopgroup.
-
-\begin{figure}[htb]
-\centering{
-\includegraphics[width=0.5\hsize]{fig/figures_6}
-}
-\caption{\label{fig:opgroup-chdescs} \Opgroup\ \chdescs. H and T are the head
-and tail of the \opgroup; HK and TK are the head keep and tail keep. The three
-\chdescs\ labeled 1 occurred during one file system operation, and the \chdesc\
-labeled 2 occurred during a second operation that depended on the first.}
-\end{figure}
 
 \subsection{Subversion Case Study}
 \label{sec:opgroup:svn}
