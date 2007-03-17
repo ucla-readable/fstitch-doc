@@ -39,6 +39,8 @@ Modules:
 Write ext2 section.
 
 Make directory synchronous module.
+Make safe UMSDOS module?
+Make patch unhook module.
 
 Opgroups:
 - Simplify interface? (Since we do not do transacations)
