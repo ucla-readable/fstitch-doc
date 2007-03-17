@@ -162,76 +162,6 @@ and tail of the \opgroup; HK and TK are the head keep and tail keep. The three
 labeled 2 occurred during a second operation that depended on the first.}
 \end{figure}
 
-\subsection{UW IMAP Case Study}
-\label{sec:opgroup:uwimap}
-
-To assess the utility of \opgroups\ in a real world application we
-updated the University of Washington's IMAP mail server to take
-advantage of \opgroups, to ensure mail updates are committed to disk
-in safe and efficient orderings.
-
-The Internet Message Access Protocol (IMAP)~\cite{rfc3501} provides
-remote access to a mail server's email message store. An IMAP client
-is in one of four states: not authenticated, authenticated, mailbox
-selected, and logged out. States define the set of valid commands a
-client may issue. For example, clients in the selected state may
-retrieve messages from the selected mailbox. In our case study we are
-interested in mailbox manipulation; the authenticated and selected
-states allow mailbox manipulation. The most relevant IMAP commands
-synchronize changes to the server's disk (CHECK), copy a message from
-the selected mailbox to another mailbox (COPY), and delete messages
-marked for deletion (EXPUNGE).
-
-UW IMAP~\cite{uwimap}, authored by Mark Crispin of the IMAP RFC,
-includes an IMAP mail server imapd and mail client library c-client.
-We have updated imapd and the mbox mail storage driver to use
-\opgroups\ to ensure all disk changes occur in a safe ordering, while
-performing a minimal number of disk writes.
-%
-The original IMAP server conservatively preserved command ordering by
-syncing the mailbox file after each CHECK on it or COPY into it. With
-\opgroups, each command's file system updates are executed under a
-distinct \opgroup\ and, through the \opgroup, made to depend on the
-previous command's updates. This is necessary, for example, so that
-moving a message to another folder (accomplished by copying to the
-destination file and then removing from the source file) can not lose
-the copied message should the server crash part way through the disk
-updates.
-%
-The updated CHECK command uses \opgroupSync to sync all preceding disk
-updates. This enhancement to CHECK removes the requirement that COPY
-sync its destination mailbox; the client's CHECK request will ensure
-changes are committed to disk; the \opgroup\ dependencies will ensure
-changes are committed in a safe ordering.
-
-These changes to UW IMAP simplify two aspects:
-%
-ensuring change ordering correctness
-%
-and making efficient usage of disk updates.
-%
-As each command's changes now depend on the preceding command's
-changes, it is no longer required that all code be concerned with
-ensuring its changes are committed before any later, dependent
-command's changes. Without \opgroups, modules like the mbox driver
-forced a conservative disk sync protocol because ensuring safety more
-efficiently required additional state information, adding further
-complexity. The Dovecot IMAP server's source code notes this exact
-difficulty~\cite[maildir-save.c]{dovecot}:
-
-\vspace{-0.5\baselineskip}
-\begin{scriptsize}
-\begin{verbatim}
-/* FIXME: when saving multiple messages, we could get
-   better performance if we left the fd open and
-   fsync()ed it later */
-\end{verbatim}
-\end{scriptsize}
-\vspace{-0.5\baselineskip}
-
-The performance of the \opgroup{}-enabled UW IMAP mail server is
-evaluated in \S\ref{sec:evaluation:uwimap}.
-
 \subsection{Subversion Case Study}
 \label{sec:opgroup:svn}
 
@@ -329,3 +259,73 @@ file's data\todo{Note that renames for files used by logs are no
   \caption{\Opgroups\ to update a file in a Subversion working copy.}
   \label{fig:svn-order}
 \end{figure}
+
+\subsection{UW IMAP Case Study}
+\label{sec:opgroup:uwimap}
+
+To assess the utility of \opgroups\ in a real world application we
+updated the University of Washington's IMAP mail server to take
+advantage of \opgroups, to ensure mail updates are committed to disk
+in safe and efficient orderings.
+
+The Internet Message Access Protocol (IMAP)~\cite{rfc3501} provides
+remote access to a mail server's email message store. An IMAP client
+is in one of four states: not authenticated, authenticated, mailbox
+selected, and logged out. States define the set of valid commands a
+client may issue. For example, clients in the selected state may
+retrieve messages from the selected mailbox. In our case study we are
+interested in mailbox manipulation; the authenticated and selected
+states allow mailbox manipulation. The most relevant IMAP commands
+synchronize changes to the server's disk (CHECK), copy a message from
+the selected mailbox to another mailbox (COPY), and delete messages
+marked for deletion (EXPUNGE).
+
+UW IMAP~\cite{uwimap}, authored by Mark Crispin of the IMAP RFC,
+includes an IMAP mail server imapd and mail client library c-client.
+We have updated imapd and the mbox mail storage driver to use
+\opgroups\ to ensure all disk changes occur in a safe ordering, while
+performing a minimal number of disk writes.
+%
+The original IMAP server conservatively preserved command ordering by
+syncing the mailbox file after each CHECK on it or COPY into it. With
+\opgroups, each command's file system updates are executed under a
+distinct \opgroup\ and, through the \opgroup, made to depend on the
+previous command's updates. This is necessary, for example, so that
+moving a message to another folder (accomplished by copying to the
+destination file and then removing from the source file) can not lose
+the copied message should the server crash part way through the disk
+updates.
+%
+The updated CHECK command uses \opgroupSync to sync all preceding disk
+updates. This enhancement to CHECK removes the requirement that COPY
+sync its destination mailbox; the client's CHECK request will ensure
+changes are committed to disk; the \opgroup\ dependencies will ensure
+changes are committed in a safe ordering.
+
+These changes to UW IMAP simplify two aspects:
+%
+ensuring change ordering correctness
+%
+and making efficient usage of disk updates.
+%
+As each command's changes now depend on the preceding command's
+changes, it is no longer required that all code be concerned with
+ensuring its changes are committed before any later, dependent
+command's changes. Without \opgroups, modules like the mbox driver
+forced a conservative disk sync protocol because ensuring safety more
+efficiently required additional state information, adding further
+complexity. The Dovecot IMAP server's source code notes this exact
+difficulty~\cite[maildir-save.c]{dovecot}:
+
+\vspace{-0.5\baselineskip}
+\begin{scriptsize}
+\begin{verbatim}
+/* FIXME: when saving multiple messages, we could get
+   better performance if we left the fd open and
+   fsync()ed it later */
+\end{verbatim}
+\end{scriptsize}
+\vspace{-0.5\baselineskip}
+
+The performance of the \opgroup{}-enabled UW IMAP mail server is
+evaluated in \S\ref{sec:evaluation:uwimap}.
