@@ -111,7 +111,7 @@ Thus, an upper file system layer defines an initial set of
 The rest of \Kudos\ generally preserves this initial set, but can modify
  them as necessary to change or fix dependency semantics.
 %
-Finally, the buffer cache obeys the constraints they define.
+Finally, the buffer cache obeys the constraints thus defined.
 
 
 We say $p$ \emph{directly depends on} $q$, and write $p \PDDepend q$, when
@@ -123,6 +123,9 @@ We say $p$ \emph{depends on} $q$, and write $p \PDepend q$, when there
 %
 Patch $p$'s set of \emph{dependencies} is written $\PDepset{p} = \{ q \mid
  p \PDepend q \}$; this is of course a superset of its direct dependencies.
+%
+Given a \emph{set} of patches $P$, we write $\PDepset{P}$ to mean the set's
+ combined dependencies $\bigcup_{p\in P} \PDepset{p}$.
 
 
 
@@ -151,93 +154,47 @@ Rollback information adds greatly to memory and CPU utilization, but it can
 often be optimized away, as we show below.
 
 
+\subsection{Obeying dependencies}
 
-
-\paragraph{Generalizations}
-
-Levels of the file system
-
-
-
-
-
-The disk's behavior is encapsulated in the following action,
-which might happen at any time:
-
-\begin{tabbing}
-\quad \textbf{Commit block.} \\
-\qquad Pick some block $b$. \\
-\qquad For each $p \in \PInf[b]$, set $\PState{p} \gets \PDiskst$.
-\end{tabbing}
-
-
-We note that soft updates-like consistency protocols demand more from disks
-than many journal protocols.
-%
-Neither type of protocol assumes that data is committed until the disk
-reports success.
-%
-However, soft updates inherently assumes that blocks are written
-\emph{atomically}, except in the case of catastrophic media error.
-%
-In particular, if the disk fails while a block $b$ is in flight, then $b$'s
-value on recovery must equal either the old value or the new value.
-%
-Most journal designs also handle the case where in-flight blocks might be
-corrupted on recovery---for instance, perhaps because the memory holding
-the new value of the block lost its coherence before the disk stopped
-writing~\cite{tso}.
-%
-However, some disks actually do provide an atomicity guarantee, for
-instance by using non-volatile memory to store blocks before they make it
-onto disk~\cite{???}.
-%
-The \Kudos\ core makes no assumptions about block atomicity, instead relying
-on software above it to implement a consistency protocol that makes sense
-for the given disk.
-
-
-
-
-The \textbf{disk safety property} is simply written
+\Kudos\ must ensure the \textbf{disk safety property}, which states that
+ the dependencies of all patches on disk are also on disk:
 %
 \[ \PDepset{\PDisk} \subseteq \PDisk. \]
 %
-That is, the dependencies of all \patches\ on disk are always also on disk,
-and
-%
-no matter when the system crashes, the disk is consistent in terms of
+Thus, no matter when the system crashes, the disk is consistent in terms of
 dependencies.
 %
 The file system's job is to set up dependencies so that the disk safety
 property implies file system correctness.
-%
-(This might involve compensating for the possibility that in-flight blocks
-can be corrupted on recovery.)
 
-
-The storage system cannot control when the disk controller commits blocks;
-instead, it controls when blocks are released to the controller.
+However, \Kudos\ can only determine when patches are handed to the disk
+ controller, not when they are written to disk.
 %
-It therefore maintains the disk safety property by enforcing, instead, the
-\textbf{in-flight safety property}: For any block $b$ with $\PInf[b] \neq
-\emptyset$,
+Disk controller behavior is encapsulated in the following atomic action:
+
+\begin{tabbing}
+\textit{Commit block:} \\
+\quad Pick some block $b$. \\
+\quad For each $p \in \PInf[b]$, set $\PState{p} \gets \PDiskst$.
+\end{tabbing}
+
+\noindent
+%
+\Kudos\ must thus enforce the following \textbf{in-flight
+ safety property}: For any block $b$,
 %
 \[ \PDepset{\PInf[b]} \subseteq \PInf[b] \cup \PDisk . \]
 %
-This, combined with the disk's ``commit block'' behavior above, implies the
-disk safety property.
-%
-The buffer cache's job is to write \patches\ in an order that obeys the
-in-flight safety property.
-\todo{mention liveness property?}
+Since in-flight blocks are mutually independent (for any $b' \neq b$,
+ $\PDepset{\PInf[b]} \cap \PDepset{\PInf[b']} \subseteq \PDisk$), the disk
+ controller can safely write them in any order and still preserve the disk
+ safety property.
 
 
-The buffer cache's required behavior is then encapsulated in the following
-action:
+The buffer cache must thus behave according to the following atomic action:
 
 \begin{tabbing}
-\textbf{Write block.} \\
+\textit{Write block:} \\
 \quad Pick some block $b$ with $\PMem[b] \neq \emptyset$. \\
 \quad Pick some $P \subseteq \PMem[b]$ with $\PDepset{P} \subseteq P \cup
 \PDisk$. \\
@@ -252,14 +209,43 @@ The last step forces any rolled-back \patches\ to wait in memory at least
 until the current version of the block is written.  (Our implementation
 achieves this property without using dependencies.)
 %
-It is easy to show that this action preserves the in-flight safety property
-and, thus, the disk safety property.
+The buffer cache is also expected to write all blocks eventually, a
+ liveness property.
+
+
+This model does not completely define the disk's behavior on system crash,
+ in particular with respect to in-flight blocks.
+%
+Soft updates inherently assumes that blocks are written
+\emph{atomically}, except in the case of catastrophic media error:
+%
+if the disk fails while a block $b$ is in flight, then $b$'s
+value on recovery must equal either the old value or the new value.
+%
+Most journal designs do not rely on this assumption, and can recover
+ propery even if in-flight blocks are corrupted on recovery---for instance,
+ because the memory holding the new value of the block lost its coherence
+ before the disk stopped writing~\cite{tso}.
+%
+However, some disks actually do provide an atomicity guarantee, for
+ instance by using non-volatile memory to store blocks before they make it
+ onto disk~\cite{???}.
+%
+The \Kudos\ core makes no assumptions about block atomicity, instead relying
+ on software above it to implement a consistency protocol that makes sense
+ for the given disk.
+
 
 
 \input{noop}
 
 
-\subsection{Challenges}
+\subsection{Discussion}
+
+- Levels of the file system
+
+
+\section{Patch Optimizations}
 \label{sec:patch:challenges}
 
 A naive implementation of this model scales extremely poorly,
@@ -334,8 +320,6 @@ them.
 
 The next section tackles all of these challenges.
 
-
-\section{Patch Optimizations}
 
 \begin{figure}
 \centering
