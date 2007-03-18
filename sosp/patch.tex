@@ -223,7 +223,7 @@ if the disk fails while a block $b$ is in flight, then $b$'s
 value on recovery must equal either the old value or the new value.
 %
 Most journal designs do not rely on this assumption, and can recover
- propery even if in-flight blocks are corrupted on recovery---for instance,
+ properly even if in-flight blocks are corrupted on recovery---for instance,
  because the memory holding the new value of the block lost its coherence
  before the disk stopped writing~\cite{tso}.
 %

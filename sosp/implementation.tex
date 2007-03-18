@@ -55,7 +55,7 @@ approaches significantly degrade performance when used alone; additionally,
 traditional FUA mode is supported by very few drives\todo{cite something?}.
 %
 However, using a write-through cache or FUA mode in conjunction with SCSI tagged
-command queueing (TCQ) or SATA native command queueing (NCQ) only slightly slows
+command queuing (TCQ) or SATA native command queuing (NCQ) only slightly slows
 write performance compared to using the write-back cache without FUA\todo{give
 figures to support this claim}, since many write requests may be outstanding at
 a time and the drive can choose how to service them in a manner not unlike how

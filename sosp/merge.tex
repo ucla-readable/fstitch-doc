@@ -195,7 +195,7 @@ Many of these and similar \chdescs\ are mergeable and have
 dependencies that allow simple (and fast) reasoning to identify many
 of the mergeable pairs: two \chdescs\ on block $b$ that overlap no other \chdescs\ in \PMem[b]
 and which have no dependency path from the new to the existing \chdesc\
-will not induce a block-level cycle and so are writeable together.
+will not induce a block-level cycle and so are writable together.
 We know that \textit{later} changes will not cause them to induce a block-level cycle due to
 invariant~\ref{cdinvar:add-before} and by not merging if the new \chdesc\
 has a before and the before is marked as allowed to violate

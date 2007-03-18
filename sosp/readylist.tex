@@ -22,7 +22,7 @@ are all ``closer to the disk'' (or are also being forwarded as part of the same
 block write). We say that such \chdescs\ are \emph{ready}. Because the
 write-back cache frequently searches for and writes many ready \chdescs,
 redundant \chdesc\ graph traversals to calculate \chdesc\ readiness would
-severly limit cache size scalabity. \Kudos\ therefore explictly tracks a
+severely limit cache size scalability. \Kudos\ therefore explicitly tracks a
 \chdesc's \before\ counts through incremental dependency updates, and uses these
 counts to maintain a \chdesc\ ready list for each block.
 
