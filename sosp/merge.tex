@@ -22,7 +22,7 @@ differ in their applicable conditions.
 \label{sec:chdescs:merge:nrb}
 
 Recall from \S\ref{sec:chdescs:nrb} that a write of any \chdescs\ on block
-$B$ must include all \nrb\ \chdescs\ on $B$.
+$b$ must include all \nrb\ \chdescs\ on $b$.
 %
 This additional requirement is in fact an exquisite optimization
 opportunity; it implies that all \nrb\ \chdescs\ on a given block can
@@ -49,7 +49,7 @@ Any two \nrb\ \chdescs\ on the same block may be (and are) merged.
 %
 Merging all \nrb\ \chdescs\ ensures:
 %
-\cdinvar{one-nrb}{\(\forall\! B\!: |\PHard[B]| \leq 1\)}
+\cdinvar{one-nrb}{\(\forall\! b\!: |\PHard[b]| \leq 1\)}
 %
 \noindent
 %
@@ -154,23 +154,23 @@ into a \nrb\ \chdesc\ and then \nrb-\nrb\ \chdesc\ merges the new \nrb\
 \chdesc\ into the now-existing \nrb\ \chdesc.
 %
 Our algorithm to transform the dependencies for \nrb-\rb\ \chdesc\
-merges (Figure~\ref{algo:merge:hard-soft}) for block $B$
+merges (Figure~\ref{algo:merge:hard-soft}) for block $b$
 %
 chooses a \chdesc\ \p{p} such that
-\(\notexists \inset{q}{\PMem[B]}\!: \indirdepends{p}{q}\)
+\(\notexists \inset{q}{\PMem[b]}\!: \indirdepends{p}{q}\)
 %
 and updates its transitive \befores\ to ensure
-\(\PDepset{\PSoft[B]} \subseteq \PDepset{p}\).
+\(\PDepset{\PSoft[b]} \subseteq \PDepset{p}\).
 %
-Because any \(\inset{q}{\PMem[B] - p}\) may have \afters, to
+Because any \(\inset{q}{\PMem[b] - p}\) may have \afters, to
 preserve dependencies we convert such a \p{q} into \anoop\ \chdesc\
 and ensure \depends{q}{p}.
 
 \noindent Algorithm:
 \begin{itemize}
-\item Choose a \(\inset{p}{\PMem[B]}\!:\
-\notexists\! \inset{q}{\PMem[B]}\!:\ \indirdepends{p}{q}\).
-\item For each \inset{q}{\PMem[B] - p}:
+\item Choose a \(\inset{p}{\PMem[b]}\!:\
+\notexists\! \inset{q}{\PMem[b]}\!:\ \indirdepends{p}{q}\).
+\item For each \inset{q}{\PMem[b] - p}:
   \begin{itemize}
   \item Call the \nrb-\nrb\ \before\ move algorithm on \p{q} and \p{p}.
   \item Convert \p{q} into \anoop\ \chdesc.
@@ -193,7 +193,7 @@ from a file.
 %
 Many of these and similar \chdescs\ are mergeable and have
 dependencies that allow simple (and fast) reasoning to identify many
-of the mergeable pairs: two \chdescs\ on block $B$ that overlap no other \chdescs\ in \PMem[B]
+of the mergeable pairs: two \chdescs\ on block $b$ that overlap no other \chdescs\ in \PMem[b]
 and which have no dependency path from the new to the existing \chdesc\
 will not induce a block-level cycle and so are writeable together.
 We know that \textit{later} changes will not cause them to induce a block-level cycle due to

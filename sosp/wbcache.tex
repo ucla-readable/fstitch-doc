@@ -20,19 +20,19 @@ policy for writing dirty blocks, and an LRU policy for evicting clean blocks
 The FIFO policy for writing blocks is really only a heuristic to help the
 write-back cache find a block which can be written, however, since the in-flight
 safety property (\S\ref{sec:patch:dependencies}) must be maintained in order to
-provide the disk safety property. When attempting to evict a block $B$, the
-write-back cache finds the maximal set of \chdescs\ $P \subseteq \PMem[B]$
+provide the disk safety property. When attempting to evict a block $b$, the
+write-back cache finds the maximal set of \chdescs\ $P \subseteq \PMem[b]$
 satisfying
 %
-$\PDepset{P} \subseteq P \cup \PDisk$ and $\PHard[B] \subseteq P$.
+$\PDepset{P} \subseteq P \cup \PDisk$ and $\PHard[b] \subseteq P$.
 %
 This is efficient, because this $P$ is the ready \chdesc\ list discussed in
 section~\ref{sec:patch:readylist}.
 %
-Assuming $P \neq \emptyset$, all other \chdescs\ on $B$ (i.e., $\PMem[B] - P$)
+Assuming $P \neq \emptyset$, all other \chdescs\ on $b$ (i.e., $\PMem[b] - P$)
 are rolled back, the resulting block data is sent to the disk driver, the
 \chdescs\ in $P$ are marked \PInfst, and the rolled-back \chdescs\ are rolled
-forward again. $B$ itself is also marked \PInfst, so that only one version of
+forward again. $b$ itself is also marked \PInfst, so that only one version of
 its data will be in flight at a time. (This whole procedure is basically the
 \textbf{Write block} action.)
 

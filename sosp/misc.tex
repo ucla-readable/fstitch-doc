@@ -12,7 +12,7 @@ degrade the performance of the system.
 In Figure~\ref{fig:chdescarrange}, we have two possible arrangements for three
 \chdescs. The \noop\ \chdesc\ represents a root node that can reach all
 other \chdescs. In the parallel arrangement on the right, \Kudos\ has the
-freedom to write \chdescs\ $C_1$, $C_2$, and $C_3$ to disk in any order. In the
+freedom to write \chdescs\ $p$, $q$, and $r$ to disk in any order. In the
 serial arrangement on the left, there exists only one valid write ordering.
 Depending on the arrangement of other \chdescs, \Kudos\ may have to perform
 additional rollbacks and write some blocks more times than would otherwise be
@@ -28,8 +28,8 @@ ordering.
   \caption{\label{fig:chdescarrange} \Chdesc\ dependencies, when
   not strictly needed, restrict the possible choices for write ordering.
   This results in suboptimal write ordering and more scans through the
-  \chdescs\ for \Kudos. On the right, \chdescs\ C1, C2, and C3 can be written
-  in any order. Only one ordering is possible on the left.}
+  \chdescs\ for \Kudos. On the right, \chdescs\ $p$, $q$, and $r$ can be
+  written in any order. Only one ordering is possible on the left.}
 \end{figure}
 % }}}
 
