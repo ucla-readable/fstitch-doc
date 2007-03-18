@@ -21,11 +21,10 @@ Related Work, Applications:
 
 Design, Change Descriptors:
 - Do we want to jump right into "definition" without a mini-introduction?
+- Model dependencies
 - Add formalisms for merge and hard patch optimizations
 - Prove theorems?
-- Integrate formals into the paper
 - Figure out how to introduce
-- Describe merging and hard patches
 
 Modules:
 - Explore modules not possible within a stackable file system (reviewer)
@@ -49,8 +48,8 @@ Opgroups:
 - Show more types of consistency requirements (eg CVS [check], database)
 - Compare data journaling (unnecessarily strict) vs minimal opgroups
 - Write about gzip
-- Write about svn+opgroups including svn's two assumptions and a crash test (?)
-  - Figure out: how does MacOSX HFS+ journaling work?
+- Do svn+opgroups crash test?
+- Figure out: how does MacOSX HFS+ journaling work?
 - Do tar, then rm: shell or utility depend?
 
 Implementation:
