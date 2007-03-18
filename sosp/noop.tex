@@ -51,17 +51,20 @@ Once the commit record is created, the empty patch is updated to depend on
 Once the commit record is written, the empty patch is automatically
  ``written'' as well, which allows the main file system changes to follow.
 %
-We could explicitly represent empty \patches\ in our model by updating the
- in-flight safety property as follows:
+To model empty \patches\ explicitly, we might introduce a fake block per
+ empty patch and update the in-flight safety property for true blocks $b$ as
+ follows:
 %
 \[ \PDepset{\PInf[b]} \subseteq \PInf[b] \cup \PDisk \cup \PEmpty. \]
-%
+
+
 Empty patches both aid and hurt performance.
 %
 On the one hand, empty patches can represent quadratic sets of dependencies
  with a linear number of edges: if all $m$ patches in $P$ must depend on
- all $n$ patches in $Q$, one could add $mn$ direct dependencies $p_i
- \PDDepend q_j$ or add an empty patch $x$ and $m+n$ direct dependencies
+ all $n$ patches in $Q$, one could 
+ %% add $mn$ direct dependencies $p_i \PDDepend q_j$ or
+ add an empty patch $x$ and $m+n$ direct dependencies
  $p_i \PDDepend x \PDDepend q_j$.
 %
 On the other hand, some functions may have to traverse trees of \noop\
