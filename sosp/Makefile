@@ -14,7 +14,7 @@ TEXSRCS = abstract.tex conclusion.tex discussion.tex evaluation.tex \
 	ext2.tex implementation.tex interfaces.tex intro.tex journal.tex \
 	modules.tex noop.tex nrb.tex merge.tex misc.tex opgroups.tex \
 	paper.tex readylist.tex related.tex softupdate.tex ufs.tex \
-	uhfs.tex using.tex wbcache.tex
+	uhfs.tex using.tex wbcache.tex svnversion.tex
 
 BIBS = paper.bib kmaster.bib
 
@@ -32,13 +32,16 @@ PDF_PRIMARY =
 
 all: paper.pdf paper.dvi
 
-paper.dvi: $(MAINFILE) $(MAINFILE:.tex=.bbl) $(DVI_IMAGES) always
+paper.dvi: $(MAINFILE) $(MAINFILE:.tex=.bbl) $(DVI_IMAGES) svnversion.tex always
 	$(LATEX) $<
 	@while grep Rerun paper.log >/dev/null 2>&1; do echo $(LATEX) $<; $(LATEX) $<; done
 
-paper.pdf: $(MAINFILE) $(MAINFILE:.tex=.bbl) $(PDF_IMAGES) always
+paper.pdf: $(MAINFILE) $(MAINFILE:.tex=.bbl) $(PDF_IMAGES) svnversion.tex always
 	$(PDFLATEX) $<
 	@while grep Rerun paper.log >/dev/null 2>&1; do echo $(PDFLATEX) $<; $(PDFLATEX) $<; done
+
+svnversion.tex: svnversion.tmpl always
+	sed "s/SVNVERSION/`svnversion`/" svnversion.tmpl > svnversion.tex
 
 opts-patches.eps: opts.gp data/opts
 	(cd `dirname "$<"`; ./$<)
@@ -97,7 +100,7 @@ fonts.sty:
 
 clean: cleanfig
 	/bin/rm -f *.log *.aux *.dvi *.bbl *.blg *.lof *.lot *.toc *~ \
-	grammar.tab.c grammar.output fonts.sty .fonts.sty paper.out paper.ps paper.pdf paper.dvi
+	grammar.tab.c grammar.output fonts.sty .fonts.sty svnversion.tex paper.out paper.ps paper.pdf paper.dvi
 
 cleanfig:
 	/bin/rm -f $(TMP_PDF_IMAGES) $(TMP_DVI_IMAGES) \
