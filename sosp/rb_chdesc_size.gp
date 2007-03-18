@@ -1,6 +1,6 @@
 #!/usr/bin/env gnuplot
 
-set terminal postscript eps enhanced color
+set terminal postscript eps enhanced
 set output "rb_chdesc_size.eps"
 
 set nokey
