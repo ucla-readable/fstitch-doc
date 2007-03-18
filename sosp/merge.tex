@@ -1,17 +1,15 @@
 \subsection{\ChDesc\ Merging}
 \label{sec:patch:merge}
 
-The large number of small, distinct changes made for cases such as
-block allocations, inode updates, and directory updates use
-significant memory for their \chdesc\ structures and dependencies and
-increase the number of \chdescs\ the system processes.
+File operations such as block allocations, inode updates, and directory updates
+create a large number of small, distinct \chdescs. Keeping track of many small
+\chdescs\ and their dependencies requires significant amounts of memory.
 %
-\Kudos\ drastically reduces the number of such \chdescs, and thus
-\chdesc\ memory usage, by conservatively identifying when a new and an
-existing \chdesc\ pair can be written to disk together, which \Kudos\
-%
-\emph{merges} together into the existing \chdesc\ (updating its disk
-change and dependencies) instead of creating the new \chdesc.
+\Kudos\ uses \emph{merges} to drastically reduces the number of \chdescs, and
+thus \chdesc\ memory usage, by conservatively identifying when a new and an
+existing \chdesc\ pair can be written to disk together. Rather than creating
+a new \chdesc, Kudos updates the disk change and dependencies to merge the
+changes into the existing \chdesc.
 %
 In this section we present three \chdesc\ merge algorithms. All three
 use Invariant~\ref{cdinvar:add-before} to reason about future graph
