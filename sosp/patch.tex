@@ -1,31 +1,10 @@
-% -*- tex-main-file: "paper.tex" -*-
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
 
 \section{Patch Model}
 \label{sec:patch}
 
-\emph{\Patches} represent any and all changes to stable storage in a \Kudos\
-system.
-%
-Patches encapsulate both the data to be written and any dependencies among
-writes.
-%
-This section describes the basic \patch\ model, and the optimizations we have
-found important so far, using a simple notation that allows us to prove the
-correctness of several transformations.
-%
-However, \patches\ are not merely theoretical objects; each active \patch\
-corresponds to an object in the \Kudos\ implementation.
-
-
-%% \subsection{Basics}
-
-\Kudos's job is simply to write \patches\ to one or more disks.
-%
-(The same ideas would apply to any other stable medium, or to network file
-systems, but to simplify our terminology, we use the term ``disk''
-throughout.)
-
 \makeatletter
+\let\emptyset\varnothing
 \newcommand{\PState}[1]{\ensuremath{#1.\textit{state}}}
 \newcommand{\PBlock}[1]{\ensuremath{#1.\textit{block}}}
 \newcommand{\PMemst}{\ensuremath{\textit{mem}}}
@@ -45,31 +24,143 @@ throughout.)
 \newcommand{\PRDepset}[1]{\ensuremath{\textit{RDep}[#1]}}
 \makeatother
 
-Patches begin in memory.
+Every change to stable storage in a \Kudos\ system is represented by a
+\emph{patch}.
 %
-They are eventually written to a disk controller, a state we call \emph{in
-flight} because the processor has lost control over when the \patches\ are
-committed (the controller might service requests in any order).
+This section describes the basic patch abstraction using a semi-formal
+notation that will be useful for analyzing our optimizations later.
 %
-At some point thereafter, \patches\ are committed to the disk itself; the
-disk reports success after the write has committed. (We say the \patches\
-are \emph{satisfied} when their associated data reaches stable storage.)
+Although the patch idea would apply to any stable medium, or to network
+file systems, we use terms like ``disk'' and ``disk controller'' throughout
+to simplify our terminology.
 %
-Thus, each \patch\ $p$ has a state:
-%
-\[ \PState{p} \in \{ \PMemst, \PInfst, \PDiskst \}. \]
-%
-The set $\PMem$ is defined as $\PMem = \{p \mid \PState{p} = \PMemst\}$,
-and similarly for $\PInf$ and $\PDisk$.
+Our patch notation is summarized in Figure~\ref{f:patchnot}.
 
-Patches are written in units called \emph{blocks}, which may cover one or
-more sectors.
+Each patch $p$ encapsulates four important pieces of state: its
+ \emph{block}, its \emph{state}, a set of \emph{direct dependencies}, and
+ some \emph{rollback data}.
+
+Patch $p$'s \textbf{block}, written $\PBlock{p}$, is the unit of disk data
+ to which $p$ applies.  The disk controller is assumed to write blocks as a
+ unit (although not necessarily atomically; see below).  A file system
+ change that affects $n$ blocks must be represented using at least $n$
+ patches, since a patch by definition can touch only one block.
+
+\begin{figure}
+\begin{small}
+\begin{tabular}{@{}ll@{}}
+$\PBlock{p} = b$ & $p$'s block \\
+$\PState{p}$ & $p$'s state, $\in \{\PMemst, \PInfst, \PDiskst\}$ \\
+~~~~$\PMem$ & all in-memory patches: $\{p \mid \PState{p} = \PMemst\}$ \\
+~~~~$\PMem[b]$ & $\{p \mid \PState{p} = \PMemst \text{ and } \PBlock{p} = b
+ \}$ \\
+~~~~$\PInf, \PDisk$ & similarly for in-flight and on-disk patches \\
+$\PDDepset{p}$ & $p$'s direct dependencies \\
+~~~~$p \PDDepend q$ & $p$ directly depends on $q$: $q \in \PDDepset{p}$ \\
+~~~~$p \PDepend q$ & $p$ depends on $q$: either $p \PDDepend q$ or there exists \\
+       & a patch $x$ so that $p \PDepend x \PDDepend q$ \\
+~~~~$\PDepset{p}$ & $p$'s dependencies: $\{ q \mid p \PDepend q \}$ \\
+\end{tabular}
+\end{small}
+
+\caption{Patch notation.}
+\label{f:patchnot}
+\end{figure}
+
+
+Each patch is in one of three \textbf{states}: \emph{in memory}; \emph{in
+ flight} to the disk controller, but not yet committed to disk; and
+ \emph{on disk}.  The intermediate in-flight state is necessary because
+ operating system software loses control of a patch upon writing its block
+ to disk.  $p$'s state is written $\PState{p} \in \{\PMemst, \PInfst,
+ \PDiskst\}$.  The operating system changes a patch's state from
+ \PMemst\ to \PInfst\ by writing its block to the disk controller.  Some
+ time later---after possible OS-level disk scheduling, transit over the
+ system bus, and a period in the disk's cache---the disk writes the block
+ to stable storage and reports success.  When the processor receives this
+ notification, it changes the patch's state to \PDiskst.
 %
-Each \patch\ applies to a single block, written $\PBlock{p}$.
+The sets \PMem, \PInf, and \PDisk\ are defined to contain all patches with
+ the given state, and the sets $\PMem[b]$, $\PInf[b]$, and $\PDisk[b]$ are
+ defined to contain all patches with the given state \emph{on the given
+ block} $b$.
+
+Patch $p$'s \textbf{direct dependencies}, written $\PDDepset{p}$, is a set of
+ other patches on which $p$ ``depends''.
 %
-For a given block $b$, we define $\PMem[b] = \{p \in \PMem \mid \PBlock{p}
-= b \}$, and similarly for $\PInf[b]$ and $\PDisk[b]$.
+That is, every patch in $\PDDepset{p}$ should be committed to disk either
+ before, or at the same time as, $p$ itself.
 %
+Dependencies are set by the file system based on whatever consistency
+ semantics it wants to ensure.
+%
+For example, a file system with asynchronous writes (and no durability
+ guarantees) might write all patches with $\PDDepset{p} = \emptyset$;
+%
+a file system implementing soft updates would arrange the dependencies
+ accordingly;
+%
+and a file system implementing journaling would write a different set of
+ dependencies, where the journal commit record would depend on the journal
+ data and the writes to the main body of the file system would in turn
+ depend on the commit record.
+%
+Thus, an upper file system layer defines an initial set of
+ dependencies.
+%
+The rest of \Kudos\ generally preserves this initial set, but can modify
+ them as necessary to change or fix dependency semantics.
+%
+Finally, the buffer cache obeys the constraints they define.
+
+
+We say $p$ \emph{directly depends on} $q$, and write $p \PDDepend q$, when
+ $q \in \PDDepset{p}$.
+%
+We say $p$ \emph{depends on} $q$, and write $p \PDepend q$, when there
+ exists a dependency chain from $p$ to $q$: that is, either $p \PDDepend q$
+ or, for some patch $x$, $p \PDepend x \PDDepend q$.
+%
+Patch $p$'s set of \emph{dependencies} is written $\PDepset{p} = \{ q \mid
+ p \PDepend q \}$; this is of course a superset of its direct dependencies.
+
+
+
+\textbf{Rollback data.}
+%
+Soft updates-like consistency orderings may require that the buffer cache
+\emph{not} write one or more \patches\ on some block.
+%
+In particular, a series of file system operations may create dependencies
+that enforce a circular order among blocks, even though the dependencies
+themselves do not form a cycle~\cite{ganger00soft}.
+%
+This is problematic since blocks with circular dependencies can never be
+written: no block can be written first since each block depends on another.
+%
+For this reason, each \patch\ carries \emph{rollback} information that gives
+the previous version of the data altered by the \patch.
+%
+If a \patch\ $p$ is not written with its containing block, the system rolls
+back the \patch, which swaps the new data and the previous version.
+%
+Once the block is written, the system will roll the \patch\ forward and, when
+allowed, write the block again, this time including the \patch.
+%
+Rollback information adds greatly to memory and CPU utilization, but it can
+often be optimized away, as we show below.
+
+
+
+
+\paragraph{Generalizations}
+
+Levels of the file system
+
+
+
+
+
 The disk's behavior is encapsulated in the following action,
 which might happen at any time:
 
@@ -106,30 +197,6 @@ on software above it to implement a consistency protocol that makes sense
 for the given disk.
 
 
-\paragraph{Dependencies}
-\label{sec:patch:dependencies}
-%
-Each \patch\ $p$ also has a set of \emph{direct dependencies}, $\PDDepset{p}$.
-%
-These are other \patches\ on which $p$ depends: every $q \in \PDDepset{p}$
-must be written to disk before $p$, or atomically with $p$, or the file
-system's consistency is at risk.
-%
-We say $p$ \emph{directly depends on} $q$ and write $p \PDDepend q$ when $q
-\in \PDDepset{p}$.
-%
-The \emph{depends on} relation, written $p \PDepend q$, is $\PDDepend$'s
-transitive closure: $p \PDepend q$ iff there exists a path of direct
-dependencies $p \PDDepend p_1 \PDDepend \cdots \PDDepend p_n \PDDepend q$.
-%
-The set $\PDepset{p}$ consists of $p$'s dependencies $\{q \mid p \PDepend
-q \}$.
-%
-Given a set of \patches\ $P = \{p_i\}$, $\PDepset{P} = \bigcup_i
-\PDepset{p_i}$.
-%
-Dependencies link \patches\ into a directed graph; $\PDepset{p}$ is just the
-set of $p$'s successors in the graph.
 
 
 The \textbf{disk safety property} is simply written
@@ -164,38 +231,6 @@ disk safety property.
 The buffer cache's job is to write \patches\ in an order that obeys the
 in-flight safety property.
 \todo{mention liveness property?}
-
-
-\paragraph{Rollback}
-%
-A simplistic implementation of \patches\ might just keep track of
-dependencies; all changes would be applied directly to a block's in-memory
-copy.
-%
-After all, disks write \emph{blocks}---arrays of memory---not \patches.
-%
-However, soft updates-like orderings may require that the buffer cache
-\emph{not} write one or more \patches\ on some block.
-%
-In particular, a series of file system operations may create dependencies
-that enforce a circular order among blocks, even though the dependencies
-themselves do not form a cycle~\cite{ganger00soft}.
-%
-This is problematic since blocks with circular dependencies can never be
-written: no block can be written first since each block depends on another.
-
-
-For this reason, each \patch\ carries \emph{rollback} information that gives
-the previous version of the data altered by the \patch.
-%
-If a \patch\ $p$ is not written with its containing block, the system rolls
-back the \patch, which swaps the new data and the previous version.
-%
-Once the block is written, the system will roll the \patch\ forward and, when
-allowed, write the block again, this time including the \patch.
-%
-Rollback information adds greatly to memory and CPU utilization, but it can
-often be optimized away, as we show below.
 
 
 The buffer cache's required behavior is then encapsulated in the following
