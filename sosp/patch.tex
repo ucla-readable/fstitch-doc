@@ -250,9 +250,55 @@ The \Kudos\ core makes no assumptions about block atomicity, instead relying
 \section{Patch Optimizations}
 \label{sec:patch:challenges}
 
-A naive implementation of this model scales extremely poorly,
-particularly with cache size.
+A naive implementation of this model has all the properties we want except
+good performance.
 %
+File system modules can define their own consistency protocols; other
+modules can modify them: for instance, the journaling module we describe
+below automatically changes soft updates orderings into journal
+transactions.
+%
+Applications can affect consistency orderings, and it is all relatively
+easy thanks to the patch abstraction.
+%
+Unfortunately, that abstraction is extremely expensive.
+
+
+Consider an unoptimized version of \Kudos\ running an ext2 file system with
+soft updates-like dependencies.
+%
+Figure~\ref{f:opt}a shows the patches generated when an application appends
+16384 bytes of data to an existing empty file.
+%
+This requires allocating four new 4096-byte blocks, writing data to them,
+attaching them to the file's inode, changing the inode's file size and
+modification time, and updating the ``group descriptor'' and superblock to
+account for the allocated blocks.
+%
+Eight blocks are written during the operation.
+%
+\Kudos, however, represents the operation with 23 patches and roughly 33000
+(!) bytes of rollback data.
+%
+The patches slow down the buffer cache system by making graph traversals
+more expensive.
+%
+The 4096 bytes of rollback data per patch stored for ``zero data'' and
+``write data'' patches, which initialize and write data blocks, is
+particularly painful since in this file system, data blocks \emph{never}
+need to be rolled back!
+
+
+This section shows how the actual \Kudos\ system uses generic patch
+properties and dependency analysis to reduce the 23 patches and 33000 bytes
+of rollback data in Figure~\ref{f:opt}a to the 8 patches and 0 bytes of
+rollback data in Figure~\ref{f:opt}d.
+%
+These optimizations apply transparently to any \Kudos\ file system.
+
+
+\begin{comment}
+
 Challenges in a \patch-based file system implementation include:
 
 \textbf{Buffer cache graph traversal.}
@@ -321,6 +367,7 @@ them.
 
 
 The next section tackles all of these challenges.
+\end{comment}
 
 
 \begin{figure}
@@ -350,6 +397,7 @@ The next section tackles all of these challenges.
 
 \caption{\Patches\ required to append 4 blocks to an existing file, without
 and with optimization.  \Nrb\ \patches\ are shown with heavy borders.}
+\label{f:opt}
 \end{figure}
 
 \input{nrb}
