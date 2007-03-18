@@ -1,6 +1,6 @@
 #!/usr/bin/env gnuplot
 
-set terminal postscript eps enhanced
+set terminal postscript eps enhanced color
 set output "rb_chdesc_size.eps"
 
 set nokey
@@ -10,4 +10,4 @@ set ylabel "Number of patches"
 
 set logscale y
 
-plot "rb_chdesc_size.data" with points 2
+plot "data/rb_chdesc_size" with points 2

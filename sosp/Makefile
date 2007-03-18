@@ -22,7 +22,7 @@ TMP_PDF_IMAGES = fig/figures_1.pdf fig/figures_2.pdf fig/figures_3.pdf \
 	fig/figures_4.pdf fig/figures_5.pdf fig/figures_6.pdf \
 	fig/opt_1.pdf fig/opt_2.pdf fig/opt_3.pdf fig/opt_4.pdf \
 	opgroup_transitions.pdf nrb_merge.pdf svn_opgroups.pdf \
-	rb_chdesc_size.pdf
+	rb_chdesc_size.pdf merge_req.pdf
 TMP_DVI_IMAGES = $(TMP_PDF_IMAGES:.pdf=.eps)
 
 PDF_IMAGES = $(TMP_PDF_IMAGES)
@@ -65,7 +65,7 @@ bib: $(MAINFILE:.tex=.aux) always
 	jpegtopnm $< | pnmtops -noturn -nosetpage > $@
 %.eps: %.neato
 	neato -Tps $< > $@
-%.eps: %.sh %.data
+%.eps: %.gp data/%
 	(cd `dirname "$<"`; ./$<)
 %.eps: %.dia
 	dia --nosplash --export=$@ $<
