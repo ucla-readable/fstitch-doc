@@ -4,9 +4,10 @@ set terminal postscript eps enhanced
 set output "rb_chdesc_size.eps"
 
 set nokey
-set xtics 4
+set xtics 8
 set xlabel "Soft patch size (bytes)"
 set ylabel "Number of patches"
+set size .8,.8
 
 set logscale y
 
