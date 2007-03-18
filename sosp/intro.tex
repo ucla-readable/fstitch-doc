@@ -79,7 +79,7 @@ This work develops a new fundamental data type called a \emph{\chdesc},
 %
 \Chdescs\ were inspired by the dependency abstraction from BSD's
  soft updates~\cite{ganger00soft}, but whereas the soft updates implementation
- is specific to the UFS file system, \chdescs\ are fully general.
+ is specific to the Unix File System, \chdescs\ are fully general.
 %
 We also develop a variety of dynamic optimizations to \chdescs, which
  significantly reduce the memory and CPU overhead associated with using them.
@@ -91,7 +91,7 @@ We present a formal theory of \chdescs, which we use to state their
 Finally, we demonstrate a prototype file system implementation using
  \chdescs\ called \Kudos.
 %
-\Chdescs allow us to decompose the entire file system layer, from system
+\Chdescs\ allow us to decompose the entire file system layer, from system
  calls to block devices, into pluggable \modules, hopefully making the
  system as a whole more configurable, extensible, and easier to understand.
 %
@@ -125,7 +125,7 @@ Modifying an IMAP mail server to use this interface requires only localized
  changes; the resulting server follows IMAP's consistency
  requirements while writing fewer blocks to disk.
 %
-Although our prorotype implementation is not yet as fast as we would like,
+Although our prototype implementation is not yet as fast as we would like,
  and \chdescs\ do not yet support all consistency policies (for instance,
  not ACID transactions: transactions should be independent, but any file
  system client can observe all active \chdescs), we believe that using
