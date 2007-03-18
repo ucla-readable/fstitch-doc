@@ -3,11 +3,10 @@
 
 There are several areas in which we would like to improve our work. The obvious
 first area we would like to work on is the performance of \Kudos. We have
-already improved the performance by literally several orders of magnitude, since
-we only recently began examining performance in addition to correctness, but the
-system is not as fast as it could be -- and not quite as fast as it needs to be
-to be a viable option for most computer systems.
-\todo{we have an additional year now}
+already improved the performance by literally several orders of magnitude over
+the original implementation, but \Kudos\ is still not as fast as it could be --
+and not quite as fast as it needs to be to be a viable option for most computer
+systems.
 
 We would also like to identify places where \Kudos\ can be made more flexible,
 by adding more features to the system and changing the existing parts that make
@@ -16,65 +15,35 @@ applications which can take advantage of \opgroups, and see what changes might
 need to be made to the \opgroup\ interface in order to facilitate adapting those
 applications.
 
-% \subsection {Optimizations}
 There are several ways in which the performance can be improved. For instance,
 we create a very large number of \chdescs, and the sheer number of them can
 cause problems for any algorithm which needs to traverse parts of the \chdesc\
-dependency graph. We can attack this problem in two ways: first, we can reduce
-the number of \chdescs\ by intelligently merging them when we determine that
-having separate \chdescs\ is not necessary. For example, if the file system
-creates a file and immediately deletes it, we can take the two opposing
-\chdesc\ sets and coalesce them into \anoop\ \chdesc.
-\todo{garbage patches probably will help delete test}
+dependency graph. We already attack this problem by merging \chdescs\ using
+several different heuristics to determine when it is safe to do so. However, the
+heuristics are fairly conservative, and further improvements will likely uncover
+additional merging opportunities.
 
-As another strategy, we can improve the efficiency of the traversal algorithms
-to examine fewer \chdescs. Many of the operations that \modules\ like the
-write-back cache need to do involve quickly discovering the set of \chdescs\
-that satisfy some property, and often even some ordering of those \chdescs. In
-early prototypes, these sets were often calculated by doing large traversals of
-the \chdesc\ dependency graph. However, these traversals are in practice
-extremely expensive, and optimizing them has improved and will likely continue
-to improve the performance of \Kudos.
-\todo{we address this to some extent in the chdesc section now}
+The merging \Kudos\ currently performs preserves the data exactly, and only
+alters the graph structure. When files are deleted, it is often the case that
+during the delete operation many blocks are updated but then later freed. It is
+not actually necessary to write the updated versions of the blocks at all in
+this case; they can merely be discarded. A new type of \chdesc, one which merges
+with those already on the block and indicates that the block need not be written
+(effectively cancelling them out), could help \Kudos\ take advantage of this
+situation.
 
-We have worked on both of these approaches, especially the second, but we
-believe further improvements can be made. One simple change which helped
-enormously was hidden in the order that \chdescs\ were listed as \befores\ of
-other \chdescs. We had originally used a simple linked list for this structure,
-and treated it like a stack for ease of insertion to the list. It turned out
-that a much better way to use the linked list was to treat the list like a
-queue, because almost always, elements being removed from the list were at the
-end of the list. (Since they had been added longest ago, and often changes are
-written in an order similar to the order in which they were made.) This
-converted a linear time search into one which would usually execute in constant
-time.
-\todo{we also address this in the chdesc section now}
+Another strategy for dealing with the large number of \chdescs\ is to avoid
+costly traversals altogether by incrementally calculating and propagating
+information about the \chdesc\ graph. We already do this as well, but there are
+still some places where we must iterate over potentially large lists of
+\chdescs. For instance, when creating a new \chdesc, \Kudos\ needs to identify
+other \chdescs\ on the same block which overlap with the new \chdesc. This is
+currently one of the larger uses of CPU time in \Kudos. Some optimization has
+already been done to improve the performance of this operation, but the problem
+has not yet been completely solved.
 
-Another example is that when examining a block and deciding which \chdescs\ must
-be rolled back in order for the block's data to be safe to write to the disk,
-the dependency graph between the various changes on that block must be taken
-into account so that changes which depend on one another are rolled back in
-proper dependency order. Once again, we discovered that we were examining the
-\chdescs\ in almost exactly the opposite order as the order they should be
-rolled back in -- for the same reason as the previous example. By simply
-changing the direction of the loop, we were able to improve the loop from
-quadratic time to linear time.
-\todo{this too is addressed in the chdesc section these days}
-
-% \subsection {Features}
-For the \Kudos\ UFS module, we want to add more features to make the
-implementation complete. Currently, we do not support triple indirect blocks or
-sparse files. The first can easily be implemented given time. Sparse file
-support will require the \LFS\ interface to be aware of files with holes. This
-also means the layer immediately above the \LFS\ interface may need to adjust
-some of the assumptions it currently makes about files and block allocation.
-
-We have not taken advantage of the UFS \module's infrastructure for supporting
-more sophisticated allocation algorithms. There are auxiliary on-disk data
-structures that assist resource allocation algorithms. We currently ignore many
-of them, partially because our basic algorithms do not use them, and partially
-due to the lack of documentation to explain the purpose of some data structures.
-Over time, we hope to better understand UFS and improve our UFS implementation.
-\todo{we have ext2 now, and we don't really care about UFS this much now}
-
-\todo{ext2, ext3 journal format compatibility}
+Finally, there are a few additional features that we would like to add to
+\Kudos. For instance, the \LFS\ interface does not currently support sparse
+files, nor does the UHFS module. We'd also like to improve the journal module,
+to support the stronger data ordering provided by Linux ext3, and to use the
+same format for the journal as ext3.
