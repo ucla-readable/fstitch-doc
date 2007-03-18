@@ -166,96 +166,142 @@ for the shell to connect them in a pipeline -- the parent process creates and
 does its file system operations without knowing or needing to know that they are
 being hooked up to \anopgroup.
 
-\subsection{Subversion Case Study}
-\label{sec:opgroup:svn}
+\subsection{Case Studies}
+\label{sec:opgroup:casestudies}
 
-TODO: decide on having a case study subsection that introduces UW IMAP
-and Subversion or contrast the two studies here or elsewhere.
+TODO: introduce and contrast gzip, Subversion, and UW IMAP?
 %
 UW IMAP case study (faster, same safety, server) vs
 Subversion case study (about same speed, additional safety on non-ext3
 ordered, client).
 
-Subversion~\cite{svn} is a version control system designed to be an
-improved, more modern replacement for CVS~\cite{cvs}. In this case
-study we take interest in Subversion's working copy library, used by
-the Subversion client to manipulate a local checkout, and its file
-system usage.
-%
-The working copy library is designed to avoid corruption or loss
-should the library's host process exit at any point during a working
-copy operation. The working copy library achieves using
-application-level write ahead journaling.
-%
-First, new versions of any updates files are created in a temporary
-location. Second, the log file is created in a temporary location;
-each log file entry manipulates the new and/or existing files and is
-either idempotent or atomic. Third, the journal is moved into its
-official location. Prior to this rename no non-temporary files have
-been modified and following this rename all actions can be replayed
-until the journal's entries are successfully played in full. Fourth,
-the journal entries are executed.  And fifth, the journal file is
-removed.
+\subsubsection{Gzip}
+\label{sec:opgroup:gzip}
 
-Although this part of the working copy library's design protects
-against premature application exit, it does not protect against an
-operating system or hardware crash. For example, the journal file
-rename may go to disk before all the data for a temporary file used in
-a journal entry.
+Gzip~\cite{gzip} is a standard file compressor.
 %
-The working copy library could sync files and directories as necessary
-to ensure safe disk write orderings, as UW IMAP and the Subversion
-repository library do, but the Subversion developers deemed this
-approach too slow to be worthwhile for client use\todo{Cite public
-  communication?}.
+Gzip's typical operation is to compress a source file into an output file,
+and then remove the source file.
 %
-Instead, it achieves the same ordering safety against system crashes
-by,
-%
-one, taking advantage of the \texttt{rename()} system call's on an
-Linux ext3 file system in ordered data mode and,
-%
-two, by taking advantage the linear metadata update ordering
-guaranteed by metadata journaling.
-%
-In ordered journal mode, to write a transaction to disk ext3 first
-writes block deallocations\todo{Is this exactly correct?}, then writes
-file data in place, and lastly writes other metadata to the journal.
-This implies that data writes to a file that is later renamed will be
-committed if the rename is committed, allowing atomic file creation by
-writing data to a temporary file and then renaming to the file's
-desired name.
-%
-The working copy library is thus able to atomically create files like the
-journal and know that the journal file will be created only if its
-associated temporary files exist with their data in full.
-%
-In addition to being an obtuse approach, file renaming does not
-ensure such ordering on many other systems, for example NTFS or BSD UFS.
-And systems such as BSD UFS do not ensure the strong linear metadata
-ordering supported by metadata journaling.
-%
-\todo{The last two thirds of this paragraph's phrasing is important and
-  should be drastically improved. Perhaps explain the concepts elsewhere?}
+We updated gzip to use \opgroups\ to ensure that the source file's
+removal is not committed before the output file's data, so that a
+crash does not lose both files. The update adds 10 lines of code to
+gzip.
 
-We updated Subversion to use \opgroups\ to express Subversion's file
-consistency protocol\todo{Note that we had to find actual dependencies
-  since the working copy assumed linear order?}.
+\subsubsection{Subversion}
+\label{sec:opgroup:svn}
+
+Subversion~\cite{svn} is a version control system.
+%
+In this case study we take an interest in how the Subversion client
+manipulates a local checkout (a Subversion ``working copy'').
+%
+The working copy library is designed to avoid data corruption or loss
+should the process exit prematurely during a working copy operation.
+%
+This safety is achieved using application-level write ahead
+journaling.
+%
+For example, to retrieve a file update, the working copy library
+performs the following operations:
+%
+\begin{description}
+\item[Create Status] Create the a status file (in a temporary location)
+  stating the working copy is updating
+\item[Install Status] Move the status file into its official location
+\item[Create Journal Data] Create files used by journal entries (in a
+  temporary, temporary location)
+\item[Install Journal Data] Move journal data files into a temporary
+  location
+\item[Create Journal] Create the journal file (in a temporary location)
+\item[Install Journal] Move the journal to its official location
+\item[Play Journal] Play the journal entries
+\item[Create Status] Create a new status file (in a temporary location)
+  with the updated working copy metadata
+\item[Install Status] Move the status file into its official location
+\item[Remove Journal] Remove the journal file
+\end{description}
+%
+Each log file entry is either idempotent or atomic.
+%
+Prior to \textbf{Install Journal}, only temporary files are modified.
+After \textbf{Install Journal}, all entries can be replayed until the
+journal is successfully played in full.
+
+Even with this precaution, a working copy operation is not protected
+against an operating system or hardware crash.
+%
+For example, \textbf{Install Journal}'s changes could be committed
+prior to the commit of all of \textbf{Create Journal Data}'s changes.
+%
+A system crash in-between the complete commit of these two operations
+and the subsequent journal replay would corrupt the working copy.
+
+The working copy library could ensure a safe commit ordering by
+syncing files as necessary, as the Subversion repository library does.
+%
+However, the Subversion developers deemed this approach too slow to be
+worthwhile for client use; a common trade-off decision among non-server
+applications.
+
+Instead, the working copy library takes advantage of two file system
+ordering properties ensured by ordered data and full data journaling
+to ensure a safe commit ordering:
+\begin{description}
+\item[Rename] A file rename is committed only after all preceding file
+  data writes
+\item[Metadata] Metadata updates are committed in their system call order
+\end{description}
+%
+The \textbf{Rename} property supports the atomic creation of a file
+with all of its data, by creating a temporary file with its data
+(\textbf{Create X}) and then renaming to the desired name
+(\textbf{Install X}).
+%
+The combination of the \textbf{Metadata} and \textbf{Rename}
+properties ensures the commit of the $n^{\mbox{\small{th}}}$ atomic
+create precedes the \((n+1)^{\mbox{\small{st}}}\) atomic create,
+ensuring \textbf{Install Journal Data} precedes \textbf{Install
+  Journal}.
+%
+In addition to being an obtuse approach, file renaming does not have
+the \textbf{Rename} property on many systems other than Ext3 in
+ordered or full data mode; for example, neither NTFS nor BSD UFS with
+soft updates provide this property.
+%
+And non-journaled systems, such as BSD UFS with soft updates, do not
+provide the \textbf{Metadata} property.
+
+We updated the Subversion working copy library to use \opgroups\ to
+express commit ordering requirements\todo{Use consistency protocol
+  phrase here and throughout?} without relying on properties of the
+underlying file system implementation.
+%
 Figure~\ref{fig:svn-order} shows the \opgroups\ created to update a
 file with conflicts.
+
+The use of atomic file creation is replaced in two ways.
 %
-Subversion first updates its checkout metadata to note the update
-operation, then creates the new files to be installed (e.g. updated
-pristine copy, the user's copy with conflicts, and a copy at each of
-the involved versions), creates the journal, plays the journal to
-install the new files, updates the checkout metadata, and finally
-removes the journal to complete the transaction.
+Live files (e.g. the status and journal files) now create
+\depends{\textbf{Install X}}{\textbf{Create X}}.
 %
-The updated version of Subversion continues to atomically create live
-files (e.g. entries and logs, but a rename depends the temporary
-file's data\todo{Note that renames for files used by logs are no
-  longer necessary since a log rename depends on its files? We keep
-  the renames since not changing this is easy.}.
+Journal data files no longer require atomic creation; instead, they
+are created in the \textbf{Create Journal Data} \opgroup\ and the
+\depends{\textbf{Install Journal}}{\textbf{Create Journal Data}}
+dependency is added.
+
+The use of the \textbf{Metadata} property is replaced by \opgroup\
+dependencies.
+%
+Although the original operations assumed the \textbf{Metadata}
+property, the actual order requirements are considerably less strict.
+%
+For example, journal data files and their data may be committed in any
+order.
+%
+Or, most journal play operations may commit in any order; however, a
+rename operation must depend on preceding reads of its source file to
+make any future replay safe.
 
 \begin{figure}[htb]
   \centering
@@ -264,7 +310,7 @@ file's data\todo{Note that renames for files used by logs are no
   \label{fig:svn-order}
 \end{figure}
 
-\subsection{UW IMAP Case Study}
+\subsubsection{UW IMAP}
 \label{sec:opgroup:uwimap}
 
 To assess the utility of \opgroups\ in a real world application we
