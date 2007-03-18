@@ -11,10 +11,21 @@ using them.
 
 \subsection {Optimization Benefits}
 
+See Figures~\ref{fig:opts} and~\ref{fig:patchsize}.
+\todo{HP vs None untar results are not often near their average. Run
+  larger number of tests.}
+
 \begin{figure}[htb]
 \centering
 \includegraphics[width=\columnwidth]{opts-patches}
 \includegraphics[width=\columnwidth]{opts-rollback}
+\begin{tabular}{|l|r|r|} \hline
+Optimization & Untar (sys sec) & Delete (sys sec) \\ \hline\hline
+None & 4.42 & 1.14 \\ \hline\hline
+\Nrb\ \Chdescs{} & 4.53 & 1.08 \\ \hline
+Overlap Merge & 3.58 & 0.85 \\ \hline\hline
+HP $+$ OM & 3.58 & 0.75 \\ \hline
+\end{tabular}
 \caption{Effects of \nrb\ \chdescs\ with \nrb\ merging and overlap
   merging for the untar and rm tests.}
 \label{fig:opts}
