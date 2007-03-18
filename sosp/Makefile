@@ -41,7 +41,7 @@ paper.pdf: $(MAINFILE) $(MAINFILE:.tex=.bbl) $(PDF_IMAGES) svnversion.tex always
 	@while grep Rerun paper.log >/dev/null 2>&1; do echo $(PDFLATEX) $<; $(PDFLATEX) $<; done
 
 svnversion.tex: svnversion.tmpl always
-	sed "s/SVNVERSION/`svnversion`/" svnversion.tmpl > svnversion.tex
+	sed "s/SVNVERSION/`svnversion .`/" svnversion.tmpl > svnversion.tex
 
 opts-patches.eps: opts.gp data/opts
 	(cd `dirname "$<"`; ./$<)
