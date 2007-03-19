@@ -89,8 +89,12 @@ so well behaved.
 The \opgroup\ API restricts dependency manipulation so that cycles are
 inconstructible, while preserving the interface's utility.
 
-A process's \opgroups\ and its engaged set are copied across \texttt{fork()},
-facilitating \opgroup\ interactions among processes.
+\Opgroups\ and file descriptors are managed similarly; e.g. they are copied
+across \texttt{fork()} and preserved across \texttt{exec()}.
+%
+This allows existing programs to interact with \opgroups\ without
+knowing it, in the same way that programs do not have to know about
+pipes for the shell to connect them in a pipeline.
 %
 For example, consider processing and then removing some input:
 %
@@ -121,18 +125,6 @@ the user can instead run:
 \end{small}
 \end{center}
 \vspace{-0.5\baselineskip}
-
-\Opgroups\ are created and managed almost exactly like file descriptors. Handles
-to them are copied across \texttt{fork()}, preserved across \texttt{exec()}, and
-closed upon \texttt{exit()}. Whether \anopgroup\ is \engaged\ or not is a
-property local to the process, like the ``close-on-exec'' flag of file
-descriptors. These properties allow existing programs to use \opgroups\ without
-knowing it, in the same way that they don't have to know anything about pipes
-for the shell to connect them in a pipeline --- the parent process creates and
-\engages\ the \opgroups\ before calling \texttt{exec()}, and then the process
-does its file system operations without knowing or needing to know that they are
-being hooked up to \anopgroup.
-
 
 % FIXME: Mention simplicity using opgroups vs fsync?
 
