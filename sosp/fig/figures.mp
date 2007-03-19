@@ -105,35 +105,33 @@ endfig;
 
 beginfig(2);
   boxjoin(a.width = b.width; a.height = b.height);
-  elementit.crc(btex Complete etex scaled 0.8, 0, 0, pull);
-  elementit.crcn(btex etex, 0, 0, pull);
-  elementit.a(btex Clear etex scaled 0.8, 0, 0, pull);
-  elementit.b(btex Alloc etex scaled 0.8, 0, 0, pull);
-  elementit.c(btex Attach etex scaled 0.8, 0, 0, pull);
-  elementit.d(btex Size etex scaled 0.8, 0, 0, pull);
-  elementit.fn(btex etex, 0, 0, pull);
-  elementit.cr(btex Commit etex scaled 0.8, 0, 0, pull);
-  elementit.crn(btex etex, 0, 0, pull);
-  elementit.aj(btex Clear\subj etex scaled 0.8, 0, 0, pull);
-  elementit.bj(btex Alloc\subj etex scaled 0.8, 0, 0, pull);
-  elementit.cj(btex Attach\subj etex scaled 0.8, 0, 0, pull);
-  elementit.dj(btex Size\subj etex scaled 0.8, 0, 0, pull);
+  patchit.crc(btex Complete\strut etex scaled 0.8, 0);
+  patchit.a(btex Clear\strut etex, 0);
+  patchit.b(btex Alloc\strut etex, 0);
+  patchit.c(btex Attach\strut etex, 0);
+  patchit.d(btex Size\strut etex, 0);
+  patchit.cr(btex Commit\strut etex scaled 0.8, 0);
+  patchit.aj(btex Clear\subj\strut etex, 0);
+  patchit.bj(btex Alloc\subj\strut etex, 0);
+  patchit.cj(btex Attach\subj\strut etex, 0);
+  patchit.dj(btex Size\subj\strut etex, 0);
   crc.width = 1.2crc.height;
 
-  a.s - b.n = aj.s - bj.n = cj.s - dj.n = (0,5);
-  b.s - c.n = bj.s - cj.n = c.s - d.n = (0,5);
-  .5[bj.w,cj.w] - crn.e = fn.w - .5[b.e,c.e] = .5[b.w,c.w] - crcn.e = (25, 0);
+  boxjoin(a.width = a.height);
+  patchit.crcn(btex etex, 0);
+  patchit.fn(btex etex, 0);
+  patchit.crn(btex etex, 0);
+  crcn.width = fn.width = crn.width = crn.height = 0.6crc.width;
+  
+  b.w - a.e = d.w - c.e = bj.w - aj.e = dj.w - cj.e = (10,0);
+  b.s - d.n = bj.s - dj.n = (0,10);
+  .5[aj.w,cj.w] - crn.e = fn.w - .5[b.e,d.e] = .5[a.w,c.w] - crcn.e = (25, 0);
   crn.w - cr.e = cr.w - fn.e = crcn.w - crc.e = (12, 0);
 
-  forsuffixes $ = crc, crcn, a, b, c, fn, cr, crn, aj, bj, cj, d, dj:
-    pproc_.$ := "thecirc_";
-  endfor;
-
-  crc.dx = 2;
   drawelement(crc,cr,aj,crcn,a,b,c,d,fn,crn,bj,cj,dj);
 
   vardef ffff(suffix a,b) =
-    drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
+    drawconnpatch(a,b)(..)
   enddef;
 
   %forsuffixes $ = crcn, fn, crn:
@@ -142,54 +140,46 @@ beginfig(2);
 
   ffff(crc,crcn);
   ffff(crcn,a);
-  ffff(crcn,b);
   ffff(crcn,c);
-  ffff(crcn,d);
-  ffff(a,fn);
+  drawconnpatch(crcn,b)(-- crcn.c + (0,2) .. tension 2 .. .3[a.s,c.n] .. );
+  drawconnpatch(crcn,d)(-- crcn.c - (0,2) .. tension 2 .. .7[a.s,c.n] ..);
   ffff(b,fn);
-  ffff(c,fn);
   ffff(d,fn);
+  drawconnpatch(a,fn)(.. .3[b.s,d.n] .. tension 2 .. fn.c + (0,2) --);
+  drawconnpatch(c,fn)(.. .7[b.s,d.n] .. tension 2 .. fn.c - (0,2) --);
   ffff(fn,cr);
   ffff(cr,crn);
   ffff(crn,aj);
-  ffff(crn,bj);
   ffff(crn,cj);
-  ffff(crn,dj);
+  drawconnpatch(crn,bj)(-- crn.c + (0,2) .. tension 2 .. .3[aj.s,cj.n] .. );
+  drawconnpatch(crn,dj)(-- crn.c - (0,2) .. tension 2 .. .7[aj.s,cj.n] ..);
 
   linecap := butt;
-  draw a.nw + (-10,10) -- a.ne + (10,10)
-  -- d.se + (10,-10) -- d.sw + (-10,-10) -- cycle withpen pencircle scaled 2 dashed evenly;
-  draw aj.nw + (-10,10) -- aj.ne + (10,10)
-  -- dj.se + (10,-10) -- dj.sw + (-10,-10) -- cycle withpen pencircle scaled 2 dashed evenly;
+  draw a.nw + (-10,10) -- b.ne + (10,10)
+  -- d.se + (10,-10) -- c.sw + (-10,-10) -- cycle withpen pencircle scaled 2 dashed evenly;
+  draw aj.nw + (-10,10) -- bj.ne + (10,10)
+  -- dj.se + (10,-10) -- cj.sw + (-10,-10) -- cycle withpen pencircle scaled 2 dashed evenly;
 
-  label.bot(btex Original FS data\strut etex, d.s - (0,12));
-  label.bot(btex Journal data\strut etex, dj.s - (0,12));
+  label.bot(btex Original FS data\strut etex, .5[c.s,d.s] - (0,12));
+  label.bot(btex Journal data\strut etex, .5[cj.s,dj.s] - (0,12));
 endfig;
 
 beginfig(3);
   boxjoin(a.width = b.width; a.height = b.height);
-  elementit.a(btex Clear etex scaled 0.8, 0, 0, pull);
-  elementit.b(btex Alloc etex scaled 0.8, 0, 0, pull);
-  elementit.c(btex Attach etex scaled 0.8, 0, 0, pull);
-  elementit.d(btex Size etex scaled 0.8, 0, 0, pull);
+  patchit.a(btex Clear etex scaled 0.8, 0);
+  patchit.b(btex Alloc etex scaled 0.8, 0);
+  patchit.c(btex Attach etex scaled 0.8, 0);
+  patchit.d(btex Size etex scaled 0.8, 0);
   a.width = 1.2a.height;
 
   a.w - c.e = (12, 1.2*a.height);
   c.w - d.e = b.w - c.e = (12, 0);
 
-  forsuffixes $ = a, b, c, d:
-    pproc_.$ := "thecirc_";
-  endfor;
-
   drawelement(a,b,c,d);
 
-  vardef ffff(suffix a,b) =
-    drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
-  enddef;
-
-  ffff(c,a);
-  ffff(c,b);
-  ffff(d,c);
+  drawconnpatch(c,a)(..);
+  drawconnpatch(c,b)(..);
+  drawconnpatch(d,c)(..);
 endfig;
 
 beginfig(4);
