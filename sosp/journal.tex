@@ -102,11 +102,12 @@ at all.
 \end{comment}
 
 
-The current prototype journal module actually ignores incoming dependencies
+Our journal module prototype ignores incoming dependencies
 and enforces transactions based on high-level file system operations.
 %
-It is thus a mechanism to uniformly enforce a particular journal
-semantics---namely, that each file system operation happens atomically.
+It is thus uniformly enforces a particular journal semantics---namely, that
+each file system operation happens atomically---regardless of the semantics
+specified by the file system above it.
 %
 It should be possible, however, to extend the journal module to obey
 dependencies.
