@@ -1,23 +1,23 @@
-\section{Consistency Using \ChDescs}
+\section{Consistency Models}
 \label{sec:using}
 
-Soft updates, journaling, and many application-specific consistency models all
-correspond to different \chdesc\ arrangements, so these features can be added to
-the system as \modules\ which appropriately connect or reconnect the \chdescs.
+Soft updates, journaling, and other consistency models
+correspond to different \chdesc\ arrangements.
+%% , so these features can be added to
+%% the system as \modules\ which appropriately connect or reconnect the \chdescs.
 %
-File system \modules\ in \Kudos\ generate soft updates dependencies by default,
-by connecting the \chdescs\ they create according to the rules
-in~\cite{ganger00soft}.
+\Kudos's current file system \modules\ generate dependencies corresponding
+to soft updates orderings by default~\cite{ganger00soft}.
 %
-For journaling, a journal \module\ is added to the system that rearranges the
-\chdescs\ to provide journaling.
+Adding an independent journal \module\ rearranges the \chdescs\ to provide
+journaling semantics;
 %
-If no consistency is desired, a \module\ that disconnects \chdesc\ dependencies
-can be used.
+for maximum speed and minimum durability, a \module\ that disconnects
+\chdesc\ dependencies can be added.
 %
-Many other semantics could be supported by the addition of similar modules. In
-this section, we will discuss how \chdescs\ are used to implement different
-consistency semantics in \Kudos.
+%% Many other semantics could be supported by the addition of similar modules. In
+%% this section, we will discuss how \chdescs\ are used to implement different
+%% consistency semantics in \Kudos.
 
 \input{softupdate}
 

@@ -107,10 +107,10 @@ beginfig(1);
   drawconnpatch(group,sblk)(..);
 
   label.top(btex set size etex scaled 0.7, sz1.n);
-  label.top(btex add block etex scaled 0.7, bk1.n);
+  label.top(btex attach block etex scaled 0.7, bk1.n);
   label.top(btex set mtime etex scaled 0.7, mtime.n);
   label.top(btex write data etex scaled 0.7, d1.n);
-  label.top(btex zero data etex scaled 0.7, i1.n);
+  label.top(btex clear data etex scaled 0.7, i1.n);
   label.top(btex alloc block etex scaled 0.7, bi1.n);
   label.top(btex \mlabel{group desc\\block} etex scaled 0.7, group.n+(0,d-1));
   label.bot(btex superblock etex scaled 0.7, sblk.s-(0,d));
