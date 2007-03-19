@@ -336,8 +336,8 @@ It checks that all paths starting at $p_1$ fit one of the following cases:
 \item $p_1 \PDDepend p_2$.
 \item $p_1 \PDDepend h$, where $h$ is the hard patch on $\PBlock{p_1}$.
 \item $p_1 \PDDepend q$, where $q$ depends on no other patch.
-\item $p_1 \PDDepend q \PDDepend r$, where $q$ depends on nothing but $r$
-  and $\PBlock{r} \neq \PBlock{p_1}$.
+\item $p_1 \PDDepend q \PDDepend r$, where $r$ depends on no other patch,
+  $q$ depends on nothing but $r$, and $\PBlock{r} \neq \PBlock{p_1}$.
 \end{xcompactitemize}
 
 \noindent

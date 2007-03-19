@@ -5,26 +5,64 @@
 
 \newcommand{\PReady}[1]{\ensuremath{#1.\textit{ready}}}
 
-Our next optimization precomputes much of the information required for the
-buffer cache to choose a set of patches to write.
+Our final important optimization precomputes much of the information
+required for the buffer cache to choose a set of patches to write.
 %
-For each patch $p$ we maintain a bit $\PReady{p}$ that specifies whether or
-not $p$ is ready to write to disk.
-%
-Thus, $\PReady{p}$ is true iff $\PDepset{p} \subseteq \{p\} \cup \PDisk$.
-%
+For each patch $p$ we maintain counts that specify whether or not $p$ is
+immediately ready to write to disk.
 
 
+The buffer cache's main task is to choose sets of patches $P$ that satisfy
+the in-flight safety property $\PDepset{P} \subseteq P \cup \PDisk$.
+%
+Redundant \chdesc\ graph traversals to calculate valid $P$ sets would
+severely limit cache size scalability.
+%
+\Kudos\ therefore explicitly tracks for each \chdesc\ how many of its
+direct dependencies are in memory or in flight.
+%
+These counts are updated as \patches\ are added to the system, and as the
+system receives notifications that \patches\ have reached the disk.
+%
+When both counts reach zero, the patch is safe to write, and it is moved
+into a \emph{ready list} on its containing block.
+%
+(Empty patches add a slight complication, since an empty patch ``reaches
+the disk'' as soon as all its dependencies reach the disk.  The counting
+algorithms propagate this state change automatically.)
 
+
+Some patches in $P$ may depend on other patches in $P$; however, since
+\Kudos\ eliminates all dependency cycles, if $P$ is nonempty then at least
+one patch in $P$ depends only on other blocks.
+%
+When that patch $p$ becomes ready, it will be added to $P$, and \Kudos\
+subtracts its count from other patches \emph{on the same block}.
+%
+This may make more patches on the block ready, which will in turn be added
+to $P$, and so forth.
+
+
+To write a block, the buffer cache thus iterates through the block's ready
+list, sending \chdescs\ to the target block device, until the list is
+empty. 
+%
+The buffer cache can also immediately tell whether a block \emph{could
+possibly} be written by checking whether its ready list is empty.
+%
+On-line maintenance of the ready counts adds some cost to several patch
+manipulations, but since it saves so much duplicate work in the buffer
+cache the resulting system is more efficient by many orders of
+magnitude---and in particular, CPU time no longer scales superlinearly with
+the size of the cache.
+
+
+\begin{comment}
 For a \module\ like the write-back cache to forward \chdescs\ in a
 dependency-preserving order, the \module\ must find \chdescs\ whose \befores\
 are all ``closer to the disk'' (or are also being forwarded as part of the same
-block write). We say that such \chdescs\ are \emph{ready}. Because the
-write-back cache frequently searches for and writes many ready \chdescs,
-redundant \chdesc\ graph traversals to calculate \chdesc\ readiness would
-severely limit cache size scalability. \Kudos\ therefore explicitly tracks a
-\chdesc's \before\ counts through incremental dependency updates, and uses these
-counts to maintain a \chdesc\ ready list for each block.
+block write). We say that such \chdescs\ are \emph{ready}. 
+
 
 Each \chdesc\ has a count of the number of \befores\ it has at block device
 modules just as close to the disk as it currently is, and a count of the number
@@ -50,3 +88,4 @@ maintenance adds some cost to forwarding \chdescs\ and changing the graph
 structure, but since it saves so much duplicate work\footnote{The amount of
 duplicate work saved is actually superlinear in the size of the write-back
 cache.} it is much more efficient.
+\end{comment}
