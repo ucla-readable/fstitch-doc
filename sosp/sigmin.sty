@@ -350,14 +350,24 @@ redistribute to lists, requires prior specific permission and/or a fee.}
       {\compactify\def\makelabel##1{\hss\llap{##1}}}%
   \fi}
 \let\endcompactitemize\endlist
+\def\xcompactitemize{%
+  \ifnum \@itemdepth >\thr@@\@toodeep\else
+    \advance\@itemdepth\@ne
+    \edef\@itemitem{labelitem\romannumeral\the\@itemdepth}%
+    \expandafter
+    \list
+      \csname\@itemitem\endcsname
+      {\xcompactify\def\makelabel##1{\hss\llap{##1}}}%
+  \fi}
+\let\endxcompactitemize\endlist
 \newenvironment{compactenumerate}
   {\def\usecounter{\compactify\latexusecounter}
    \begin{enumerate}}
   {\end{enumerate}\let\usecounter=\latexusecounter}
-\newenvironment{xcompactitemize}
+\newenvironment{xcompactenumerate}
   {\def\usecounter{\xcompactify\latexusecounter}
-   \begin{itemize}}
-  {\end{itemize}\let\usecounter=\latexusecounter}
+   \begin{enumerate}}
+  {\end{enumerate}\let\usecounter=\latexusecounter}
 
 
 \newenvironment{Itemize}%

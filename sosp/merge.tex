@@ -327,31 +327,47 @@ will ever exist.
 
 
 As with hard patch creation, the \Kudos\ implementation checks a simpler
-property that requires less graph traversal:
+property that requires less graph traversal.
 %
-it checks that all paths starting at $p_1$ either terminate or reach patch
-$p_2$ in two or fewer steps, and that none of those paths are block-level
-cycles.
+It checks that all paths starting at $p_1$ fit one of the following cases:
+
+\begin{xcompactitemize}
+\item $p_1 \PDDepend q$, where $q \not\in \PMem$.
+\item $p_1 \PDDepend p_2$.
+\item $p_1 \PDDepend h$, where $h$ is the hard patch on $\PBlock{p_1}$.
+\item $p_1 \PDDepend q$, where $q$ depends on no other patch.
+\item $p_1 \PDDepend q \PDDepend r$, where $q$ depends on nothing but $r$
+  and $\PBlock{r} \neq \PBlock{p_1}$.
+\end{xcompactitemize}
+
+\noindent
 %
-If this property holds, then $p_1$ and $p_2$ can have the same lifetime,
-and $p_1$ can be merged into $p_2$ where they overlap.
+If this property holds, then there exists no block-level cycle from $p_1$
+to $p_2$, $p_1$ and $p_2$ can have the same lifetime, and $p_1$ can be
+merged into $p_2$ where they overlap.
 %
-As with other types of merging, this requires filtering dependencies to
-avoid cycles; it may also require growing the destination patch in the case
-that the new patch is bigger than it.
+(This may require growing $p_2$ to cover $p_1$'s data range.)
+%
+We initially began with a simpler check, namely that $p_1$ \emph{only}
+depended on $p_2$, but extending the check to length-2 non-branching paths
+allowed much more merging (further extensions did not).
 %
 It also simplifies the implementation somewhat to limit overlap merging to
 the case when neither $p_1$ nor $p_2$ overlaps with any other patch.
 
 
-Overlap merging 
+
+In our running example, overlap merging is able to combine all remaining
+soft patches with their hard counterparts, reducing the number of patches
+to the minimum of 8 and the amount of rollback data to the minimum of 0.
+%
+In our experiments, we observe that hard patches and our patch merging
+optimizations reduce the number of patches in soft-updates orderings by as
+much as 99.96\%, approaching the efficiency of soft updates through a
+modular, general mechanism.
 
 
-\begin{itemize}
-\item
-\end{itemize}
-
-
+\begin{comment}
 %
 If the only dependency between $p_1$ and $p_2$ is direct---that is, no path
 $p_1 \PDepend x \PDepend p_2$ exists for any $x \not\in \{p_1,
@@ -394,3 +410,4 @@ internal and semantic file system descriptions.
 \todo{Should we talk about why we allow NRBs and merging to be
   disabled? (Debugging simplicity and depend add to \noop\ \chdescs\
   with \afters\ bug catching.)}
+\end{comment}
