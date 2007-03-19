@@ -127,37 +127,37 @@ the user can instead run:
 \subsection{Implementation}
 \label{sec:opgroup:implementation}
 
-An \opgroup\ brackets its \chdescs\ so that the entire group can
-depend on another \opgroup.
-
-\Opgroups\ are implemented in an \LFS\ module that imposes \opgroup\
+An \opgroup\ is a bracket around its \chdescs, so that the entire
+group can depend on another \opgroup.
+%
+\Opgroups\ are implemented as an \LFS\ module that imposes \opgroup\
 dependencies using additional \chdesc\ dependencies among \LFS\
 operations.
 %
 Figure~\ref{fig:opgroup-chdescs} shows \anopgroup's \chdesc\ arrangement.
 %
-The ``head'' \chdesc\ depends on the \opgroup's \chdescs, the ``tail''
-\chdesc, and the ``head keep'' \chdesc.
+The head \chdesc\ depends on the \opgroup's \chdescs\ and the tail
+\chdesc.
 %
-The \opgroup's \chdescs\ all depend on the ``tail'' \chdesc, which in
-turn depends on the ``tail keep'' \chdesc.
-%
-The ``keep'' \chdescs\ prevent the head and tail \chdescs\ from being
-prematurely satisfied should all their other \befores\ be satisfied
-(for instance, by being written to disk).
+The \opgroup's \chdescs\ all depend on the ``tail'' \chdesc.
 %
 Using this \chdesc\ arrangement, \anopgroup\ dependency \depends{Q}{P}
 is implemented as \depends{\mbox{tail}_Q}{\mbox{head}_P}
 
 \begin{figure}[htb]
 \centering{
-\includegraphics[width=0.5\hsize]{fig/figures_5}
+\includegraphics[width=0.3\hsize]{fig/figures_5}
 }
 \caption{\label{fig:opgroup-chdescs} \Opgroup\ \chdescs. H and T are the head
-and tail of the \opgroup; HK and TK are the head keep and tail keep. The three
-\chdescs\ labeled 1 occurred during one file system operation, and the \chdesc\
-labeled 2 occurred during a second operation that depended on the first.}
+  and tail of the \opgroup.
+  %
+  The three \chdescs\ labeled 1 occurred during one file system
+  operation,
+  %
+  and the \chdesc\ labeled 2 occurred during a second operation that
+  depended on the first.}
 \end{figure}
+\todo{Remove HK and TK from the diagram}
 
 \Opgroups\ are created and managed almost exactly like file descriptors. Handles
 to them are copied across \texttt{fork()}, preserved across \texttt{exec()}, and
@@ -182,15 +182,12 @@ ordered, client).
 \subsubsection{Gzip}
 \label{sec:opgroup:gzip}
 
-Gzip~\cite{gzip} is a standard file compressor.
-%
 Gzip's typical operation is to compress a source file into an output file,
-and then remove the source file.
+and then remove the source file~\cite{gzip}.
 %
-We updated gzip to use \opgroups\ to ensure that the source file's
-removal is not committed before the output file's data, so that a
-crash does not lose both files. The update adds 10 lines of code to
-gzip.
+We updated gzip to use \opgroups\ to ensure that the source's removal
+is not committed before the output file's data, so that a crash does
+not lose both files. The update adds 10 lines of code to gzip.
 
 \subsubsection{Subversion}
 \label{sec:opgroup:svn}
