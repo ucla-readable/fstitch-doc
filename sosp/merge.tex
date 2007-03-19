@@ -301,7 +301,7 @@ hard or soft, that they overlap.
 Bitmap blocks and inodes accumulate many nearby and overlapping \chdescs\
 as data is appended to or truncated from a file.
 %
-Figure~\ref{f:opt} shows how even data blocks can collect overlapping
+Figure~\ref{fig:opt} shows how even data blocks can collect overlapping
 dependencies: actual data writes $d'_j$ overlap, and therefore depend on,
 block initialization writes $d_j$, but cannot be made hard since when they
 are created another block (the inode) already depends on the data block.
