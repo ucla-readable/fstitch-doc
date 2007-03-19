@@ -165,7 +165,7 @@ The \opgroup\ dependency \depends{P}{Q} is implemented as
 \subsection{Case Studies}
 \label{sec:opgroup:casestudies}
 
-TODO: introduce and contrast gzip, Subversion, and UW IMAP?
+\todo{Introduce and contrast gzip, Subversion, and UW IMAP}
 %
 UW IMAP case study (faster, same safety, server) vs
 Subversion case study (about same speed, additional safety on non-ext3
@@ -195,11 +195,12 @@ This safety is achieved using application-level write ahead
 journaling, where each entry is either idempotent or atomic\todo{Explain
 temporary files used by the journal?}.
 
-Even with this precaution, a working copy operation is not protected
-against an operating system or hardware crash.
+Even with this precaution, a working copy operation may not be
+protected against an operating system or hardware crash.
 %
 For example, the journal file move from its temporary to official
-location could be committed prior to the commit of the file's data.
+location (which indicates the journal may played) could be committed
+prior to the commit of the journal file's data.
 %
 A system crash in-between the complete commit of these two operations
 and the subsequent journal replay could corrupt the working copy.
@@ -216,26 +217,23 @@ Instead, the working copy library takes advantage of two file system
 ordering properties ensured by ordered data and full data journaling
 to ensure a safe commit ordering.
 %
-First, a file rename is committed only after all preceding file data
-writes are committed;
+First, a file's rename commit proceeds the file's data commits;
 %
 and second, metadata updates are committed in their system call order.
 %
-The combination of the these properties ensures the commit of the
-$i^{\mbox{\small{th}}}$ atomic create precedes the
-$(i+1)^{\mbox{\small{st}}}$ atomic create. Continuing the journal file
-example, this ensures the journal file's data precedes the rename into
-its official location.
-%
-In addition to being an obtuse approach, file renaming does not have
-the behave as required on many systems other than Ext3 in ordered or
-full data mode; for example, neither NTFS nor BSD UFS with soft
-updates provide this property.
+The combination of these properties ensures the creation of file
+$i^{\mbox{\small{th}}}$ precedes the creation of file
+$(i+1)^{\mbox{\small{st}}}$.
+
+In addition to being an obtuse approach, file renaming does not behave
+as required on many systems other than Ext3 in ordered or full data
+mode; for example, neither NTFS nor BSD UFS with soft updates provide
+this property.
 %
 And non-journaled systems, such as BSD UFS with soft updates, do not
-provide the metadata ordering property. On these systems the journal
-file may precede priorly created files for the journal's playback
-(e.g. an file merge).
+provide the metadata ordering property. On these systems, the journal
+file's installation may precede earlier file installations, leaving the
+working copy in an inconsistent state.
 
 We updated the Subversion working copy library to use \opgroups\ to
 express commit ordering requirements\todo{Use consistency protocol
@@ -245,28 +243,29 @@ underlying file system implementation.
 Figure~\ref{fig:svn-order} shows the \opgroups\ created to update a
 file with conflicts.
 
-The use of atomic file creation is replaced in two ways.
+The use of the file rename property is replaced in two ways.
 %
-Live files (e.g. the status and journal files) now create
-\depends{\textbf{Install X}}{\textbf{Create X}}.
+First, files created in a temporary location and then moved into their
+official location (e.g. the directory status and journal files) now
+make the rename depend on the file data writes.
 %
-Journal data files no longer require atomic creation; instead, they
-are created in the \textbf{Create Journal Data} \opgroup\ and the
-\depends{\textbf{Install Journal}}{\textbf{Create Journal Data}}
-dependency is added.
+Second, files only referenced by official files (e.g. updated file
+copies used by journal file entries) only require a weaker ordering.
+The data for these files need only precede the installation of the
+referencing file.
 
-The use of the \textbf{Metadata} property is replaced by \opgroup\
-dependencies.
+The use of linearly ordered metadata updates is also replaced by
+\opgroup\ dependencies.
 %
-Although the original operations assumed the \textbf{Metadata}
-property, the actual order requirements are considerably less strict.
+Although the original operations assumed a linear ordering of metadata
+updates, the actual order requirements are considerably less strict.
 %
-For example, journal data files and their data may be committed in any
-order.
+For example, the updated file copies used by the journal may be
+committed independently of each other.
 %
-Or, most journal play operations may commit in any order; however, a
-rename operation must depend on preceding reads of its source file to
-make any future replay safe.
+A second example, most journal playback operations may commit
+independently of each other; only interacting operations, such as a
+file read and subsequent rename, need ordering.
 
 \begin{figure}[htb]
   \centering
@@ -278,28 +277,20 @@ make any future replay safe.
 \subsubsection{UW IMAP}
 \label{sec:opgroup:uwimap}
 
-To assess the utility of \opgroups\ in a real world application we
-updated the University of Washington's IMAP mail server to take
+We updated the University of Washington's IMAP mail server to take
 advantage of \opgroups, to ensure mail updates are committed to disk
 in safe and efficient orderings.
 
 The Internet Message Access Protocol (IMAP)~\cite{rfc3501} provides
-remote access to a mail server's email message store. An IMAP client
-is in one of four states: not authenticated, authenticated, mailbox
-selected, and logged out. States define the set of valid commands a
-client may issue. For example, clients in the selected state may
-retrieve messages from the selected mailbox. In our case study we are
-interested in mailbox manipulation; the authenticated and selected
-states allow mailbox manipulation. The most relevant IMAP commands
-synchronize changes to the server's disk (CHECK), copy a message from
-the selected mailbox to another mailbox (COPY), and delete messages
-marked for deletion (EXPUNGE).
+remote access to a mail server's email message store.
+%
+The most relevant IMAP commands synchronize changes to the server's
+disk (CHECK), copy a message from the selected mailbox to another
+mailbox (COPY), and delete messages marked for deletion (EXPUNGE).
 
-UW IMAP~\cite{uwimap}, authored by Mark Crispin of the IMAP RFC,
-includes an IMAP mail server imapd and mail client library c-client.
-We have updated imapd and the mbox mail storage driver to use
-\opgroups\ to ensure all disk changes occur in a safe ordering, while
-performing a minimal number of disk writes.
+We have updated the UW IMAP~\cite{uwimap} imapd and mbox mail storage
+driver to use \opgroups\ to ensure all disk changes occur in a safe
+ordering, while performing a minimal number of disk writes.
 %
 The original IMAP server conservatively preserved command ordering by
 syncing the mailbox file after each CHECK on it or COPY into it. With
