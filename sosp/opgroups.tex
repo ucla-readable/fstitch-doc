@@ -18,7 +18,7 @@ clients synchronize local files with the server, and IMAP servers
 must commit mailbox changes to disk. In this section we discuss the
 extension of \chdescs\ from \Kudos\ to user applications to support
 custom application-level consistency protocols. We discuss the
-\opgroup\ interface and implementation and case studies of \opgroups\
+\opgroup\ interface and implementation as well as case studies of \opgroups\
 in gzip, the Subversion client, and the UW IMAP server.
 
 \subsection{Interface}
@@ -58,7 +58,7 @@ with each of the process's \emph{engaged} \opgroups\ (\opgroupEngage\
 and \opgroupDisengage\ add and remove \anopgroup\ from the process's
 engaged set).
 %
-The \opgroup\ api uses an engaged set, instead of an additional system
+The \opgroup\ API uses an engaged set, instead of an additional system
 call parameter with each file system system call, to match typical
 application granularity where each operation involves multiple file
 system operations and to simplify modular composition.
