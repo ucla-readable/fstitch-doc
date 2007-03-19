@@ -259,7 +259,8 @@ corresponding patches into a single transaction, but the
 cycles.
 %
 In practice, the \Kudos\ implementation currently disallows any dependency
-cycles, including cycles within a single block.
+cycles, including cycles within a single block; this simplifies many graph
+traversals.
 
 
 \input{noop}
@@ -299,6 +300,10 @@ This requires allocating four new 4096-byte blocks, writing data to them,
 attaching them to the file's inode, changing the inode's file size and
 modification time, and updating the ``group descriptor'' and superblock to
 account for the allocated blocks.
+%
+The operation is broken into four one-block appends, each of which updates
+the inode; note, for example, how overlap dependencies force each
+modification of the inode's size to depend on the previous one.
 %
 Eight blocks are written during the operation.
 %

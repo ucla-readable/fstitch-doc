@@ -16,13 +16,11 @@ beginfig(1);
   patchit.sz3(btex $i_3'$\strut etex,0);
   patchit.sz4(btex $i_4'$\strut etex,0);
 
-  boxjoin();
-  patchit.bk1(btex $i_1$\strut etex,0);
   boxjoin(a.width = b.width = a.height; a.s = b.n + (0,30));
+  patchit.bk1(btex $i_1$\strut etex,0);
   patchit.bk2(btex $i_2$\strut etex,0);
   patchit.bk3(btex $i_3$\strut etex,0);
   patchit.bk4(btex $i_4$\strut etex,0);
-  bk1.width = bk1.height = bk2.width; bk1.s = bk2.n + (0,23);
 
   boxjoin(a.width = b.width = a.height);
   patchit.d1(btex $d_1'$\strut etex, 0);
@@ -52,15 +50,15 @@ beginfig(1);
   i4.height=i4.width;bk4.height=bk4.width;sz4.height=sz4.width;bi4.height=bi4.width;
   mtime.height=mtime.width;group.height=group.width;sblk.height=sblk.width;
 
-  .5[sz1.nw,(xpart sz1.nw,ypart bk4.sw)] - mtime.e = (10,0);
+  .5[bk1.nw,(xpart bk1.nw,ypart sz4.sw)] - mtime.e = (10,0);
   mtime.width=sz1.width;
   group.s - sblk.n = (0,30);
   .5[group.w,sblk.w] - .5[bi1.ne,bi4.se] = (31,0);
   
-  bk1.w = .4[sz1.s,sz2.n] + (20,0);
+  sz1.w = .05[bk1.s,bk2.n] + (20,0);
 
   forsuffixes $=1,2,3,4:
-    d$.w-sz$.e+(0,ypart (sz4.e-bk4.e)/2) = (60,0);
+    d$.w-bk$.e+(0,ypart (bk4.e-sz 4.e)/2) = (60,0);
     i$.w-d$.e = (20,0); bi$.w-i$.e = (32,0);
   endfor
   
@@ -69,7 +67,7 @@ beginfig(1);
   d = 6;
   def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor .9white enddef;
   ylab = ypart i1.ne + 3d;
-  z1 = (xpart mtime.w,ypart sz1.nw)+(-1.2d,2d); z2 = bk4.se + (1.5d,-d);
+  z1 = (xpart mtime.w,ypart bk1.nw)+(-1.2d,2d); z2 = sz4.se + (1.5d,-d);
   blockbox(z1 -- (x2,y1) -- z2 -- (x1,y2) -- cycle);
 
   blockbox(d1.nw+(-d,2d) -- i1.ne+(d,2d) -- i1.se+(d,-d) -- d1.sw+(-d,-d) -- cycle);
@@ -94,14 +92,14 @@ beginfig(1);
   drawconnpatch(bk3,bk2)(..);
   drawconnpatch(bk4,bk3)(..);
   forsuffixes $=1,2,3,4:
-    drawconnpatch(sz$,d$)({dir 10} .. {dir -10});
+    drawconnpatch(sz$,d$)(..);
     drawconnpatch(d$,i$)(..);
     drawconnpatch(i$,bi$)(..);
   endfor
-  drawconnpatch(bk1,i1)({dir -25} .. {dir 40});
-  drawconnpatch(bk2,i2)({dir -25} .. {dir 45});
-  drawconnpatch(bk3,i3)({dir -25} .. {dir 45});
-  drawconnpatch(bk4,i4)({dir -25} .. {dir 45});
+  drawconnpatch(bk1,i1)({dir 25} .. d1.n + (5,12) .. );
+  drawconnpatch(bk2,i2)({dir 15} .. {dir -45});
+  drawconnpatch(bk3,i3)({dir 15} .. {dir -45});
+  drawconnpatch(bk4,i4)({dir 15} .. {dir -45});
   drawconnpatch(i1,bi1)(..);
   drawconnpatch(i2,bi2)(..);
   drawconnpatch(i3,bi3)(..);
@@ -162,15 +160,15 @@ beginfig(2);
   i4.height=i4.width;bk4.height=bk4.width;sz4.height=sz4.width;bi4.height=bi4.width;
   mtime.height=mtime.width;group.height=group.width;sblk.height=sblk.width;
 
-  .5[sz1.nw,(xpart sz1.nw,ypart bk4.sw)] - mtime.e = (10,0);
+  .5[bk1.nw,(xpart bk1.nw,ypart sz4.sw)] - mtime.e = (10,0);
   mtime.width=sz1.width;
   group.s - sblk.n = (0,30);
   .5[group.w,sblk.w] - .5[bi1.ne,bi4.se] = (31,0);
   
-  bk1.w = .4[sz1.s,sz2.n] + (20,7);
+  sz1.w = .1[bk1.s,bk2.n] + (20,0);
 
   forsuffixes $=1,2,3,4:
-    d$.w-(xpart sz$.e,ypart .5[sz$.e,bk$.e]) = (60,0);
+    d$.w-(xpart bk$.e,ypart .5[bk$.e,sz$.e]) = (60,0);
     i$.w-d$.e = (20,0); bi$.w-i$.e = (32,0);
   endfor
 
@@ -183,7 +181,7 @@ beginfig(2);
 
   d = 6;
   def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor .9white enddef;
-  z1 = (xpart mtime.w,ypart sz1.nw)+(-1.2d,d); z2 = bk4.se + (1.5d,-d);
+  z1 = (xpart mtime.w,ypart bk1.nw)+(-1.2d,d); z2 = sz4.se + (1.5d,-d);
   blockbox(z1 -- (x2,y1) -- z2 -- (x1,y2) -- cycle);
 
   forsuffixes $=1,2,3,4:
@@ -196,20 +194,14 @@ beginfig(2);
   endfor
   
   drawelement(bk1,bk2,bk3,bk4,sz1,sz2,sz3,sz4,d1,d2,d3,d4,i1,i2,i3,i4,bi1,bi2,bi3,bi4,mtime,group,sblk);
-  drawconnpatch(sz2,sz1)(..);
-  drawconnpatch(sz3,sz2)(..);
-  drawconnpatch(sz4,sz3)(..);
-  drawconnpatch(bk2,bk1)(..);
-  drawconnpatch(bk3,bk2)(..);
-  drawconnpatch(bk4,bk3)(..);
   forsuffixes $=1,2,3,4:
     drawconnpatch(sz$,bk$)(..);
-    drawconnpatch(sz$,d$)({dir 10} .. {dir -10});
+    drawconnpatch(sz$,d$)(..);
     drawconnpatch(d$,i$)(..);
-    drawconnpatch(bk$,i$)({dir -25} .. {dir 45});
+    drawconnpatch(bk$,i$)({dir 15} .. {dir -45});
     drawconnpatch(i$,bi$)(..);
   endfor
-  drawconnpatch(mtime,sz4)({down} ..);
+  drawconnpatch(mtime,sz4)({down} .. bk4.sw - (2,2) ..);
   drawconnpatch(bk2,sz1)(..);
   drawconnpatch(bk3,sz2)(..);
   drawconnpatch(bk4,sz3)(..);

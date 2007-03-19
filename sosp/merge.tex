@@ -1,10 +1,10 @@
 % -*- mode: latex; tex-main-file: "paper.tex" -*-
 
-\subsection{Hard--Hard \ChDesc\ Merging}
+\subsection{Hard \ChDesc\ Merging}
 \label{sec:patch:merge}
 
 File operations such as block allocations, inode updates, and directory updates
-create a large number of small, distinct \chdescs. Keeping track of many small
+create many distinct \chdescs. Keeping track of these
 \chdescs\ and their dependencies requires significant amounts of memory and
 CPU time.
 %
@@ -12,8 +12,20 @@ CPU time.
 the \chdesc\ counts and memory usage, by conservatively identifying when a
 new \patch\ could always be written at the same time as an existing \patch.
 %
-Rather than creating a new \chdesc\ in this case, Kudos updates the data
-and dependencies to merge the new \patch\ into the existing one.
+Rather than creating a new \chdesc\ in this case, \Kudos\ updates the data
+and dependencies so as to merge the new \patch\ into the existing one.
+
+
+The first type of merging is trivial to explain:
+%
+since all of a block's hard patches must be written at the same time, there
+is no need to maintain more than one hard patch per block.
+
+
+\Kudos\ ensures that each block contains at most one hard patch.
+%
+When a block $b$ has a hard patch $h$, every succeeding hard patch is
+merged into $h$:
 
 
 \Kudos\ includes three distinct \chdesc\ merge algorithms.
