@@ -20,12 +20,55 @@ The first type of merging is trivial to explain:
 %
 since all of a block's hard patches must be written at the same time, there
 is no need to maintain more than one hard patch per block.
-
-
-\Kudos\ ensures that each block contains at most one hard patch.
 %
-When a block $b$ has a hard patch $h$, every succeeding hard patch is
-merged into $h$:
+All other hard patches can safely be merged into the first,
+%
+and in fact \Kudos\ ensures that each block contains at most one hard
+patch.
+
+
+Assume some module attempts to create a patch $p$ on a block that already
+has a hard patch $h$, and \Kudos\ determines that $p$ may be hard.
+%
+Then the implementation merges $p$ into $h$ at creation time by applying
+$p$'s data to the block and setting $\PDDepset{h} \gets \PDDepset{h} \cup
+\PDDepset{p}$.
+%
+Although this changes $h$'s direct dependency set, that change cannot
+introduce any new block-level cycles or $p$ would not have been hard in the
+first place.
+%
+The existing hard patch $h$ is returned to the caller.
+
+
+Unfortunately, the merge can create \emph{intra}-block cycles.
+%
+If some empty patch $x$ exists with $p \PDepend x \PDepend h$, then after
+the merge $h \PDepend x \PDepend h$.
+%
+The merge algorithm uses a graph traversal to prune these cyclic
+dependencies as it merges $p$'s dependencies into $h$.
+
+
+Hard patch merging is able to eliminate 8 of the patches in our running
+example, as shown in Figure~\ref{f:opt}c.
+
+
+\paragraph{Soft-to-Hard Conversion}
+
+A similar optimization occurs when a new hard patch is created on a block
+that has existing \emph{soft} patches in memory.
+%
+This can happen as a result of ...
+
+Similarly, when a new hard patch is created on a block, we know that any
+existing \emph{soft} patches on that block can safely be converted to hard
+patches.
+
+
+\begin{itemize}
+\item
+\end{itemize}
 
 
 \Kudos\ includes three distinct \chdesc\ merge algorithms.
