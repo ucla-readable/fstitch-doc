@@ -57,11 +57,13 @@ fewer rollbacks and more flexibility in write ordering.
 
 %% \subsubsection{\ChDesc\ List Ordering}
 
-Finally, the buffer cache and a few other modules expect that the
-\patches\ on a block are listed in order of creation time.
+Finally, the buffer cache and a few other modules perform better in the
+common case that the \patches\ on a block are listed in order of creation
+time.
 %
 This improves their performance from $O(n^2)$ to $O(n)$ in the number of
-patches in the common case that this order is preserved.
+patches.
+%% in the common case that this order is preserved.
 
 
 \begin{comment}
