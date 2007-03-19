@@ -59,8 +59,6 @@ example, as shown in Figure~\ref{f:opt}c.
 A similar optimization occurs when a new hard patch is created on a block
 that has existing \emph{soft} patches in memory.
 %
-This can happen once hard patches are written to disk.
-%
 For example, Figure~\ref{f:soft2hard}a shows a block with both hard and
 soft patches: $p_1$ must be soft since it initiates a block-level cycle
 $p_1 \PDepend q_h \PDepend p_h$, and similarly for $p_2$ and $p_3$.
@@ -91,20 +89,11 @@ But as a result, we know that there are no block-level dependency cycles
 with the existing \emph{soft} patch as head, since such a cycle would imply
 an $h$-headed cycle $h \PDDepend p \PDepend q \PDepend p'$.
 %
-Thus, $p$ can be transformed into a hard patch and then merged into $h$.
+Thus, $p$ can be transformed into a hard patch and then merged into $h$
+using hard patch merging.
 %
-Figure~\ref{f:soft2hard}c shows the result for our example.
-
-
-Like hard patch merging, soft-to-hard conversion requires that the
-implementation filter dependencies to avoid introducing cycles.
-%
-Unlike hard patch merging, soft-to-hard conversion is complicated by the
-fact that other patches may already depend on the soft patches that are
-being merged.
-%
-Rather than shift these dependencies, \Kudos\ simply changes the existing
-soft patches into empty patches in place.
+Figure~\ref{f:soft2hard}c shows what happens to our example when a new hard
+patch $p_h'$ is added.
 
 
 \begin{figure}
@@ -305,11 +294,69 @@ into \noop{}s? (Must modify \nrb-\nrb\ algo usage.)}
 
 \subsection{Overlap Merging}
 \label{sec:chdescs:merge:overlap}
-\todo{Note as useful when new may need to be rolled back.}
-Bitmap blocks and inode size fields accumulate many nearby and
-overlapping mergeable \chdescs\ as data is appended to or truncated
-from a file.
+
+The final important optimization merges soft patches with other patches,
+hard or soft, that they overlap.
 %
+Bitmap blocks and inodes accumulate many nearby and overlapping \chdescs\
+as data is appended to or truncated from a file.
+%
+Figure~\ref{f:opt} shows how even data blocks can collect overlapping
+dependencies: actual data writes $d'_j$ overlap, and therefore depend on,
+block initialization writes $d_j$, but cannot be made hard since when they
+are created another block (the inode) already depends on the data block.
+%
+Luckily, simple and fast reasoning can identify many mergeable pairs,
+further reducing the number of patches and the amount of rollback data
+required.
+
+
+Two overlapping patches $p_1$ and $p_2$, with $p_1 \PDepend p_2$, may be
+merged iff it would always be possible to write them at the same time.
+%
+Here we may reuse the reasoning developed for hard patches above: it is
+always possible to write these patches simultaneously if, assuming that
+$p_2$ were hard, $p_1$ could also be made hard---that is, if $p_1$ will
+never be the head of a block-level cycle terminating at $p_2$.
+%
+The same properties that simplified the creation of hard patches also help
+us check this property: that is, if no block-level cycle $p_1 \PDepend x
+\PDepend p_2$ exists when $p_1$ is created, then no such block-level cycle
+will ever exist.
+
+
+
+As with hard patch creation, the \Kudos\ implementation checks a simpler
+property that requires less graph traversal:
+%
+it checks that all paths starting at $p_1$ have length less than or equal
+to two, and that none of those paths are block-level cycles terminating at
+$p_2$.
+%
+If this property holds, then $p_1$ and $p_2$ can have the same lifetime,
+and $p_1$ can be merged into $p_2$ where they overlap.
+%
+As with other types of merging, this requires filtering dependencies to
+avoid cycles; it may also require growing the destination patch in the case
+that the new patch is bigger than it.
+%
+It also simplifies the implementation somewhat to limit overlap merging to
+the case when neither $p_1$ nor $p_2$ overlaps with any other patch.
+
+\begin{itemize}
+\item
+\end{itemize}
+
+
+%
+If the only dependency between $p_1$ and $p_2$ is direct---that is, no path
+$p_1 \PDepend x \PDepend p_2$ exists for any $x \not\in \{p_1,
+p_2\}$---then it will always be possible to write $p_1$ and $p_2$ at the
+same time.
+%
+Specifically, it is possible to write $p_1$ 
+
+
 Many of these and similar \chdescs\ are mergeable and have
 dependencies that allow simple (and fast) reasoning to identify many
 of the mergeable pairs: two \chdescs\ on block $b$ that overlap no other \chdescs\ in \PMem[b]

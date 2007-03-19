@@ -215,7 +215,7 @@ endfig;
 
 beginfig(3);
   numeric d;
-  patchit.in(btex $i_{\text{1-4}}+i'_{\text{1-4}}+i''$\strut etex,0);
+  patchit.in(btex \mlabel{$i_{\text{1\dots4}}+i'_{\text{1\dots4}}$\\$+i''$} etex,0);
 
   boxjoin(a.width = b.width = a.height; a.s=b.n+(0,20));
   patchit.d1(btex $d_1'$\strut etex, 0);
@@ -339,7 +339,7 @@ endfig;
 
 beginfig(4);
   numeric d;
-  patchit.in(btex $i_{\text{1-4}}+i'_{\text{1-4}}+i''$\strut etex,0);
+  patchit.in(btex \mlabel{$i_{\text{1\dots4}}+i'_{\text{1\dots4}}$\\$+i''$} etex,0);
 
   boxjoin(a.width = b.width; b.height = a.height; a.s=b.n+(0,20));
   patchit.d1(btex $d_1+d_1'$\strut etex, 0);
@@ -349,7 +349,7 @@ beginfig(4);
   d1.dx=10;
 
   boxjoin();
-  patchit.bi(btex $a_{\text{1-4}}$\strut etex, 0);
+  patchit.bi(btex $a_{\text{1\dots4}}$\strut etex, 0);
   bi1.dx=4;
 
   patchit.group(btex $g$\strut etex, 0);
