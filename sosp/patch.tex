@@ -36,7 +36,7 @@ to simplify our terminology.
 %
 Our patch notation is summarized in Figure~\ref{f:patchnot}.
 
-Each patch $p$ encapsulates four important pieces of state: its
+Each patch $p$ encapsulates four important pieces of information: its
  \emph{block}, its \emph{state}, a set of \emph{direct dependencies}, and
  some \emph{rollback data}.
 
@@ -243,6 +243,24 @@ The \Kudos\ core makes no assumptions about block atomicity, instead relying
  for the given disk.
 
 
+The buffer cache can't handle cross-block dependency cycles since it must
+write data in units of blocks.
+%
+Thus, if $p \PDepend q \PDepend p$, then $p$ and $q$ must be on the same
+block; otherwise, neither $p$ nor $q$ could ever get written.
+%
+Whenever upper layers might generate cross-block dependency cycles,
+intervening layers must break those cycles somehow before they reach the
+cache.
+%
+For instance, a journal layer might detect dependency cycles and put the
+corresponding patches into a single transaction, but the
+\emph{implementation} of that transaction could not contain cross-block
+cycles.
+%
+In practice, the \Kudos\ implementation currently disallows any dependency
+cycles, including cycles within a single block.
+
 
 \input{noop}
 
@@ -394,7 +412,7 @@ The next section tackles all of these challenges.
 
 \includegraphics[scale=0.62]{fig/opt_3}
 
-\textbf{c)} With \nrb--\nrb\ merging
+\textbf{c)} With \nrb\ patch merging
 
 \vskip.5\baselineskip
 
