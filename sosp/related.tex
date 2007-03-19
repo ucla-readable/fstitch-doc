@@ -81,13 +81,14 @@ benefits of both ideas.
 
 \paragraph{Applications}
 
-A variety of extensions to file systems have been proposed in recent work, like
-the FS2 Free Space File System~\cite{huang05fs2} and encrypting file systems
-like NCryptfs~\cite{wright03ncryptfs}. Although we have not implemented \Kudos\
+A variety of extensions to file systems and disk interfaces have been proposed
+in recent work, like the FS2 Free Space File System~\cite{huang05fs2},
+encrypting file systems like NCryptfs~\cite{wright03ncryptfs}, and type-safe
+disks~\cite{sivathanu06typesafe}. Although we have not implemented \Kudos\
 \modules\ for these extensions, we believe that the \Kudos\ \module\ system is
-flexible enough to allow straightforward implementations of these ideas.
-\todo{Cite type-safe disks?}
-%%  NCryptfs has been written in a
+flexible enough to allow straightforward implementations of these ideas as
+system \modules.
+%% NCryptfs has been written in a
 %% stackable way already, allowing it to be easily adapted for new underlying file
 %% systems -- but FS2 is currently specific to ext2, since it deals directly with
 %% low-level disk structures. The \Kudos\ \module\ interface should allow such an
