@@ -1,22 +1,23 @@
-\subsection{Miscellaneous}
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
+\subsection{Other Optimizations}
 \label{sec:patch:misc}
 
-\subsubsection{Unnecessary \ChDesc\ Dependencies}
-Even with \Kudos\ dynamically optimizing \chdesc\ graphs, there is only so much
-that can be done while preserving the semantics of the dependencies specified by
-the \module\ which created the \chdescs. It is obvious that having too few
-dependencies compromises the correctness of the system; it is perhaps less
-obvious but no less true that having too many dependencies can non-trivially
-degrade the performance of the system.
+Even with these optimizations, there is only so much
+that can be done with bad sets of dependencies.
+%
+Just as having too few dependencies can compromise system correctness,
+having too many dependencies can non-trivially degrade the system
+performance.
 
-In Figure~\ref{fig:chdescarrange}, we have two possible arrangements for three
+Figure~\ref{fig:chdescarrange} shows two possible arrangements for four
 \chdescs. The \noop\ \chdesc\ represents a root node that can reach all
 other \chdescs. In the parallel arrangement on the right, \Kudos\ has the
 freedom to write \chdescs\ $p$, $q$, and $r$ to disk in any order. In the
 serial arrangement on the left, there exists only one valid write ordering.
 Depending on the arrangement of other \chdescs, \Kudos\ may have to perform
-additional rollbacks and write some blocks more times than would otherwise be
-necessary in order to write these \chdescs\ to disk. Even if that is not
+additional rollbacks and write some blocks more times than would otherwise
+be necessary in order to write these \chdescs\ to disk. Even if that is not
 necessary, \Kudos\ will still have less flexibility in choosing an order to
 write the blocks, potentially increasing disk seek times due to suboptimal
 ordering.
