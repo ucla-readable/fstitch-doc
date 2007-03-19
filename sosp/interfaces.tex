@@ -79,15 +79,3 @@ int (*append_file_block)(LFS_t *module,
 
 \noindent%
 This design lets \LFS\ modules examine and modify the dependency structure.
-
-
-Each \chdesc\ on a cached block may or may not be visible to a given \module.
-For example, \modules\ that respond to user requests generally view the most
-current state of every block -- the block with all \chdescs\ applied. However, a
-write-back cache may choose to write some \chdescs\ on a block while reverting
-others, since those others currently have outstanding dependencies. In this
-case, \modules\ below the write-back cache (i.e. closer to the disk) should view
-those \chdescs\ in the reverted state. \Kudos\ provides a block revisioning
-library function that automatically rolls back those \chdescs\ that should not
-be visible at a particular \module, and then rolls them forward again after that
-\module\ is done with the block.

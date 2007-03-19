@@ -27,6 +27,30 @@ aware of \chdescs, and therefore when a filesystem stored on a loopback device
 sets up \chdesc\ dependencies, they will be correctly forwarded to and honored
 by the rest of the system.
 
+\begin{figure}[htb]
+  \centering
+  \includegraphics[height=3in]{fig/figures_1}
+  \caption{A running \Kudos\ configuration. {\it/} is a soft updated
+    file system on an IDE drive; {\it/loop} is an externally journaled
+    file system on loop devices.}
+  \label{fig:kfs-graph}
+\end{figure}
+
+Figure~\ref{fig:kfs-graph} shows an example configuration taking advantage of
+this ability. A file system image is mounted with an external journal, both of
+which are loopback block devices stored on the root file system, (which uses
+soft updates). The journaled file system's ordering requirements are sent
+through the loopback device as \chdescs, allowing dependency information to be
+maintained across boundaries that might otherwise lose that information. In
+contrast, without \chdescs\ and the ability to forward \chdescs\ through
+loopback devices, BSD cannot express soft updates' consistency requirements
+through loopback devices. The \modules\ in Figure~\ref{fig:kfs-graph} are a
+complete and working \Kudos\ configuration, and although the use of a loopback
+device is somewhat contrived in the example, they are increasingly being used in
+conventional operating systems. For instance, Mac OS X uses them in order to
+allow users to encrypt their home directories.
+
+\begin{comment}
 An example configuration taking advantage of this ability could be a file
 system image mounted with an external journal, both of which are loopback block
 devices stored on the root file system (which could use soft updates). The
@@ -39,6 +63,7 @@ Although the use of a loopback device is somewhat contrived in the example,
 they are increasingly being used in conventional operating systems. For
 instance, Mac OS X uses them in order to allow users to encrypt their home
 directories.
+\end{comment}
 
 \input{ext2}
 \input{ufs}

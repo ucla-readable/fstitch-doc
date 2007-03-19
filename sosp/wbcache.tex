@@ -1,43 +1,82 @@
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
 \subsection{Write-Back Cache}
 \label{sec:modules:wbcache}
 
-Write-back cache \modules\ act as the system's buffer cache, and are responsible
-for holding on to the \chdescs\ sent to them until they can be safely sent on
-towards the disk. There can be many write-back caches in a configuration at once
-(for instance, one for each block device). To a write-back cache, the complex
-consistency protocols that other \modules\ want to enforce are nothing more than
-sets of dependencies among \chdescs\ -- it has no idea what consistency
-protocols it is implementing, if any at all.
+The \Kudos\ buffer cache module is called the \emph{write-back cache}.
+%
+Its job is twofold: first, it caches blocks in memory, and second, it
+ensures that modifications are written to stable storage in an order that
+preserves the in-flight safety property.
+%
+Modules ``below'' the write-back cache---that is, between its output
+interface and the disk---can reorder block writes at will without violating
+dependency orderings.
+%
+There can be many write-back caches in a configuration at once (for
+instance, one for each block device). To a write-back cache, the complex
+consistency protocols that other \modules\ want to enforce are nothing more
+than sets of dependencies among \chdescs; it has no idea what consistency
+protocols it is implementing, if any.
 % Yet it is the \module\ that ends up doing most of the work to make sure that
 % \chdescs\ are written in an acceptable order.
 
 % Despite this, write-back caches are relatively simple; they are only slightly
 % more complex than the naive implementation already suggested.
-The current write-back cache \module\ is little more than just a front end to
-the automatically-maintained ready \chdesc\ lists described in
-Section~\ref{sec:patch:readylist}.
+Our prototype write-back cache \module\ 
+%% is little more than a front end to
+%% the automatically-maintained ready \chdesc\ lists described in
+%% Section~\ref{sec:patch:readylist}.
 %
-It uses a FIFO policy for writing dirty blocks, and an LRU policy for evicting
-clean blocks (upon being written, a dirty block becomes clean and may then be
-evicted).
+uses a modified FIFO policy to write dirty blocks and an LRU policy to
+evict clean blocks.  (Upon being written, a dirty block becomes clean and
+may then be evicted.)
 %
-The FIFO policy for writing blocks is really only a heuristic to help the
-write-back cache find a block which can be written, however: only ready
-\chdescs\ may be written, in order to uphold the in-flight safety property and
-thus the disk safety property (\S\ref{sec:patch:dependencies}).
+The FIFO policy used to write blocks is modified only to preserve the
+in-flight safety property: a block will not be written if none of its
+\patches\ are ready to write.
 %
-Once the write-back cache finds a block with ready \chdescs, all other \chdescs\
-on that block are rolled back, the resulting block data is sent to the disk
-driver, the ready \chdescs\ are marked \PInfst, and the rolled-back \chdescs\
-are rolled forward again. The block itself is also marked \PInfst, so that only
+Once the write-back cache finds a block with ready \chdescs, all other
+\chdescs\ on that block are rolled back, the resulting block data is copied
+and sent to the disk driver, the ready \chdescs\ are marked in-flight, and
+the rolled-back \chdescs\ are rolled forward again.
+%
+The block itself is also marked in-flight, ensuring that the cache will not
+try to write it again until the current version commits.
+
+
+As a special case to aid disk performance, when the write-back cache finds
+it can write block $n$, it then checks to see if block $n+1$ can be written as
+well.
+%
+It continues writing increasing block numbers until some block is either
+unwritable or not in the cache.
+%
+\begin{comment}
+The block itself is also marked \PInfst, so that only
 one version of its data will be in flight at a time. (This whole procedure is
 basically the buffer cache \textit{Write block} action.)
+\end{comment}
+%
+This simple optimization greatly improves I/O wait time, since the I/O
+requests are merged and reordered in Linux's elevator scheduler.
+%
+Nevertheless, our profiling results indicate significant opportunities for
+further optimization: for example, since the cache will write a block even
+if only one of its patches is ready, it can choose to roll back
+\patches\ unnecessarily when a different order would have required fewer
+writes.
 
-The simplicity of this algorithm for finding blocks to write is only tolerable
-at all because the I/O requests are merged and reordered in the Linux elevator
-scheduler. The write-back cache does have one special case meant to help the
-elevator scheduler: after writing block $n$, it will check to see if block $n+1$
-can be written as well, and continue writing increasing block numbers until some
-block is either unwritable or not in the cache. This helps significantly, but
-nevertheless we suspect that the simple algorithm here contributes to some of
-the I/O delay \Kudos\ incurs in many tests.
+
+\begin{comment}
+Each \chdesc\ on a cached block may or may not be visible to a given \module.
+For example, \modules\ that respond to user requests generally view the most
+current state of every block -- the block with all \chdescs\ applied. However, a
+write-back cache may choose to write some \chdescs\ on a block while reverting
+others, since those others currently have outstanding dependencies. In this
+case, \modules\ below the write-back cache (i.e. closer to the disk) should view
+those \chdescs\ in the reverted state. \Kudos\ provides a block revisioning
+library function that automatically rolls back those \chdescs\ that should not
+be visible at a particular \module, and then rolls them forward again after that
+\module\ is done with the block.
+\end{comment}
