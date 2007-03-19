@@ -21,39 +21,25 @@ necessary, \Kudos\ will still have less flexibility in choosing an order to
 write the blocks, potentially increasing disk seek times due to suboptimal
 ordering.
 
-% {{{ fig:chdescarrange
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=192pt]{fig/figures_5}
+  \includegraphics[width=192pt]{fig/figures_4}
   \caption{\label{fig:chdescarrange} On the right, \chdescs\ $p$, $q$, and $r$
   can be written in any order. Only one ordering is possible on the left.}
 \end{figure}
-% }}}
 
 Even when no unnecessary dependencies are explicitly created, they can still be
 created implicitly and care must be taken to avoid them. When \chdescs\ overlap,
 the later \chdesc\ is made to depend on the first so that it cannot precede the
 change it is changing further to disk. As a result, however, unnecessary
 dependencies may result if the \chdescs\ are larger than the data they are
-actually changing. In Figure~\ref{fig:overlap}, to update a field in an inode
-structure on disk, a \chdesc\ spanning the entire inode could be created even
-though only a single field changed. A later change to a different field would
-appear to overlap the first, creating an unnecessary dependency. Creating
-\chdescs\ which correspond more precisely to the changes being made avoids this
-problem, so a utility function is provided by \Kudos\ to make this operation as
-convenient as creating a single \chdesc\ for an entire large structure.
-
-% {{{ fig:overlap
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=64pt]{fig/figures_4}
-  \caption{\label{fig:overlap} On inode 17, the gray regions represent
-  modified fields that do not overlap. If \chdesc\ A and \chdesc\ B are
-  exactly the size of the gray regions, then there is no implicit dependency.
-  However, making \chdescs\ for the entire inode data structure will make
-  one \chdesc\ depend on the other because they overlap.}
-\end{figure}
-% }}}
+actually changing. For instance, to update a field in an inode structure on
+disk, a \chdesc\ spanning the entire inode could be created even though only a
+single field changed. A later change to a different field would appear to
+overlap the first, creating an unnecessary dependency. Creating \chdescs\ which
+correspond more precisely to the changes being made avoids this problem, so a
+utility function is provided by \Kudos\ to make this operation as convenient as
+creating a single \chdesc\ for an entire large structure.
 
 \subsubsection{\ChDesc\ List Ordering}
 Several functions in \Kudos\ iterate over lists of \chdescs\ looking for either

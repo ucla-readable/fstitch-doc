@@ -34,7 +34,7 @@ Although the patch idea would apply to any stable medium, or to network
 file systems, we use terms like ``disk'' and ``disk controller'' throughout
 to simplify our terminology.
 %
-Our patch notation is summarized in Figure~\ref{f:patchnot}.
+Our patch notation is summarized in Figure~\ref{fig:patchnot}.
 
 Each patch $p$ encapsulates four important pieces of information: its
  \emph{block}, its \emph{state}, a set of \emph{direct dependencies}, and
@@ -64,7 +64,7 @@ $\PDDepset{p}$ & $p$'s direct dependencies \\
 \end{small}
 
 \caption{Patch notation.}
-\label{f:patchnot}
+\label{fig:patchnot}
 \end{figure}
 
 
@@ -294,7 +294,7 @@ Unfortunately, that abstraction is extremely expensive.
 Consider an unoptimized version of \Kudos\ running an ext2 file system with
 soft updates-like dependencies.
 %
-Figure~\ref{f:opt}a shows the patches generated when an application appends
+Figure~\ref{fig:opt}a shows the patches generated when an application appends
 16384 bytes of data to an existing empty file.
 %
 This requires allocating four new 4096-byte blocks, writing data to them,
@@ -322,8 +322,8 @@ need to be rolled back!
 
 This section shows how the actual \Kudos\ system uses generic patch
 properties and dependency analysis to reduce the 23 patches and 33000 bytes
-of rollback data in Figure~\ref{f:opt}a to the 8 patches and 0 bytes of
-rollback data in Figure~\ref{f:opt}d.
+of rollback data in Figure~\ref{fig:opt}a to the 8 patches and 0 bytes of
+rollback data in Figure~\ref{fig:opt}d.
 %
 These optimizations apply transparently to any \Kudos\ file system.
 
@@ -428,7 +428,7 @@ The next section tackles all of these challenges.
 
 \caption{\Patches\ required to append 4 blocks to an existing file, without
 and with optimization.  \Nrb\ \patches\ are shown with heavy borders.}
-\label{f:opt}
+\label{fig:opt}
 \end{figure}
 
 \input{nrb}

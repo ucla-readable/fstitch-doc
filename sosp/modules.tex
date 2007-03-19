@@ -2,13 +2,12 @@
 \label{sec:modules}
 
 This section describes several \Kudos\ \modules\ which contribute significantly
-to the overall functionality of \Kudos, or which demonstrate unique or
-important capabilities of \chdescs\ and the \module\ system. Some \modules,
-like the journal \module\ and the write-back cache, have already been described
-(see \S\ref{sec:using:journal} and \S\ref{sec:using:wbcache}), while others
-like the write-through cache, partitioner, and memory block device, have
-functions which are fairly obvious from their names and need no further
-description.
+to the overall functionality of \Kudos, or which demonstrate unique or important
+capabilities of \chdescs\ and the \module\ system. Some \modules, like the
+journal \module\ and the write-back cache, have already been described (in
+\S\ref{sec:using:journal} and \S\ref{sec:using:wbcache}), while others like the
+write-through cache, partitioner, and memory block device, have functions which
+are fairly obvious from their names and need no further description.
 
 \input{interfaces}
 
@@ -52,19 +51,19 @@ allow users to encrypt their home directories.
 
 \subsection{Case Insensitivity}
 \label{sec:modules:icase}
-\Kudos\ provides a case insensitivity \module\ at the CFS layer. It
-allows file systems such as UFS and ext2, which inherently handle filenames
-case sensitively, to become case insensitive in this regard. So now if a user
-needs to run an application that expected the underlying filename semantics
-to be case insensitive, on top of a case sensitive file system, they would
-merely enable the module. This is also a great testament to the flexibility
-of \Kudos's modular abstractions. By allowing a module to intercept actions
-between the CFS and \LFS\ layers, filename transformations can be made
-transparently for the user regardless of the on-disk storage format of
-the actual filename.
+
+\Kudos\ provides a case insensitivity \module\ at the CFS layer. It allows file
+systems such as UFS and ext2, which inherently handle filenames case
+sensitively, to become case insensitive. If a user needs to run an application
+that expects the underlying filenames to be case insensitive on top of a case
+sensitive file system, they can simply add this \module\ to the \Kudos\
+\module\ graph. By allowing a \module\ to intercept actions between the CFS and
+\LFS\ layers, filename transformations can be made transparently for the user
+regardless of the on-disk storage format of the actual filename.
 
 \subsection{\ChDesc\ Unlinking}
 \label{sec:modules:unlink}
+
 In the event that no consistency semantics are desired, for instance to compare
 a prototype implementation of a system for working with explicit dependency
 information to an existing asynchronous file system like ext2, \Kudos\ provides
@@ -73,7 +72,3 @@ By using this \module, the \chdesc\ graph will not enforce any ordering at all,
 and the buffer cache will be free to write blocks in any order. \Chdescs\ are
 not really necessary to implement this ``consistency'' protocol, but they
 nevertheless support it as a degenerate case.
-
-\todo{sync directory}
-\todo{file hiding}
-\todo{umsdos?}

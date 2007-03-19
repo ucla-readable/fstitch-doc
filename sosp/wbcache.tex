@@ -13,7 +13,7 @@ order.
 
 Despite this, write-back caches are relatively simple; they are only slightly
 more complex than the naive implementation suggested in
-section~\ref{sec:patch:optimizations}. The current write-back cache uses a FIFO
+Section~\ref{sec:patch:optimizations}. The current write-back cache uses a FIFO
 policy for writing dirty blocks, and an LRU policy for evicting clean blocks
 (upon being written, a dirty block becomes clean and may then be evicted).
 %
@@ -27,7 +27,7 @@ satisfying
 $\PDepset{P} \subseteq P \cup \PDisk$ and $\PHard[b] \subseteq P$.
 %
 This is efficient, because this $P$ is the ready \chdesc\ list discussed in
-section~\ref{sec:patch:readylist}.
+Section~\ref{sec:patch:readylist}.
 %
 Assuming $P \neq \emptyset$, all other \chdescs\ on $b$ (i.e., $\PMem[b] - P$)
 are rolled back, the resulting block data is sent to the disk driver, the
@@ -41,4 +41,4 @@ so that (for instance) dependencies between the changes on a file system and its
 external journal are properly respected. This is actually not a special case,
 nor does it require any extra code -- it is a property that just falls out of
 the definition of $P$ above. This property also extends to \opgroups, which are
-explained in section~\ref{sec:opgroup}.
+explained in Section~\ref{sec:opgroup}.

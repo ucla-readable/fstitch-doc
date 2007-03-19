@@ -18,12 +18,12 @@ TEXSRCS = abstract.tex conclusion.tex discussion.tex evaluation.tex \
 
 BIBS = paper.bib kmaster.bib
 
-TMP_PDF_IMAGES = fig/figures_1.pdf fig/figures_2.pdf fig/figures_3.pdf \
-	fig/figures_4.pdf fig/figures_5.pdf fig/figures_6.pdf \
+TMP_PDF_IMAGES = fig/figures_1.pdf fig/figures_2.pdf \
+        fig/figures_3.pdf fig/figures_4.pdf fig/figures_5.pdf \
 	fig/opt_1.pdf fig/opt_2.pdf fig/opt_3.pdf fig/opt_4.pdf \
 	fig/softhard_1.pdf fig/softhard_2.pdf fig/softhard_3.pdf \
-	nrb_merge.pdf svn_opgroups.pdf \
-	rb_chdesc_size.pdf merge_cdf.pdf opts-patches.pdf opts-rollback.pdf
+	rb_chdesc_size.pdf merge_cdf.pdf nrb_merge.pdf svn_opgroups.pdf \
+	opts-patches.pdf opts-rollback.pdf
 TMP_DVI_IMAGES = $(TMP_PDF_IMAGES:.pdf=.eps)
 
 PDF_IMAGES = $(TMP_PDF_IMAGES)

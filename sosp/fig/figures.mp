@@ -193,21 +193,6 @@ beginfig(3);
 endfig;
 
 beginfig(4);
-  label.top(btex Patch A etex, (15,25));
-  boxjoin(a.width = b.width; a.height = b.height; a.s - b.n = (0,20));
-  elementit.a(btex \quad Inode 17 \quad etex, 0, 0, pull);
-  elementit.b(btex \quad Inode 17 \quad etex, 0, 0, pull);
-  label.bot(btex Patch B etex, (50,-55));
-
-  fixelement(a,b);
-
-  fill a.nw -- .2[a.nw,a.ne] -- .2[a.sw,a.se] -- a.sw -- cycle withcolor .8white;
-  fill b.ne -- .2[b.ne,b.nw] -- .2[b.se,b.sw] -- b.se -- cycle withcolor .8white;
-
-  drawelement(a,b);
-endfig;
-
-beginfig(5);
   boxjoin(a.width = b.width; a.height = b.height);
   elementit.a(btex Empty etex scaled 0.8, 0, 0, pull);
   elementit.b(btex p etex scaled 0.8, 0, 0, pull);
@@ -249,7 +234,7 @@ beginfig(5);
 
 endfig;
 
-beginfig(6);
+beginfig(5);
   boxjoin(a.width = b.width; a.height = b.height);
   elementit.hk(btex HK etex scaled 0.8, 0, 0, pull);
   elementit.tk(btex TK etex scaled 0.8, 0, 0, pull);

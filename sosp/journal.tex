@@ -73,7 +73,7 @@ metadata -- thus achieving metadata-only journaling (as opposed to the full data
 journaling implied above), without any knowledge of the file system.
 %
 The journal \module\ can automatically identify metadata \chdescs\ because of
-the \LFS\ interface described in section~\ref{sec:modules:interfaces}, and the
+the \LFS\ interface described in Section~\ref{sec:modules:interfaces}, and the
 UHFS module~(\S\ref{sec:modules:uhfs}) which is responsible for writing to all
 non-metadata blocks. Other block device layering systems, like GEOM~\cite{geom}
 or JBD in Linux, would or do need special hooks into file system code to
