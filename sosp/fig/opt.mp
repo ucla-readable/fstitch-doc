@@ -203,11 +203,13 @@ beginfig(2);
   drawconnpatch(bk3,bk2)(..);
   drawconnpatch(bk4,bk3)(..);
   forsuffixes $=1,2,3,4:
+    drawconnpatch(sz$,bk$)(..);
     drawconnpatch(sz$,d$)({dir 10} .. {dir -10});
     drawconnpatch(d$,i$)(..);
     drawconnpatch(bk$,i$)({dir -25} .. {dir 45});
     drawconnpatch(i$,bi$)(..);
   endfor
+  drawconnpatch(mtime,sz4)({down} ..);
   drawconnpatch(group,sblk)(..);
   drawconnpatch(bi2,bi1)(..);
   drawconnpatch(bi3,bi1)({dir 65}..{dir 120});
