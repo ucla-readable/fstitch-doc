@@ -18,7 +18,7 @@ the in-flight safety property $\PDepset{P} \subseteq P \cup \PDisk$.
 Redundant \chdesc\ graph traversals to calculate valid $P$ sets would
 severely limit cache size scalability.
 %
-\Kudos\ therefore explicitly tracks for each \chdesc\ how many of its
+\Kudos\ therefore explicitly tracks, for each \chdesc, how many of its
 direct dependencies are in memory or in flight.
 %
 These counts are updated as \patches\ are added to the system, and as the

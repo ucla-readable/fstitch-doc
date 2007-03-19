@@ -1,6 +1,6 @@
 % -*- mode: latex; tex-main-file: "paper.tex" -*-
 
-\subsection{Hard \ChDesc\ Merging}
+\subsection{\Nrb\ \ChDesc\ Merging}
 \label{sec:patch:merge}
 
 File operations such as block allocations, inode updates, and directory updates
@@ -295,7 +295,7 @@ into \noop{}s? (Must modify \nrb-\nrb\ algo usage.)}
 \subsection{Overlap Merging}
 \label{sec:chdescs:merge:overlap}
 
-The final important optimization merges soft patches with other patches,
+The final type of merging merges soft patches with other patches,
 hard or soft, that they overlap.
 %
 Bitmap blocks and inodes accumulate many nearby and overlapping \chdescs\
@@ -362,9 +362,9 @@ soft patches with their hard counterparts, reducing the number of patches
 to the minimum of 8 and the amount of rollback data to the minimum of 0.
 %
 In our experiments, we observe that hard patches and our patch merging
-optimizations reduce the number of patches in soft-updates orderings by as
-much as 99.96\%, approaching the efficiency of soft updates through a
-modular, general mechanism.
+optimizations reduce the amount of memory allocated for rollback data in
+soft updates orderings by as much as 99.96\%, approaching the efficiency
+of soft updates through a modular, general mechanism.
 
 
 \begin{comment}

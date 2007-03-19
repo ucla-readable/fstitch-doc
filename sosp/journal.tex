@@ -1,45 +1,34 @@
 \subsection{Journaling}
 \label{sec:using:journal}
 
-%Although \chdescs\ might initially seem to be specifically designed to implement
-%soft updates-like consistency semantics, they are in fact much more flexible and
-%can be used to implement journaling as well.
-In a journaling file system,
-changes to disk structures are written to a journal before being written to the
-main file system area on the disk, and a single disk block (the \emph{commit
-record}) is written after the journal is written. Once the commit record has
-been written, the changes (which collectively are called a \emph{transaction})
-are considered to have been made to the file system: if the system crashes, the
-data from the journal will be copied into the main file system as part of
-recovery. After the commit record has been written, the original changes may be
-written in any order desired, and once they have been written, the commit record
-may be erased and the portion of the journal storing the data it referenced can
-be reused.
+In a journaling file system, changes to disk structures are written to a journal
+before being written to the main file system area on the disk, and a single disk
+block (the \emph{commit record}) is written after the journal is written. Once
+the commit record has been written, the changes (which collectively are called a
+\emph{transaction}) are considered to have been made to the file system: if the
+system crashes, the data from the journal will be copied into the main file
+system as part of recovery. After the commit record has been written, the
+original changes may be written in any order desired, and once they have been
+written, the commit record may be erased and the portion of the journal storing
+the data it referenced can be reused.
 
 Almost all of this description of journaling translates directly into \chdesc\
 dependencies. The incoming \chdescs\ must be rearranged to implement the new
 structure, but for the most part this transformation is straightforward. There
-are two special situations which the journal \module\ must handle, however.
-First, with soft updates, \chdescs\ can always be written to the disk in order
-to empty the cache, while the journal must be able to ``lock'' \chdescs\ into
-the cache while transactions are in progress. Second, the commit record is
-created at the very end of the transaction, but the file system changes created
-during the transaction (and thus before it) must be made to depend on it.
-Ordinarily this is not allowed, in order to prevent \chdesc\ cycles.
+are two special considerations which the journal \module\ must address, however.
 
-To accomplish the first of these tasks, the journal \module\ advertises a
-managed \noop\ \chdesc\ (\S\ref{sec:patch:noop}) to \modules\ above it,
-which they must make all changes they create depend on. This special \chdesc\ is
-not considered satisfied until the journal \module\ explicitly satisfies it, so
-no changes which depend on it will be written from the cache.  At the end of the
-transaction, the journal \module\ satisfies this \chdesc, allowing all the
-changes to be written to disk.
+First, with soft updates, \chdescs\ can always be written to the disk when
+flushing the cache, while the journal must be able to ``lock'' \chdescs\ into
+the cache while transactions are in progress. To accomplish this, the journal
+\module\ uses a managed \noop\ \chdesc, as outlined in
+Section~\ref{sec:patch:noop}.
 
-To accomplish the second task, a special flag is used to override the normal
-rule prohibiting the addition of new \befores\ to a \chdesc\ after it is
-created. The condition for using this flag is a static proof that no cycle can
-result from its use (immediately or in the future); we have determined this to
-be the case for the journal \module\ by hand.
+Second, the commit record is created at the end of the transaction, but the file
+system changes created during the transaction must be made to depend on it.
+Ordinarily this is not permitted (see \S\ref{sec:patch:nrb}). The condition for
+violating this rule is a static proof that no cycle can result from doing so
+(immediately or in the future); we have determined this to be the case for the
+journal \module\ by hand.
 
 \begin{figure}
   \centering
@@ -49,28 +38,34 @@ be the case for the journal \module\ by hand.
     \noop\ \chdescs, used to simplify the implementation of the journal.}
 \end{figure}
 
-Figure~\ref{fig:journal} shows the \chdesc\ configuration which is created by
-applying this transformation to the \chdescs\ in Figure~\ref{fig:softupdate}.
-The original four \chdescs\ have been modified to depend on a journal commit
-record (via \anoop\ \chdesc), and no longer have explicit dependencies on each
-other. The commit record depends on journal blocks containing copies of the
-changes. Finally, the commit record can be marked as completed once the
-original four \chdescs\ have been written. This transformation is performed
-incrementally as \chdescs\ arrive. The resulting journal on disk is similar in
-format to those generated by ext3~\cite{tweedie98journaling} -- it has a list of
-block numbers, followed by the data which should be in those blocks. Finally,
-there is a commit record which applies to the whole set.
+Figure~\ref{fig:journal} shows the \chdesc\ configuration which is created
+by applying the journal transformation to the \chdescs\ in
+Figure~\ref{fig:softupdate}. The original four \chdescs\ have been
+modified to depend on a journal commit record (via \anoop\ \chdesc), and
+no longer have explicit dependencies on each other. The commit record
+depends on journal blocks containing copies of the changes. Finally, the
+commit record can be marked as completed once the original four \chdescs\
+have been written. This transformation is performed incrementally as
+\chdescs\ arrive. The resulting journal on disk is similar in format to
+those generated by ext3~\cite{tweedie98journaling}: it has a list of block
+numbers, followed by the data which should be in those blocks. Finally,
+there is a single commit record which applies to the whole set.
 
-A particularly nice property of this arrangement is that the journal \module\ is
-completely independent of any specific file system. It is a block device
-\module\ that automatically journals whatever file system is stored on it. In
-fact, the incoming \chdescs\ need not be arranged for soft updates, or for that
-matter in any particular configuration at all.
+Due to this design, the journal \module\ is completely independent of any
+specific file system. It is a block device \module\ that automatically journals
+whatever file system is stored on it. In fact, the incoming \chdescs\ need not
+be arranged for soft updates, or for that matter in any particular configuration
+at all.
 
 Perhaps the most unique property of our journal \module, however, is that it can
 automatically selectively journal only \chdescs\ that modify file system
-metadata -- thus achieving metadata-only journaling (as opposed to the full data
-journaling implied above), without any knowledge of the file system.
+metadata -- thus achieving metadata-only journaling \footnote{There are at least
+two major variants of metadata-only journaling, depending on when the
+non-journaled data is written relative to the commit record. Our journal module
+writes it after the commit record; writing it before the commit record requires
+very careful checks to avoid premature reuse of blocks~\cite{tweedie00ext3}.}
+(as opposed to the full data journaling implied above), without any knowledge of
+the file system.
 %
 The journal \module\ can automatically identify metadata \chdescs\ because of
 the \LFS\ interface described in Section~\ref{sec:modules:interfaces}, and the
@@ -79,10 +74,3 @@ non-metadata blocks. Other block device layering systems, like GEOM~\cite{geom}
 or JBD in Linux, would or do need special hooks into file system code to
 determine what disk changes represent metadata in order to do metadata-only
 journaling. \Chdescs\ and the \LFS\ interface allow us to do this automatically.
-%
-(There are at least two major variants of metadata-only journaling, depending on
-when the non-journaled data is written relative to the commit record. Our
-journal module writes it after the commit record; writing it before the commit
-record requires very careful checks to avoid premature reuse of
-blocks~\cite{tweedie00ext3}.)
-

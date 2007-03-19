@@ -3,42 +3,46 @@
 
 \paragraph{Consistency}
 
-Soft updates~\cite{ganger00soft} 
-%% is one of the biggest innovations in file
-%% systems in terms of
-significantly lowers the overhead required to provide file system
-consistency. By carefully ordering writes to disk, soft updates avoids the need
-for synchronous writes to disk or duplicate writes to a journal. Soft updates
-also guarantees a strong level of consistency after a crash, enough so that the
-system can avoid time-consuming file system consistency checks using a utility
-like \emph{fsck}. 
-
-%% Section~\ref{sec:using:softupdate}
-%% explains soft updates in greater detail.
+Soft updates~\cite{ganger00soft} significantly lowers the overhead required to
+provide file system consistency. By carefully ordering writes to disk, soft
+updates avoids the need for synchronous writes to disk or duplicate writes to
+a journal. Soft updates also guarantees a strong level of consistency after a
+crash, enough so that the system can avoid time-consuming file system
+consistency checks using a utility like \emph{fsck}. 
 
 Another approach to protecting the integrity of the file system is to write
 upcoming operations to a journal first. The content and the layout of the
-journal vary in each implementation, but in all cases, the system can use
-the journal to play out (or roll back) the operations that did not complete
-as a result of a crash. Thus, \emph{fsck} can be avoided by consulting the
-journal when recovering from a crash. Section \ref{sec:using:journal}
-explains journaling with \chdescs. \cite{seltzer00journaling} compares
-journaling and soft updates in practice.
+journal vary in each implementation, but in all cases, the system can use the
+journal to play out (or roll back) the operations that did not complete as a
+result of a crash. Thus, \emph{fsck} can be avoided by consulting the journal
+when recovering from a crash. Section \ref{sec:using:journal} explains
+journaling with \chdescs. \cite{seltzer00journaling} compares journaling and
+soft updates in practice.
 
-\cite{nightingale06rethink}
+External synchrony~\cite{nightingale06rethink} builds on journaling to
+automatically provide strict file system operation ordering for applications,
+without requiring them to block on each write. It combines operations into a
+journal, but tracks the activity of the calling processes after returning
+control to them from the file system. If a process later performs some
+\emph{user-visible} operation like printing text to the screen or sending
+network traffic, the journal transaction containing the changes is forced to
+commit before the process can continue.
+
 \cite{sivathanu05ensuring}
 
 Customizable application-level consistency protocols have previously been
 considered in the context of distributed, parallel file systems by
 CAPFS~\cite{vilayannur05providing} and Echo~\cite{mann94coherent}.
 %
-CAPFS allows application writers to design plug-ins for the parallel file
-store, which define what consistency policy actions to take before and after
-each client-side system call.
+CAPFS allows application writers to design plug-ins for the parallel file store,
+which define what actions to take before and after each client-side system call
+to enforce additional consistency policies.
 %
-Echo maintains a partial order on the locally cached updates to the parallel
-file store, and guarantees that the server will store the updates accordingly.
-It also provides a mechanism for applications to extend the partial order.
+Echo maintains a partial order on the locally cached updates to the remote file
+system, and guarantees that the server will store the updates accordingly. It
+also provides a mechanism for applications to extend the partial order, thus
+reducing the server's flexibility to choose how to write the data or make it
+available to other clients.
 %
 Both systems are based on the principle that not providing the right
 consistency protocol can cause unpredictable failures, yet enforcing

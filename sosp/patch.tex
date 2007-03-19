@@ -25,40 +25,30 @@
 \makeatother
 
 Every change to stable storage in a \Kudos\ system is represented by a
-\emph{patch}.
+\emph{\patch}.
 %
-This section describes the basic patch abstraction using a semi-formal
+This section describes the basic \patch\ abstraction using a semi-formal
 notation that will be useful for analyzing our optimizations later.
 %
-Although the patch idea would apply to any stable medium, or to network
+Although the \patch\ idea would apply to any stable medium, or to network
 file systems, we use terms like ``disk'' and ``disk controller'' throughout
 to simplify our terminology.
 %
-Our patch notation is summarized in Figure~\ref{fig:patchnot}.
+Our \patch\ notation is summarized in Figure~\ref{fig:patchnot}.
 
-Each patch $p$ encapsulates four important pieces of information: its
- \emph{block}, its \emph{state}, a set of \emph{direct dependencies}, and
- some \emph{rollback data}.
-
-Patch $p$'s \textbf{block}, written $\PBlock{p}$, is the unit of disk data
- to which $p$ applies.  The disk controller is assumed to write blocks as a
- unit (although not necessarily atomically; see below).  A file system
- change that affects $n$ blocks must be represented using at least $n$
- patches, since a patch by definition can touch only one block.
-
-\begin{figure}
+\begin{figure}[htb]
 \begin{small}
 \begin{tabular}{@{}ll@{}}
 $\PBlock{p} = b$ & $p$'s block \\
 $\PState{p}$ & $p$'s state, $\in \{\PMemst, \PInfst, \PDiskst\}$ \\
-~~~~$\PMem$ & all in-memory patches: $\{p \mid \PState{p} = \PMemst\}$ \\
+~~~~$\PMem$ & all in-memory \patches: $\{p \mid \PState{p} = \PMemst\}$ \\
 ~~~~$\PMem[b]$ & $\{p \mid \PState{p} = \PMemst \text{ and } \PBlock{p} = b
  \}$ \\
-~~~~$\PInf, \PDisk$ & similarly for in-flight and on-disk patches \\
+~~~~$\PInf, \PDisk$ & similarly for in-flight and on-disk \patches\ \\
 $\PDDepset{p}$ & $p$'s direct dependencies \\
 ~~~~$p \PDDepend q$ & $p$ directly depends on $q$: $q \in \PDDepset{p}$ \\
 ~~~~$p \PDepend q$ & $p$ depends on $q$: either $p \PDDepend q$ or there exists \\
-       & a patch $x$ so that $p \PDepend x \PDDepend q$ \\
+       & a \patch\ $x$ so that $p \PDepend x \PDDepend q$ \\
 ~~~~$\PDepset{p}$ & $p$'s dependencies: $\{ q \mid p \PDepend q \}$ \\
 \end{tabular}
 \end{small}
@@ -67,35 +57,44 @@ $\PDDepset{p}$ & $p$'s direct dependencies \\
 \label{fig:patchnot}
 \end{figure}
 
+Each \patch\ $p$ encapsulates four important pieces of information: its
+ \emph{block}, its \emph{state}, a set of \emph{direct dependencies}, and
+ some \emph{rollback data}.
 
-Each patch is in one of three \textbf{states}: \emph{in memory}; \emph{in
+Patch $p$'s \textbf{block}, written $\PBlock{p}$, is the unit of disk data
+ to which $p$ applies.  The disk controller is assumed to write blocks as a
+ unit (although not necessarily atomically; see below).  A file system
+ change that affects $n$ blocks must be represented using at least $n$
+ \patches, since a \patch\ by definition can touch only one block.
+
+Each \patch\ is in one of three \textbf{states}: \emph{in memory}; \emph{in
  flight} to the disk controller, but not yet committed to disk; and
  \emph{on disk}.  The intermediate in-flight state is necessary because
- operating system software loses control of a patch upon writing its block
+ operating system software loses control of a \patch\ upon writing its block
  to disk.  $p$'s state is written $\PState{p} \in \{\PMemst, \PInfst,
- \PDiskst\}$.  The operating system changes a patch's state from
+ \PDiskst\}$.  The operating system changes a \patch's state from
  \PMemst\ to \PInfst\ by writing its block to the disk controller.  Some
- time later---after possible OS-level disk scheduling, transit over the
- system bus, and a period in the disk's cache---the disk writes the block
+ time later---after possible controller-level disk scheduling, transit over
+ the system bus, and a period in the disk's cache---the disk writes the block
  to stable storage and reports success.  When the processor receives this
- notification, it changes the patch's state to \PDiskst.
+ notification, it changes the \patch's state to \PDiskst.
 %
-The sets \PMem, \PInf, and \PDisk\ are defined to contain all patches with
+The sets \PMem, \PInf, and \PDisk\ are defined to contain all \patches\ with
  the given state, and the sets $\PMem[b]$, $\PInf[b]$, and $\PDisk[b]$ are
- defined to contain all patches with the given state \emph{on the given
+ defined to contain all \patches\ with the given state \emph{on the given
  block} $b$.
 
 Patch $p$'s \textbf{direct dependencies}, written $\PDDepset{p}$, is a set of
- other patches on which $p$ ``depends''.
+ other \patches\ on which $p$ ``depends''.
 %
-That is, every patch in $\PDDepset{p}$ should be committed to disk either
+That is, every \patch\ in $\PDDepset{p}$ should be committed to disk either
  before, or at the same time as, $p$ itself.
 %
 Dependencies are set by the file system based on whatever consistency
  semantics it wants to ensure.
 %
 For example, a file system with asynchronous writes (and no durability
- guarantees) might write all patches with $\PDDepset{p} = \emptyset$;
+ guarantees) might write all \patches\ with $\PDDepset{p} = \emptyset$;
 %
 a file system implementing soft updates would arrange the dependencies
  accordingly;
@@ -119,12 +118,12 @@ We say $p$ \emph{directly depends on} $q$, and write $p \PDDepend q$, when
 %
 We say $p$ \emph{depends on} $q$, and write $p \PDepend q$, when there
  exists a dependency chain from $p$ to $q$: that is, either $p \PDDepend q$
- or, for some patch $x$, $p \PDepend x \PDDepend q$.
+ or, for some \patch\ $x$, $p \PDepend x \PDDepend q$.
 %
 Patch $p$'s set of \emph{dependencies} is written $\PDepset{p} = \{ q \mid
  p \PDepend q \}$; this is of course a superset of its direct dependencies.
 %
-Given a \emph{set} of patches $P$, we write $\PDepset{P}$ to mean the set's
+Given a \emph{set} of \patches\ $P$, we write $\PDepset{P}$ to mean the set's
  combined dependencies $\bigcup_{p\in P} \PDepset{p}$.
 
 
@@ -154,21 +153,21 @@ Rollback information adds greatly to memory and CPU utilization, but it can
 often be optimized away, as we show below.
 
 
-\subsection{Obeying dependencies}
+\subsection{Obeying Dependencies}
 \label{sec:patch:dependencies}
 
 \Kudos\ must ensure the \textbf{disk safety property}, which states that
- the dependencies of all patches on disk are also on disk:
+ the dependencies of all \patches\ on disk are also on disk:
 %
 \[ \PDepset{\PDisk} \subseteq \PDisk. \]
 %
-Thus, no matter when the system crashes, the disk is consistent in terms of
-dependencies.
+Thus, no matter when the system crashes, the disk is (or the disks are)
+consistent in terms of dependencies.
 %
 The file system's job is to set up dependencies so that the disk safety
 property implies file system correctness.
 
-However, \Kudos\ can only control when patches are handed to the disk
+However, \Kudos\ can only control when \patches\ are handed to the disk
  controller, not when they are written to disk.
 %
 Disk controller behavior is encapsulated in the following atomic action:
@@ -212,8 +211,8 @@ one version of a block can be in flight at any time.
 Thus, the last step above forces any rolled-back \patches\ to wait in
 memory at least until the in-flight version of the block is written.
 %
-Likewise, any patch created on a block with in-flight patches must depend
-on those patches.
+Likewise, any \patch\ created on a block with in-flight \patches\ must depend
+on those \patches.
 %
 (Our implementation achieves this property without using dependencies.)
 %
@@ -255,7 +254,7 @@ intervening layers must break those cycles somehow before they reach the
 cache.
 %
 For instance, a journal layer might detect dependency cycles and put the
-corresponding patches into a single transaction, but the
+corresponding \patches\ into a single transaction, but the
 \emph{implementation} of that transaction could not contain cross-block
 cycles.
 %
@@ -286,7 +285,7 @@ below automatically changes soft updates orderings into journal
 transactions.
 %
 Applications can affect consistency orderings, and it is all relatively
-easy thanks to the patch abstraction.
+easy thanks to the \patch\ abstraction.
 %
 Unfortunately, that abstraction is extremely expensive.
 
@@ -294,7 +293,7 @@ Unfortunately, that abstraction is extremely expensive.
 Consider an unoptimized version of \Kudos\ running an ext2 file system with
 soft updates-like dependencies.
 %
-Figure~\ref{fig:opt}a shows the patches generated when an application appends
+Figure~\ref{fig:opt}a shows the \patches\ generated when an application appends
 16384 bytes of data to an existing empty file.
 %
 This requires allocating four new 4096-byte blocks, writing data to them,
@@ -308,21 +307,21 @@ modification of the inode's size to depend on the previous one.
 %
 Eight blocks are written during the operation.
 %
-\Kudos, however, represents the operation with 23 patches and roughly 33000
+\Kudos, however, represents the operation with 23 \patches\ and roughly 33000
 (!) bytes of rollback data.
 %
-The patches slow down the buffer cache system by making graph traversals
+The \patches\ slow down the buffer cache system by making graph traversals
 more expensive.
 %
-The 4096 bytes of rollback data per patch stored for ``zero data'' and
-``write data'' patches, which initialize and write data blocks, is
-particularly painful since in this file system, data blocks \emph{never}
+The 4096 bytes of rollback data per \patch\ stored for ``zero data'' and
+``write data'' \patches, which initialize and write data blocks, is
+particularly painful since in this example, data blocks \emph{never}
 need to be rolled back!
 
 
-This section shows how the actual \Kudos\ system uses generic patch
-properties and dependency analysis to reduce the 23 patches and 33000 bytes
-of rollback data in Figure~\ref{fig:opt}a to the 8 patches and 0 bytes of
+This section shows how the actual \Kudos\ system uses generic \patch\
+properties and dependency analysis to reduce the 23 \patches\ and 33000 bytes
+of rollback data in Figure~\ref{fig:opt}a to the 8 \patches\ and 0 bytes of
 rollback data in Figure~\ref{fig:opt}d.
 %
 These optimizations apply transparently to any \Kudos\ file system.
@@ -412,13 +411,13 @@ The next section tackles all of these challenges.
 
 \includegraphics[scale=0.62]{fig/opt_2}
 
-\textbf{b)} With \nrb\ \patches
+\textbf{b)} With \nrb\ \patches\
 
 \vskip.5\baselineskip
 
 \includegraphics[scale=0.62]{fig/opt_3}
 
-\textbf{c)} With \nrb\ patch merging
+\textbf{c)} With \nrb\ \patch\ merging
 
 \vskip.5\baselineskip
 
