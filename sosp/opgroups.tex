@@ -122,18 +122,30 @@ the user can instead run:
 \end{center}
 \vspace{-0.5\baselineskip}
 
+\Opgroups\ are created and managed almost exactly like file descriptors. Handles
+to them are copied across \texttt{fork()}, preserved across \texttt{exec()}, and
+closed upon \texttt{exit()}. Whether \anopgroup\ is \engaged\ or not is a
+property local to the process, like the ``close-on-exec'' flag of file
+descriptors. These properties allow existing programs to use \opgroups\ without
+knowing it, in the same way that they don't have to know anything about pipes
+for the shell to connect them in a pipeline --- the parent process creates and
+\engages\ the \opgroups\ before calling \texttt{exec()}, and then the process
+does its file system operations without knowing or needing to know that they are
+being hooked up to \anopgroup.
+
+
 % FIXME: Mention simplicity using opgroups vs fsync?
 
 \subsection{Implementation}
 \label{sec:opgroup:implementation}
 
-An \opgroup\ is a bracket around its \chdescs, so that the entire
-group can depend on another \opgroup.
+\Anopgroup\ is implemented by surrouding its \patches\ by a bracket of
+empty \patches; \opgroup\ dependencies are represented as dependencies
+among these bracket empty \patches.
 %
-\Opgroups\ are implemented as an \LFS\ module that imposes \opgroup\
-dependencies using additional \chdesc\ dependencies among \LFS\
-operations.
-%
+These dependencies are created by the \opgroup\ \module\ as file
+system operations are performed.
+
 Figure~\ref{fig:opgroup-chdescs} shows \anopgroup's \chdesc\ arrangement.
 %
 The head \chdesc\ depends on the \opgroup's \chdescs\ and the tail
@@ -141,8 +153,8 @@ The head \chdesc\ depends on the \opgroup's \chdescs\ and the tail
 %
 The \opgroup's \chdescs\ all depend on the tail \chdesc.
 %
-Using this \chdesc\ arrangement, \anopgroup\ dependency \depends{P}{Q}
-is implemented as \depends{\mbox{tail}_P}{\mbox{head}_Q}
+The \opgroup\ dependency \depends{P}{Q} is implemented as
+\depends{\mbox{tail}_P}{\mbox{head}_Q}
 
 \begin{figure}[htb]
 \centering{
@@ -157,17 +169,6 @@ is implemented as \depends{\mbox{tail}_P}{\mbox{head}_Q}
   and the \chdesc\ labeled 2 occurred during a second operation that
   depended on the first.}
 \end{figure}
-
-\Opgroups\ are created and managed almost exactly like file descriptors. Handles
-to them are copied across \texttt{fork()}, preserved across \texttt{exec()}, and
-closed upon \texttt{exit()}. Whether \anopgroup\ is \engaged\ or not is a
-property local to the process, like the ``close-on-exec'' flag of file
-descriptors. These properties allow existing programs to use \opgroups\ without
-knowing it, in the same way that they don't have to know anything about pipes
-for the shell to connect them in a pipeline --- the parent process creates and
-\engages\ the \opgroups\ before calling \texttt{exec()}, and then the process
-does its file system operations without knowing or needing to know that they are
-being hooked up to \anopgroup.
 
 \subsection{Case Studies}
 \label{sec:opgroup:casestudies}
