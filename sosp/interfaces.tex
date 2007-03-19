@@ -25,7 +25,8 @@ Closest to the system call interface are \emph{common file system} (CFS)
 \Kudos\ also supports an intermediate interface between BD and CFS.
 %
 This \emph{low-level file system} (\LFS) interface helps divide file system
-implementations into common (reusable) code and file system specific code. 
+implementations into code common across block-structured file systems and
+file system-specific code.
 %
 \begin{comment}
 A
@@ -38,11 +39,20 @@ Linux kernel.
 %
 The \LFS\ interface has functions to allocate blocks, add blocks to files,
 allocate file names, and other file system micro-operations. A \module\ implementing
-the \LFS\ interface should define how bits are laid out on the disk, but doesn't
+the \LFS\ interface defines how bits are laid out on the disk, but doesn't
 have to know how to combine the micro-operations into larger, more familiar file system
-operations. A generic CFS-to-\LFS\ \module\ decomposes the larger file write,
-read, append, and other standard operations into \LFS\ micro-operations. This module,
-called UHFS, is described in the next section.
+operations. A generic CFS-to-\LFS\ \module\ called UHFS decomposes the larger file write,
+read, append, and other standard operations into \LFS\ micro-operations. 
+%
+File system extensions resembling existing stackable file systems generally
+use the CFS interface; for example, we wrote a simple module that provides
+case-insensitive access to a case-sensitive file system.
+%
+File system implementations, such as our ext2 and UFS implementations, use
+the \LFS\ interface.
+
+
+
 
 Each \chdesc\ on a cached block may or may not be visible to a given \module.
 For example, \modules\ that respond to user requests generally view the most

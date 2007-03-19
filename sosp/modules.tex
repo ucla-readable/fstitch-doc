@@ -13,7 +13,7 @@ description.
 
 \input{interfaces}
 
-\input{uhfs}
+%% \input{uhfs}
 
 \input{wbcache}
 
@@ -53,6 +53,7 @@ allow users to encrypt their home directories.
 \input{ext2}
 \input{ufs}
 
+\begin{comment}
 \subsection{Case Insensitivity}
 \label{sec:modules:icase}
 
@@ -64,3 +65,4 @@ sensitive file system, they can simply add this \module\ to the \Kudos\
 \module\ graph. By allowing a \module\ to intercept actions between the CFS and
 \LFS\ layers, filename transformations can be made transparently for the user
 regardless of the on-disk storage format of the actual filename.
+\end{comment}
