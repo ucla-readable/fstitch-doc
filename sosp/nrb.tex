@@ -1,16 +1,58 @@
 \subsection{\Nrb\ \ChDescs}
 \label{sec:chdescs:nrb}
 
-Each data\todo{Name?} \chdesc\ contains a copy of its block's previous data to
-allow rollback\footnote{Actually, \Kudos\ supports a specialized type of \chdesc\ for
-efficiently flipping individual bits using an inline exclusive-or mask instead
-of a copy of the previous data, but most \chdescs\ are not of this type.}.
+The first optimization reduces the space overhead of rollback data by
+detecting when rollback data will never be necessary.
 %
-In practice, many \chdesc\ are never actually rolled back (e.g. file
-data blocks)
+When a patch $p$ is created, \Kudos\ conservatively detects whether $p$
+will ever need to be rolled back.
 %
-and the previous data copies nearly double the combined memory usage of
-\chdescs\ and cached blocks.
+If it will not, $p$ is a \emph{hard patch}: its data can be applied
+directly to the in-memory copy of the block without saving rollback data
+for the previous version.
+
+
+Only patches that are part of a block-level dependency cycle might need to
+be rolled back.
+%
+Thus, patch $p$ may be hard iff it cannot be part of a block-level
+dependency cycle: that is, there will \emph{never} exist patches $q$ and
+$r$ with $\PBlock{p} = \PBlock{r} \neq \PBlock{q}$ and $p \PDepend q
+\PDepend r$.
+
+
+To create a hard patch, then, \Kudos\ must conservatively decide whether
+any future patch or dependency could create a block-level cycle.
+%
+This decision is simplified by an API property: \emph{All of a patch's
+direct dependencies are specified at creation time};
+%
+no new dependencies $p \PDDepend q$ may be introduced after $p$ is
+created.\footnote{The actual rule is somewhat looser: modules may add new
+direct dependencies if they can guarantee that those dependencies won't
+introduce any new block-level cycles.  For instance, if an empty patch $p$
+is not depended on by any other patch, adding a new $p \PDDepend q$
+dependency cannot cause a cycle.}
+%
+Since every patch follows this rule, all possible block-level cycles $p
+\PDepend q \PDepend r$ are visible at creation time.
+
+
+However, traversing the dependency graph to exactly determine the
+possibility of a block-level cycle could explode in complexity.
+%
+Thus, \Kudos\ implements a conservative approximation: patch $p$ may be
+hard if no other block depends on the current state of $\PBlock{p}$.
+%
+That is, for all dependencies $q \PDepend r$, either $\PState{r} \neq
+\PMemst$, $\PBlock{r} \neq \PBlock{p}$, or $\PBlock{q} = \PBlock{p}$.
+
+
+\begin{compactitemize}
+\item 
+\end{compactitemize}
+
+
 %
 To avoid this overhead, \Kudos\ identifies \chdescs\ that will never
 need to be rolled back and omits their previous data copies. We call
