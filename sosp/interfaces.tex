@@ -38,11 +38,12 @@ Linux kernel.
 \end{comment}
 %
 The \LFS\ interface has functions to allocate blocks, add blocks to files,
-allocate file names, and other file system micro-operations. A \module\ implementing
-the \LFS\ interface defines how bits are laid out on the disk, but doesn't
-have to know how to combine the micro-operations into larger, more familiar file system
-operations. A generic CFS-to-\LFS\ \module\ decomposes the larger file write,
-read, append, and other standard operations into \LFS\ micro-operations. 
+allocate file names, and other file system micro-operations. A \module\
+implementing the \LFS\ interface defines how bits are laid out on the disk, but
+doesn't have to know how to combine the micro-operations into larger, more
+familiar file system operations. A generic CFS-to-\LFS\ \module\ called UHFS
+(``universal high-level file system'') decomposes the larger file write, read,
+append, and other standard operations into \LFS\ micro-operations. 
 %
 File system extensions like those often implemented by stackable file
 systems would generally use the CFS interface; for example, we wrote a

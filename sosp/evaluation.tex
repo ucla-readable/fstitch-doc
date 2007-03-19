@@ -90,6 +90,10 @@ create 100 small files in a directory and measure the number of blocks
 written to disk. We do this with and without soft updates. \Kudos\
 writes 122 blocks, while FreeBSD writes 135 blocks.
 
+Another test pits Linux ext2 and ext3 against \Kudos\ ext2 with soft updates,
+when extracting a large archive. Linux ext2 writes 523248 blocks; Linux ext3
+writes 523192; \Kudos\ writes 540472.
+
 We also look at a very small benchmark: removing a file from a
 directory and adding a new file to it. We compare the number of blocks
 written by \Kudos\ with that of FreeBSD using soft updates. Here
@@ -100,12 +104,6 @@ data journaling mode. Creating 100 small files with the journal
 resulted in 245 blocks written to the disk, but only 126 blocks
 without the journal. Deleting and adding a file resulted in writing
 31 with the journal module and 18 without it.
-
-From this we gather that our UFS, soft updates, and journal
-implementations are correct, and this reinforces our case that we need
-to reduce CPU usage to be competitive.\todo{Is it I/O time now?}
-
-\todo{\# of writes/block, \# of blocks coalesced}
 
 \begin{figure}[htb]
 \vspace{-0.5\baselineskip}
@@ -173,7 +171,7 @@ performance has been steadily improving over time and we expect that it will
 continue to improve as we optimize it further.
 %
 There are more optimization opportunities that can likely bring us much closer
-in performance to Linux (see \S\ref{sec:discussion}).
+in performance to Linux.
 
 \subsubsection {Postmark}
 
