@@ -11,7 +11,7 @@ using them.
 
 \subsection {Optimization Benefits}
 
-See Figures~\ref{fig:opts}, \ref{fig:patchsize-histo},
+See Figures~\ref{fig:opts}
 and~\ref{fig:mergereq-cdf}.
 \todo{HP vs None untar results are not often near their average. Run
   larger number of tests.}
@@ -32,6 +32,7 @@ HP $+$ OM & 3.58 & 0.75 \\ \hline
 \label{fig:opts}
 \end{figure}
 
+\begin{comment}
 \begin{figure}[htb]
 \vspace{-0.5\baselineskip}
 \centering{
@@ -39,10 +40,11 @@ HP $+$ OM & 3.58 & 0.75 \\ \hline
 }
 \vspace{-0.5\baselineskip}
 \caption{\label{fig:patchsize-histo} \Rb\ \chdesc\ size histogram for a sample
-  workload (extracting a large archive into ext2). All the \chdescs\ larger than
-  63 bytes have been optimized into \nrb\ \chdescs. \Rb\ \chdescs\ 4 bytes and
-  smaller account for about 51\% of all \rb\ \chdescs.}
+workload (extracting a large archive into ext2). All the \chdescs\ larger than
+63 bytes have been optimized into \nrb\ \chdescs. \Rb\ \chdescs\ 4 bytes and
+smaller account for about 51\% of all \rb\ \chdescs.}
 \end{figure}
+\end{comment}
 
 \subsection {Microbenchmarks}
 We have also looked at the number of block writes that \Kudos\ makes
