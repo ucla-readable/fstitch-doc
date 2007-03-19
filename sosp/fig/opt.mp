@@ -210,6 +210,9 @@ beginfig(2);
     drawconnpatch(i$,bi$)(..);
   endfor
   drawconnpatch(mtime,sz4)({down} ..);
+  drawconnpatch(bk2,sz1)(..);
+  drawconnpatch(bk3,sz2)(..);
+  drawconnpatch(bk4,sz3)(..);
   drawconnpatch(group,sblk)(..);
   drawconnpatch(bi2,bi1)(..);
   drawconnpatch(bi3,bi1)({dir 65}..{dir 120});
