@@ -32,16 +32,15 @@ have been written, the commit record may be erased and the portion of the
 journal storing the data it referenced can be reused.
 \end{comment}
 
-The \Kudos\ journal module sits below a regular file system, analyzes
-incoming \patches, and automatically transforms them into \patches\ that
-represent journal transactions.
+The \Kudos\ journal module sits below a regular file system and transforms
+incoming \patches\ into journal transactions.
 %
 Data \patches\ are copied into the journal; a commit record depends on the
 journal patches; and the original file system patches depend in turn on the
 commit record.
 %
 The dependencies among the original \patches\ are removed since the journal
-itself provides the necessary dependency semantics.
+itself provides consistency for each high-level file system operation.
 %
 The journal format is similar to ext3's~\cite{tweedie98journaling}: a
 transaction contains a list of block numbers, the data to be written to
@@ -101,3 +100,13 @@ whatever file system is stored on it. In fact, the incoming \chdescs\ need not
 be arranged for soft updates, or for that matter in any particular configuration
 at all.
 \end{comment}
+
+
+The current prototype journal module actually ignores incoming dependencies
+and enforces transactions based on high-level file system operations.
+%
+It is thus a mechanism to uniformly enforce a particular journal
+semantics---namely, that each file system operation happens atomically.
+%
+It should be possible, however, to extend the journal module to obey
+dependencies.
