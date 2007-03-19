@@ -329,7 +329,8 @@ will ever exist.
 As with hard patch creation, the \Kudos\ implementation checks a simpler
 property that requires less graph traversal.
 %
-It checks that all paths starting at $p_1$ fit one of the following cases:
+It checks that every path starting at $p_1$ fits at least one of the
+following cases:
 
 \begin{xcompactitemize}
 \item $p_1 \PDDepend q$, where $q \not\in \PMem$.
@@ -342,7 +343,7 @@ It checks that all paths starting at $p_1$ fit one of the following cases:
 
 \noindent
 %
-If this property holds, then there exists no block-level cycle from $p_1$
+If all paths fit, then there are no block-level cycles from $p_1$
 to $p_2$, $p_1$ and $p_2$ can have the same lifetime, and $p_1$ can be
 merged into $p_2$ where they overlap.
 %
