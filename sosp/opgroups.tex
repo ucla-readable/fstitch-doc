@@ -124,9 +124,6 @@ the user can instead run:
 \vspace{-0.5\baselineskip}
 
 % FIXME: Mention simplicity using opgroups vs fsync?
-% FIXME: Note that destruction is not an issue (unless a transaction) and that
-% apply/rollback and dependency removal aren't seen as helpful since apps are
-% not doing transformations?
 
 \subsection{Implementation}
 \label{sec:opgroup:implementation}
@@ -166,7 +163,7 @@ closed upon \texttt{exit()}. Whether \anopgroup\ is \engaged\ or not is a
 property local to the process, like the ``close-on-exec'' flag of file
 descriptors. These properties allow existing programs to use \opgroups\ without
 knowing it, in the same way that they don't have to know anything about pipes
-for the shell to connect them in a pipeline -- the parent process creates and
+for the shell to connect them in a pipeline --- the parent process creates and
 \engages\ the \opgroups\ before calling \texttt{exec()}, and then the process
 does its file system operations without knowing or needing to know that they are
 being hooked up to \anopgroup.
