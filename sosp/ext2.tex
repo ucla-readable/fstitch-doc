@@ -21,6 +21,6 @@ and enforce the \chdesc\ orderings.
 
 In order to implement soft updates ordering, each \LFS\ call to the ext2
 \module\ must connect the \chdescs\ it creates according to the rules for soft
-updates~\cite{ganger00soft}. The UHFS \module\ (\S\ref{sec:modules:uhfs})
-connects the resulting \chdesc\ subgraphs together in soft updates order,
+updates~\cite{ganger00soft}. The generic CFS-to-\LFS\ \module\ (\S\ref{sec:modules:interfaces})
+will connect the resulting \chdesc\ subgraphs together in soft updates order,
 completing the implementation of soft updates using \chdescs.
