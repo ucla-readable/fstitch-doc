@@ -44,14 +44,41 @@ have to know how to combine the micro-operations into larger, more familiar file
 operations. A generic CFS-to-\LFS\ \module\ called UHFS decomposes the larger file write,
 read, append, and other standard operations into \LFS\ micro-operations. 
 %
-File system extensions resembling existing stackable file systems generally
-use the CFS interface; for example, we wrote a simple module that provides
-case-insensitive access to a case-sensitive file system.
+File system extensions like those often implemented by stackable file
+systems would generally use the CFS interface; for example, we wrote a
+simple CFS module that provides case-insensitive access to a case-sensitive
+file system.
 %
 File system implementations, such as our ext2 and UFS implementations, use
 the \LFS\ interface.
 
 
+\Patches\ are explicitly part of the \LFS\ interface.
+%
+Every \LFS\ function that might modify the file system takes a
+\texttt{\textit{patch\char`\_t **p}} argument.
+%
+When the function is called, the patch \texttt{*p} is set to the patch, if
+any, on which the modification should depend;
+%
+when the function returns, the patch \texttt{*p} must be set to depend on
+the modification itself.
+%
+(Empty patches allow this interface to generalize to multiple
+dependencies.)
+%
+For example, this function is called to append a block to an \LFS\ inode
+(which is called ``\verb+fdesc_t+''):
+
+\begin{small}
+\begin{alltt}
+int (*append_file_block)(LFS_t *module, 
+   fdesc_t *file, uint32_t block, patch_t **p);
+\end{alltt}
+\end{small}
+
+\noindent%
+This design lets \LFS\ modules examine and modify the dependency structure.
 
 
 Each \chdesc\ on a cached block may or may not be visible to a given \module.
