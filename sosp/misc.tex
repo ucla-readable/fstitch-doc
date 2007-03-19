@@ -7,42 +7,64 @@ Even with these optimizations, there is only so much
 that can be done with bad sets of dependencies.
 %
 Just as having too few dependencies can compromise system correctness,
-having too many dependencies can non-trivially degrade the system
-performance.
-
-Figure~\ref{fig:chdescarrange} shows two possible arrangements for four
-\chdescs. The \noop\ \chdesc\ represents a root node that can reach all
-other \chdescs. In the parallel arrangement on the right, \Kudos\ has the
-freedom to write \chdescs\ $p$, $q$, and $r$ to disk in any order. In the
-serial arrangement on the left, there exists only one valid write ordering.
-Depending on the arrangement of other \chdescs, \Kudos\ may have to perform
-additional rollbacks and write some blocks more times than would otherwise
-be necessary in order to write these \chdescs\ to disk. Even if that is not
-necessary, \Kudos\ will still have less flexibility in choosing an order to
-write the blocks, potentially increasing disk seek times due to suboptimal
-ordering.
+having too many dependencies, or the wrong dependencies, can non-trivially
+degrade the system performance.
+%
+For example, in both the following patch arrangements, $p$ depends on all
+of $q$, $r$, and $s$, but the left-hand arrangement gives \Kudos\ much more
+freedom to choose a better-performing order for block writes:
 
 \begin{figure}[htb]
-  \centering
-  \includegraphics[width=192pt]{fig/figures_4}
-  \caption{\label{fig:chdescarrange} On the right, \chdescs\ $p$, $q$, and $r$
-  can be written in any order. Only one ordering is possible on the left.}
+\centering
+\begin{tabular}{@{}p{.45\hsize}p{.45\hsize}@{}}
+\centering \includegraphics[width=.5\hsize]{fig/figures_4} &
+\centering \includegraphics[width=.5\hsize]{fig/figures_6}
+\end{tabular}
+\vskip-\baselineskip
 \end{figure}
 
-Even when no unnecessary dependencies are explicitly created, they can still be
-created implicitly and care must be taken to avoid them. When \chdescs\ overlap,
-the later \chdesc\ is made to depend on the first so that it cannot precede the
-change it is changing further to disk. As a result, however, unnecessary
-dependencies may result if the \chdescs\ are larger than the data they are
-actually changing. For instance, to update a field in an inode structure on
-disk, a \chdesc\ spanning the entire inode could be created even though only a
-single field changed. A later change to a different field would appear to
-overlap the first, creating an unnecessary dependency. Creating \chdescs\ which
-correspond more precisely to the changes being made avoids this problem, so a
-utility function is provided by \Kudos\ to make this operation as convenient as
-creating a single \chdesc\ for an entire large structure.
+\noindent%
+For example, if $q$, $r$, and $s$ are adjacent on disk, the left-hand
+arrangement can be satisfied with two disk requests while the right-hand
+one will require four.
+%
+Although the arrangements have similar coding difficulty, in several cases
+we discovered that one of our file system implementations was performing
+slowly because it created an arrangement like the one on the right.
 
-\subsubsection{\ChDesc\ List Ordering}
+Care must also be taken to avoid unnecessary \emph{implicit} dependencies,
+and in particular overlap dependencies.
+%
+For instance, inode blocks contain multiple inodes, and changes to two
+inodes should generally be independent; a similar statement holds for
+directories and even sometimes for different fields in a summary block like
+the superblock.
+%
+The best results can be obtained from \emph{minimal} patches that change
+one independent field at a time; \Kudos\ will merge these patches when
+appropriate, but if they cannot be merged, minimal patches will lead to
+fewer rollbacks and more flexibility in write ordering.
+
+
+%% the changes to update a field in an inode structure
+%% on disk, a \chdesc\ spanning the entire inode could be created even though
+%% only a single field changed. A later change to a different field in the
+%% same inode would appear to overlap the first, possibly creating an
+%% unnecessary dependency. Creating \chdescs\ that correspond more precisely
+%% to the changes being made avoids this problem, so a utility function is
+%% provided by \Kudos\ to make this operation as convenient as creating a
+%% single \chdesc\ for an entire large structure.
+
+%% \subsubsection{\ChDesc\ List Ordering}
+
+Finally, the buffer cache and a few other modules expect that the
+\patches\ on a block are listed in order of creation time.
+%
+This improves their performance from $O(n^2)$ to $O(n)$ in the number of
+patches in the common case that this order is preserved.
+
+
+\begin{comment}
 Several functions in \Kudos\ iterate over lists of \chdescs\ looking for either
 a single \chdesc\ or set of \chdescs\ satisfying some property, or trying to
 process all the \chdescs\ in the list in some order determined by the dependency
@@ -57,3 +79,4 @@ operation, while it might otherwise take $O(n^2)$ time to execute. Similarly,
 many \chdesc\ merging functions need to find for a given block some \chdesc\
 which has no \befores\ on the same block, and the oldest \chdesc\ on a block
 always satisfies this requirement.
+\end{comment}

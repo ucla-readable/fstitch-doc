@@ -1,4 +1,4 @@
-input elements;
+input patches;
 verbatimtex %&latex
 \documentclass[12pt]{article}
 \usepackage{elemfig,amsmath}
@@ -194,45 +194,38 @@ endfig;
 
 beginfig(4);
   boxjoin(a.width = b.width; a.height = b.height);
-  elementit.a(btex Empty etex scaled 0.8, 0, 0, pull);
-  elementit.b(btex p etex scaled 0.8, 0, 0, pull);
-  elementit.c(btex q etex scaled 0.8, 0, 0, pull);
-  elementit.d(btex r etex scaled 0.8, 0, 0, pull);
+  patchit.a(btex $p$\strut etex, 0);
+  patchit.b(btex $q$\strut etex, 0);
+  patchit.c(btex $r$\strut etex, 0);
+  patchit.d(btex $s$\strut etex, 0);
+  a.width=a.height;
 
-  elementit.e(btex Empty etex scaled 0.8, 0, 0, pull);
-  elementit.f(btex p etex scaled 0.8, 0, 0, pull);
-  elementit.g(btex q etex scaled 0.8, 0, 0, pull);
-  elementit.h(btex r etex scaled 0.8, 0, 0, pull);
-  a.width = 1.2a.height;
+  d.w-c.e=c.w-b.e=(10,0);
+  a.s-c.n=(0,8);
 
-  a.s - b.n = (1.2*a.width, 0.6*a.height);
-  a.s - c.n = (0, 0.6*a.height);
-  a.s - d.n = (-1.2*a.width, 0.6*a.height);
-
-  e.s - a.s = (150, 0);
-  e.s - f.n = (1.2*a.width, 0.6*a.height);
-  e.s - g.n = (0, 0.6*a.height);
-  e.s - h.n = (-1.2*a.width, 0.6*a.height);
-
-  forsuffixes $ = a, b, c, d, e, f, g, h:
-    pproc_.$ := "thecirc_";
-  endfor;
-
-  drawelement(a,b,c,d,e,f,g,h);
-
-  vardef ffff(suffix a,b) =
-    drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
-  enddef;
-
-  ffff(e,f);
-  ffff(e,g);
-  ffff(e,h);
-
-  ffff(a,d);
-  ffff(d,c);
-  ffff(c,b);
-
+  drawelement(a,b,c,d);
+  drawconnpatch(a,b)(..);
+  drawconnpatch(a,c)(..);
+  drawconnpatch(a,d)(..);
 endfig;
+
+beginfig(6);
+  boxjoin(a.width = b.width; a.height = b.height);
+  patchit.a(btex $p$\strut etex, 0);
+  patchit.b(btex $q$\strut etex, 0);
+  patchit.c(btex $r$\strut etex, 0);
+  patchit.d(btex $s$\strut etex, 0);
+  a.width=a.height;
+
+  d.w-c.e=c.w-b.e=(10,0);
+  a.s-c.n=(0,8);
+
+  drawelement(a,b,c,d);
+  drawconnpatch(a,b)(..);
+  drawconnpatch(b,c)(..);
+  drawconnpatch(c,d)(..);
+endfig;
+
 
 beginfig(5);
   boxjoin(a.width = b.width; a.height = b.height);
