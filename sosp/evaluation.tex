@@ -11,11 +11,47 @@ using them.
 
 \subsection {Optimization Benefits}
 
-See Figures~\ref{fig:opts}
+See Figures~\ref{f:optdata}
 and~\ref{fig:mergereq-cdf}.
 \todo{HP vs None untar results are not often near their average. Run
   larger number of tests.}
 
+\begin{figure}
+\small
+\begin{tabular}{@{}lrrr@{}}
+%& \multicolumn{3}{c}{\textbf{Untar}} &
+%\multicolumn{3}{c@{}}{\textbf{Delete}} \\
+\textbf{Optimization}
+        & \textbf{\# patches} & \textbf{Rollback data} & \textbf{System time} \\
+\hline
+\multicolumn{4}{@{}c@{}}{\textbf{Untar test}\raise2pt\hbox{\strut}} \\
+None
+        & 537,989		& 458.64~MB             & 4.42~sec \\
+Hard patches
+        & 537,131               & 205.68~MB             & 4.53~sec \\
+Overlap merging
+        & 253,839               & 255.45~MB             & 3.58~sec \\
+Both optimizations
+        & 276,829               & 1.24~MB               & 3.58~sec \\
+\hline
+\multicolumn{4}{@{}c@{}}{\textbf{Rm test}\raise2pt\hbox{\strut}} \\
+None
+        & 193,062               & 3.17~MB               & 1.14~sec \\
+Hard patches
+        & 172,351               & 3.15~MB               & 1.08~sec \\
+Overlap merging
+        & 87,692                & 1.83~MB               & 0.85~sec \\
+Both optimizations
+        & 54,076                & 0.64~MB               & 0.75~sec \\
+\end{tabular}
+\caption{Effectiveness of \Kudos\ optimizations.  The combination of hard
+patches and overlap merging removes almost half the patches and 99.73\% of
+the rollback data required to untar Linux.}
+\label{f:optdata}
+\end{figure}
+
+
+\begin{comment}
 \begin{figure}[htb]
 \centering
 \includegraphics[width=\columnwidth]{opts-patches}
@@ -28,9 +64,10 @@ Overlap Merge & 3.58 & 0.85 \\ \hline\hline
 HP $+$ OM & 3.58 & 0.75 \\ \hline
 \end{tabular}
 \caption{Effects of \nrb\ \chdescs\ with \nrb\ merging and overlap
-  merging for the untar and rm tests.}
+merging for the untar and rm tests.}
 \label{fig:opts}
 \end{figure}
+\end{comment}
 
 \begin{comment}
 \begin{figure}[htb]
