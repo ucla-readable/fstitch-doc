@@ -22,3 +22,22 @@ allocated is built into UHFS. A file system \module\ need only implement four
 \texttt{append\_block()}, and \texttt{write\_block()}. Additionally, the
 granularity of calls at the \LFS\ layer makes it an appropriate layer for
 inserting test harnesses and developing file system unit tests.
+
+
+Perhaps the most unique property of our journal \module, however, is that it can
+automatically selectively journal only \chdescs\ that modify file system
+metadata -- thus achieving metadata-only journaling \footnote{There are at least
+two major variants of metadata-only journaling, depending on when the
+non-journaled data is written relative to the commit record. Our journal module
+writes it after the commit record; writing it before the commit record requires
+very careful checks to avoid premature reuse of blocks~\cite{tweedie00ext3}.}
+(as opposed to the full data journaling implied above), without any knowledge of
+the file system.
+%
+The journal \module\ can automatically identify metadata \chdescs\ because of
+the \LFS\ interface described in Section~\ref{sec:modules:interfaces}, and the
+UHFS module~(\S\ref{sec:modules:uhfs}) which is responsible for writing to all
+non-metadata blocks. Other block device layering systems, like GEOM~\cite{geom}
+or JBD in Linux, would or do need special hooks into file system code to
+determine what disk changes represent metadata in order to do metadata-only
+journaling. \Chdescs\ and the \LFS\ interface allow us to do this automatically.

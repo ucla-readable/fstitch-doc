@@ -10,10 +10,10 @@ correspond to different \chdesc\ arrangements.
 to soft updates orderings by default~\cite{ganger00soft}.
 %
 Adding an independent journal \module\ rearranges the \chdescs\ to provide
-journaling semantics;
+journaling semantics.
 %
-for maximum speed and minimum durability, a \module\ that disconnects
-\chdesc\ dependencies can be added.
+%% for maximum speed and minimum durability, a \module\ that disconnects
+%% \chdesc\ dependencies can be added.
 %
 %% Many other semantics could be supported by the addition of similar modules. In
 %% this section, we will discuss how \chdescs\ are used to implement different
@@ -22,3 +22,21 @@ for maximum speed and minimum durability, a \module\ that disconnects
 \input{softupdate}
 
 \input{journal}
+
+\paragraph{Asynchronous writes}
+\label{sec:modules:unlink}
+
+Finally, we also wrote a trivial module that removes all dependencies from
+incoming patches, allowing the buffer cache to write blocks in any order.
+%
+This implements similar semantics to existing file systems like ext2 in
+asynchronous write mode.
+
+%% In the event that no consistency semantics are desired, for instance to compare
+%% a prototype implementation of a system for working with explicit dependency
+%% information to an existing asynchronous file system like ext2, \Kudos\ provides
+%% a \module\ which unlinks the dependencies from all \chdescs\ passing through it.
+%% By using this \module, the \chdesc\ graph will not enforce any ordering at all,
+%% and the buffer cache will be free to write blocks in any order. \Chdescs\ are
+%% not really necessary to implement this ``consistency'' protocol, but they
+%% nevertheless support it as a degenerate case.
