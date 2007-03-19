@@ -51,11 +51,12 @@ Once the commit record is created, the empty patch is updated to depend on
 Once the commit record is written, the empty patch is automatically
  ``written'' as well, which allows the main file system changes to follow.
 %
-To model empty \patches\ explicitly, we might introduce a fake block per
- empty patch and update the in-flight safety property for true blocks $b$ as
- follows:
+Some aspects of our model would have to change to handle empty
+ patches; for example, the in-flight safety property would change to:
 %
 \[ \PDepset{\PInf[b]} \subseteq \PInf[b] \cup \PDisk \cup \PEmpty. \]
+%
+We call a patch \emph{true} if it is not empty.
 
 
 Empty patches both aid and hurt performance.

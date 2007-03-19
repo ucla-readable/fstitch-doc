@@ -1,13 +1,13 @@
 \section{\Opgroups}
 \label{sec:opgroup}
 
-\newcommand{\opgroupCreate}{\texttt{pg\_create()}}
-\newcommand{\opgroupAddDepend}{\texttt{pg\_depend()}}
-\newcommand{\opgroupEngage}{\texttt{pg\_engage()}}
-\newcommand{\opgroupDisengage}{\texttt{pg\_disengage()}}
-\newcommand{\opgroupRelease}{\texttt{pg\_release()}}
-\newcommand{\opgroupSync}{\texttt{pg\_sync()}}
-\newcommand{\opgroupAbandon}{\texttt{pg\_close()}}
+\newcommand{\pgCreate}{\texttt{pg\_create()}}
+\newcommand{\pgDepend}{\texttt{pg\_depend()}}
+\newcommand{\pgEngage}{\texttt{pg\_engage()}}
+\newcommand{\pgDisengage}{\texttt{pg\_disengage()}}
+\newcommand{\pgRelease}{\texttt{pg\_release()}}
+\newcommand{\pgSync}{\texttt{pg\_sync()}}
+\newcommand{\pgClose}{\texttt{pg\_close()}}
 
 \Kudos\ \modules\ use \chdescs\ to express internal file system
 consistency protocols, such as soft updates and journaling
@@ -23,6 +23,21 @@ in gzip, the Subversion client, and the UW IMAP server.
 
 \subsection{Interface}
 \label{sec:opgroup:interface}
+
+The problem we are trying to solve is how to let user applications
+(simply) ensure safe disk write ordering without sacrificing
+performance.
+%
+This is interesting an interesting problem because users may strongly
+desire to not lose file system data, but current methods are either
+limited to much stronger requests (write this data now!)  or depend on
+file system implementation properties used through indirect
+interfaces, which are not widely supported.
+%
+We describe the \opgroup\ abstraction and then show how \opgroups\
+allow gzip, Subversion, and UW IMAP to easily specify their
+application-level consistency protocols to the file system for
+it to enforce.
 
 The \opgroup\ interface allows applications to specify orderings among
 file system operations.
@@ -41,7 +56,7 @@ functions.
 \begin{alltt}
 typedef int pg_t;
 pg_t \textbf{pg_create}(void);
-int  \textbf{pg_depend}(pg_t \after, pg_t \before)
+int  \textbf{pg_depend}(pg_t \after, pg_t \before);
 int  \textbf{pg_engage}(pg_t pg);
 int  \textbf{pg_disengage}(pg_t pg);
 int  \textbf{pg_sync}(pg_t pg);
@@ -54,8 +69,8 @@ int  \textbf{pg_close}(pg_t pg);
 \end{figure}
 
 The \chdescs\ created during a file system operation are associated
-with each of the process's \emph{engaged} \opgroups\ (\opgroupEngage\
-and \opgroupDisengage\ add and remove \anopgroup\ from the process's
+with each of the process's \emph{engaged} \opgroups\ (\pgEngage\
+and \pgDisengage\ add and remove \anopgroup\ from the process's
 engaged set).
 %
 The \opgroup\ API uses an engaged set, instead of an additional system
@@ -63,10 +78,10 @@ call parameter with each file system system call, to match typical
 application granularity where each operation involves multiple file
 system operations and to simplify modular composition.
 %
-Making \opgroup\ $Q$ depend on \opgroup\ $P$ (\opgroupAddDepend)
+Making \opgroup\ $Q$ depend on \opgroup\ $P$ (\pgDepend)
 ensures \(P \subseteq \PDepset{Q}\).
 %
-\opgroupSync\ forces an immediate write of \anopgroup\ to disk.
+\pgSync\ forces an immediate write of \anopgroup\ to disk.
 
 The \opgroup\ interface prevents the creation of non-evictable
 \chdescs\ and \chdesc\ cycles by limiting the order of \opgroup\
@@ -346,7 +361,7 @@ destination file and then removing from the source file) can not lose
 the copied message should the server crash part way through the disk
 updates.
 %
-The updated CHECK command uses \opgroupSync to sync all preceding disk
+The updated CHECK command uses \pgSync\ to sync all preceding disk
 updates. This enhancement to CHECK removes the requirement that COPY
 sync its destination mailbox; the client's CHECK request will ensure
 changes are committed to disk; the \opgroup\ dependencies will ensure
