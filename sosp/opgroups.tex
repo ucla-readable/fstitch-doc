@@ -9,39 +9,45 @@
 \newcommand{\pgSync}{\texttt{pg\_sync()}}
 \newcommand{\pgClose}{\texttt{pg\_close()}}
 
-\Opgroups\ enable applications to express dependencies among file
-system operations, allowing the operating system to order disk writes
-so that a system crash will leave the application's on-disk data in a
-sane state.
+Applications often manipulate valuable data, e.g. a mail server's mail
+or a version control system's local checkout.
 %
-We describe the \opgroup\ abstraction and show how it allows gzip,
-Subversion, and UW IMAP to easily specify their application-level
-consistency protocols.
+To ensure their on-disk data remains in a sane state even after a
+system crash, such applications require their changes be committed in
+an application-defined order.
+%
+Existing systems provide two interfaces to ensure such orders.
+%
+Applications may dictate \emph{how} the file system must implement the
+ordering and/or they may require particular file system implementation
+semantics.
+%
+However, these techniques dramatically limit performance or limit
+safety to only a particular file system, respectively.
+
+We extend the \chdesc\ abstraction to user-space, as a \opgroup,
+%
+to enable applications to \emph{express} dependencies among file system
+operations.
+%
+Compared to a dictated order, dependency specification allows the file
+system to optimize commit orderings;
+%
+and compared to required file system semantics, \opgroup\ dependencies
+are independent of the underlying file system.
+%
+For example, \opgroups\ even allow an application to specify
+dependencies among raw block device writes.
+
+In this section we describe the \opgroup\ abstraction
+%
+and show how it allows gzip, Subversion, and UW IMAP to easily specify
+their application-level consistency protocols.
 
 \subsection{Interface}
 \label{sec:opgroup:interface}
 
-Existing systems do not provide the ability for applications to
-express the dependencies they require among file system operations
-to ensure their changes are written in an acceptable ordering,
-%
-unless the application tells the file system \emph{how} to implement
-the ordering, dramatically limiting performance,
-%
-or the application requires particular file system implementation
-semantics, restricting safety to only particular file systems.
-
-We extend the \chdesc\ abstraction to user-space.
-%
-Through it, applications specify their file operation ordering
-requirements,
-%
-neither dictating how the file system must implement a safe ordering
-%
-nor depending on semantics particular to the underlying file system
-implementation.
-%
-\Anopgroup\ corresponds to the changes (\chdescs) made by a set of
+A \emph{\opgroup} corresponds to the changes (\chdescs) made by a set of
 file system operations;
 %
 applications can specify ordering requirements among \opgroups.
@@ -55,7 +61,7 @@ Figure~\ref{fig:opgroup-interface} shows the \opgroup\ interface.
 \begin{alltt}
 typedef int pg_t;
 pg_t \textbf{pg_create}(void);
-int  \textbf{pg_depend}(pg_t \after, pg_t \before);
+int  \textbf{pg_depend}(pg_t pg1, pg_t pg2);
 int  \textbf{pg_engage}(pg_t pg);
 int  \textbf{pg_disengage}(pg_t pg);
 int  \textbf{pg_sync}(pg_t pg);
@@ -82,13 +88,6 @@ so well behaved.
 %
 The \opgroup\ API restricts dependency manipulation so that cycles are
 inconstructable, while preserving the interface's utility.
-
-Note that \opgroups\ allow applications to express ordering
-requirements independently of the underlying file system's consistency
-protocol.
-%
-For example, \opgroups\ even allow dependencies among raw block device
-writes.
 
 A process's \opgroups\ and its engaged set are copied across \texttt{fork()},
 facilitating \opgroup\ interactions among processes.
@@ -127,6 +126,9 @@ the user can instead run:
 
 \subsection{Implementation}
 \label{sec:opgroup:implementation}
+
+An \opgroup\ brackets its \chdescs\ so that the entire group can
+depend on another \opgroup.
 
 \Opgroups\ are implemented in an \LFS\ module that imposes \opgroup\
 dependencies using additional \chdesc\ dependencies among \LFS\
@@ -243,8 +245,8 @@ The working copy library could ensure a safe commit ordering by
 syncing files as necessary, as the Subversion repository library does.
 %
 However, the Subversion developers deemed this approach too slow to be
-worthwhile for client use; a common trade-off decision among non-server
-applications.
+worthwhile for client use~\cite{svntradeoff}; a common trade-off
+decision among non-server applications.
 
 Instead, the working copy library takes advantage of two file system
 ordering properties ensured by ordered data and full data journaling
