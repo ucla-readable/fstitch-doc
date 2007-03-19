@@ -329,9 +329,9 @@ will ever exist.
 As with hard patch creation, the \Kudos\ implementation checks a simpler
 property that requires less graph traversal:
 %
-it checks that all paths starting at $p_1$ have length less than or equal
-to two, and that none of those paths are block-level cycles terminating at
-$p_2$.
+it checks that all paths starting at $p_1$ either terminate or reach patch
+$p_2$ in two or fewer steps, and that none of those paths are block-level
+cycles.
 %
 If this property holds, then $p_1$ and $p_2$ can have the same lifetime,
 and $p_1$ can be merged into $p_2$ where they overlap.
@@ -342,6 +342,10 @@ that the new patch is bigger than it.
 %
 It also simplifies the implementation somewhat to limit overlap merging to
 the case when neither $p_1$ nor $p_2$ overlaps with any other patch.
+
+
+Overlap merging 
+
 
 \begin{itemize}
 \item
