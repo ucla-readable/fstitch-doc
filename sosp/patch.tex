@@ -205,9 +205,16 @@ The buffer cache must thus behave according to the following atomic action:
 
 \noindent
 %
-The last step forces any rolled-back \patches\ to wait in memory at least
-until the current version of the block is written.  (Our implementation
-achieves this property without using dependencies.)
+Since the disk controller can write in-flight blocks in any order, at most
+one version of a block can be in flight at any time.
+%
+Thus, the last step above forces any rolled-back \patches\ to wait in
+memory at least until the in-flight version of the block is written.
+%
+Likewise, any patch created on a block with in-flight patches must depend
+on those patches.
+%
+(Our implementation achieves this property without using dependencies.)
 %
 The buffer cache is also expected to write all blocks eventually, a
  liveness property.

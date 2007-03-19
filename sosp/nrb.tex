@@ -16,8 +16,8 @@ Only patches that are part of a block-level dependency cycle might need to
 be rolled back.
 %
 Thus, patch $p$ may be hard iff it cannot be part of a block-level
-dependency cycle: that is, there will \emph{never} exist patches $q$ and
-$r$ with $\PBlock{p} = \PBlock{r} \neq \PBlock{q}$ and $p \PDepend q
+dependency cycle: that is, iff there will \emph{never} exist patches $q$
+and $r$ with $\PBlock{p} = \PBlock{r} \neq \PBlock{q}$ and $p \PDepend q
 \PDepend r$.
 
 
@@ -38,21 +38,54 @@ Since every patch follows this rule, all possible block-level cycles $p
 \PDepend q \PDepend r$ are visible at creation time.
 
 
-However, traversing the dependency graph to exactly determine the
-possibility of a block-level cycle could explode in complexity.
+Traversing the dependency graph to check for a block-level cycle could
+become quite expensive.
 %
-Thus, \Kudos\ implements a conservative approximation: patch $p$ may be
-hard if no other block depends on the current state of $\PBlock{p}$.
+\Kudos\ thus implements a conservative approximation: patch $p$ is created
+as hard if no other block depends on the current state of $\PBlock{p}$.
 %
-That is, for all dependencies $q \PDepend r$, either $\PState{r} \neq
-\PMemst$, $\PBlock{r} \neq \PBlock{p}$, or $\PBlock{q} = \PBlock{p}$.
+That is, for all dependencies $q \PDepend r$ with $r \in
+\PMem[\PBlock{p}]$, either $\PBlock{q} = \PBlock{p}$ or $q$ is an empty
+patch.
+%
+If no other block depends on $p$'s block, then $p$ can never be part of a
+block-level cycle no matter what $p$ depends on.
+%
+This is relatively simple to check: \Kudos\ can simply traverse reverse
+dependencies from a block's patches.
+%
+It also works well in practice; for example, in most file systems, nothing
+depends upon a write to a file data block.
 
 
-\begin{compactitemize}
-\item 
-\end{compactitemize}
+Hard patches change the buffer cache's ``write block'' behavior since they
+can never be rolled back.
+%
+The cache \emph{must} write any hard patches that exist on a block.
+%
+If we write $\PHard[b]$ for the set of hard patches on block $b$, then to
+write block $b$, the buffer cache must choose some $P \subseteq \PMem[b]$
+with
+%
+\[ \PDepset{P} \subseteq P \cup \PDisk \text{ and } \PHard[b] \cap \PMem
+\subseteq P. \]
+%
+If no such $P$ exists, then the cache must write a different block.
+%
+Once a block has a hard patch, then, every succeeding soft patch on that
+version of the block effectively depends on the hard patch.
+%
+\Kudos\ represents this as an explicit overlap dependency, since the hard
+patch is considered to cover the entire block.
 
 
+In our running example, 14 of the 23 patches may be created as hard
+(Figure~\ref{f:opt}b),
+%
+reducing the rollback data required by slightly more than half.
+
+
+\begin{comment}
 %
 To avoid this overhead, \Kudos\ identifies \chdescs\ that will never
 need to be rolled back and omits their previous data copies. We call
@@ -116,3 +149,4 @@ gain any \befores\ that induce block-level cycles.''}.}
 additions to \chdesc\ creation, \noop\ \chdescs\ with no \afters, or
 when the invariant is statically proven to hold for the affected
 \chdescs.
+\end{comment}
