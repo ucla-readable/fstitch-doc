@@ -1,9 +1,10 @@
 \subsection{Journaling}
 \label{sec:using:journal}
 
-Although \chdescs\ might initially seem to be specifically designed to implement
-soft updates-like consistency semantics, they are in fact much more flexible and
-can be used to implement journaling as well. In a journaling file system,
+%Although \chdescs\ might initially seem to be specifically designed to implement
+%soft updates-like consistency semantics, they are in fact much more flexible and
+%can be used to implement journaling as well.
+In a journaling file system,
 changes to disk structures are written to a journal before being written to the
 main file system area on the disk, and a single disk block (the \emph{commit
 record}) is written after the journal is written. Once the commit record has
@@ -43,7 +44,7 @@ be the case for the journal \module\ by hand.
 \begin{figure}
   \centering
   \includegraphics[width=\hsize]{fig/figures_2}
-  \caption{\label{fig:journal} Journal \chdesc\ graph for the
+  \caption{\label{fig:journal} Journal \chdesc\ subgraph for the
     change in Figure~\ref{fig:softupdate}. The unlabeled circles are
     \noop\ \chdescs, used to simplify the implementation of the journal.}
 \end{figure}
@@ -69,11 +70,11 @@ matter in any particular configuration at all.
 Perhaps the most unique property of our journal \module, however, is that it can
 automatically selectively journal only \chdescs\ that modify file system
 metadata -- thus achieving metadata-only journaling (as opposed to the full data
-journaling implied above), yet still without any knowledge of the file system.
+journaling implied above), without any knowledge of the file system.
 %
 The journal \module\ can automatically identify metadata \chdescs\ because of
-the \LFS\ interface described in \S\ref{sec:modules:interfaces}, and the UHFS
-module~(\S\ref{sec:modules:uhfs}) which is responsible for writing to all
+the \LFS\ interface described in section~\ref{sec:modules:interfaces}, and the
+UHFS module~(\S\ref{sec:modules:uhfs}) which is responsible for writing to all
 non-metadata blocks. Other block device layering systems, like GEOM~\cite{geom}
 or JBD in Linux, would or do need special hooks into file system code to
 determine what disk changes represent metadata in order to do metadata-only

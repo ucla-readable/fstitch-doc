@@ -90,12 +90,13 @@ We present a formal theory of \chdescs, which we use to state their
 %
 Finally, we demonstrate a prototype file system implementation using
  \chdescs\ called \Kudos.
-%
+
+
 \Chdescs\ allow us to decompose the entire file system layer, from system
  calls to block devices, into pluggable \modules, hopefully making the
  system as a whole more configurable, extensible, and easier to understand.
 %
-Any file system can generate \chdescs, and those \chdescs\ are obeyed
+Any file system \module\ can generate \chdescs, and those \chdescs\ are obeyed
  by all other file system layers.
 %
 \Chdescs\ may be examined and modified by other modules as well, and

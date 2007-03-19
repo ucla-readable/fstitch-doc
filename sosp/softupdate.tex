@@ -33,7 +33,7 @@ disk image necessary to implement that operation. As a result, there exist many
 specialized data structures to represent the different possible file system
 operations. These structures, their relationships to one another, and their uses
 for tracking and enforcing dependencies are all complex.
-%
+
 In \Kudos, \chdescs\ are used to store all changes to the disk. Rather than a
 single structure that represents the whole file system operation, several
 \chdescs\ are created, one for each range of bytes on the disk which must be
