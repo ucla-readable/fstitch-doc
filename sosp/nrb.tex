@@ -63,9 +63,10 @@ can never be rolled back.
 %
 The cache \emph{must} write any hard patches that exist on a block.
 %
-If we write $\PHard[b]$ for the set of hard patches on block $b$, then to
-write block $b$, the buffer cache must choose some $P \subseteq \PMem[b]$
-with
+Let $\PHard[b]$ be the set of hard patches on block $b$.
+%
+Then to write block $b$, the buffer cache must choose some $P \subseteq
+\PMem[b]$ with
 %
 \[ \PDepset{P} \subseteq P \cup \PDisk \text{ and } \PHard[b] \cap \PMem
 \subseteq P. \]

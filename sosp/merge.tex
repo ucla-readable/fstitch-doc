@@ -1,22 +1,27 @@
 % -*- mode: latex; tex-main-file: "paper.tex" -*-
 
-\subsection{\ChDesc\ Merging}
+\subsection{Hard--Hard \ChDesc\ Merging}
 \label{sec:patch:merge}
 
 File operations such as block allocations, inode updates, and directory updates
 create a large number of small, distinct \chdescs. Keeping track of many small
-\chdescs\ and their dependencies requires significant amounts of memory.
+\chdescs\ and their dependencies requires significant amounts of memory and
+CPU time.
 %
-\Kudos\ uses \emph{merges} to drastically reduces the number of \chdescs, and
-thus \chdesc\ memory usage, by conservatively identifying when a new and an
-existing \chdesc\ pair can be written to disk together. Rather than creating
-a new \chdesc, Kudos updates the disk change and dependencies to merge the
-changes into the existing \chdesc.
+\Kudos\ therefore \emph{merges} patches when possible, drastically reducing
+the \chdesc\ counts and memory usage, by conservatively identifying when a
+new \patch\ could always be written at the same time as an existing \patch.
 %
-In this section we present three \chdesc\ merge algorithms. All three
-use Invariant~\ref{cdinvar:add-before} to reason about future graph
-changes and use fast, conservative checks during \chdesc\ creation; they
-differ in their applicable conditions.
+Rather than creating a new \chdesc\ in this case, Kudos updates the data
+and dependencies to merge the new \patch\ into the existing one.
+
+
+\Kudos\ includes three distinct \chdesc\ merge algorithms.
+%
+All three use Invariant~\ref{cdinvar:add-before} to reason about future
+graph changes and use fast, conservative checks during \chdesc\ creation;
+they differ in their applicable conditions.
+
 
 \subsubsection{\Nrb\ \ChDesc\ Merging}
 \label{sec:chdescs:merge:nrb}
