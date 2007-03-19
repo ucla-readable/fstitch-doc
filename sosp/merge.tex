@@ -59,17 +59,73 @@ example, as shown in Figure~\ref{f:opt}c.
 A similar optimization occurs when a new hard patch is created on a block
 that has existing \emph{soft} patches in memory.
 %
-This can happen as a result of ...
+This can happen once hard patches are written to disk.
+%
+For example, Figure~\ref{f:soft2hard}a shows a block with both hard and
+soft patches: $p_1$ must be soft since it initiates a block-level cycle
+$p_1 \PDepend q_h \PDepend p_h$, and similarly for $p_2$ and $p_3$.
+%
+To write these blocks, the buffer cache must roll back $p_1$, $p_2$, and
+$p_3$ and write $p_h$ on its own.
+%
+Once $p_h$ reaches disk, the patches in memory reach the state in
+Figure~\ref{f:soft2hard}b.
+%
+Now that $p_h$ has moved to \PDisk, it is irrelevant for cycle detection,
+and in fact there are no block-level dependency cycles in the diagram: it
+would be safe to transform $p_1$, $p_2$, and $p_3$ into hard patches.
+%
+However, \Kudos\ delays this and performs the conversion only later when
+adding a new hard patch to the $p$ block. 
 
-Similarly, when a new hard patch is created on a block, we know that any
-existing \emph{soft} patches on that block can safely be converted to hard
-patches.
+
+Consider a new hard patch $h$ that is added to a block that contains some
+soft patch $p$.
+%
+Since $h$ overlaps $p$, \Kudos\ adds a direct dependency $h \PDDepend p$.
+%
+Since $h$ could be hard, we know there are no block-level dependency cycles
+$h \PDepend q \PDepend p'$.
+%
+But as a result, we know that there are no block-level dependency cycles
+with the existing \emph{soft} patch as head, since such a cycle would imply
+an $h$-headed cycle $h \PDDepend p \PDepend q \PDepend p'$.
+%
+Thus, $p$ can be transformed into a hard patch and then merged into $h$.
+%
+Figure~\ref{f:soft2hard}c shows the result for our example.
 
 
-\begin{itemize}
-\item
-\end{itemize}
+Like hard patch merging, soft-to-hard conversion requires that the
+implementation filter dependencies to avoid introducing cycles.
+%
+Unlike hard patch merging, soft-to-hard conversion is complicated by the
+fact that other patches may already depend on the soft patches that are
+being merged.
+%
+Rather than shift these dependencies, \Kudos\ simply changes the existing
+soft patches into empty patches in place.
 
+
+\begin{figure}
+\centering
+\begin{small}
+\begin{tabular}{@{}p{.32\hsize}@{~~}p{.32\hsize}@{~~}p{.32\hsize}@{}}
+\includegraphics[width=\hsize]{fig/softhard_1} &
+\includegraphics[width=\hsize]{fig/softhard_2} &
+\includegraphics[width=\hsize]{fig/softhard_3} \\
+\centering \textbf{a)} Initial state &
+\centering \textbf{b)} After $p_h$ reaches~disk &
+\centering \textbf{c)} Soft-to-hard conversion
+\end{tabular}
+\end{small}
+\caption{Soft-to-hard conversion.}
+\label{f:soft2hard}
+\end{figure}
+
+
+
+\begin{comment}
 
 \Kudos\ includes three distinct \chdesc\ merge algorithms.
 %
@@ -244,7 +300,10 @@ it is rare?}
 dependencies? For the paper, free \chdescs\ instead of convert them
 into \noop{}s? (Must modify \nrb-\nrb\ algo usage.)}
 
-\subsubsection{Overlap \ChDesc\ Merging}
+\end{comment}
+
+
+\subsection{Overlap Merging}
 \label{sec:chdescs:merge:overlap}
 \todo{Note as useful when new may need to be rolled back.}
 Bitmap blocks and inode size fields accumulate many nearby and
