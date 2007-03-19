@@ -17,30 +17,37 @@ description.
 
 \input{wbcache}
 
-\subsection{Loopback Block Device}
+\subsection{Loopback Module}
 \label{sec:modules:loop}
 
-The loopback block device is a BD module which uses a file in an \LFS\ module as
-its underlying data store. It is very similar to the device of the same name in
-Linux, however it has one critical difference. The \Kudos\ loopback device is
-aware of \chdescs, and therefore when a filesystem stored on a loopback device
-sets up \chdesc\ dependencies, they will be correctly forwarded to and honored
-by the rest of the system.
+The loopback module is a BD module that uses a file in an \LFS\ module as
+its underlying data store. It is very similar to the device of the same
+name in Linux, but with one critical difference: it is aware of \chdescs.
+%
+The loopback module preserves its file system's dependencies and forwards
+them to its underlying data store.
+%
+As a result, the data store will honor those dependencies and preserve the
+loopback file system's consistency, even if the data store would normally
+provide no guarantees for consistency of file system data (e.g., it used
+metadata-only journaling).
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[height=3in]{fig/figures_1}
+  \includegraphics[height=2.5in]{fig/figures_1}
   \caption{A running \Kudos\ configuration. {\it/} is a soft updated
     file system on an IDE drive; {\it/loop} is an externally journaled
     file system on loop devices.}
   \label{fig:kfs-graph}
 \end{figure}
 
-Figure~\ref{fig:kfs-graph} shows an example configuration taking advantage of
-this ability. A file system image is mounted with an external journal, both of
-which are loopback block devices stored on the root file system, (which uses
+Figure~\ref{fig:kfs-graph} shows an example configuration using the
+loopback module.
+%
+A file system image is mounted with an external journal, both of
+which are loopback block devices stored on the root file system (which uses
 soft updates). The journaled file system's ordering requirements are sent
-through the loopback device as \chdescs, allowing dependency information to be
+through the loopback module as \chdescs, allowing dependency information to be
 maintained across boundaries that might otherwise lose that information. In
 contrast, without \chdescs\ and the ability to forward \chdescs\ through
 loopback devices, BSD cannot express soft updates' consistency requirements
