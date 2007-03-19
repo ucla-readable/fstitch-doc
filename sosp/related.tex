@@ -30,13 +30,26 @@ journaling and soft updates in practice.
 
 Customizable application-level consistency protocols have previously been
 considered in the context of distributed, parallel file systems by
-CAPFS~\cite{vilayannur05providing}. In such a system, enforcing an unnecessary
-consistency protocol can be extremely expensive, and not providing the right
-consistency protocol can cause unpredictable failures. However, this is also
-true with a local file system -- and as a result, applications must use
-expensive interfaces like \texttt{fsync()} when they require specific
-consistency guarantees. \Kudos\ brings this sort of customizable consistency to
-all applications, not just those using specialized distributed file systems.
+CAPFS~\cite{vilayannur05providing} and Echo~\cite{mann94coherent}.
+%
+CAPFS allows application writers to design plug-ins for the parallel file
+store, which define what consistency policy actions to take before and after
+each client-side system call.
+%
+Echo maintains a partial order on the locally cached updates to the parallel
+file store, and guarantees that the server will store the updates accordingly.
+It also provides a mechanism for applications to extend the partial order.
+%
+Both systems are based on the principle that not providing the right
+consistency protocol can cause unpredictable failures, yet enforcing
+unnecessary consistency protocols can be extremely expensive.
+%
+However, this is also true with a local file system -- and as a result,
+applications must use expensive interfaces like \texttt{fsync()} when they
+require specific consistency guarantees.
+%
+\Kudos\ brings this sort of customizable consistency to all applications, not
+just those using specialized distributed file systems.
 
 % "allow the kernel to safely and efficiently handle any metadata layout without understanding the layout itself"
 % \cite{kaashoek97application}
