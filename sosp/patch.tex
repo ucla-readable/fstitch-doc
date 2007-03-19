@@ -313,7 +313,7 @@ Eight blocks are written during the operation.
 The \patches\ slow down the buffer cache system by making graph traversals
 more expensive.
 %
-The 4096 bytes of rollback data per \patch\ stored for ``zero data'' and
+The 4096 bytes of rollback data per \patch\ stored for ``clear data'' and
 ``write data'' \patches, which initialize and write data blocks, is
 particularly painful since in this example, data blocks \emph{never}
 need to be rolled back!
@@ -428,6 +428,8 @@ The next section tackles all of these challenges.
 \caption{\Patches\ required to append 4 blocks to an existing file, without
 and with optimization.  \Nrb\ \patches\ are shown with heavy borders.}
 \label{fig:opt}
+\label{f:opt} %% MIKE: DO NOT REMOVE THIS.  IF YOU WANT TO CALL THE
+              %% REFERENCE SOMETHING ELSE JUST HAVE MORE THAN ONE.
 \end{figure}
 
 \input{nrb}
