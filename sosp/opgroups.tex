@@ -139,10 +139,10 @@ Figure~\ref{fig:opgroup-chdescs} shows \anopgroup's \chdesc\ arrangement.
 The head \chdesc\ depends on the \opgroup's \chdescs\ and the tail
 \chdesc.
 %
-The \opgroup's \chdescs\ all depend on the ``tail'' \chdesc.
+The \opgroup's \chdescs\ all depend on the tail \chdesc.
 %
-Using this \chdesc\ arrangement, \anopgroup\ dependency \depends{Q}{P}
-is implemented as \depends{\mbox{tail}_Q}{\mbox{head}_P}
+Using this \chdesc\ arrangement, \anopgroup\ dependency \depends{P}{Q}
+is implemented as \depends{\mbox{tail}_P}{\mbox{head}_Q}
 
 \begin{figure}[htb]
 \centering{
@@ -157,7 +157,6 @@ is implemented as \depends{\mbox{tail}_Q}{\mbox{head}_P}
   and the \chdesc\ labeled 2 occurred during a second operation that
   depended on the first.}
 \end{figure}
-\todo{Remove HK and TK from the diagram}
 
 \Opgroups\ are created and managed almost exactly like file descriptors. Handles
 to them are copied across \texttt{fork()}, preserved across \texttt{exec()}, and
