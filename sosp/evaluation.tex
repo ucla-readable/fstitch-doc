@@ -3,7 +3,7 @@
 
 We evaluate our prototype implementation of \Kudos\ in two ways: first, we
 show that the overall performance is within reason, even though it is slower
-than Linux or BSD by a nontrivial amount. We justify this difference, and argue
+than Linux by a nontrivial amount. We justify this difference, and argue
 that it can be improved substantially. Second, we show specific block write
 orderings in a variety of situations, demonstrating the effect and utility of
 \opgroups\ and the potential for them to improve the efficiency of applications
@@ -32,7 +32,7 @@ untar and rm tests in Figure~\ref{f:optdata}, with all combinations of using
 themselves, the combination of the two is particularly effective at reducing the
 amount of rollback data.
 
-\begin{figure}[htb]
+\begin{figure}[t]
 \small
 \begin{tabular}{@{}lrrr@{}}
 %& \multicolumn{3}{c}{\textbf{Untar}} &
@@ -101,15 +101,15 @@ smaller account for about 51\% of all \rb\ \chdescs.}
 
 \subsection {Microbenchmarks}
 Our first microbenchmark measures the number of blocks written by Linux ext2
-and ext3 and \Kudos\ ext2 with soft updates, during the untar test. Linux ext2
+and ext3 and \Kudos\ ext2 with soft updates during the untar test. Linux ext2
 writes 523,248 blocks; Linux ext3 writes 523,192; \Kudos\ writes 540,472.
 
-We have also looked at the number of block writes that \Kudos\ makes relative
-to FreeBSD for soft updates operations. In one test, we create 100 small files
-in a directory and measure the number of blocks written to disk. \Kudos\ writes
-122 blocks, while FreeBSD writes 135 blocks.
+\Kudos's soft-updates ext2 writes a similar number of blocks as FreeBSD's
+soft-updates UFS. In one test, we create 100 small files in a directory and
+measure the number of blocks written to disk. \Kudos\ writes 122 blocks,
+while FreeBSD writes 135 blocks.
 
-Finally, in Figure~\ref{fig:mergereq-cdf} we plot a CDF of the sizes of disk
+Finally, Figure~\ref{fig:mergereq-cdf} plots a CDF of the sizes of disk
 write requests during the untar test. Here we can see one likely contributing
 factor to the speed difference between Linux and \Kudos: \Kudos makes over
 twice as many requests to the disk. We suspect that this is due to a suboptimal
