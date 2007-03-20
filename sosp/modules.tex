@@ -74,11 +74,11 @@ directories.
 
 \subsection{ext2 and UFS}
 
-\Kudos\ currently has \modules\ which implement two file system types: Linux
-ext2, and 4.2 BSD UFS (Unix File System, the modern incarnation of the Fast File
+\Kudos\ currently has \modules\ that implement two file system types, Linux
+ext2 and 4.2 BSD UFS (Unix File System, the modern incarnation of the Fast File
 System~\cite{mckusick84fast}).
 %
-Both of these \modules\ initially generate soft updates dependencies; other
+Both of these \modules\ initially generate soft updates-like dependencies; other
 dependency arrangements are achieved by transforming these.
 %
 % We briefly describe these \modules\ as examples of complete and relatively
@@ -87,23 +87,27 @@ dependency arrangements are achieved by transforming these.
 To the best of our knowledge, our implementation of ext2 is the first to provide
 soft updates consistency guarantees.
 %
-UFS is of particular interest because it is the only file system that has been
-extended with both soft updates and journaling.~\cite{seltzer00journaling}
+%% UFS is of particular interest because it is the only file system that has been
+%% extended with both soft updates and journaling.~\cite{seltzer00journaling}
 %
 % We chose UFS1 over UFS2, as UFS1 is well established and more widely
 % supported.
 
-Both \modules\ are implemented at the \LFS\ interface. This keeps properties
-specific to the file system (such as the on-disk format and rules governing
-block allocation) hidden within the \module. The \modules\ create \chdescs\ for
-all their changes to the disk, and connect them to form subgraphs that enforce
+Both \modules\ are implemented at the \LFS\ interface. 
+%
+%% This keeps properties
+%% specific to the file system (such as the on-disk format and rules governing
+%% block allocation) hidden within the \module. 
+%
+The \modules\ create \chdescs\ for
+all their changes to the disk and connect them to form subgraphs that enforce
 the soft updates rules~\cite{ganger00soft}. The UHFS \module\
-(\S\ref{sec:modules:interfaces}) will connect the resulting \chdesc\ subgraphs
+will connect the resulting \chdesc\ subgraphs
 together in soft updates order, completing the implementation of soft updates
 using \chdescs. Unlike FreeBSD's soft updates implementation, once the
 dependencies have been hooked up, the ext2 and UFS \modules\ no longer need to
-concern themselves with the \chdescs\ they have created. The block device
-subsystem will track and enforce the \chdesc\ orderings.
+concern themselves with their \chdescs, as the block device
+subsystem tracks and enforces the dependency orderings.
 
 The UFS \module\ provides a good demonstration of some of the flexibility of the
 \module\ interfaces in \Kudos. For instance, UFS uses 2KB \emph{fragments} to
