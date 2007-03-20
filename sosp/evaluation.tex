@@ -192,11 +192,13 @@ updates to blocks which have been freed, which we have a plan to optimize.)
 
 \subsection {Patchgroups}
 
-\subsubsection {Subversion Case Study}
+%\subsubsection {gzip}
 
-Complexity of implementation, reliance on specific FS semantics (i.e. ext3)
-even with all that jumping through hoops - broken on NTFS, for example.
-Straightforward to get correctness with \opgroups; counts only on a simple API.
+%\subsubsection {Subversion Case Study}
+%
+%Complexity of implementation, reliance on specific FS semantics (i.e. ext3)
+%even with all that jumping through hoops - broken on NTFS, for example.
+%Straightforward to get correctness with \opgroups; counts only on a simple API.
 
 \subsubsection {UW IMAP Case Study}
 \label{sec:evaluation:uwimap}
@@ -223,5 +225,3 @@ FreeBSD 5.4 & 2200 \\ \hline
 \caption{\label{fig:imap-compare} Number of block writes to move 100
   IMAP messages.}
 \end{figure}
-
-\subsubsection {gzip}
