@@ -237,11 +237,11 @@ value on recovery must equal either the old value or the new value.
 Most journal designs do not rely on this assumption, and can recover
  properly even if in-flight blocks are corrupted---for instance,
  because the memory holding the new value of the block lost its coherence
- before the disk stopped writing~\cite{tso}.
+ before the disk stopped writing~\cite{nightingale06rethink}.
 %
-However, some disks actually do provide an atomicity guarantee, for
+However, some disks may actually provide an atomicity guarantee, for
  instance by using non-volatile memory to store blocks before they make it
- onto disk~\cite{???}.
+ onto disk.
 %
 The \Kudos\ core makes no assumptions about block atomicity, instead relying
  on software above it to implement a consistency protocol that makes sense

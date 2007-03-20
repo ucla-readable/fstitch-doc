@@ -116,9 +116,9 @@ while FreeBSD writes 135 blocks.
 
 Finally, Figure~\ref{fig:mergereq-cdf} plots a CDF of the sizes of disk
 write requests during the untar test. Here we can see one likely contributing
-factor to the speed difference between Linux and \Kudos: \Kudos makes over
+factor to the speed difference between Linux and \Kudos: \Kudos\ makes over
 twice as many requests to the disk. We suspect that this is due to a suboptimal
-cache eviction algorithm, which we would like to optimize.
+cache eviction algorithm, as described above.
 
 \begin{figure}[t]
 \vspace{-0.5\baselineskip}
@@ -137,13 +137,14 @@ cache eviction algorithm, which we would like to optimize.
 \subsubsection{Untar and Delete}
 \label{sec:eval:untardel}
 
-The times are listed in Figure~\ref{fig:macro} and include time to
-fully sync the changes to disk.
+Times to untar and remove our Linux tarball are listed in
+Figure~\ref{fig:macro} for several systems, including time to fully sync
+the changes to disk.
 
 % make this into a table
 \begin{figure}[t]
 \centering{
-\begin{tabular}{@{}l|r|r@{}}
+\begin{tabular}{@{}lrr@{}}
 System & Untar (sec) & Delete (sec) \\ \hline
 \Kudos\ (SU) & 18.39 & 9.47 \\
 \Kudos\ (async) & 3.88 & 6.94 \\ \hline
@@ -159,21 +160,22 @@ Linux (ext3) & 13.92 & 4.47 \\
 \Kudos\ is about 21\% faster than FreeBSD using soft updates for
 writes, and about 41\% faster for deletions.\footnote{Interestingly, FreeBSD 5.4
 performs better than version 6.0 at these tests, particularly the delete test,
-but \Kudos\ is still faster than the untar test.}
+but \Kudos\ is still faster on the untar test.}
 %
 When compared to Linux ext3, \Kudos\ is about 32\% slower for writes, but many
 times slower for deletions.
+(A major cause of the slow delete performance is writing
+updates to blocks which have been freed, which we have a plan to optimize.)
 %
 This demonstrates that the overhead of using \chdescs\ in \Kudos\ is not
 entirely unreasonable, but has room for significant improvement.
 %
-While \Kudos\ does still have some CPU usage and I/O delay problems, its
-performance has been steadily improving over time and we expect that it will
-continue to improve as we optimize it further.
+%% While \Kudos\ does still have some CPU usage and I/O delay problems, its
+%% performance has been steadily improving over time and we expect that it will
+%% continue to improve as we optimize it further.
 %
-There are more optimization opportunities that can likely bring us much closer
-in performance to Linux. (A major cause of the slow delete performance is writing
-updates to blocks which have been freed, which we have a plan to optimize.)
+%% There are more optimization opportunities that can likely bring us much closer
+%% in performance to Linux. 
 
 \subsubsection {Postmark}
 \label{sec:eval:postmark}
@@ -193,7 +195,7 @@ Figure~\ref{fig:postmark} shows the results.
 
 \begin{figure}[t]
 \centering
-\begin{tabular}{@{}l|r@{}}
+\begin{tabular}{@{}lr@{}}
 System & Time (sec) \\ \hline
 \Kudos\ & 46.6 \\ % r3266: 46.173 46.555 46.495 46.479 47.371
 Linux (ext2) & 16.9 \\ % 10.602 16.983 17.033 16.905 16.798
@@ -227,13 +229,13 @@ mailbox, marks each source message for deletion, expunges the marked
 messages, requests a check, and logs out. We compare using soft updates;
 Figure~\ref{fig:imap-compare} shows the results.
 
-\begin{figure}[htb]
+\begin{figure}[t]
 \centering{
-\begin{tabular}{|l|r|} \hline
-System & \# writes (blocks) \\ \hline\hline
-\Kudos\ (with \opgroups) & 919 \\ \hline
-\Kudos\ (w/o \opgroups) & 1537 \\ \hline
-FreeBSD 5.4 & 2200 \\ \hline
+\begin{tabular}{@{}lr@{}}
+System & \# writes (blocks) \\ \hline
+\Kudos\ (with \opgroups) & 919 \\
+\Kudos\ (w/o \opgroups) & 1537 \\
+FreeBSD 5.4 & 2200 \\
 \end{tabular}
 }
 \caption{\label{fig:imap-compare} Number of block writes to move 100
