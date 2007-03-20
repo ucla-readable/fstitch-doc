@@ -100,26 +100,20 @@ smaller account for about 51\% of all \rb\ \chdescs.}
 \end{comment}
 
 \subsection {Microbenchmarks}
-We have also looked at the number of block writes that \Kudos\ makes
-relative to other systems for several operations. In one test, we
-create 100 small files in a directory and measure the number of blocks
-written to disk. We do this with and without soft updates. \Kudos\
-writes 122 blocks, while FreeBSD writes 135 blocks.
+Our first microbenchmark measures the number of blocks written by Linux ext2
+and ext3 and \Kudos\ ext2 with soft updates, during the untar test. Linux ext2
+writes 523,248 blocks; Linux ext3 writes 523,192; \Kudos\ writes 540,472.
 
-Another test pits Linux ext2 and ext3 against \Kudos\ ext2 with soft updates,
-when extracting a large archive. Linux ext2 writes 523,248 blocks; Linux ext3
-writes 523,192; \Kudos\ writes 540,472.
+We have also looked at the number of block writes that \Kudos\ makes relative
+to FreeBSD for soft updates operations. In one test, we create 100 small files
+in a directory and measure the number of blocks written to disk. \Kudos\ writes
+122 blocks, while FreeBSD writes 135 blocks.
 
-We also look at a very small benchmark: removing a file from a
-directory and adding a new file to it. We compare the number of blocks
-written by \Kudos\ with that of FreeBSD using soft updates. Here
-\Kudos\ writes 15 blocks, while FreeBSD writes 83 blocks.
-
-We ran the two small benchmarks with the journal module, in full
-data journaling mode. Creating 100 small files with the journal
-resulted in 245 blocks written to the disk, but only 126 blocks
-without the journal. Deleting and adding a file resulted in writing
-31 with the journal module and 18 without it.
+Finally, in Figure~\ref{fig:mergereq-cdf} we plot a CDF of the sizes of disk
+write requests during the untar test. Here we can see one likely contributing
+factor to the speed difference between Linux and \Kudos: \Kudos makes over
+twice as many requests to the disk. We suspect that this is due to a suboptimal
+cache eviction algorithm, which we would like to optimize.
 
 \begin{figure}[htb]
 \vspace{-0.5\baselineskip}
@@ -128,9 +122,8 @@ without the journal. Deleting and adding a file resulted in writing
 }
 \vspace{-0.5\baselineskip}
 \caption{\label{fig:mergereq-cdf} CDF of disk write request sizes for
-  Linux ext2 and \Kudos\ ext2 during a sample workload (extracting a large
-  archive into ext2). Linux totals 2021 requests to the disk, while \Kudos\
-  totals 4382 requests.}
+  Linux ext2 and \Kudos\ ext2 during the untar test. Linux totals 2021
+  requests to the disk, while \Kudos\ totals 4382 requests.}
 \end{figure}
 
 \subsection {Macrobenchmarks}
