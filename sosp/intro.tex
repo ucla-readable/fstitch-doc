@@ -4,48 +4,50 @@
 \label{sec:intro}
 
 
+This paper aims to evaluate whether a simple, unified abstraction that
+represents all modifications to stable storage, including
+\emph{dependencies} among modifications, could support an entire file
+system, where modifications are common and cache sizes are large.
+%
+The answer is a qualified yes.
+
+
+\begin{comment}
 Ongoing massive growth in both disk capacities and user and application
- storage requirements, combined with the increasing
- disparity between disk and processor speeds, has led to ongoing
- innovation in file system design.
+storage requirements, combined with the increasing
+disparity between disk and processor speeds, has led to ongoing
+innovation in file system design.
 %
 File systems are expected to do more things: they can automatically encrypt
- stored data~\cite{wright03ncryptfs}, support extensible metadata, such as
- content indexes~\cite{gifford91semantic}, automatically
- version~\cite{soules03metadata,fast04versionfs,quinlan02venti,cornell04wayback},
- and even detect viruses~\cite{miretskiy04avfs}.
+stored data~\cite{wright03ncryptfs}, support extensible metadata, such as
+content indexes~\cite{gifford91semantic}, automatically
+version~\cite{soules03metadata,fast04versionfs,quinlan02venti,cornell04wayback},
+and even detect viruses~\cite{miretskiy04avfs}.
 %
 Improved disk interfaces can make use of file system usage patterns to
- improve
- performance~\cite{sivathanu03semantically-smart,sivathanu05database-aware}.
+improve
+performance~\cite{sivathanu03semantically-smart,sivathanu05database-aware}.
+\end{comment}
 
 
-As file system functionality increases, file system \emph{correctness} is
- also increasingly a focus of
+As file system functionality increases, file system correctness is
+ increasingly a focus of
  research~\cite{sivathanuetal05-logic,denehyetal05-journal-guided}.
 %
-File system extensions and disk-layer interventions risk violating
- the dependency relationships between written blocks on which file system
- correctness relies~\cite{ganger00soft}.
+File systems must maintain dependency relationships between written blocks
+ to preserve file system correctness.
 %
-Stackable file
+This is difficult enough for file system
+ implementers~\cite{tweedie98journaling,mckusick99soft}, but further
+ complicated by file system extensions and special disk interfaces~\cite{soules03metadata,fast04versionfs,quinlan02venti,cornell04wayback,wright03ncryptfs,sivathanu03semantically-smart,sivathanu05database-aware}.
+%
+Although stackable file
  systems~\cite{zadok00fist,zadok99extending,heidemann94filesystem,rosenthal90evolving}
- avoid some of these issues by placing extensions over an existing
- file system, which is responsible for maintaining consistency.
-%
-Unfortunately, not all extensions are easily implemented entirely above an
- unmodified file system.
-%
-Furthermore, a stackable file system may implement a single system call
- with multiple operations; for instance, imagine creating a file whose
- additional metadata information is stored in another file with a related
- name.
-%
-Since current VFS (virtual file system) implementations can't
- express dependencies among operations, the stackable
- file system must must either impose an ordering using \texttt{fsync},
- which is expensive, or accept and account for the possibility of
- inconsistency.
+ %% can aid in preserving consistency by 
+ place extensions over an existing file system responsible for maintaining
+ consistency, some extensions---for instance, creating a file containing
+ metadata information about a directory---can introduce ordering
+ requirements difficult to express at the VFS layer.
 %
 This problem exists for applications as well.
 %
@@ -59,15 +61,15 @@ Robust applications, including databases, mail servers, and source code
 
 Proposed systems for improving file system integrity and consistency differ
  mainly in the kind of consistency they aim to impose, ranging from
- metadata consistency to full data journaling~\cite{tweedie98journaling}
- \todo{Is this really the best reference for this?} and even full ACID
+ metadata consistency to full data journaling
+ and even full ACID
  transactions~\cite{gal05transactional,liskov04transactional}.
 %
 However, different extensions within a file system, or different
  applications over the file system, may require different types of
  consistency semantics, and performance suffers when lower layers are
  unnecessarily denied the opportunity to reorder
- writes~\cite{ganger00soft}.
+ writes.
 %
 A better choice might be an abstraction that could express many consistency
  models.
@@ -77,30 +79,46 @@ This work develops a new fundamental data type called a \emph{\chdesc},
  which represents both a change to disk data and any \emph{dependencies}
  between that change and other changes. 
 %
-\Chdescs\ were inspired by the dependency abstraction from BSD's
- soft updates~\cite{ganger00soft}, but whereas the soft updates implementation
- is specific to the Unix File System, \chdescs\ are fully general.
+\Chdescs\ were inspired by the dependency abstraction from BSD's soft
+ updates~\cite{ganger00soft}, but whereas the soft updates implementation
+ involves many structures specific to the UFS file
+ system~\cite{mckusick99soft}, \chdescs\ are fully general, simply
+ specifying how a range of data should be changed.
 %
-We also develop a variety of dynamic optimizations to \chdescs, which
- significantly reduce the memory and CPU overhead associated with using them.
+This lets file system implementations and extensions examine and modify
+ dependency structures independent of the file system's layout.
 %
-We present a formal theory of \chdescs, which we use to state their
- behavior and the safety properties they provide, and to reason about our
- dynamic optimizations to show that they will work correctly.
+This generality comes at a cost, but the cost can be partially mitigated.
+%
+Real file system implementations achieve consistency and write ordering
+ relationships using a variety of file system specific optimizations, and
+ we found that a naive implementation scaled terribly poorly, spending far
+ more space and time on dependency manipulation than conventional systems.
+%
+We therefore developed a variety of dynamic optimizations that which
+ significantly reduce the memory and CPU overhead associated with \patches.
+%
+We describe \chdescs\ abstractly, state their behavior and safety
+ properties, and reason about the correctness of our optimizations.
 %
 Finally, we demonstrate a prototype file system implementation using
  \chdescs\ called \Kudos.
+%
+For an untar-Linux benchmark that writes 253~MB of data, our optimizations
+ can reduce the number of \patches\ created by half and the amount of
+ rollback data memory required by 99.73\%. 
 
 
-\Chdescs\ allow us to decompose the entire file system layer, from system
- calls to block devices, into pluggable \modules, hopefully making the
- system as a whole more configurable, extensible, and easier to understand.
+The \Kudos\ file system implementation is decomposed entirely into
+ pluggable \modules\ that manipulate \chdescs, hopefully making the system
+ as a whole more configurable, extensible, and easier to understand.
 %
-Any file system \module\ can generate \chdescs, and those \chdescs\ are obeyed
- by all other file system layers.
+Any file system \module\ can generate \chdescs; other modules can examine
+ them and modify them when required.
 %
-\Chdescs\ may be examined and modified by other modules as well, and
- even passed through layers such as loop-back block devices.
+\Chdesc\ dependency requirements are obeyed by all other file system
+ layers, allowing them to be passed through layers such as loopback block
+ devices.
 %
 As a result, the loosely-coupled \modules\ that make up a file system
  implementation can cooperate to implement strong and often complex
@@ -112,11 +130,7 @@ As a result, the loosely-coupled \modules\ that make up a file system
  soft updates and journaling.
 %
 Our file system modules impose soft updates-style \chdesc\
- requirements by default.
-%
-A single module placed downstream of any file system can analyze these
- \chdesc\ layouts and transform them into dependencies that
- implement a journal.
+ requirements by default; we have also written a prototype journal module. 
 %
 Additionally, we give user-level applications controlled access to \chdescs,
 allowing applications to impose their own limited consistency
@@ -126,19 +140,22 @@ Modifying an IMAP mail server to use this interface requires only localized
  changes; the resulting server follows IMAP's consistency
  requirements while writing fewer blocks to disk.
 %
-Although our prototype implementation is not yet as fast as we would like,
- and \chdescs\ do not yet support all consistency policies (for instance,
+Our prototype implementation is not yet as fast as we would like, but it
+ already runs several benchmarks faster than FreeBSD on the same hardware.
+
+\begin{comment}
  not ACID transactions: transactions should be independent, but any file
  system client can observe all active \chdescs), we believe that using
  \chdescs\ will allow the construction of consistent, modular, extensible
  file systems that are much easier to understand.
+\end{comment}
 
 
 Our contributions include the generalized \chdesc\ design, the
  optimizations we have developed for dealing with \chdescs, the formal
  model of \chdescs, the \module\ interfaces in our \Kudos\ prototype,
  several of the individual \Kudos\ \modules\ like the journal, and the
- \opgroup\ interface that exports \chdescs\ to userspace.
+ \opgroup\ interface that exports \chdescs\ to user space.
 
 
 %% They can also be extended, in a carefully controlled way, into userspace --

@@ -1,13 +1,13 @@
 \begin{abstract}
 
-File system data consistency inherently relies on careful write ordering,
- where one block cannot be written until another is safely committed to
- stable storage.
+File systems ensure that their data is kept consistent through careful
+ write ordering, where one block cannot be written until another is safely
+ committed to stable storage.
 %
 Previous file systems have enforced write orderings in system-dependent
  ways, either with rules specialized for each file system
  structure~\cite{ganger00soft} or with a journal, which enforces a
- particular consistency protocol~\cite{xxx}.
+ particular consistency protocol.
 %
 We present a general \emph{\chdesc} abstraction that can represent any
  write ordering in a file system agnostic manner.
@@ -15,7 +15,7 @@ We present a general \emph{\chdesc} abstraction that can represent any
 A \chdesc-based file system implementation expresses dependencies among
  writes, but not how those dependencies should be enforced.
 %
-File system \modules\ can examine, preserve, and even modify write
+File system \modules\ can examine, preserve, and modify write
  orderings.
 %
 Generalized file system dependencies are naturally exportable to user
@@ -27,10 +27,9 @@ We present the \chdesc\ abstraction, describe a number of important
  implementation of a storage subsystem that uses \chdescs\ to enforce
  consistency.
 %
-Our prototype is competitive with FreeBSD soft updates and ext3 journaling
- for number of blocks written, and allows several novel
- configurations, such as ext2 with soft updates or correct dependency
- enforcement within a file system image file.
+Our ext2 prototype is competitive with FreeBSD soft updates and allows
+ several novel configurations, such as ext2 with soft updates or correct
+ dependency enforcement within a loopback file system.
 
 
 \begin{comment}
