@@ -9,17 +9,18 @@
 \newcommand{\pgSync}{\texttt{pg\_sync()}}
 \newcommand{\pgClose}{\texttt{pg\_close()}}
 
-Applications often manipulate valuable data, e.g. a mail server's mail
-or a version control system's local checkout.
+Robust applications
+%% often manipulate valuable data, e.g. a mail server's mail
+%% or a version control system's local checkout.
 %
-To ensure their on-disk data remains in a sane state even after a
-system crash, such applications require their changes be committed in
-an application-defined order.
+ensure their on-disk data remains in a sane state even after a
+system crash by requiring their changes be committed in
+a specified order.
 %
-Existing systems provide two interfaces to ensure such orders.
+Existing systems provide two ways to ensure such orders:
 %
-Applications may dictate \emph{how} the file system must implement the
-ordering and/or they may require particular file system implementation
+applications may dictate \emph{how} the file system must implement the
+ordering, or they may require particular file system implementation
 semantics.
 %
 However, these techniques dramatically limit performance or limit
@@ -96,32 +97,16 @@ This allows existing programs to interact with \opgroups\ without
 knowing it, in the same way that programs do not have to know about
 pipes for the shell to connect them in a pipeline.
 %
-For example, consider processing and then removing some input:
-%
+For example, a \texttt{depend} program could apply \patchgroups\ to
+unmodified applications by setting up the \patchgroups\ before calling
+\texttt{exec}.  The following command line would ensure that \texttt{in} is
+not removed until all changes in the preceding \texttt{sort} have committed
+to disk:
+
 \vspace{-0.5\baselineskip}
 \begin{center}
 \begin{small}
-\verb+sort < in > out && rm in+
-\end{small}
-\end{center}
-\vspace{-0.5\baselineskip}
-%
-Using \opgroups, the user can ensure that \texttt{in} is not removed
-before \texttt{out} is committed to disk, so that a crash part way
-through does not lose both files.
-%
-Using \texttt{depend}, a program that, for each argument,
-%
-creates \anopgroup\ that depends on the previous argument's \opgroup\
-%
-and runs the argument within its \opgroup,
-%
-the user can instead run:
-%
-\vspace{-0.5\baselineskip}
-\begin{center}
-\begin{small}
-\verb+depend "sort < in > out" "rm in"+\todo{Is this example worth its space?}
+\verb+depend "sort < in > out" "rm in"+
 \end{small}
 \end{center}
 \vspace{-0.5\baselineskip}
@@ -165,13 +150,17 @@ The \opgroup\ dependency \depends{P}{Q} is implemented as
 \subsection{Case Studies}
 \label{sec:opgroup:casestudies}
 
-\todo{Introduce and contrast gzip, Subversion, and UW IMAP}
-%
-UW IMAP case study (faster, same safety, server) vs
-Subversion case study (about same speed, additional safety on non-ext3
-ordered, client).
+%% \todo{Introduce and contrast gzip, Subversion, and UW IMAP}
+%% %
+%% UW IMAP case study (faster, same safety, server) vs
+%% Subversion case study (about same speed, additional safety on non-ext3
+%% ordered, client).
 
-\subsubsection{Gzip}
+We tested the \opgroup\ interface by adding \opgroup\ support to three
+applications: the gzip compression utility, the Subversion version control
+system, and the uw-imapd IMAP mail server daemon.
+
+\paragraph{Gzip}
 \label{sec:opgroup:gzip}
 
 Gzip's typical operation is to compress a source file into an output file,
@@ -181,7 +170,7 @@ We updated gzip to use \opgroups\ to ensure that the source's removal
 is not committed before the output file's data, so that a crash does
 not lose both files. The update adds 10 lines of code to gzip.
 
-\subsubsection{Subversion}
+\paragraph{Subversion}
 \label{sec:opgroup:svn}
 
 In this case study we take an interest in how the Subversion version
@@ -274,7 +263,7 @@ file read and subsequent rename, need ordering.
   \label{fig:svn-order}
 \end{figure}
 
-\subsubsection{UW IMAP}
+\paragraph{UW IMAP}
 \label{sec:opgroup:uwimap}
 
 We updated the University of Washington's IMAP mail server to take
