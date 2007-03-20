@@ -219,30 +219,34 @@ endfig;
 
 beginfig(5);
   boxjoin(a.width = b.width; a.height = b.height);
-  elementit.h(btex H etex scaled 0.8, 0, 0, pull);
-  elementit.t(btex T etex scaled 0.8, 0, 0, pull);
+  patchit.h(btex $h_p$ etex, 0);
+  patchit.t(btex $t_p$ etex, 0);
+  patchit.hq(btex $h_q$ etex, 0);
+  patchit.tq(btex $t_q$ etex, 0);
 
-  elementit.aa(btex 1 etex scaled 0.8, 0, 0, pull);
-  elementit.ab(btex 1 etex scaled 0.8, 0, 0, pull);
-  elementit.ac(btex 1 etex scaled 0.8, 0, 0, pull);
-  elementit.b(btex 2 etex scaled 0.8, 0, 0, pull);
-  h.width = 1.2h.height;
+  patchit.aa(btex $a_1$ etex, 0);
+  patchit.ab(btex $a_2$ etex, 0);
+  patchit.ac(btex $a_3$ etex, 0);
+  patchit.b(btex $b$ etex, 0);
+  patchit.c(btex $c$ etex, 0);
+  h.width = h.height;
 
-  h.s - t.n = (0, 4*h.height);
+  t.w - h.e = (3h.width,0);
+  .5[t.c,h.c] - .5[b.c,ab.c] = (0,25);
 
-  aa.w - b.e = (1.2*h.width, 0);
-  ac.w - ab.e = (1.2*h.width, 0);
-  aa.s - ac.n = (0, 1*h.height);
-  h.nw - b.se = (-2.5*h.width, 2.5*h.height);
+  hq.w - t.e = (h.width,0);
+  tq.w - hq.e = (2h.width,0);
+  .5[tq.c,hq.c] - c.c = (0,25);
 
-  forsuffixes $ = h, t, aa, ab, ac, b:
-    pproc_.$ := "thecirc_";
-  endfor;
+  ab.w - b.e = (0.5*h.width, 0);
+  ac.w - aa.e = (0.5*h.width, 0);
+  ab.s - ac.n = (0, h.height/2);
 
-  drawelement(h,t,aa,ab,ac,b);
+  fillelement(hq,tq,c)(.9white);
+  drawelement(h,t,aa,ab,ac,b,hq,tq,c);
 
   vardef ffff(suffix a,b) =
-    drawconnarrow (a.c -- b.c) cutbefore bpath.a cutafter bpath.b
+    drawconnpatch(a,b)(..)
   enddef;
 
   ffff(h,t);
@@ -252,12 +256,17 @@ beginfig(5);
 
   ffff(ab,t);
   ffff(ac,t);
-  ffff(b,t);
+  drawconnpatch(b,t)(.. ab.nw ..);
 
   ffff(b,aa);
 
   ffff(aa,ab);
   ffff(aa,ac);
+
+  drawconnpatch(t,hq)(..) withpen connectionpen scaled 3;
+  drawconnpatch(hq,tq)(..);
+  drawconnpatch(hq,c)(..);
+  drawconnpatch(c,tq)(..);
 
 endfig;
 

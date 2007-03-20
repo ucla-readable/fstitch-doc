@@ -1,13 +1,13 @@
 \section{\Opgroups}
 \label{sec:opgroup}
 
-\newcommand{\pgCreate}{\texttt{pg\_create()}}
-\newcommand{\pgDepend}{\texttt{pg\_depend()}}
-\newcommand{\pgEngage}{\texttt{pg\_engage()}}
-\newcommand{\pgDisengage}{\texttt{pg\_disengage()}}
-\newcommand{\pgRelease}{\texttt{pg\_release()}}
-\newcommand{\pgSync}{\texttt{pg\_sync()}}
-\newcommand{\pgClose}{\texttt{pg\_close()}}
+\newcommand{\pgCreate}{\texttt{pg\_create}}
+\newcommand{\pgDepend}{\texttt{pg\_depend}}
+\newcommand{\pgEngage}{\texttt{pg\_engage}}
+\newcommand{\pgDisengage}{\texttt{pg\_disengage}}
+\newcommand{\pgRelease}{\texttt{pg\_release}}
+\newcommand{\pgSync}{\texttt{pg\_sync}}
+\newcommand{\pgClose}{\texttt{pg\_close}}
 
 Robust applications
 %% often manipulate valuable data, e.g. a mail server's mail
@@ -17,78 +17,74 @@ ensure their on-disk data remains in a sane state even after a
 system crash by requiring their changes be committed in
 a specified order.
 %
-Existing systems provide two ways to ensure such orders:
+Existing systems can ensure such orders in two ways:
 %
-applications may dictate \emph{how} the file system must implement the
-ordering, or they may require particular file system implementation
-semantics.
+applications may tell the file system \emph{how} to implement the ordering
+by requiring that all changes on a particular file (or the whole disk) be
+committed with \texttt{(f)sync}, or applications can simply require
+particular file system implementation semantics, such as journaling.
 %
-However, these techniques dramatically limit performance or limit
-safety to only a particular file system, respectively.
+%
+The \chdesc\ abstraction, in contrast, can let a process specify
+\emph{what} ordering is required and leave the file system to implement
+that ordering in the most appropriate way.
 
-We extend the \chdesc\ abstraction to user-space, as a \opgroup,
-%
-to enable applications to \emph{express} dependencies among file system
+
+This section describes \emph{\opgroups}, which extend \chdescs\ to user
+space and let applications to express dependencies among file system
 operations.
 %
-Compared to a dictated order, dependency specification allows the file
-system to optimize commit orderings;
-%
-and compared to required file system semantics, \opgroup\ dependencies
-are independent of the underlying file system.
+Compared to a dictated order, this lets the file system optimize commit
+orderings, but is still relatively independent of the underlying file
+system.
 %
 For example, \opgroups\ even allow an application to specify
 dependencies among raw block device writes.
 
 In this section we describe the \opgroup\ abstraction
 %
-and show how it allows gzip, Subversion, and UW IMAP to easily specify
-their application-level consistency protocols.
+and apply it to three robust applications.
 
-\subsection{Interface}
+%%  it usefulness on three and show how it allows gzip, Subversion, and UW IMAP to easily specify
+%% their application-level consistency protocols.
+
+\subsection{Interface and Implementation}
 \label{sec:opgroup:interface}
 
-A \emph{\opgroup} corresponds to the changes (\chdescs) made by a set of
-file system operations;
+\Opgroups\ encapsulate sets of file system operations into units among
+which dependencies can be applied.
 %
-applications can specify ordering requirements among \opgroups.
+%% applications can specify ordering requirements among \opgroups.
 %
-Figure~\ref{fig:opgroup-interface} shows the \opgroup\ interface.
+The \opgroup\ interface is as follows:
 
-\begin{figure}[htb]
-\vskip-14pt
-\begin{tabular}{@{\hskip0.22in}p{2in}@{}}
 \begin{scriptsize}
 \begin{alltt}
-typedef int pg_t;
-pg_t \textbf{pg_create}(void);
-int  \textbf{pg_depend}(pg_t pg1, pg_t pg2);
-int  \textbf{pg_engage}(pg_t pg);
-int  \textbf{pg_disengage}(pg_t pg);
-int  \textbf{pg_sync}(pg_t pg);
-int  \textbf{pg_close}(pg_t pg);
+  typedef int pg_t;          pg_t \textbf{pg_create}(void);
+  int \textbf{pg_depend}(pg_t pg1, pg_t pg2);
+  int \textbf{pg_engage}(pg_t pg);    int \textbf{pg_disengage}(pg_t pg);
+  int \textbf{pg_sync}(pg_t pg);      int \textbf{pg_close}(pg_t pg);
 \end{alltt}
 \end{scriptsize}
-\end{tabular}
-\vspace{-10pt}
-\caption{\label{fig:opgroup-interface} \Opgroup\ API.}
-\end{figure}
 
-The \chdescs\ created during a file system operation are associated
-with each of the process's \emph{engaged} \opgroups\ (\pgEngage\ and
-\pgDisengage\ add to and remove from the process's engaged set).
+Each process has its own set of \opgroups.
 %
-Making \opgroup\ $P$ depend on \opgroup\ $Q$ (\pgDepend)
-ensures \(\indirdepends{P}{Q}\).
+The call \texttt{\pgDepend(p, q)} makes \opgroup\ \texttt{p} depend on
+\opgroup\ \texttt{q}: every change associated with \texttt{p} will be
+delayed until all changes associated with \texttt{q} have committed.
+%
+\Opgroups\ can be \emph{engaged} or \emph{disengaged}; all changes made by
+a process are associated with that process's engaged \opgroups.
 %
 \pgSync\ forces an immediate write of \anopgroup\ to disk.
-
+%
 Whereas \Kudos\ \modules\ are presumed to not create cyclic
 dependencies, the kernel cannot safely trust user applications to be
-so well behaved.
+so well behaved, so
 %
-The \opgroup\ API restricts dependency manipulation so that cycles are
-inconstructible, while preserving the interface's utility.
+the \opgroup\ API restricts dependency manipulation so that cycles are
+inconstructible. For example, \texttt{\pgDepend(p, q)} returns an error if
+\texttt{p} has ever been engaged.
 
 \Opgroups\ and file descriptors are managed similarly; e.g. they are copied
 across \texttt{fork()} and preserved across \texttt{exec()}.
@@ -113,38 +109,26 @@ to disk:
 
 % FIXME: Mention simplicity using opgroups vs fsync?
 
-\subsection{Implementation}
-\label{sec:opgroup:implementation}
+\Opgroup\ support is implemented by an \LFS\ module that lives above a file
+system module like ext2.
+%
+Each \opgroup\ corresponds to a pair of empty \patches, and inter-\opgroup\
+dependencies affect these \patches.
+%
+When an \opgroup\ is engaged, the \LFS\ module ensures that all file system
+changes are inserted between these \patches.
+%
+Figure~\ref{fig:opgroup-chdescs} shows an example \patch\ arrangement for
+two \patchgroups.
 
-\Anopgroup\ is implemented by surrounding its \patches\ by a bracket of
-empty \patches; \opgroup\ dependencies are represented as dependencies
-among these bracket empty \patches.
-%
-These dependencies are created by the \opgroup\ \module\ as file
-system operations are performed.
-
-Figure~\ref{fig:opgroup-chdescs} shows \anopgroup's \chdesc\ arrangement.
-%
-The head \chdesc\ depends on the \opgroup's \chdescs\ and the tail
-\chdesc.
-%
-The \opgroup's \chdescs\ all depend on the tail \chdesc.
-%
-The \opgroup\ dependency \depends{P}{Q} is implemented as
-\depends{\mbox{tail}_P}{\mbox{head}_Q}
-
-\begin{figure}[htb]
-\centering{
-\includegraphics[width=0.3\hsize]{fig/figures_5}
-}
-\caption{\label{fig:opgroup-chdescs} \Opgroup\ \chdescs. H and T are the head
-  and tail of the \opgroup.
-  %
-  The three \chdescs\ labeled 1 occurred during one file system
-  operation,
-  %
-  and the \chdesc\ labeled 2 occurred during a second operation that
-  depended on the first.}
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.7\hsize]{fig/figures_5}
+\caption{\label{fig:opgroup-chdescs} \Chdescs\ corresponding to two
+  \opgroups, $p$ and $q$.  The $h$ and $t$ patches are created by the 
+  \opgroup\ module; the heavy dependency between $t_p$ and $h_q$ was added
+  by \texttt{pg~depend(p, q)}.  Each of $a_i$, $b$, and $c$ corresponds to
+  a different file system change.}
 \end{figure}
 
 \subsection{Case Studies}
