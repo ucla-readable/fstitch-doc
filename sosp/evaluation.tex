@@ -104,8 +104,8 @@ Our first microbenchmark measures the number of blocks written by Linux ext2
 and ext3 and \Kudos\ ext2 with soft updates during the untar test. Linux ext2
 writes 523,248 blocks; Linux ext3 writes 523,192; \Kudos\ writes 540,472.
 
-\Kudos's soft-updates ext2 writes a similar number of blocks as FreeBSD's
-soft-updates UFS. In one test, we create 100 small files in a directory and
+We also tested that \Kudos's soft updates ext2 writes a similar number of blocks as FreeBSD's
+soft updates UFS. In one test, we create 100 small files in a directory and
 measure the number of blocks written to disk. \Kudos\ writes 122 blocks,
 while FreeBSD writes 135 blocks.
 
