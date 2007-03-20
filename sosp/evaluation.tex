@@ -177,7 +177,7 @@ entirely unreasonable, but has room for significant improvement.
 %% There are more optimization opportunities that can likely bring us much closer
 %% in performance to Linux. 
 
-\subsubsection {Postmark}
+\subsubsection {PostMark}
 \label{sec:eval:postmark}
 
 We next evaluate overall performance using the PostMark benchmark,
@@ -191,7 +191,8 @@ and finally delete its files. PostMark is a single process, single
 threaded program that performs these file system operations as quickly
 as possible.
 %
-Figure~\ref{fig:postmark} shows the results.
+Figure~\ref{fig:postmark} shows the times to run PostMark and then
+synchronize its results to disk.
 
 \begin{figure}[t]
 \centering
@@ -206,7 +207,10 @@ FreeBSD & 27.0 \\
 \label{fig:postmark}
 \end{figure}
 
-\todo{Comment on benchmark.}
+\Kudos's PostMark performance, compared to Linux and FreeBSD, falls
+into the middle of \S\ref{sec:eval:untardel}'s untar and delete
+benchmarks. As PostMark combines file creation and deletion, its
+results follow for similar reasons as the untar and delete benchmarks'.
 
 \subsection {Patchgroups}
 
