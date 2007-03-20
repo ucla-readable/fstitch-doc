@@ -37,13 +37,13 @@ operations. These structures, their relationships to one another, and their uses
 for tracking and enforcing dependencies are quite
 complex~\cite{mckusick99soft}.
 
-\Kudos, in contrast, represents all dependencies by patches and relies on
+\Kudos, in contrast, represents all dependencies by \patches\ and relies on
 general optimizations to reduce memory usage.
 %
 The resulting system is not as optimized as the BSD implementation, but
 much simpler to specify and easier for other modules to manipulate.
 %
-The \chdescs\ that make up a file system operation are connected to specify
+The \patches\ that make up a file system operation are connected to specify
 the order in which the changes must be written to disk.
 %
 For instance, most file systems require at least two \patches\ to remove
@@ -51,7 +51,7 @@ block from a file, one ($p$) to clear the block reference from the file's
 block list and one ($q$) to mark the block as free; adding the $q \PDDepend
 p$ dependency straightforwardly implements soft updates semantics.
 %
-Figure~\ref{fig:softupdate} shows another example, the patches generated in
+Figure~\ref{fig:softupdate} shows another example, the \patches\ generated in
 UFS when a file is extended by one block.\footnote{The dependencies differ
 from the ext2 dependencies for a similar operation in Figure~\ref{f:opt}
 because of a difference in file system semantics.}
@@ -59,9 +59,9 @@ because of a difference in file system semantics.}
 \begin{comment}
 appr to the
 block out when a block is removed from a file, we create (at least) two
-\chdescs\ in most file systems: one that clears out the reference to that
+\patches\ in most file systems: one that clears out the reference to that
 block number in the file's list of blocks, and one that marks the block as
-free. By hooking up the second \chdesc\ to depend upon the first, we can
+free. By hooking up the second \patch\ to depend upon the first, we can
 implement the soft updates semantic straightforwardly. Another example is
 depicted in Figure~\ref{fig:softupdate}.
 \end{comment}

@@ -36,7 +36,7 @@ The \Kudos\ journal module sits below a regular file system and transforms
 incoming \patches\ into journal transactions.
 %
 Data \patches\ are copied into the journal; a commit record depends on the
-journal patches; and the original file system patches depend in turn on the
+journal \patches; and the original file system \patches\ depend in turn on the
 commit record.
 %
 The dependencies among the original \patches\ are removed since the journal
@@ -54,15 +54,15 @@ this is allowed since the new dependencies will never introduce a
 block-level cycle.
 
 \begin{comment}
-Almost all of this description of journaling translates directly into \chdesc\
-dependencies. The incoming \chdescs\ must be rearranged to implement the new
+Almost all of this description of journaling translates directly into \patch\
+dependencies. The incoming \patches\ must be rearranged to implement the new
 structure, but for the most part this transformation is straightforward. There
 are two special considerations which the journal \module\ must address, however.
 
-First, with soft updates, \chdescs\ can always be written to the disk when
-flushing the cache, while the journal must be able to ``lock'' \chdescs\ into
+First, with soft updates, \patches\ can always be written to the disk when
+flushing the cache, while the journal must be able to ``lock'' \patches\ into
 the cache while transactions are in progress. To accomplish this, the journal
-\module\ uses a managed \noop\ \chdesc, as outlined in
+\module\ uses a managed \noop\ \patch, as outlined in
 Section~\ref{sec:patch:noop}.
 
 Second, the commit record is created at the end of the transaction, but the file
@@ -76,27 +76,27 @@ journal \module\ by hand.
 \begin{figure}
   \centering
   \includegraphics[width=\hsize]{fig/figures_2}
-  \caption{\label{fig:journal} Journal \chdesc\ subgraph for the
+  \caption{\label{fig:journal} Journal \patch\ subgraph for the
     change in Figure~\ref{fig:softupdate}. The unlabeled circles are
-    \noop\ \chdescs.}
+    \noop\ \patches.}
 \end{figure}
 
 \begin{comment}
-Figure~\ref{fig:journal} shows the \chdesc\ configuration which is created
-by applying the journal transformation to the \chdescs\ in
-Figure~\ref{fig:softupdate}. The original four \chdescs\ have been
-modified to depend on a journal commit record (via \anoop\ \chdesc), and
+Figure~\ref{fig:journal} shows the \patch\ configuration which is created
+by applying the journal transformation to the \patches\ in
+Figure~\ref{fig:softupdate}. The original four \patches\ have been
+modified to depend on a journal commit record (via \anoop\ \patch), and
 no longer have explicit dependencies on each other. The commit record
 depends on journal blocks containing copies of the changes. Finally, the
-commit record can be marked as completed once the original four \chdescs\
+commit record can be marked as completed once the original four \patches\
 have been written. This transformation is performed incrementally as
-\chdescs\ arrive. 
+\patches\ arrive. 
 \end{comment}
 
 \begin{comment}
 Due to this design, the journal \module\ is completely independent of any
 specific file system. It is a block device \module\ that automatically journals
-whatever file system is stored on it. In fact, the incoming \chdescs\ need not
+whatever file system is stored on it. In fact, the incoming \patches\ need not
 be arranged for soft updates, or for that matter in any particular configuration
 at all.
 \end{comment}

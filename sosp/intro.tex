@@ -75,14 +75,14 @@ A better choice might be an abstraction that could express many consistency
  models.
 
 
-This work develops a new fundamental data type called a \emph{\chdesc},
+This work develops a new fundamental data type called a \emph{\patch},
  which represents both a change to disk data and any \emph{dependencies}
  between that change and other changes. 
 %
-\Chdescs\ were inspired by the dependency abstraction from BSD's soft
+\Patches\ were inspired by the dependency abstraction from BSD's soft
  updates~\cite{ganger00soft}, but whereas the soft updates implementation
  involves many structures specific to the UFS file
- system~\cite{mckusick99soft}, \chdescs\ are fully general, simply
+ system~\cite{mckusick99soft}, \patches\ are fully general, simply
  specifying how a range of data should be changed.
 %
 This lets file system implementations and extensions examine and modify
@@ -98,11 +98,11 @@ Real file system implementations achieve consistency and write ordering
 We therefore developed a variety of dynamic optimizations that which
  significantly reduce the memory and CPU overhead associated with \patches.
 %
-We describe \chdescs\ abstractly, state their behavior and safety
+We describe \patches\ abstractly, state their behavior and safety
  properties, and reason about the correctness of our optimizations.
 %
 Finally, we demonstrate a prototype file system implementation using
- \chdescs\ called \Kudos.
+ \patches\ called \Kudos.
 %
 For an untar-Linux benchmark that writes 253~MB of data, our optimizations
  can reduce the number of \patches\ created by half and the amount of
@@ -110,13 +110,13 @@ For an untar-Linux benchmark that writes 253~MB of data, our optimizations
 
 
 The \Kudos\ file system implementation is decomposed entirely into
- pluggable \modules\ that manipulate \chdescs, hopefully making the system
+ pluggable \modules\ that manipulate \patches, hopefully making the system
  as a whole more configurable, extensible, and easier to understand.
 %
-Any file system \module\ can generate \chdescs; other modules can examine
+Any file system \module\ can generate \patches; other modules can examine
  them and modify them when required.
 %
-\Chdesc\ dependency requirements are obeyed by all other file system
+\Patch\ dependency requirements are obeyed by all other file system
  layers, allowing them to be passed through layers such as loopback block
  devices.
 %
@@ -126,13 +126,13 @@ As a result, the loosely-coupled \modules\ that make up a file system
  relatively small part of the work.
 
 
-\Chdescs\ can implement many consistency mechanisms, including
+\Patches\ can implement many consistency mechanisms, including
  soft updates and journaling.
 %
-Our file system modules impose soft updates-style \chdesc\
+Our file system modules impose soft updates-style \patch\
  requirements by default; we have also written a prototype journal module. 
 %
-Additionally, we give user-level applications controlled access to \chdescs,
+Additionally, we give user-level applications controlled access to \patches,
 allowing applications to impose their own limited consistency
  policies.
 %
@@ -145,17 +145,17 @@ Our prototype implementation is not yet as fast as we would like, but it
 
 \begin{comment}
  not ACID transactions: transactions should be independent, but any file
- system client can observe all active \chdescs), we believe that using
- \chdescs\ will allow the construction of consistent, modular, extensible
+ system client can observe all active \patches), we believe that using
+ \patches\ will allow the construction of consistent, modular, extensible
  file systems that are much easier to understand.
 \end{comment}
 
 
-Our contributions include the generalized \chdesc\ design, the
- optimizations we have developed for dealing with \chdescs, the formal
- model of \chdescs, the \module\ interfaces in our \Kudos\ prototype,
+Our contributions include the generalized \patch\ design, the
+ optimizations we have developed for dealing with \patches, the formal
+ model of \patches, the \module\ interfaces in our \Kudos\ prototype,
  several of the individual \Kudos\ \modules\ like the journal, and the
- \opgroup\ interface that exports \chdescs\ to user space.
+ \patchgroup\ interface that exports \patches\ to user space.
 
 
 %% They can also be extended, in a carefully controlled way, into userspace --

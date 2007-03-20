@@ -4,11 +4,11 @@
 \Kudos\ provides a new way for file system implementations to formalize
 write ordering requirements, allowing file system software to be divided
 into \modules\ that cooperate loosely to implement strong consistency
-guarantees. We also explored several optimizations to the \chdesc\
+guarantees. We also explored several optimizations to the \patch\
 abstraction that significantly improve performance.  \Patches\
 simplify the design of consistency protocols like
 journaling and soft updates by separating the specification and enforcement
-of write ordering requirements. Additionally, \chdescs\ can be extended
+of write ordering requirements. Additionally, \patches\ can be extended
 outside the file system implementation into userspace, allowing
 applications to specify in a limited way what their specific consistency
 requirements are, providing the file system implementation more freedom to

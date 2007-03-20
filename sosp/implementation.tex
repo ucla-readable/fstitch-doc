@@ -19,13 +19,13 @@ In between is a \Kudos\ module graph that replaces Linux's conventional
 file system layers and buffer cache.
 %
 We bypass all Linux caches as the simplest way to ensure that the
-\Dodder\ buffer cache obeys all necessary dependency orderings.
+\Kudos\ buffer cache obeys all necessary dependency orderings.
 %
 A small kernel patch informs \Kudos\ of process fork and exit events as
 required to update per-process \patchgroup\ state.
 
 
-\Dodder\ modules interact with Linux's generic block layer mainly via
+\Kudos\ modules interact with Linux's generic block layer mainly via
 \verb+generic_make_request+.
 %
 This function sends read or write requests to a Linux disk scheduler, which
@@ -35,8 +35,8 @@ the device.
 Writes are considered in flight as soon as they are enqueued on the disk
 scheduler.
 %
-A callback notifies \Dodder\ when the disk controller reports request
-completion; for writes, this sets the corresponding patch states to
+A callback notifies \Kudos\ when the disk controller reports request
+completion; for writes, this sets the corresponding \patch\ states to
 \PDiskst.
 %
 The disk safety property requires that the disk controller wait to report
@@ -112,11 +112,11 @@ command like \mbox{\texttt{mount -t kfs kfs:\textit{name} /mnt/point}}.
 
 \begin{comment}
 The Linux kernel must be modified in order to
-provide support for \opgroups.  As a kernel module, there is no way to
+provide support for \patchgroups.  As a kernel module, there is no way to
 get notifications about when processes are created, or when they terminate; this
-is necessary to clone the \opgroup\ scope 
-from the parent process when the process is created, and to \abandon\ all
-the \opgroups\ when it terminates. Ordinarily, this sort of state would be kept
+is necessary to clone the \patchgroup\ scope 
+from the parent process when the process is created, and to release all
+the \patchgroups\ when it terminates. Ordinarily, this sort of state would be kept
 as part of the Linux \texttt{task\_struct} (i.e. process) structure, but this is
 not a viable option for a dynamically loadable kernel module. Instead, the
 \Kudos\ module keeps this state internally and uses new kernel hooks
@@ -124,10 +124,10 @@ to be notified when processes fork or exit.
 %% The patch to add these hooks
 %% is based on the ``process events connector'' which was introduced in Linux
 %% 2.6.15, and is only about 250 lines long. Without it, \Kudos\ can still operate,
-%% but it does not allow \opgroups.
+%% but it does not allow \patchgroups.
 
 Our interfaces bypass all Linux caches, because \Kudos\ provides its own
-\chdesc-aware caches (\S\ref{sec:modules:wbcache}) in order to provide its
+\patch-aware caches (\S\ref{sec:modules:wbcache}) in order to provide its
 write-ordering guarantees.
 
 Our current implementation uses Linux's queuing structures for queuing I/O
@@ -146,7 +146,7 @@ cache) and only reads take a long time.
 Future work will require hardening several aspects of our Linux
 integration.
 %
-Integrating patch and dependency support into Linux's native buffer cache
+Integrating \patch\ and dependency support into Linux's native buffer cache
 would allow applications to use memory-mapped I/O on \Kudos\ files and
 reduce \Kudos's memory usage.
 %

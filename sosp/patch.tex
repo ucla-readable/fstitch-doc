@@ -1,6 +1,6 @@
 % -*- mode: latex; tex-main-file: "paper.tex" -*-
 
-\section{Patch Model}
+\section{\Patch\ Model}
 \label{sec:patch}
 
 \makeatletter
@@ -39,7 +39,7 @@ Each \patch\ $p$ encapsulates four important pieces of information: its
  \emph{block}, its \emph{state}, a set of \emph{direct dependencies}, and
  some \emph{rollback data}.
 
-Patch $p$'s \textbf{block}, written $\PBlock{p}$, is the unit of disk data
+\Patch\ $p$'s \textbf{block}, written $\PBlock{p}$, is the unit of disk data
  to which $p$ applies.  The disk controller is assumed to execute writes a
  block at a time (although not necessarily atomically; see below).  A file system
  change that affects $n$ blocks must be represented using at least $n$
@@ -62,7 +62,7 @@ The sets \PMem, \PInf, and \PDisk\ are defined to contain all \patches\ with
  defined to contain all \patches\ with the given state \emph{on the given
  block} $b$.
 
-Patch $p$'s \textbf{direct dependencies}, written $\PDDepset{p}$, is a set of
+\Patch\ $p$'s \textbf{direct dependencies}, written $\PDDepset{p}$, is a set of
  other \patches\ on which $p$ ``depends''.
 %
 That is, every \patch\ in $\PDDepset{p}$ should be committed to disk either
@@ -98,7 +98,7 @@ We say $p$ \emph{depends on} $q$, and write $p \PDepend q$, when there
  exists a dependency chain from $p$ to $q$: that is, either $p \PDDepend q$
  or, for some \patch\ $x$, $p \PDepend x \PDDepend q$.
 %
-Patch $p$'s set of \emph{dependencies} is written $\PDepset{p} = \{ q \mid
+\Patch\ $p$'s set of \emph{dependencies} is written $\PDepset{p} = \{ q \mid
  p \PDepend q \}$; this is of course a superset of its direct dependencies.
 %
 Given a \emph{set} of \patches\ $P$, we write $\PDepset{P}$ to mean the set's
@@ -138,7 +138,7 @@ Our \patch\ notation is summarized in Figure~\ref{fig:patchnot}.
 \begin{tabular}{@{}ll@{}}
 $\PBlock{p} = b$ & $p$'s block \\
 $\PState{p}$ & $p$'s state, $\in \{\PMemst, \PInfst, \PDiskst\}$ \\
-$\PDDepset{p}$ & $p$'s direct dependencies: patches that must go to disk \\
+$\PDDepset{p}$ & $p$'s direct dependencies: \patches\ that must go to disk \\
 	& before $p$ \\
 \noalign{\vskip3pt}
 $\PMem$ & all in-memory \patches: $\{p \mid \PState{p} = \PMemst\}$ \\
@@ -153,7 +153,7 @@ $\PDepset{p}$ & $p$'s dependencies: $\{ q \mid p \PDepend q \}$ \\
 \end{tabular}
 \end{small}
 
-\caption{Patch notation.}
+\caption{\Patch\ notation.}
 \label{fig:patchnot}
 \end{figure}
 
@@ -271,7 +271,7 @@ traversals.
 \input{noop}
 
 
-\section{Patch Optimizations}
+\section{\Patch\ Optimizations}
 \label{sec:patch:optimizations}
 
 A naive implementation of this model has all the properties we want except
@@ -374,7 +374,7 @@ CPU time spent to preserve the old version is wasted.
 
 \textbf{\Patch\ memory usage.}
 %
-Patches themselves take up memory and require time to allocate, free, and
+\Patches\ themselves take up memory and require time to allocate, free, and
 traverse.
 %
 If two \patches\ have redundant dependencies, it would be faster to combine

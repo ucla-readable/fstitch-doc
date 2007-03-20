@@ -1,5 +1,5 @@
-\section{\Opgroups}
-\label{sec:opgroup}
+\section{\Patchgroups}
+\label{sec:patchgroup}
 
 \newcommand{\pgCreate}{\texttt{pg\_create}}
 \newcommand{\pgDepend}{\texttt{pg\_depend}}
@@ -25,12 +25,12 @@ committed with \texttt{(f)sync}, or applications can simply require
 particular file system implementation semantics, such as journaling.
 %
 %
-The \chdesc\ abstraction, in contrast, can let a process specify
+The \patch\ abstraction, in contrast, can let a process specify
 \emph{what} ordering is required and leave the file system to implement
 that ordering in the most appropriate way.
 
 
-This section describes \emph{\opgroups}, which extend \chdescs\ to user
+This section describes \emph{\patchgroups}, which extend \patches\ to user
 space and let applications express dependencies among file system
 operations.
 %
@@ -38,10 +38,10 @@ Compared to a dictated order, this lets the file system optimize commit
 orderings, but is still relatively independent of the underlying file
 system.
 %
-For example, \opgroups\ even allow an application to specify
+For example, \patchgroups\ even allow an application to specify
 dependencies among raw block device writes.
 
-In this section we describe the \opgroup\ abstraction
+In this section we describe the \patchgroup\ abstraction
 %
 and apply it to three robust applications.
 
@@ -49,14 +49,14 @@ and apply it to three robust applications.
 %% their application-level consistency protocols.
 
 \subsection{Interface and Implementation}
-\label{sec:opgroup:interface}
+\label{sec:patchgroup:interface}
 
-\Opgroups\ encapsulate sets of file system operations into units among
+\Patchgroups\ encapsulate sets of file system operations into units among
 which dependencies can be applied.
 %
-%% applications can specify ordering requirements among \opgroups.
+%% applications can specify ordering requirements among \patchgroups.
 %
-The \opgroup\ interface is as follows:
+The \patchgroup\ interface is as follows:
 
 \begin{scriptsize}
 \begin{alltt}
@@ -67,29 +67,29 @@ The \opgroup\ interface is as follows:
 \end{alltt}
 \end{scriptsize}
 
-Each process has its own set of \opgroups.
+Each process has its own set of \patchgroups.
 %
-The call \texttt{\pgDepend(p, q)} makes \opgroup\ \texttt{p} depend on
-\opgroup\ \texttt{q}: every change associated with \texttt{p} will be
+The call \texttt{\pgDepend(p, q)} makes \patchgroup\ \texttt{p} depend on
+\patchgroup\ \texttt{q}: every change associated with \texttt{p} will be
 delayed until all changes associated with \texttt{q} have committed.
 %
-\Opgroups\ can be \emph{engaged} or \emph{disengaged}; all changes made by
-a process are associated with that process's engaged \opgroups.
+\Patchgroups\ can be \emph{engaged} or \emph{disengaged}; all changes made by
+a process are associated with that process's engaged \patchgroups.
 %
-\pgSync\ forces an immediate write of \anopgroup\ to disk.
+\pgSync\ forces an immediate write of a \patchgroup\ to disk.
 %
 Whereas \Kudos\ \modules\ are presumed to not create cyclic
 dependencies, the kernel cannot safely trust user applications to be
 so well behaved, so
 %
-the \opgroup\ API restricts dependency manipulation so that cycles are
+the \patchgroup\ API restricts dependency manipulation so that cycles are
 inconstructible. For example, \texttt{\pgDepend(p, q)} returns an error if
 \texttt{p} has ever been engaged.
 
-\Opgroups\ and file descriptors are managed similarly; e.g. they are copied
+\Patchgroups\ and file descriptors are managed similarly; e.g. they are copied
 across \texttt{fork()} and preserved across \texttt{exec()}.
 %
-This allows existing programs to interact with \opgroups\ without
+This allows existing programs to interact with \patchgroups\ without
 knowing it, in the same way that programs do not have to know about
 pipes for the shell to connect them in a pipeline.
 %
@@ -107,32 +107,32 @@ to disk:
 \end{center}
 \vspace{-0.5\baselineskip}
 
-% FIXME: Mention simplicity using opgroups vs fsync?
+% FIXME: Mention simplicity using patchgroups vs fsync?
 
-\Opgroup\ support is implemented by an \LFS\ module that lives above a file
+\Patchgroup\ support is implemented by an \LFS\ module that lives above a file
 system module like ext2.
 %
-Each \opgroup\ corresponds to a pair of empty \patches, and inter-\opgroup\
+Each \patchgroup\ corresponds to a pair of \noop\ \patches, and inter-\patchgroup\
 dependencies affect these \patches.
 %
-When an \opgroup\ is engaged, the \LFS\ module ensures that all file system
+When an \patchgroup\ is engaged, the \LFS\ module ensures that all file system
 changes are inserted between these \patches.
 %
-Figure~\ref{fig:opgroup-chdescs} shows an example \patch\ arrangement for
+Figure~\ref{fig:patchgroup-patches} shows an example \patch\ arrangement for
 two \patchgroups.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.7\hsize]{fig/figures_5}
-\caption{\label{fig:opgroup-chdescs} \Chdescs\ corresponding to two
-  \opgroups, $p$ and $q$.  The $h$ and $t$ patches are created by the 
-  \opgroup\ module; the heavy dependency between $t_p$ and $h_q$ was added
+\caption{\label{fig:patchgroup-patches} \Patches\ corresponding to two
+  \patchgroups, $p$ and $q$.  The $h$ and $t$ \patches\ are created by the 
+  \patchgroup\ module; the heavy dependency between $t_p$ and $h_q$ was added
   by \texttt{pg~depend(p, q)}.  Each of $a_i$, $b$, and $c$ corresponds to
   a different file system change.}
 \end{figure}
 
 \subsection{Case Studies}
-\label{sec:opgroup:casestudies}
+\label{sec:patchgroup:casestudies}
 
 %% \todo{Introduce and contrast gzip, Subversion, and UW IMAP}
 %% %
@@ -140,20 +140,20 @@ two \patchgroups.
 %% Subversion case study (about same speed, additional safety on non-ext3
 %% ordered, client).
 
-We tested the \opgroup\ interface by adding \opgroup\ support to three
+We tested the \patchgroup\ interface by adding \patchgroup\ support to three
 applications: the gzip compression utility, the Subversion version control
 system, and the uw-imapd IMAP mail server daemon.
 
 \paragraph{Gzip}
-\label{sec:opgroup:gzip}
+\label{sec:patchgroup:gzip}
 
 Our first test showed that trivial consistency requirements were trivial to
-add.  We updated gzip to use \opgroups\ that ensure the input file's
+add.  We updated gzip to use \patchgroups\ that ensure the input file's
 removal is not committed before the output file's data is written, so that
 a crash does not lose both files. The update adds 10 lines of code to gzip.
 
 \paragraph{Subversion}
-\label{sec:opgroup:svn}
+\label{sec:patchgroup:svn}
 
 The Subversion version control system's client~\cite{svn} manipulates a
 local \emph{working copy} of a possibly-remote source repository.
@@ -209,13 +209,13 @@ provide the metadata ordering property. On these systems, the journal
 file's installation may precede earlier file installations, leaving the
 working copy in an inconsistent state.
 
-We updated the Subversion working copy library to use \opgroups\ to
+We updated the Subversion working copy library to use \patchgroups\ to
 express commit ordering requirements
 %% \todo{Use consistency protocol phrase here and throughout?} 
 without relying on properties of the
 underlying file system implementation.
 %
-For example, Figure~\ref{fig:svn-order} shows the \opgroups\ created to update a
+For example, Figure~\ref{fig:svn-order} shows the \patchgroups\ created to update a
 file with conflicts.
 %
 The use of the file rename property is replaced in two ways.
@@ -230,7 +230,7 @@ the data for these files need only precede the installation of the
 referencing file.
 %
 The use of linearly ordered metadata updates is also replaced by
-\opgroup\ dependencies.
+\patchgroup\ dependencies.
 %
 Although the original operations assumed a linear ordering of metadata
 updates, the actual order requirements are considerably less strict.
@@ -249,12 +249,12 @@ the 220 lines of code that enforce safety for conflicted updates (out of
 \begin{figure}[t]
   \centering
   \includegraphics[width=.8\columnwidth]{svn_opgroups}
-  \caption{\Opgroups\ to update a file in a Subversion working copy.}
+  \caption{\Patchgroups\ to update a file in a Subversion working copy.}
   \label{fig:svn-order}
 \end{figure}
 
 \paragraph{UW IMAP}
-\label{sec:opgroup:uwimap}
+\label{sec:patchgroup:uwimap}
 
 Finally, we updated the University of Washington's IMAP mail server~\cite{uwimap} to
 ensure mail updates are committed to disk
@@ -268,13 +268,13 @@ disk (CHECK), copy a message from the selected mailbox to another
 mailbox (COPY), and delete messages marked for deletion (EXPUNGE).
 
 The imapd and mbox mail storage
-drivers were updated to use \opgroups, ensuring that all disk changes occur in a safe
+drivers were updated to use \patchgroups, ensuring that all disk changes occur in a safe
 ordering without enforcing any specific order.
 %
 The original server conservatively preserved command ordering by
 syncing the mailbox file after each CHECK on it or COPY into it. With
-\opgroups, each command's file system updates are executed under a
-distinct \opgroup\ and, through the \opgroup, made to depend on the
+\patchgroups, each command's file system updates are executed under a
+distinct \patchgroup\ and, through the \patchgroup, made to depend on the
 previous command's updates. This is necessary, for example, so that
 moving a message to another folder (accomplished by copying to the
 destination file and then removing from the source file) cannot lose
@@ -284,7 +284,7 @@ updates.
 The updated CHECK command uses \pgSync\ to sync all preceding disk
 updates. This enhancement to CHECK removes the requirement that COPY
 sync its destination mailbox: the client's CHECK request will ensure
-changes are committed to disk, and the \opgroup\ dependencies ensure
+changes are committed to disk, and the \patchgroup\ dependencies ensure
 changes are committed in a safe ordering.
 
 These changes to UW IMAP simplify it in two ways:
@@ -296,7 +296,7 @@ and making efficient usage of disk updates.
 As each command's changes now depend on the preceding command's
 changes, it is no longer required that all code
 ensure its changes are committed before any later, dependent
-command's changes. Without \opgroups, modules like the mbox driver
+command's changes. Without \patchgroups, modules like the mbox driver
 forced a conservative disk sync protocol because ensuring safety more
 efficiently required additional state information, adding further
 complexity. The Dovecot IMAP server's source code notes this exact
@@ -312,5 +312,5 @@ difficulty~\cite[maildir-save.c]{dovecot}:
 \end{scriptsize}
 \vspace{-0.5\baselineskip}
 
-The performance of the \opgroup{}-enabled UW IMAP mail server is
+The performance of the \patchgroup{}-enabled UW IMAP mail server is
 evaluated in Section~\ref{sec:evaluation:uwimap}.

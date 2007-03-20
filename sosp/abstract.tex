@@ -9,10 +9,10 @@ Previous file systems have enforced write orderings in system-dependent
  structure~\cite{ganger00soft} or with a journal, which enforces a
  particular consistency protocol.
 %
-We present a general \emph{\chdesc} abstraction that can represent any
+We present a general \emph{\patch} abstraction that can represent any
  write ordering in a file system agnostic manner.
 %
-A \chdesc-based file system implementation expresses dependencies among
+A \patch-based file system implementation expresses dependencies among
  writes, but not how those dependencies should be enforced.
 %
 File system \modules\ can examine, preserve, and modify write
@@ -22,9 +22,9 @@ Generalized file system dependencies are naturally exportable to user
  level, allowing applications to specify their own consistency protocols
  for the file system to follow.
 
-We present the \chdesc\ abstraction, describe a number of important
- optimizations for \chdesc-based file systems, and present a Linux kernel
- implementation of a storage subsystem that uses \chdescs\ to enforce
+We present the \patch\ abstraction, describe a number of important
+ optimizations for \patch-based file systems, and present a Linux kernel
+ implementation of a storage subsystem that uses \patches\ to enforce
  consistency.
 %
 Our ext2 prototype is competitive with FreeBSD soft updates and allows
@@ -35,19 +35,19 @@ Our ext2 prototype is competitive with FreeBSD soft updates and allows
 \begin{comment}
 
 We propose a file system implementation architecture, called \emph{\Kudos},
-where structures called \emph{\chdescs} represent any and all changes to
+where structures called \emph{\patches} represent any and all changes to
 stable storage.
 %
-%%  File systems generate \chdescs\ for all writes, then
+%%  File systems generate \patches\ for all writes, then
 %% send them to block devices for eventual commit. Explicit dependencies between
-%% \chdescs\ let \Kudos\ \modules\ preserve necessary file system
-%% invariants without understanding the file system itself. \Chdescs\ can
+%% \patches\ let \Kudos\ \modules\ preserve necessary file system
+%% invariants without understanding the file system itself. \Patches\ can
 %% implement many consistency mechanisms, including soft updates and journaling.
 %
 \Kudos\ is decomposed into fine-grained \modules\ which generate, consume,
- forward, and manipulate \chdescs.
+ forward, and manipulate \patches.
 %
-The uniform abstraction of \chdescs\ allows modules to impose and
+The uniform abstraction of \patches\ allows modules to impose and
  follow arbitrary file system consistency policies: a collection of
  loosely-coupled modules cooperates to implement strong and possibly
  complex guarantees, even though each individual module does a relatively
@@ -58,11 +58,11 @@ The uniform abstraction of \chdescs\ allows modules to impose and
 %% layout from higher-level file system-independent code, which operates on
 %% abstract disk structures. 
 %
-For example, by observing and modifying \chdesc\ constraints, our
+For example, by observing and modifying \patch\ constraints, our
  journaling \module\ can automatically add journaling to any file system.
 %
 Additionally, a new system call interface gives applications some direct
- control over \chdescs. We have used this interface to
+ control over \patches. We have used this interface to
 improve the UW IMAP server, removing inefficient and unnecessary calls to
 \texttt{fsync()} while preserving the integrity of mail messages.
 %

@@ -17,7 +17,7 @@ journal vary in each implementation, but in all cases, the system can use the
 journal to play out (or roll back) the operations that did not complete as a
 result of a crash. Thus, \emph{fsck} can be avoided by consulting the journal
 when recovering from a crash.  Section \ref{sec:using:journal} explains
-journaling with \chdescs.
+journaling with \patches.
 
 External synchrony~\cite{nightingale06rethink} builds on journaling to
 automatically provide strict file system operation ordering for applications,
@@ -89,8 +89,8 @@ systems. %% (Wrapfs~\cite{zadok99stackable, zadok99extending} is similar.)
 GEOM, on the other hand, deals only with the block device layer, and has no
 way to work with the file systems stored on those block devices. Neither
 has a formal way of specifying or honoring complex write-ordering
-information, which is what \chdescs\ in \Kudos\ provide. We imagine that
-systems like these could be adapted to work with \chdescs, giving the
+information, which is what \patches\ in \Kudos\ provide. We imagine that
+systems like these could be adapted to work with \patches, giving the
 benefits of both ideas.
 
 \paragraph{Applications}

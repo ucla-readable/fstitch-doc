@@ -11,14 +11,14 @@ systems.
 We would also like to identify places where \Kudos\ can be made more flexible,
 by adding more features to the system and changing the existing parts that make
 these features difficult to add. For instance, we would like to find more
-applications which can take advantage of \opgroups, and see what changes might
-need to be made to the \opgroup\ interface in order to facilitate adapting those
+applications which can take advantage of \patchgroups, and see what changes might
+need to be made to the \patchgroup\ interface in order to facilitate adapting those
 applications.
 
 There are several ways in which the performance can be improved. For instance,
-we create a very large number of \chdescs, and the sheer number of them can
-cause problems for any algorithm which needs to traverse parts of the \chdesc\
-dependency graph. We already attack this problem by merging \chdescs\ using
+we create a very large number of \patches, and the sheer number of them can
+cause problems for any algorithm which needs to traverse parts of the \patch\
+dependency graph. We already attack this problem by merging \patches\ using
 several different heuristics to determine when it is safe to do so. However, the
 heuristics are fairly conservative, and further improvements will likely uncover
 additional merging opportunities.
@@ -27,17 +27,17 @@ The merging \Kudos\ currently performs preserves the data exactly, and only
 alters the graph structure. When files are deleted, it is often the case that
 during the delete operation many blocks are updated but then later freed. It is
 not actually necessary to write the updated versions of the blocks at all in
-this case; they can merely be discarded. A new type of \chdesc, one which merges
+this case; they can merely be discarded. A new type of \patch, one which merges
 with those already on the block and indicates that the block need not be written
 (effectively cancelling them out), could help \Kudos\ take advantage of this
 situation.
 
-Another strategy for dealing with the large number of \chdescs\ is to avoid
+Another strategy for dealing with the large number of \patches\ is to avoid
 costly traversals altogether by incrementally calculating and propagating
-information about the \chdesc\ graph. We already do this as well, but there are
+information about the \patch\ graph. We already do this as well, but there are
 still some places where we must iterate over potentially large lists of
-\chdescs. For instance, when creating a new \chdesc, \Kudos\ needs to identify
-other \chdescs\ on the same block which overlap with the new \chdesc. This is
+\patches. For instance, when creating a new \patch, \Kudos\ needs to identify
+other \patches\ on the same block which overlap with the new \patch. This is
 currently one of the larger uses of CPU time in \Kudos. Some optimization has
 already been done to improve the performance of this operation, but the problem
 has not yet been completely solved.

@@ -1,99 +1,99 @@
 % -*- mode: latex; tex-main-file: "paper.tex" -*-
 
-\subsection{\Nrb\ \ChDesc\ Merging}
+\subsection{\Nrb\ \Patch\ Merging}
 \label{sec:patch:merge}
 
 File operations such as block allocations, inode updates, and directory updates
-create many distinct \chdescs. Keeping track of these
-\chdescs\ and their dependencies requires significant amounts of memory and
+create many distinct \patches. Keeping track of these
+\patches\ and their dependencies requires significant amounts of memory and
 CPU time.
 %
-\Kudos\ therefore \emph{merges} patches when possible, drastically reducing
-the \chdesc\ counts and memory usage, by conservatively identifying when a
+\Kudos\ therefore \emph{merges} \patches\ when possible, drastically reducing
+the \patch\ counts and memory usage, by conservatively identifying when a
 new \patch\ could always be written at the same time as an existing \patch.
 %
-Rather than creating a new \chdesc\ in this case, \Kudos\ updates the data
+Rather than creating a new \patch\ in this case, \Kudos\ updates the data
 and dependencies so as to merge the new \patch\ into the existing one.
 
 
 The first type of merging is trivial to explain:
 %
-since all of a block's hard patches must be written at the same time, there
-is no need to maintain more than one hard patch per block.
+since all of a block's \nrb\ \patches\ must be written at the same time, there
+is no need to maintain more than one \nrb\ \patch\ per block.
 %
-All other hard patches can safely be merged into the first,
+All other \nrb\ \patches\ can safely be merged into the first,
 %
-and in fact \Kudos\ ensures that each block contains at most one hard
-patch.
+and in fact \Kudos\ ensures that each block contains at most one \nrb\
+\patch.
 
 
-Assume some module attempts to create a patch $p$ on a block that already
-has a hard patch $h$, and \Kudos\ determines that $p$ may be hard.
+Assume some module attempts to create a \patch\ $p$ on a block that already
+has a \nrb\ \patch\ $h$, and \Kudos\ determines that $p$ may be \nrb.
 %
 Then the implementation merges $p$ into $h$ at creation time by applying
 $p$'s data to the block and setting $\PDDepset{h} \gets \PDDepset{h} \cup
 \PDDepset{p}$.
 %
 Although this changes $h$'s direct dependency set, that change cannot
-introduce any new block-level cycles or $p$ would not have been hard in the
+introduce any new block-level cycles or $p$ would not have been \nrb\ in the
 first place.
 %
-The existing hard patch $h$ is returned to the caller.
+The existing \nrb\ \patch\ $h$ is returned to the caller.
 
 
 Unfortunately, the merge can create \emph{intra}-block cycles.
 %
-If some empty patch $x$ exists with $p \PDepend x \PDepend h$, then after
+If some \noop\ \patch\ $x$ exists with $p \PDepend x \PDepend h$, then after
 the merge $h \PDepend x \PDepend h$.
 %
 The merge algorithm uses a graph traversal to prune these cyclic
 dependencies as it merges $p$'s dependencies into $h$.
 
 
-Hard patch merging is able to eliminate 8 of the patches in our running
+\Nrb\ \patch\ merging is able to eliminate 8 of the \patches\ in our running
 example, as shown in Figure~\ref{fig:opt}c.
 
 
-\paragraph{Soft-to-Hard Conversion}
+\paragraph{\Rb-to-\Nrb\ Conversion}
 
-A new hard patch might also be created on a block
-that has existing \emph{soft} patches in memory.
+A new \nrb\ \patch\ might also be created on a block
+that has existing \emph{\rb} \patches\ in memory.
 %
-For example, Figure~\ref{f:soft2hard}a shows a block with both hard and
-soft patches: $p_1$ must be soft since it initiates a block-level cycle
+For example, Figure~\ref{f:soft2hard}a shows a block with both \nrb\ and
+\rb\ \patches: $p_1$ must be \rb\ since it initiates a block-level cycle
 $p_1 \PDepend q_h \PDepend p_h$, and similarly for $p_2$ and $p_3$.
 %
 To write these blocks, the buffer cache must roll back $p_1$, $p_2$, and
 $p_3$ and write $p_h$ on its own.
 %
-Once $p_h$ reaches disk, the patches in memory reach the state in
+Once $p_h$ reaches disk, the \patches\ in memory reach the state in
 Figure~\ref{f:soft2hard}b.
 %
 Now that $p_h$ has moved to \PDisk, it is irrelevant for cycle detection,
 and in fact there are no block-level dependency cycles in the diagram: it
-would be safe to transform $p_1$, $p_2$, and $p_3$ into hard patches.
+would be safe to transform $p_1$, $p_2$, and $p_3$ into \nrb\ \patches.
 %
 However, \Kudos\ delays this and performs the conversion only later when
-adding a new hard patch to the $p$ block. 
+adding a new \nrb\ \patch\ to the $p$ block. 
 
 
-Consider a new hard patch $p_h$ that is added to a block that contains some
-soft patch $p$.
+Consider a new \nrb\ \patch\ $p_h$ that is added to a block that contains some
+\rb\ \patch\ $p$.
 %
 Since $p_h$ overlaps $p$, \Kudos\ adds a direct dependency $p_h \PDDepend p$.
 %
-Since $p_h$ could be hard, we know there are no block-level dependency cycles
+Since $p_h$ could be \nrb, we know there are no block-level dependency cycles
 $p_h \PDepend q \PDepend p'$.
 %
 But as a result, we know that there are no block-level dependency cycles
-with the existing \emph{soft} patch as head, since such a cycle would imply
+with the existing \emph{\rb} \patch\ as head, since such a cycle would imply
 a $p_h$-headed cycle $p_h \PDDepend p \PDepend q \PDepend p'$.
 %
-Thus, $p$ can be transformed into a hard patch and then merged into $p_h$
-using hard patch merging.
+Thus, $p$ can be transformed into a \nrb\ \patch\ and then merged into $p_h$
+using \nrb\ \patch\ merging.
 %
-Figure~\ref{f:soft2hard}c shows the resulting configuration when a new hard
-patch $p_h'$ is added.
+Figure~\ref{f:soft2hard}c shows the resulting configuration when a new \nrb\
+\patch\ $p_h'$ is added.
 
 
 \begin{figure}
@@ -105,10 +105,10 @@ patch $p_h'$ is added.
 \includegraphics[width=\hsize]{fig/softhard_3} \\
 \centering \textbf{a)} Initial state &
 \centering \textbf{b)} After $p_h$ reaches~disk &
-\centering \textbf{c)} Soft-to-hard conversion
+\centering \textbf{c)} \Rb-to-\nrb\ conversion
 \end{tabular}
 \end{small}
-\caption{Soft-to-hard conversion.}
+\caption{\Rb-to-\nrb\ conversion.}
 \label{f:soft2hard}
 \end{figure}
 
@@ -116,99 +116,99 @@ patch $p_h'$ is added.
 
 \begin{comment}
 
-\Kudos\ includes three distinct \chdesc\ merge algorithms.
+\Kudos\ includes three distinct \patch\ merge algorithms.
 %
 All three use Invariant~\ref{cdinvar:add-before} to reason about future
-graph changes and use fast, conservative checks during \chdesc\ creation;
+graph changes and use fast, conservative checks during \patch\ creation;
 they differ in their applicable conditions.
 
 
-\subsubsection{\Nrb\ \ChDesc\ Merging}
-\label{sec:chdescs:merge:nrb}
+\subsubsection{\Nrb\ \Patch\ Merging}
+\label{sec:patches:merge:nrb}
 
-Recall from Section~\ref{sec:chdescs:nrb} that a write of any \chdescs\ on
-block $b$ must include all \nrb\ \chdescs\ on $b$.
+Recall from Section~\ref{sec:patches:nrb} that a write of any \patches\ on
+block $b$ must include all \nrb\ \patches\ on $b$.
 %
 This additional requirement is in fact an exquisite optimization
-opportunity; it implies that all \nrb\ \chdescs\ on a given block can
+opportunity; it implies that all \nrb\ \patches\ on a given block can
 be merged.
 %
-Further, merging can remove the need for the \nrb\ \chdesc\ implicit
+Further, merging can remove the need for the \nrb\ \patch\ implicit
 dependency rules by ensuring that
 %
-there is at most one \nrb\ \chdesc\ per block (\nrb-\nrb\ merging)
+there is at most one \nrb\ \patch\ per block (\nrb-\nrb\ merging)
 %
-and that all \rb\ \chdescs\ on a given block depend on the \nrb\ \chdesc\
+and that all \rb\ \patches\ on a given block depend on the \nrb\ \patch\
 (\nrb-\rb\ merging).
 %
-We describe these two \chdesc\ merging algorithms and how they
+We describe these two \patch\ merging algorithms and how they
 preserve dependency semantics in this section.
 
-\paragraph{\Nrb-\Nrb\ \ChDesc\ Merging}
-\label{sec:chdescs:merge:nrb:hard-hard}
+\paragraph{\Nrb-\Nrb\ \Patch\ Merging}
+\label{sec:patches:merge:nrb:hard-hard}
 
-\emph{\Nrb-\nrb\ \chdesc\ merging} merges a new \nrb\ \chdesc\ \p{q}
-into an existing \nrb\ \chdesc\ \p{p} instead of creating \p{q}.
+\emph{\Nrb-\nrb\ \patch\ merging} merges a new \nrb\ \patch\ \p{q}
+into an existing \nrb\ \patch\ \p{p} instead of creating \p{q}.
 %
-Any two \nrb\ \chdescs\ on the same block may be (and are) merged.
+Any two \nrb\ \patches\ on the same block may be (and are) merged.
 %
-Merging all \nrb\ \chdescs\ ensures:
+Merging all \nrb\ \patches\ ensures:
 %
 \cdinvar{one-nrb}{\(\forall\! b\!: |\PHard[b]| \leq 1\)}
 %
 \noindent
 %
-Invariant~\ref{cdinvar:one-nrb} simplifies \nrb\ \chdesc\ handling by
+Invariant~\ref{cdinvar:one-nrb} simplifies \nrb\ \patch\ handling by
 %
-removing the implicit dependencies that ensure all \nrb\ \chdescs\
+removing the implicit dependencies that ensure all \nrb\ \patches\
 are written together
 %
-and by removing the need to scan for an existing \nrb\ \chdesc\ when
-\nrb-\nrb\ \chdesc\ merging.
+and by removing the need to scan for an existing \nrb\ \patch\ when
+\nrb-\nrb\ \patch\ merging.
 %
-% Although merging two \chdescs\ will not induce block-level dependency
-% cycles, without sufficient care merging could induce \chdesc-level
+% Although merging two \patches\ will not induce block-level dependency
+% cycles, without sufficient care merging could induce \patch-level
 % dependency cycles.  A trivial example is merging \p{q} into \p{p} when
 % \p{q} has an explicit dependency on \p{p}; the combined \p{(p+q)}
 % should not and need not depend on itself.
 %
 To preserve dependency semantics, the merged \p{(p+q)} must depend on
 the union of \p{p} and \p{q}'s transitive \befores. Additionally, while the
-\chdescs\ can be merged without forming a \chdesc-level dependency cycle,
+\patches\ can be merged without forming a \patch-level dependency cycle,
 the merge must ensure that it does not introduce a needless cycle, e.g.
-through \anoop\ \chdesc\ \p{e} in \depends{q}{\depends{e}{p}}
+through \anoop\ \patch\ \p{e} in \depends{q}{\depends{e}{p}}
 \todo{Is cycle avoidance worth mentioning? Is this a good way to mention it?}.
 
-From Invariant~\ref{cdinvar:add-before} and the \nrb\ \chdesc\
+From Invariant~\ref{cdinvar:add-before} and the \nrb\ \patch\
 creation condition (no external \afters), the only possible
 dependencies involving \p{p} and \p{q} are those shown in
 Figure~\ref{fig:nrb-merge}\todo{Should we give these deductions or a
   flavor?}.
 %
 Notice, for example, that any \p{r} such that
-\indirdepends{q}{\indirdepends{r}{p}} is \anoop\ \chdesc\todo{This is
+\indirdepends{q}{\indirdepends{r}{p}} is \anoop\ \patch\todo{This is
   a strong statement. Expand on its implications?}.
 %
-Our algorithm to transform dependencies for \nrb-\nrb\ \chdesc\ merges
+Our algorithm to transform dependencies for \nrb-\nrb\ \patch\ merges
 (Figure~\ref{algo:merge:hard-hard}) follows from these possible
 dependencies.
 %
 It updates \p{p}'s transitive \befores\ to ensure
-\(\PDepset{q}\todo{Incorrect! Only the non-\noop{}s.} \subseteq
+\(\PDepset{q}\todo{Incorrect! Only the true \patches.} \subseteq
 \PDepset{p}\)\todo{Note that Invariant~\ref{cdinvar:add-before}
-  ensures that \noop\ \chdescs\ reachable from \p{q} will not gain
-  data \chdesc\ \befores?}\todo{Note that it only needs to move dependencies?}.
+  ensures that \noop\ \patches\ reachable from \p{q} will not gain
+  data \patch\ \befores?}\todo{Note that it only needs to move dependencies?}.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=\columnwidth]{nrb_merge}
-  \caption{Possible dependencies when merging \nrb\ \chdesc\ \p{q}
-    into existing \nrb\ \chdesc\ \p{p}.}
+  \caption{Possible dependencies when merging \nrb\ \patch\ \p{q}
+    into existing \nrb\ \patch\ \p{p}.}
   \label{fig:nrb-merge}
 \end{figure}
 
 \noindent Algorithm called on \p{q} and \p{p}:\\
-Input: \chdesc\ \p{a} and existing \nrb\ \chdesc\ \p{p}.\\
+Input: \patch\ \p{a} and existing \nrb\ \patch\ \p{p}.\\
 Returns: whether \indirdepends{a}{p} exists. \(\forall\! \p{b}\!: \indirdepends{a}{b}\) and \notindirdepends{b}{p}, creates \indirdepends{p}{b}.
 
 \begin{itemize}
@@ -225,50 +225,50 @@ Returns: whether \indirdepends{a}{p} exists. \(\forall\! \p{b}\!: \indirdepends{
   \end{itemize}
 \end{itemize}
 
-\paragraph{\Nrb-\Rb\ \ChDesc\ Merging}
-\label{sec:chdescs:merge:nrb:hard-soft}
+\paragraph{\Nrb-\Rb\ \Patch\ Merging}
+\label{sec:patches:merge:nrb:hard-soft}
 
-When creating the first \nrb\ \chdesc\ on a block, \emph{\nrb-\rb\
-  \chdesc\ merging} merges all existing (\rb) \chdescs\ into the new
-\nrb\ \chdesc.
+When creating the first \nrb\ \patch\ on a block, \emph{\nrb-\rb\
+  \patch\ merging} merges all existing (\rb) \patches\ into the new
+\nrb\ \patch.
 %
-Such an arrangement can arise through a combination of \chdesc\ creates
+Such an arrangement can arise through a combination of \patch\ creates
 and block writes; 
 %
-for example, the block may first obtain an initial (\nrb{}) \chdesc,
+for example, the block may first obtain an initial (\nrb{}) \patch,
 %
-then gain external \afters\ on its \chdesc,
+then gain external \afters\ on its \patch,
 %
-accumulate additional (\rb{}) \chdescs,
+accumulate additional (\rb{}) \patches,
 %
-write the subset of its \chdescs\ with external \afters\ (leaving some
-\rb\ \chdescs\ on the block),
+write the subset of its \patches\ with external \afters\ (leaving some
+\rb\ \patches\ on the block),
 %
-and then gain a \nrb\ \chdesc.
+and then gain a \nrb\ \patch.
 %
-In addition to reducing the number of data \chdescs, \nrb-\rb\
-\chdesc\ merging removes the second implicit \nrb\ \chdesc\
-dependency, that \rb\ \chdescs\ not explicitly dependent on the
-block's \nrb\ \chdesc\ implicitly depend on it.
+In addition to reducing the number of data \patches, \nrb-\rb\
+\patch\ merging removes the second implicit \nrb\ \patch\
+dependency, that \rb\ \patches\ not explicitly dependent on the
+block's \nrb\ \patch\ implicitly depend on it.
 %
-As in \nrb-\nrb\ \chdesc\ merging, \Kudos\ merges such \chdescs\ to
+As in \nrb-\nrb\ \patch\ merging, \Kudos\ merges such \patches\ to
 avoid the complications of their implicit dependencies.
 
-\Nrb-\rb\ \chdesc\ merging's implementation first merges all \rb\ \chdescs\
-into a \nrb\ \chdesc\ and then \nrb-\nrb\ \chdesc\ merges the new \nrb\
-\chdesc\ into the now-existing \nrb\ \chdesc.
+\Nrb-\rb\ \patch\ merging's implementation first merges all \rb\ \patches\
+into a \nrb\ \patch\ and then \nrb-\nrb\ \patch\ merges the new \nrb\
+\patch\ into the now-existing \nrb\ \patch.
 %
-Our algorithm to transform the dependencies for \nrb-\rb\ \chdesc\
+Our algorithm to transform the dependencies for \nrb-\rb\ \patch\
 merges (Figure~\ref{algo:merge:hard-soft}) for block $b$
 %
-chooses a \chdesc\ \p{p} such that
+chooses a \patch\ \p{p} such that
 \(\notexists \inset{q}{\PMem[b]}\!: \indirdepends{p}{q}\)
 %
 and updates its transitive \befores\ to ensure
 \(\PDepset{\PSoft[b]} \subseteq \PDepset{p}\).
 %
 Because any \(\inset{q}{\PMem[b] - p}\) may have \afters, to
-preserve dependencies we convert such a \p{q} into \anoop\ \chdesc\
+preserve dependencies we convert such a \p{q} into \anoop\ \patch\
 and ensure \depends{q}{p}.
 
 \noindent Algorithm:
@@ -278,55 +278,55 @@ and ensure \depends{q}{p}.
 \item For each \inset{q}{\PMem[b] - p}:
   \begin{itemize}
   \item Call the \nrb-\nrb\ \before\ move algorithm on \p{q} and \p{p}.
-  \item Convert \p{q} into \anoop\ \chdesc.
+  \item Convert \p{q} into \anoop\ \patch.
   \end{itemize}
-\item Convert \p{p} into a \nrb\ \chdesc\ (free it's previous data copy).
+\item Convert \p{p} into a \nrb\ \patch\ (free it's previous data copy).
 \end{itemize}
 
 \todo{Note that \nrb-\rb\ merging is rare? Note why it is helpful even though
 it is rare?}
 \todo{Explain why this preserves dependency semantics? Show possible
-dependencies? For the paper, free \chdescs\ instead of convert them
+dependencies? For the paper, free \patches\ instead of convert them
 into \noop{}s? (Must modify \nrb-\nrb\ algo usage.)}
 
 \end{comment}
 
 
 \subsection{Overlap Merging}
-\label{sec:chdescs:merge:overlap}
+\label{sec:patches:merge:overlap}
 
-The final type of merging merges soft patches with other patches,
-hard or soft, when they overlap.
+The final type of merging merges \rb\ \patches\ with other \patches,
+\nrb\ or \rb, when they overlap.
 %
-Bitmap blocks and inodes accumulate many nearby and overlapping \chdescs\
+Bitmap blocks and inodes accumulate many nearby and overlapping \patches\
 as data is appended to or truncated from a file.
 %
 Figure~\ref{fig:opt} shows how even data blocks can collect overlapping
 dependencies: actual data writes $d'_j$ overlap, and therefore depend on,
-block initialization writes $d_j$, but cannot be made hard since when they
+block initialization writes $d_j$, but cannot be made \nrb\ since when they
 are created another block (the inode) already depends on the data block.
 %
 Luckily, simple reasoning can identify many mergeable pairs,
-further reducing the number of patches and the amount of rollback data
+further reducing the number of \patches\ and the amount of rollback data
 required.
 
 
-Two overlapping patches $p_1$ and $p_2$, with $p_1 \PDepend p_2$, may be
+Two overlapping \patches\ $p_1$ and $p_2$, with $p_1 \PDepend p_2$, may be
 merged iff it would always be possible to write them at the same time.
 %
-Here we may reuse the reasoning developed for hard patches above: it is
-always possible to write these patches simultaneously if, assuming that
-$p_2$ were hard, $p_1$ could also be made hard---that is, if $p_1$ will
+Here we may reuse the reasoning developed for \nrb\ \patches\ above: it is
+always possible to write these \patches\ simultaneously if, assuming that
+$p_2$ were \nrb, $p_1$ could also be made \nrb---that is, if $p_1$ will
 never be the head of a block-level cycle terminating at $p_2$.
 %
-The same properties that simplified the creation of hard patches also help
+The same properties that simplified the creation of \nrb\ \patches\ also help
 us check this property: that is, if no block-level cycle $p_1 \PDepend x
 \PDepend p_2$ exists when $p_1$ is created, then no such block-level cycle
 will ever exist.
 
 
 
-As with hard patch creation, the \Kudos\ implementation checks a simpler
+As with \nrb\ \patch\ creation, the \Kudos\ implementation checks a simpler
 property that requires less graph traversal.
 %
 It checks that every path starting at $p_1$ fits at least one of the
@@ -335,9 +335,9 @@ following cases:
 \begin{xcompactitemize}
 \item $p_1 \PDDepend q$, where $q \not\in \PMem$.
 \item $p_1 \PDDepend p_2$.
-\item $p_1 \PDDepend h$, where $h$ is the hard patch on $\PBlock{p_1}$.
-\item $p_1 \PDDepend q$, where $q$ depends on no other patch.
-\item $p_1 \PDDepend q \PDDepend r$, where $r$ depends on no other patch,
+\item $p_1 \PDDepend h$, where $h$ is the \nrb\ \patch\ on $\PBlock{p_1}$.
+\item $p_1 \PDDepend q$, where $q$ depends on no other \patch.
+\item $p_1 \PDDepend q \PDDepend r$, where $r$ depends on no other \patch,
   $q$ depends on nothing but $r$, and $\PBlock{r} \neq \PBlock{p_1}$.
 \end{xcompactitemize}
 
@@ -354,15 +354,15 @@ depended on $p_2$, but extending the check to length-2 non-branching paths
 allowed much more merging (further extensions did not).
 %
 It also simplifies the implementation somewhat to limit overlap merging to
-the case when neither $p_1$ nor $p_2$ overlaps with any other patch.
+the case when neither $p_1$ nor $p_2$ overlaps with any other \patch.
 
 
 
 In our running example, overlap merging is able to combine all remaining
-soft patches with their hard counterparts, reducing the number of patches
+\rb\ \patches\ with their \nrb\ counterparts, reducing the number of \patches\
 to the minimum of 8 and the amount of rollback data to the minimum of 0.
 %
-In our experiments, we observe that hard patches and our patch merging
+In our experiments, we observe that \nrb\ \patches\ and our \patch\ merging
 optimizations reduce the amount of memory allocated for rollback data in
 soft updates orderings by up to 99.73\%.
 
@@ -377,37 +377,37 @@ same time.
 Specifically, it is possible to write $p_1$ 
 
 
-Many of these and similar \chdescs\ are mergeable and have
+Many of these and similar \patches\ are mergeable and have
 dependencies that allow simple (and fast) reasoning to identify many
-of the mergeable pairs: two \chdescs\ on block $b$ that overlap no other \chdescs\ in \PMem[b]
-and which have no dependency path from the new to the existing \chdesc\
+of the mergeable pairs: two \patches\ on block $b$ that overlap no other \patches\ in \PMem[b]
+and which have no dependency path from the new to the existing \patch\
 will not induce a block-level cycle and so are writable together.
 We know that \textit{later} changes will not cause them to induce a block-level cycle due to
-invariant~\ref{cdinvar:add-before} and by not merging if the new \chdesc\
+invariant~\ref{cdinvar:add-before} and by not merging if the new \patch\
 has a before and the before is marked as allowed to violate
 invariant~\ref{cdinvar:add-before}.
 %
 While path existence testing is expensive, a conservative path test
-of only a depth of two identifies most mergeable \chdescs. If the new
-\chdesc\ has an explicit \before\ that is not the existing \chdesc\ and
+of only a depth of two identifies most mergeable \patches. If the new
+\patch\ has an explicit \before\ that is not the existing \patch\ and
 this \before\ has a \before, then there may be a path to the existing
-\chdesc.
+\patch.
 %
-To merge two such overlapping \chdescs, add the new \chdesc's explicit
-before to the existing \chdesc\ (if any and if not the existing \chdesc).
+To merge two such overlapping \patches, add the new \patch's explicit
+before to the existing \patch\ (if any and if not the existing \patch).
 
 
 %%
 
-At the end of \chdesc\ optimizations, say something along the lines:
+At the end of \patch\ optimizations, say something along the lines:
 %
 The dynamic optimizations facilitated through \nrb\
-\chdescs\ implement the efficiency in systems using soft updates or
+\patches\ implement the efficiency in systems using soft updates or
 journaling\todo{Actually do this for journaling} while expressing
 changes modularly through structural descriptions rather than through
 internal and semantic file system descriptions.
 
 \todo{Should we talk about why we allow NRBs and merging to be
-  disabled? (Debugging simplicity and depend add to \noop\ \chdescs\
+  disabled? (Debugging simplicity and depend add to \noop\ \patches\
   with \afters\ bug catching.)}
 \end{comment}

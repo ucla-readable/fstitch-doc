@@ -1,11 +1,11 @@
 % -*- mode: latex; tex-main-file: "paper.tex" -*-
 
-\subsection{\Dodder\ Interface and \Noop\ \ChDescs}
+\subsection{\Kudos\ Interface and \Noop\ \Patches}
 \label{sec:patch:noop}
 
 \def\_{{\ttfamily\char`\_}}
 
-\Dodder\ modules create patches with functions like \texttt{patch\_\-create\_\-byte}.
+\Kudos\ \modules\ create \patches\ with functions like \texttt{patch\_\-create\_\-byte}.
 %
 Arguments to these functions include the relevant block ($\PBlock{p}$), any
 direct dependencies ($\PDDepset{p}$), and the new data represented by the
@@ -46,10 +46,10 @@ $q$ where $p \PDDepend q$) and its direct ``reverse dependencies'' (that
 is, all $q$ where $q \PDDepend p$).
 
 
-\Kudos\ also supports \emph{empty} \patches, which have
+\Kudos\ also supports \emph{\noop} \patches, which have
  no associated data or block.
 %
-Empty \patches\ are useful for representing sets of dependencies and for
+\Noop\ \patches\ are useful for representing sets of dependencies and for
  preventing other \patches\ from being written.
 %
 For example, while a journal transaction is being populated in a journaling
@@ -70,38 +70,38 @@ Some aspects of our model would have to change to handle \noop\
 %
 \[ \PDepset{\PInf[b]} \subseteq \PInf[b] \cup \PDisk \cup \PEmpty. \]
 %
-We call a \patch\ \emph{true} if it is not empty.
+We call a \patch\ \emph{true} if it is not \noop.
 
 
-Empty \patches\ both aid and hurt performance.
+\Noop\ \patches\ both aid and hurt performance.
 %
-On the one hand, empty \patches\ can represent quadratic sets of dependencies
+On the one hand, \noop\ \patches\ can represent quadratic sets of dependencies
  with a linear number of edges: if all $m$ \patches\ in $P$ must depend on
  all $n$ \patches\ in $Q$, one could 
  %% add $mn$ direct dependencies $p_i \PDDepend q_j$ or
- add an empty \patch\ $x$ and $m+n$ direct dependencies
+ add an \noop\ \patch\ $x$ and $m+n$ direct dependencies
  $p_i \PDDepend x \PDDepend q_j$.
 %
 On the other hand, some functions may have to traverse trees of \noop\
- \chdescs\ to determine true dependencies.
+ \patches\ to determine true dependencies.
 
 
 \begin{comment}
-To solve this problem, we introduce an additional type of \chdesc. The
-prototypical \chdesc\ corresponds to some change on disk, but \Kudos\ also
-supports \aemphnoop\ \chdesc\ type, which doesn't change the disk at all.
-\Noop\ \chdescs\ can have \befores, like other \chdescs, but they don't need to
+To solve this problem, we introduce an additional type of \patch. The
+prototypical \patch\ corresponds to some change on disk, but \Kudos\ also
+supports \aemphnoop\ \patch\ type, which doesn't change the disk at all.
+\Noop\ \patches\ can have \befores, like other \patches, but they don't need to
 be written to disk: they are trivially satisfied when all of their \befores\ are
 satisfied. Thus, they can be used to ``stand for'' entire sets of other changes.
 %
 This capability is extremely useful, and is used by most operations on disk
-structures so that a single \chdesc\ can be returned that depends on the whole
-change. Likewise, \anoop\ \chdesc\ can be passed in as a parameter to a disk
+structures so that a single \patch\ can be returned that depends on the whole
+change. Likewise, \anoop\ \patch\ can be passed in as a parameter to a disk
 operation to make the whole operation depend on a set of other changes. \Noop\
-\chdescs\ allow dependencies between sets with only a linear number of
-dependency edges in the \chdesc\ graph, and without having to pass around arrays
-of \chdescs.
+\patches\ allow dependencies between sets with only a linear number of
+dependency edges in the \patch\ graph, and without having to pass around arrays
+of \patches.
 %
-The cost is that some functions may have to traverse trees of \noop\ \chdescs\
+The cost is that some functions may have to traverse trees of \noop\ \patches\
 to determine true dependencies.
 \end{comment}

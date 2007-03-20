@@ -1,78 +1,78 @@
 % -*- mode: latex; tex-main-file: "paper.tex" -*-
 
-\subsection{\Nrb\ \ChDescs}
+\subsection{\Nrb\ \Patches}
 \label{sec:patch:nrb}
 
 The first optimization reduces the space overhead of rollback data by
 detecting when it will never be necessary.
 %
-When a patch $p$ is created, \Kudos\ conservatively detects whether $p$
+When a \patch\ $p$ is created, \Kudos\ conservatively detects whether $p$
 will ever need to be rolled back.
 %
-If not, $p$ is a \emph{hard patch}: its data can be applied
+If not, $p$ is a \emph{\nrb\ \patch}: its data can be applied
 directly to the in-memory copy of the block without saving rollback data
 for the previous version.
 
 
-Only patches in a block-level dependency cycle might need to be rolled
+Only \patches\ in a block-level dependency cycle might need to be rolled
 back.
 %
-However, some of the patches in a cycle may be hard; only the crucial
-patch that creates the cycle must be soft, for that is the patch that
+However, some of the \patches\ in a cycle may be \nrb; only the crucial
+\patch\ that creates the cycle must be \rb, for that is the \patch\ that
 must be rolled back to create a valid write order.
 %
-Thus, patch $p$ may be hard if it will \emph{never} be the head of a
-block-level cycle: that is, if there will never exist true patches $q$
+Thus, \patch\ $p$ may be \nrb\ if it will \emph{never} be the head of a
+block-level cycle: that is, if there will never exist true \patches\ $q$
 and $p'$ with $p \PDepend q \PDepend p'$ and $\PBlock{p} = \PBlock{p'}
 \neq \PBlock{q}$.
 %
 In other words, if the only cycle between $\PBlock{p}$ and $\PBlock{q}$ is $p
-\PDDepend q \PDDepend p'$, then $q$ and $p'$ may be hard, but $p$ may
+\PDDepend q \PDDepend p'$, then $q$ and $p'$ may be \nrb, but $p$ may
 not.
 %
-As a result, the set of all hard patches in memory will never contain
+As a result, the set of all \nrb\ \patches\ in memory will never contain
 a block-level cycle, and the system can always find a valid order to
-write hard patches to disk.
+write \nrb\ \patches\ to disk.
 %
 This assumes that the dependency structure correctly represents
-dependencies among patches on the same block.
+dependencies among \patches\ on the same block.
 %
-Specifically, all hard patches on a block depend on each other (since
-they can't be written independently), and any soft patch on a block
-depends on that block's hard patches, if any (since it cannot be written
+Specifically, all \nrb\ \patches\ on a block depend on each other (since
+they can't be written independently), and any \rb\ \patch\ on a block
+depends on that block's \nrb\ \patches, if any (since it cannot be written
 without them).
 
 
-When patch $p$ is created, \Kudos\ must decide whether any future
-patch or dependency could create a block-level cycle with $p$ at the
+When \patch\ $p$ is created, \Kudos\ must decide whether any future
+\patch\ or dependency could create a block-level cycle with $p$ at the
 head.
 %
-This decision is simplified by an API property: \emph{All of a patch's
+This decision is simplified by an API property: \emph{All of a \patch's
 direct dependencies are specified at creation time};
 %
 no new dependencies $p \PDDepend q$ may be introduced after $p$ is
 created.\footnote{The actual rule is somewhat more flexible: modules may add
   new direct dependencies if they guarantee that those dependencies
   don't introduce any new block-level cycles.  As one example, if no
-  patch depends on some empty patch $p$, then adding a new $p
+  \patch\ depends on some \noop\ \patch\ $p$, then adding a new $p
   \PDDepend q$ dependency can't introduce a cycle.  Additionally,
-  modules can specify at creation time that a patch is not allowed to
-  become hard, because dependencies might be added to it later.}
+  modules can specify at creation time that a \patch\ is not allowed to
+  become \nrb, because dependencies might be added to it later.}
 %
-Since every patch follows this rule, all possible block-level cycles $p
+Since every \patch\ follows this rule, all possible block-level cycles $p
 \PDepend q \PDepend p'$ are visible at creation time.
 
 
 Traversing the dependency graph to check for a block-level cycle
 proved to be quite expensive.
 %
-\Kudos\ thus implements a conservative approximation: patch $p$ is
-created as hard if \emph{no} other block depends on the in-memory
+\Kudos\ thus implements a conservative approximation: \patch\ $p$ is
+created as \nrb\ if \emph{no} other block depends on the in-memory
 version of $\PBlock{p}$.
 %
 That is, for all dependencies $q \PDepend p'$ with $p' \in
-\PMem[\PBlock{p}]$, either $\PBlock{q} = \PBlock{p}$ or $q$ is an empty
-patch.
+\PMem[\PBlock{p}]$, either $\PBlock{q} = \PBlock{p}$ or $q$ is \anoop\
+\patch.
 %
 If no other block depends on $p$'s block, then $p$ can never initiate a
 block-level cycle no matter its dependencies.
@@ -83,18 +83,18 @@ traversal, and works well in practice.
 
 \Kudos\ further ensures that the dependency structure correctly
 represents dependencies on the same block through overlap
-dependencies: since hard patches are considered to cover the entire
-block, every succeeding patch will overlap at least one hard patch,
+dependencies: since \nrb\ \patches\ are considered to cover the entire
+block, every succeeding \patch\ will overlap at least one \nrb\ \patch,
 and \Kudos\ will automatically add a dependency.
 %
 (Some cases are handled by other optimizations.)
 
 
-The buffer cache's ``write block'' behavior must account for hard
-patches, as it \emph{must} write any hard patches that exist on a
+The buffer cache's ``write block'' behavior must account for \nrb\
+\patches, as it \emph{must} write any \nrb\ \patches\ that exist on a
 block.
 %
-Let $\PHard[b]$ be the set of hard patches on block $b$.
+Let $\PHard[b]$ be the set of \nrb\ \patches\ on block $b$.
 %
 Then to write block $b$, the buffer cache must choose some $P \subseteq
 \PMem[b]$ with
@@ -105,7 +105,7 @@ Then to write block $b$, the buffer cache must choose some $P \subseteq
 If no such $P$ exists, then the cache must write a different block.
 
 
-Applying hard patch rules to our example makes 14 of the 23 patches hard
+Applying \nrb\ \patch\ rules to our example makes 14 of the 23 \patches\ \nrb\
 (Figure~\ref{fig:opt}b),
 %
 reducing the rollback data required by slightly more than half.
@@ -113,15 +113,15 @@ reducing the rollback data required by slightly more than half.
 
 \begin{comment}
 %
-To avoid this overhead, \Kudos\ identifies \chdescs\ that will never
+To avoid this overhead, \Kudos\ identifies \patches\ that will never
 need to be rolled back and omits their previous data copies. We call
-these \emph{\nrb} \chdescs. (The opposite naturally being a \emph{\rb}
-\chdesc, when necessary to differentiate them.)
+these \emph{\nrb} \patches. (The opposite naturally being a \emph{\rb}
+\patch, when necessary to differentiate them.)
 %
-Since a \nrb\ \chdesc\ cannot be rolled back, a write of any \chdescs\
-on block $B$ must include all \nrb\ \chdescs\ on $B$. To accordingly
-update our formal model we define a new set of \chdescs, \PHard, which
-contains all \nrb\ \chdescs. We write \PHard[B] to restrict the set
+Since a \nrb\ \patch\ cannot be rolled back, a write of any \patches\
+on block $B$ must include all \nrb\ \patches\ on $B$. To accordingly
+update our formal model we define a new set of \patches, \PHard, which
+contains all \nrb\ \patches. We write \PHard[B] to restrict the set
 to block $B$\todo{Introduce \PSoft\ and \PSoft[B].}:
 
 \begin{tabbing}
@@ -136,15 +136,15 @@ to block $B$\todo{Introduce \PSoft\ and \PSoft[B].}:
 
 \paragraph{}
 To avoid (expensive) dependency traversals to determine whether a new
-\chdesc\ will need to be rolled back,
+\patch\ will need to be rolled back,
 %
-\Kudos\ conservatively identifies \nrb\ \chdescs\ using only local
+\Kudos\ conservatively identifies \nrb\ \patches\ using only local
 dependency information.
 %
-\Kudos\ detects that a new \chdesc\ on block $b$ may need to be rolled back if:
+\Kudos\ detects that a new \patch\ on block $b$ may need to be rolled back if:
 \todo{Which form is easier to read? Can we write \(\PMem - \PMem[b] - \PEmpty\) more concisely?}
 %
-\todo{Actually, our implementation also uses in flight \chdescs. Can we make
+\todo{Actually, our implementation also uses in flight \patches. Can we make
 it not?}
 %
 \[ \PRDepset{\PMem[b]} \cap (\PMem - \PMem[b] - \PEmpty) \ne \emptyset \]
@@ -155,24 +155,24 @@ it not?}
 This is both a safe and useful indicator because
 %
 the presence of an external \after\ is a necessary condition for a new
-\chdesc's \before\ to induce a block-level cycle
+\patch's \before\ to induce a block-level cycle
 %
-and many blocks have no \chdescs\ with external \afters\ (e.g. most
+and many blocks have no \patches\ with external \afters\ (e.g. most
 file data blocks).
 
-While this algorithm detects whether a \chdesc\ may need to be rolled
+While this algorithm detects whether a \patch\ may need to be rolled
 back, \Kudos\ must also be sure that no future dependency manipulation
-will cause the \chdesc\ to require a rollback.
+will cause the \patch\ to require a rollback.
 %
 We introduce Invariant~\ref{cdinvar:add-before} to support such reasoning:
 %
 \cdinvar{add-before}{All block-level cycles induced through
-\chdesc\ \p{p}'s \befores\ exist when \p{p} is
-created\todo{Change this phrasing? ``Once created, a \chdesc\ will not
+\patch\ \p{p}'s \befores\ exist when \p{p} is
+created\todo{Change this phrasing? ``Once created, a \patch\ will not
 gain any \befores\ that induce block-level cycles.''}.}
 %
 \noindent \Kudos\ ensures this invariant by restricting \before\
-additions to \chdesc\ creation, \noop\ \chdescs\ with no \afters, or
+additions to \patch\ creation, \noop\ \patches\ with no \afters, or
 when the invariant is statically proven to hold for the affected
-\chdescs.
+\patches.
 \end{comment}

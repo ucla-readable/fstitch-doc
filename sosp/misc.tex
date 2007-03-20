@@ -10,7 +10,7 @@ Just as having too few dependencies can compromise system correctness,
 having too many dependencies, or the wrong dependencies, can non-trivially
 degrade the system performance.
 %
-For example, in both the following patch arrangements, $p$ depends on all
+For example, in both the following \patch\ arrangements, $p$ depends on all
 of $q$, $r$, and $s$, but the left-hand arrangement gives the system more
 freedom to reorder block writes:
 
@@ -40,45 +40,45 @@ inodes should generally be independent; a similar statement holds for
 directories and even sometimes for different fields in a summary block like
 the superblock.
 %
-The best results can be obtained from \emph{minimal} patches that change
-one independent field at a time; \Kudos\ will merge these patches when
-appropriate, but if they cannot be merged, minimal patches will lead to
+The best results can be obtained from \emph{minimal} \patches\ that change
+one independent field at a time; \Kudos\ will merge these \patches\ when
+appropriate, but if they cannot be merged, minimal \patches\ will lead to
 fewer rollbacks and more flexibility in write ordering.
 
 
 %% the changes to update a field in an inode structure
-%% on disk, a \chdesc\ spanning the entire inode could be created even though
+%% on disk, a \patch\ spanning the entire inode could be created even though
 %% only a single field changed. A later change to a different field in the
 %% same inode would appear to overlap the first, possibly creating an
-%% unnecessary dependency. Creating \chdescs\ that correspond more precisely
+%% unnecessary dependency. Creating \patches\ that correspond more precisely
 %% to the changes being made avoids this problem, so a utility function is
 %% provided by \Kudos\ to make this operation as convenient as creating a
-%% single \chdesc\ for an entire large structure.
+%% single \patch\ for an entire large structure.
 
-%% \subsubsection{\ChDesc\ List Ordering}
+%% \subsubsection{\Patch\ List Ordering}
 
 Finally, the buffer cache and a few other modules perform better in the
 common case that the \patches\ on a block are listed in order of creation
 time.
 %
 This improves their performance from $O(n^2)$ to $O(n)$ in the number of
-patches.
+\patches.
 %% in the common case that this order is preserved.
 
 
 \begin{comment}
-Several functions in \Kudos\ iterate over lists of \chdescs\ looking for either
-a single \chdesc\ or set of \chdescs\ satisfying some property, or trying to
-process all the \chdescs\ in the list in some order determined by the dependency
-graph. It is generally the case that the \chdescs\ satisfying the property or
-the order in which the \chdescs\ should be processed can be determined very
+Several functions in \Kudos\ iterate over lists of \patches\ looking for either
+a single \patch\ or set of \patches\ satisfying some property, or trying to
+process all the \patches\ in the list in some order determined by the dependency
+graph. It is generally the case that the \patches\ satisfying the property or
+the order in which the \patches\ should be processed can be determined very
 quickly by keeping the lists sorted. For instance, the library function which
-rolls \chdescs\ back needs to perform the rollbacks essentially in inverse
-creation order, so that rolling back a \chdesc\ which has since been overwritten
-by a later \chdesc\ does the right thing. Keeping the list of all \chdescs\ on a
+rolls \patches\ back needs to perform the rollbacks essentially in inverse
+creation order, so that rolling back a \patch\ which has since been overwritten
+by a later \patch\ does the right thing. Keeping the list of all \patches\ on a
 block sorted in creation order (which is very easy) makes this an efficient
 operation, while it might otherwise take $O(n^2)$ time to execute. Similarly,
-many \chdesc\ merging functions need to find for a given block some \chdesc\
-which has no \befores\ on the same block, and the oldest \chdesc\ on a block
+many \patch\ merging functions need to find for a given block some \patch\
+which has no \befores\ on the same block, and the oldest \patch\ on a block
 always satisfies this requirement.
 \end{comment}

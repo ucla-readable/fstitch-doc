@@ -4,7 +4,7 @@
 \begin{comment}
 This section describes several \Kudos\ \modules\ which contribute significantly
 to the overall functionality of \Kudos, or which demonstrate unique or
-important capabilities of \chdescs\ and the \module\ system. The journal
+important capabilities of \patches\ and the \module\ system. The journal
 \module\ has already been described (in \S\ref{sec:using:journal}), while
 others like the write-through cache, partitioner, and memory block device, have
 functions which are fairly obvious from their names and need no further
@@ -22,7 +22,7 @@ description.
 
 The loopback module is a BD module that uses a file in an \LFS\ module as
 its underlying data store. It is very similar to the device of the same
-name in Linux, but with one critical difference: it is aware of \chdescs.
+name in Linux, but with one critical difference: it is aware of \patches.
 %
 The loopback module preserves its file system's dependencies and forwards
 them to its underlying data store.
@@ -47,9 +47,9 @@ loopback module.
 A file system image is mounted with an external journal, both of
 which are loopback block devices stored on the root file system (which uses
 soft updates). The journaled file system's ordering requirements are sent
-through the loopback module as \chdescs, allowing dependency information to be
+through the loopback module as \patches, allowing dependency information to be
 maintained across boundaries that might otherwise lose that information. In
-contrast, without \chdescs\ and the ability to forward \chdescs\ through
+contrast, without \patches\ and the ability to forward \patches\ through
 loopback devices, BSD cannot express soft updates' consistency requirements
 through loopback devices. The \modules\ in Figure~\ref{fig:kfs-graph} are a
 complete and working \Kudos\ configuration, and although the use of a loopback
@@ -62,9 +62,9 @@ An example configuration taking advantage of this ability could be a file
 system image mounted with an external journal, both of which are loopback block
 devices stored on the root file system (which could use soft updates). The
 journaled file system's ordering requirements are sent through the loopback
-device as \chdescs, allowing dependency information to be maintained across
+device as \patches, allowing dependency information to be maintained across
 boundaries that might otherwise lose that information. In contrast, without
-\chdescs\ and the ability to forward \chdescs\ through loopback devices, BSD
+\patches\ and the ability to forward \patches\ through loopback devices, BSD
 cannot express soft updates' consistency requirements through loopback devices.
 Although the use of a loopback device is somewhat contrived in the example,
 they are increasingly being used in conventional operating systems. For
@@ -103,7 +103,7 @@ Both \modules\ are implemented at the \LFS\ interface.
 %% specific to the file system (such as the on-disk format and rules governing
 %% block allocation) hidden within the \module. 
 %
-The \modules\ create \chdescs\ for all their changes to the disk and
+The \modules\ create \patches\ for all their changes to the disk and
 connect them to form subgraphs that enforce the soft updates
 rules~\cite{ganger00soft} as applied to each file system. 
 %
@@ -113,7 +113,7 @@ resulting \patches\ up in the correct order.
 %
 Unlike FreeBSD's soft updates implementation, once the dependencies have
 been hooked up, the ext2 and UFS \modules\ no longer need to concern
-themselves with their \chdescs, as the block device subsystem tracks and
+themselves with their \patches, as the block device subsystem tracks and
 enforces the dependency orderings.
 
 \begin{comment}
