@@ -148,8 +148,7 @@ Linux (ext2) & 5.27 & 4.43 \\ \hline
 Linux (ext3) & 13.92 & 4.47 \\ \hline
 \end{tabular}
 }
-\caption{\label{fig:macro} Untar/delete times for \Kudos\ and FreeBSD, for soft
-updates and async mode, and Linux, for ext2 and ext3.}
+\caption{\label{fig:macro} Untar and delete times.}
 \end{figure}
 
 \Kudos\ is about 21\% faster than FreeBSD using soft updates for
@@ -178,10 +177,10 @@ We next evaluate overall performance using the PostMark benchmark,
 designed to simulate the small file workloads seen on email and
 netnews servers~\cite{postmark}.
 %
-We use PostMark 1.5, configured to use 4kB reads and writes and
-to create 500 files ranging in size from 500 B and 2 MB; perform 500
+We use PostMark 1.5, configured to use 4kB reads and writes and to
+create 500 files ranging in size from 500 B to 2 MB; perform 500
 transactions consisting of file reads, writes, creates, and deletes;
-and finally delete its files.  PostMark is a single process, single
+and finally delete its files. PostMark is a single process, single
 threaded program that performs these file system operations as quickly
 as possible.
 %
