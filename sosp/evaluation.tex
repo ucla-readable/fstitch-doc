@@ -134,6 +134,10 @@ without the journal. Deleting and adding a file resulted in writing
 \end{figure}
 
 \subsection {Macrobenchmarks}
+\label{sec:eval:macro}
+
+\subsubsection{Untar and Delete}
+\label{sec:eval:untardel}
 
 The times are listed in Figure~\ref{fig:macro} and include time to
 fully sync the changes to disk.
@@ -155,19 +159,6 @@ Linux (ext3) & 13.92 & 4.47 \\ \hline
 updates and async mode, and Linux, for ext2 and ext3.}
 \end{figure}
 
-\begin{figure}[htb]
-\centering
-\begin{tabular}{|l|r|} \hline
-System & Time (sec) \\ \hline\hline
-\Kudos\ & 46.6 \\ \hline % r3266: 46.173 46.555 46.495 46.479 47.371
-Linux (ext2) & 16.9 \\ \hline % 10.602 16.983 17.033 16.905 16.798
-Linux (ext3) & 19.6 \\ \hline % 16.590 20.533 19.713 19.174 19.129
-FreeBSD & 27.0 \\ \hline % 26.83 27.18
-\end{tabular}
-\caption{Postmark. TODO: describe and comment on performance.}
-\label{fig:postmark}
-\end{figure}
-
 \Kudos\ is about 21\% faster than FreeBSD using soft updates for
 writes, and about 41\% faster for deletions.\footnote{Interestingly, FreeBSD 5.4
 performs better than version 6.0 at these tests, particularly the delete test,
@@ -179,8 +170,6 @@ times slower for deletions.
 This demonstrates that the overhead of using \chdescs\ in \Kudos\ is not
 entirely unreasonable, but has room for significant improvement.
 %
-\todo{Reference and discuss Figure~\ref{fig:postmark}.}
-%
 While \Kudos\ does still have some CPU usage and I/O delay problems, its
 performance has been steadily improving over time and we expect that it will
 continue to improve as we optimize it further.
@@ -190,6 +179,35 @@ in performance to Linux. (A major cause of the slow delete performance is writin
 updates to blocks which have been freed, which we have a plan to optimize.)
 
 \subsubsection {Postmark}
+\label{sec:eval:postmark}
+
+We next evaluate overall performance using the PostMark benchmark,
+designed to simulate the small file workloads seen on email and
+netnews servers~\cite{postmark}.
+%
+We use PostMark 1.5, configured to use 4kB reads and writes and
+to create 500 files ranging in size from 500 B and 2 MB; perform 500
+transactions consisting of file reads, writes, creates, and deletes;
+and finally delete its files.  PostMark is a single process, single
+threaded program that performs these file system operations as quickly
+as possible.
+%
+Figure~\ref{fig:postmark} shows the results.
+
+\begin{figure}[htb]
+\centering
+\begin{tabular}{|l|r|} \hline
+System & Time (sec) \\ \hline\hline
+\Kudos\ & 46.6 \\ \hline % r3266: 46.173 46.555 46.495 46.479 47.371
+Linux (ext2) & 16.9 \\ \hline % 10.602 16.983 17.033 16.905 16.798
+Linux (ext3) & 19.6 \\ \hline % 16.590 20.533 19.713 19.174 19.129
+FreeBSD & 27.0 \\ \hline % 26.83 27.18
+\end{tabular}
+\caption{PostMark times.}
+\label{fig:postmark}
+\end{figure}
+
+\todo{Comment on benchmark.}
 
 \subsection {Patchgroups}
 
