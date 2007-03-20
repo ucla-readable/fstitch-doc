@@ -10,6 +10,12 @@ orderings in a variety of situations, demonstrating the effect and utility of
 using them. All tests were run on a Dell Precision 380 with a 3.2GHz Pentium 4
 CPU, 2GB of RAM, and a Seagate ST3320620AS 320GB 7200RPM SATA2 disk, using 10GB
 file systems.
+%
+All tests use a 10 GB file system.
+%
+Our tests use Linux 2.6.20.1 with ext2 and ext3, \Kudos\ with ext2, and
+FreeBSD 6.0 with UFS in soft updates mode, all created with default
+configurations.
 
 \subsection {Optimization Benefits}
 
@@ -122,28 +128,29 @@ without the journal. Deleting and adding a file resulted in writing
 \subsection {Macrobenchmarks}
 
 Our first benchmark test is to untar the Linux 2.6.15 source code from
-\texttt{linux-2.6.15.tar} (218 MB), which is already decompressed and cached in RAM. We
-did this test running Linux 2.6.20.1 (using ext2 and ext3), FreeBSD 6.0 (using
-UFS, with and without soft updates), and \Kudos\ running as a Linux 2.6.20.1
-kernel module (using ext2, with and without soft updates). As a second test, we
-then delete the resulting source tree, after unmounting and remounting the file
-system. The times are listed in Figure~\ref{fig:macro} and include time to fully
-sync the changes to disk.
+\texttt{linux-2.6.15.tar} (218 MB), which is already decompressed and
+cached in RAM.
+%
+As a second test, we then delete the resulting source tree, after
+unmounting and remounting the file system.
+%
+The times are listed in Figure~\ref{fig:macro} and include time to
+fully sync the changes to disk.
 
 % make this into a table
 \begin{figure}[htb]
 \centering{
 \begin{tabular}{|l|r|r|} \hline
 System & Untar (sec) & Delete (sec) \\ \hline\hline
-\Kudos\ (ext2 SU) & 18.39 & 9.47 \\ \hline
-\Kudos\ (ext2 async) & 3.88 & 6.94 \\ \hline\hline
-FreeBSD 6.0 (SU) & 23.22 & 15.95 \\ \hline
-FreeBSD 6.0 (async) & 10.09 & 3.25 \\ \hline
-Linux 2.6.20.1 (ext2) & 5.27 & 4.43 \\ \hline
-Linux 2.6.20.1 (ext3) & 13.92 & 4.47 \\ \hline
+\Kudos\ (SU) & 18.39 & 9.47 \\ \hline
+\Kudos\ (async) & 3.88 & 6.94 \\ \hline\hline
+FreeBSD (SU) & 23.22 & 15.95 \\ \hline
+FreeBSD (async) & 10.09 & 3.25 \\ \hline
+Linux (ext2) & 5.27 & 4.43 \\ \hline
+Linux (ext3) & 13.92 & 4.47 \\ \hline
 \end{tabular}
 }
-\caption{\label{fig:macro} Untar/delete times for \Kudos and FreeBSD, for soft
+\caption{\label{fig:macro} Untar/delete times for \Kudos\ and FreeBSD, for soft
 updates and async mode, and Linux, for ext2 and ext3.}
 \end{figure}
 
@@ -151,9 +158,9 @@ updates and async mode, and Linux, for ext2 and ext3.}
 \centering
 \begin{tabular}{|l|r|} \hline
 System & Time (sec) \\ \hline\hline
-\Kudos\ (ext2 SU) & 46.6 \\ \hline % r3266: 46.173 46.555 46.495 46.479 47.371
-Linux 2.6.20.1 (ext2) & 16.9 \\ \hline % 10.602 16.983 17.033 16.905 16.798
-Linux 2.6.20.1 (ext3) & 19.6 \\ \hline % 16.590 20.533 19.713 19.174 19.129
+\Kudos\ & 46.6 \\ \hline % r3266: 46.173 46.555 46.495 46.479 47.371
+Linux (ext2) & 16.9 \\ \hline % 10.602 16.983 17.033 16.905 16.798
+Linux (ext3) & 19.6 \\ \hline % 16.590 20.533 19.713 19.174 19.129
 FreeBSD & 27.0 \\ \hline % 26.83 27.18
 \end{tabular}
 \caption{Postmark. TODO: describe and comment on performance.}
@@ -201,6 +208,8 @@ creates the new mailbox, copies each of the 100 messages to the new
 mailbox, marks each source message for deletion, expunges the marked
 messages, requests a check, and logs out. We compare using soft updates;
 Figure~\ref{fig:imap-compare} shows the results.
+%
+\todo{Update these for 2007.}
 
 \begin{figure}[htb]
 \centering{
