@@ -33,37 +33,14 @@ notation that will be useful for analyzing our optimizations later.
 Although the \patch\ idea would apply to any stable medium, or to network
 file systems, we use terms like ``disk'' and ``disk controller'' throughout
 to simplify our terminology.
-%
-Our \patch\ notation is summarized in Figure~\ref{fig:patchnot}.
-
-\begin{figure}[htb]
-\begin{small}
-\begin{tabular}{@{}ll@{}}
-$\PBlock{p} = b$ & $p$'s block \\
-$\PState{p}$ & $p$'s state, $\in \{\PMemst, \PInfst, \PDiskst\}$ \\
-~~~~$\PMem$ & all in-memory \patches: $\{p \mid \PState{p} = \PMemst\}$ \\
-~~~~$\PMem[b]$ & $\{p \mid \PState{p} = \PMemst \text{ and } \PBlock{p} = b
- \}$ \\
-~~~~$\PInf, \PDisk$ & similarly for in-flight and on-disk \patches\ \\
-$\PDDepset{p}$ & $p$'s direct dependencies \\
-~~~~$p \PDDepend q$ & $p$ directly depends on $q$: $q \in \PDDepset{p}$ \\
-~~~~$p \PDepend q$ & $p$ depends on $q$: either $p \PDDepend q$ or there exists \\
-       & a \patch\ $x$ so that $p \PDepend x \PDDepend q$ \\
-~~~~$\PDepset{p}$ & $p$'s dependencies: $\{ q \mid p \PDepend q \}$ \\
-\end{tabular}
-\end{small}
-
-\caption{Patch notation.}
-\label{fig:patchnot}
-\end{figure}
 
 Each \patch\ $p$ encapsulates four important pieces of information: its
  \emph{block}, its \emph{state}, a set of \emph{direct dependencies}, and
  some \emph{rollback data}.
 
 Patch $p$'s \textbf{block}, written $\PBlock{p}$, is the unit of disk data
- to which $p$ applies.  The disk controller is assumed to write blocks as a
- unit (although not necessarily atomically; see below).  A file system
+ to which $p$ applies.  The disk controller is assumed to execute writes a
+ block at a time (although not necessarily atomically; see below).  A file system
  change that affects $n$ blocks must be represented using at least $n$
  \patches, since a \patch\ by definition can touch only one block.
 
@@ -151,6 +128,33 @@ allowed, write the block again, this time including the \patch.
 %
 Rollback information adds greatly to memory and CPU utilization, but it can
 often be optimized away, as we show below.
+
+%
+Our \patch\ notation is summarized in Figure~\ref{fig:patchnot}.
+
+\begin{figure}[t]
+\begin{small}
+\begin{tabular}{@{}ll@{}}
+$\PBlock{p} = b$ & $p$'s block \\
+$\PState{p}$ & $p$'s state, $\in \{\PMemst, \PInfst, \PDiskst\}$ \\
+$\PDDepset{p}$ & $p$'s direct dependencies: patches that must go to disk \\
+	& before $p$ \\
+\noalign{\vskip3pt}
+$\PMem$ & all in-memory \patches: $\{p \mid \PState{p} = \PMemst\}$ \\
+$\PMem[b]$ & $\{p \mid \PState{p} = \PMemst \text{ and } \PBlock{p} = b
+ \}$ \\
+$\PInf, \PDisk$ & similarly for in-flight and on-disk \patches\ \\
+\noalign{\vskip3pt}
+$p \PDDepend q$ & $p$ directly depends on $q$: $q \in \PDDepset{p}$ \\
+$p \PDepend q$ & $p$ depends on $q$: either $p \PDDepend q$ or there exists \\
+       & a \patch\ $x$ so that $p \PDepend x \PDDepend q$ \\
+$\PDepset{p}$ & $p$'s dependencies: $\{ q \mid p \PDepend q \}$ \\
+\end{tabular}
+\end{small}
+
+\caption{Patch notation.}
+\label{fig:patchnot}
+\end{figure}
 
 
 \subsection{Obeying Dependencies}

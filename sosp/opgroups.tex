@@ -31,7 +31,7 @@ that ordering in the most appropriate way.
 
 
 This section describes \emph{\opgroups}, which extend \chdescs\ to user
-space and let applications to express dependencies among file system
+space and let applications express dependencies among file system
 operations.
 %
 Compared to a dictated order, this lets the file system optimize commit
@@ -242,8 +242,9 @@ A second example, most journal playback operations may commit
 independently of each other; only interacting operations, such as a
 file read and subsequent rename, need ordering.
 
-Once we understood Subversion's writing requirements, it took a day to add
-the XXXXX lines of code that enforce them.
+Once we understood Subversion's requirements, it took a day to add
+the 220 lines of code that enforce safety for conflicted updates (out of
+25000 in the working copy library).
 
 \begin{figure}[t]
   \centering

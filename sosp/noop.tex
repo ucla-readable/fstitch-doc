@@ -1,11 +1,11 @@
 % -*- mode: latex; tex-main-file: "paper.tex" -*-
 
-\subsection{Implementation and \Noop\ \ChDescs}
+\subsection{\Dodder\ Interface and \Noop\ \ChDescs}
 \label{sec:patch:noop}
 
 \def\_{{\ttfamily\char`\_}}
 
-Patches are created with functions like \texttt{patch\_\-create\_\-byte}.
+\Dodder\ modules create patches with functions like \texttt{patch\_\-create\_\-byte}.
 %
 Arguments to these functions include the relevant block ($\PBlock{p}$), any
 direct dependencies ($\PDDepset{p}$), and the new data represented by the
