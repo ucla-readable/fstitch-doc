@@ -134,7 +134,6 @@ cache eviction algorithm, as described above.
 \subsection {Macrobenchmarks}
 \label{sec:eval:macro}
 
-\subsubsection{Untar and Delete}
 \label{sec:eval:untardel}
 
 Times to untar and remove our Linux tarball are listed in
@@ -177,7 +176,21 @@ entirely unreasonable, but has room for significant improvement.
 %% There are more optimization opportunities that can likely bring us much closer
 %% in performance to Linux. 
 
-\subsubsection {PostMark}
+We also tested the correctness of our soft updates implementation by
+implementing a module that crashes the operating system, without giving it
+a chance to synchronize its buffers, at a random time during the untar
+test.
+%
+Removing dependencies from our ext2 file system represents similar
+guarantees as an asynchronous file system; after crashing, fsync reported
+that the file system contained many references to inodes that had been
+deleted: the file system was corrupt.
+%
+With our soft updates dependencies, the file system was mostly consistent:
+fsync reported that inode reference counts were higher than the correct
+values (an expected discrepancy after a soft updates crash).
+
+
 \label{sec:eval:postmark}
 
 We next evaluate overall performance using the PostMark benchmark,
