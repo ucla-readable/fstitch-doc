@@ -1,3 +1,5 @@
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
 \subsection{\Nrb\ \ChDescs}
 \label{sec:patch:nrb}
 
@@ -24,9 +26,9 @@ block-level cycle: that is, if there will never exist true patches $q$
 and $p'$ with $p \PDepend q \PDepend p'$ and $\PBlock{p} = \PBlock{p'}
 \neq \PBlock{q}$.
 %
-(If the only cycle between $\PBlock{p}$ and $\PBlock{q}$ is $p
+In other words, if the only cycle between $\PBlock{p}$ and $\PBlock{q}$ is $p
 \PDDepend q \PDDepend p'$, then $q$ and $p'$ may be hard, but $p$ may
-not.)
+not.
 %
 As a result, the set of all hard patches in memory will never contain
 a block-level cycle, and the system can always find a valid order to
@@ -54,8 +56,8 @@ created.\footnote{The actual rule is somewhat more flexible: modules may add
   don't introduce any new block-level cycles.  As one example, if no
   patch depends on some empty patch $p$, then adding a new $p
   \PDDepend q$ dependency can't introduce a cycle.  Additionally,
-  modules can specify at creation time that a patch can never be hard
-  because of possible future dependencies.}
+  modules can specify at creation time that a patch is not allowed to
+  become hard, because dependencies might be added to it later.}
 %
 Since every patch follows this rule, all possible block-level cycles $p
 \PDepend q \PDepend p'$ are visible at creation time.
@@ -103,7 +105,7 @@ Then to write block $b$, the buffer cache must choose some $P \subseteq
 If no such $P$ exists, then the cache must write a different block.
 
 
-In our running example, 14 of the 23 patches may be created as hard
+Applying hard patch rules to our example makes 14 of the 23 patches hard
 (Figure~\ref{fig:opt}b),
 %
 reducing the rollback data required by slightly more than half.

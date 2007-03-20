@@ -56,7 +56,7 @@ example, as shown in Figure~\ref{fig:opt}c.
 
 \paragraph{Soft-to-Hard Conversion}
 
-A similar optimization occurs when a new hard patch is created on a block
+A new hard patch might also be created on a block
 that has existing \emph{soft} patches in memory.
 %
 For example, Figure~\ref{f:soft2hard}a shows a block with both hard and
@@ -77,22 +77,22 @@ However, \Kudos\ delays this and performs the conversion only later when
 adding a new hard patch to the $p$ block. 
 
 
-Consider a new hard patch $h$ that is added to a block that contains some
+Consider a new hard patch $p_h$ that is added to a block that contains some
 soft patch $p$.
 %
-Since $h$ overlaps $p$, \Kudos\ adds a direct dependency $h \PDDepend p$.
+Since $p_h$ overlaps $p$, \Kudos\ adds a direct dependency $p_h \PDDepend p$.
 %
-Since $h$ could be hard, we know there are no block-level dependency cycles
-$h \PDepend q \PDepend p'$.
+Since $p_h$ could be hard, we know there are no block-level dependency cycles
+$p_h \PDepend q \PDepend p'$.
 %
 But as a result, we know that there are no block-level dependency cycles
 with the existing \emph{soft} patch as head, since such a cycle would imply
-an $h$-headed cycle $h \PDDepend p \PDepend q \PDepend p'$.
+a $p_h$-headed cycle $p_h \PDDepend p \PDepend q \PDepend p'$.
 %
-Thus, $p$ can be transformed into a hard patch and then merged into $h$
+Thus, $p$ can be transformed into a hard patch and then merged into $p_h$
 using hard patch merging.
 %
-Figure~\ref{f:soft2hard}c shows what happens to our example when a new hard
+Figure~\ref{f:soft2hard}c shows the resulting configuration when a new hard
 patch $p_h'$ is added.
 
 
@@ -306,7 +306,7 @@ dependencies: actual data writes $d'_j$ overlap, and therefore depend on,
 block initialization writes $d_j$, but cannot be made hard since when they
 are created another block (the inode) already depends on the data block.
 %
-Luckily, simple and fast reasoning can identify many mergeable pairs,
+Luckily, simple reasoning can identify many mergeable pairs,
 further reducing the number of patches and the amount of rollback data
 required.
 
@@ -364,8 +364,7 @@ to the minimum of 8 and the amount of rollback data to the minimum of 0.
 %
 In our experiments, we observe that hard patches and our patch merging
 optimizations reduce the amount of memory allocated for rollback data in
-soft updates orderings by as much as 99.96\%, approaching the efficiency
-of soft updates through a modular, general mechanism.
+soft updates orderings by up to 99.73\%.
 
 
 \begin{comment}

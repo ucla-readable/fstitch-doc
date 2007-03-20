@@ -30,9 +30,10 @@ Every change to stable storage in a \Kudos\ system is represented by a
 This section describes the basic \patch\ abstraction using a semi-formal
 notation that will be useful for analyzing our optimizations later.
 %
-Although the \patch\ idea would apply to any stable medium, or to network
-file systems, we use terms like ``disk'' and ``disk controller'' throughout
-to simplify our terminology.
+Although the \patch\ idea would apply to any stable medium, to network file
+systems, or to multiple disks, we use terms like ``the disk'' and ``the
+disk controller'' throughout to simplify our terminology.
+
 
 Each \patch\ $p$ encapsulates four important pieces of information: its
  \emph{block}, its \emph{state}, a set of \emph{direct dependencies}, and
@@ -67,7 +68,7 @@ Patch $p$'s \textbf{direct dependencies}, written $\PDDepset{p}$, is a set of
 That is, every \patch\ in $\PDDepset{p}$ should be committed to disk either
  before, or at the same time as, $p$ itself.
 %
-Dependencies are set by the file system based on whatever consistency
+Dependencies are set by the file system based on the consistency
  semantics it wants to ensure.
 %
 For example, a file system with asynchronous writes (and no durability
@@ -81,13 +82,13 @@ and a file system implementing journaling would write a different set of
  data and the writes to the main body of the file system would in turn
  depend on the commit record.
 %
-Thus, an upper file system layer defines an initial set of
- dependencies.
+In summary, an upper file system layer defines an initial set of
+ dependencies;
 %
-The rest of \Kudos\ generally preserves this initial set, but can modify
- them as necessary to change or fix dependency semantics.
+the rest of \Kudos\ generally preserves this initial set, but can modify
+ it as necessary to change dependency semantics;
 %
-Finally, the buffer cache obeys the constraints thus defined.
+and finally, the buffer cache obeys the constraints thus defined.
 
 
 We say $p$ \emph{directly depends on} $q$, and write $p \PDDepend q$, when
@@ -165,8 +166,8 @@ $\PDepset{p}$ & $p$'s dependencies: $\{ q \mid p \PDepend q \}$ \\
 %
 \[ \PDepset{\PDisk} \subseteq \PDisk. \]
 %
-Thus, no matter when the system crashes, the disk is (or the disks are)
-consistent in terms of dependencies.
+Thus, no matter when the system crashes, the disk is consistent in terms of
+dependencies.
 %
 The file system's job is to set up dependencies so that the disk safety
 property implies file system correctness.
@@ -178,21 +179,21 @@ Disk controller behavior is encapsulated in the following atomic action:
 
 \begin{tabbing}
 \textit{Commit block:} \\
-\quad Pick some block $b$. \\
+\quad Pick some block $b$ with $\PInf[b] \neq \emptyset$. \\
 \quad For each $p \in \PInf[b]$, set $\PState{p} \gets \PDiskst$.
 \end{tabbing}
 
 \noindent
 %
-\Kudos\ must thus enforce the following \textbf{in-flight
- safety property}: For any block $b$,
+Since the controller can write blocks in any order, \Kudos\ must ensure
+that in-flight blocks are mutually independent.  This is precisely stated
+by the \textbf{in-flight safety property:}
 %
-\[ \PDepset{\PInf[b]} \subseteq \PInf[b] \cup \PDisk . \]
+\[ \text{For all blocks $b$,~~} \PDepset{\PInf[b]} \subseteq \PInf[b] \cup \PDisk . \]
 %
-Since in-flight blocks are mutually independent (for any $b' \neq b$,
- $\PDepset{\PInf[b]} \cap \PDepset{\PInf[b']} \subseteq \PDisk$), the disk
- controller can safely write them in any order and still preserve the disk
- safety property.
+This ensures that for any $b' \neq b$, $\PDepset{\PInf[b]} \cap
+ \PDepset{\PInf[b']} \subseteq \PDisk$; the disk controller can safely
+ write in-flight blocks in any order and still preserve disk safety.
 
 
 The buffer cache must thus behave according to the following atomic action:
@@ -218,7 +219,7 @@ memory at least until the in-flight version of the block is written.
 Likewise, any \patch\ created on a block with in-flight \patches\ must depend
 on those \patches.
 %
-(Our implementation achieves this property without using dependencies.)
+(These dependencies are implicit in our implementation.)
 %
 The buffer cache is also expected to write all blocks eventually, a
  liveness property.
@@ -234,7 +235,7 @@ if the disk fails while a block $b$ is in flight, then $b$'s
 value on recovery must equal either the old value or the new value.
 %
 Most journal designs do not rely on this assumption, and can recover
- properly even if in-flight blocks are corrupted on recovery---for instance,
+ properly even if in-flight blocks are corrupted---for instance,
  because the memory holding the new value of the block lost its coherence
  before the disk stopped writing~\cite{tso}.
 %
@@ -276,24 +277,22 @@ traversals.
 A naive implementation of this model has all the properties we want except
 good performance.
 %
-File system modules can define their own consistency protocols; other
-modules can modify them: for instance, the journaling module we describe
-below automatically changes soft updates orderings into journal
-transactions.
+File system modules can define their own consistency protocols, other
+modules can modify them,
 %
-Applications can affect consistency orderings, and it is all relatively
+applications can affect consistency orderings, and it is all relatively
 easy thanks to the \patch\ abstraction.
 %
-Unfortunately, that abstraction is extremely expensive.
+Unfortunately, this abstraction is extremely expensive.
 
 
 Consider an unoptimized version of \Kudos\ running an ext2 file system with
 soft updates-like dependencies.
 %
 Figure~\ref{fig:opt}a shows the \patches\ generated when an application appends
-16384 bytes of data to an existing empty file.
+16~kB of data to an existing empty file.
 %
-This requires allocating four new 4096-byte blocks, writing data to them,
+This requires allocating four new 4~kB blocks, writing data to them,
 attaching them to the file's inode, changing the inode's file size and
 modification time, and updating the ``group descriptor'' and superblock to
 account for the allocated blocks.

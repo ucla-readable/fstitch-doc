@@ -11,8 +11,8 @@ having too many dependencies, or the wrong dependencies, can non-trivially
 degrade the system performance.
 %
 For example, in both the following patch arrangements, $p$ depends on all
-of $q$, $r$, and $s$, but the left-hand arrangement gives \Kudos\ much more
-freedom to choose a better-performing order for block writes:
+of $q$, $r$, and $s$, but the left-hand arrangement gives the system more
+freedom to reorder block writes:
 
 \begin{figure}[htb]
 \centering

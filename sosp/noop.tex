@@ -32,7 +32,21 @@ There's no need for file system modules to detect and enforce such
 dependencies themselves.
 
 
-The \Kudos\ implementation also supports \emph{empty} \patches, which have
+For each block $b$, \Kudos\ maintains a list of all \patches\ with
+$\PBlock{p} = b$.
+%
+However, the implementation does not keep track of on-disk \patches; when
+\patch\ $p$ commits, \Kudos\ destroys $p$ and removes all dependencies $q
+\PDDepend p$.
+%
+The resulting behavior follows our model.
+%
+For each \patch\ $p$, \Kudos\ maintains lists of its direct dependencies (all
+$q$ where $p \PDDepend q$) and its direct ``reverse dependencies'' (that
+is, all $q$ where $q \PDDepend p$).
+
+
+\Kudos\ also supports \emph{empty} \patches, which have
  no associated data or block.
 %
 Empty \patches\ are useful for representing sets of dependencies and for
@@ -91,17 +105,3 @@ of \chdescs.
 The cost is that some functions may have to traverse trees of \noop\ \chdescs\
 to determine true dependencies.
 \end{comment}
-
-
-For each block $b$, \Kudos\ maintains a list of all \patches\ with
-$\PBlock{p} = b$.
-%
-However, the implementation does not keep track of on-disk \patches; when
-\patch\ $p$ commits, \Kudos\ destroys $p$ and removes all dependencies $q
-\PDDepend p$.
-%
-The resulting behavior follows our model.
-%
-For each \patch\ $p$, \Kudos\ maintains lists of its direct dependencies (all
-$q$ so that $p \PDDepend q$) and its direct ``reverse dependencies'' (that
-is, all $q$ so that $q \PDDepend p$).
