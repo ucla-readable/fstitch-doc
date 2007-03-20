@@ -134,12 +134,12 @@ disk.\todo{the BSD rm times are suspicious; did we umount/remount for them?}
 \centering{
 \begin{tabular}{|l|r|r|} \hline
 System & Untar (sec) & Delete (sec) \\ \hline\hline
-\Kudos\ (ext2 SU) & 16.05 & 6.03 \\ \hline % kudos-mm
+\Kudos\ (ext2 SU) & 17.79 & 6.03 \\ \hline % kudos-mm
 \Kudos\ (ext2 async) & 5.27 & 2.99 \\ \hline\hline % kudos-mm
-FreeBSD 6.0 (SU) & 23.22 & 15.95 \\ \hline % kudos-pb
-FreeBSD 6.0 (async) & 10.09 & 3.25 \\ \hline % kudos-pb
-Linux 2.6.20.1 (ext2) & 6.05 & 0.44 \\ \hline % kudos-mm
-Linux 2.6.20.1 (ext3) & 12.02 & 0.37 \\ \hline % kudos-mm
+FreeBSD 6.0 (SU) & 23.22 & 15.95 \\ \hline
+FreeBSD 6.0 (async) & 10.09 & 3.25 \\ \hline
+Linux 2.6.20.1 (ext2) & 6.26 & 0.16 \\ \hline
+Linux 2.6.20.1 (ext3) & 13.70 & 0.29 \\ \hline
 \end{tabular}
 }
 \caption{\label{fig:macro} Untar/delete times for \Kudos and FreeBSD, for soft
