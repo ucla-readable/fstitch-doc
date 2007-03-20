@@ -126,21 +126,21 @@ Our first benchmark test is to untar the Linux 2.6.15 source code from
 did this test running Linux 2.6.20.1 (using ext2 and ext3), FreeBSD 6.0 (using
 UFS, with and without soft updates), and \Kudos\ running as a Linux 2.6.20.1
 kernel module (using ext2, with and without soft updates). As a second test, we
-then delete the resulting source tree. The times are listed in
-Figure~\ref{fig:macro} and include time to fully sync the changes to
-disk.
+then delete the resulting source tree, after unmounting and remounting the file
+system. The times are listed in Figure~\ref{fig:macro} and include time to fully
+sync the changes to disk.
 
 % make this into a table
 \begin{figure}[htb]
 \centering{
 \begin{tabular}{|l|r|r|} \hline
 System & Untar (sec) & Delete (sec) \\ \hline\hline
-\Kudos\ (ext2 SU) & 18.39 & 5.80 \\ \hline
-\Kudos\ (ext2 async) & 3.88 & 3.22 \\ \hline\hline
+\Kudos\ (ext2 SU) & 18.39 & 9.47 \\ \hline
+\Kudos\ (ext2 async) & 3.88 & 6.94 \\ \hline\hline
 FreeBSD 6.0 (SU) & 23.22 & 15.95 \\ \hline
 FreeBSD 6.0 (async) & 10.09 & 3.25 \\ \hline
-Linux 2.6.20.1 (ext2) & 5.27 & 0.19 \\ \hline
-Linux 2.6.20.1 (ext3) & 13.92 & 0.30 \\ \hline
+Linux 2.6.20.1 (ext2) & 5.27 & 4.43 \\ \hline
+Linux 2.6.20.1 (ext3) & 13.92 & 4.47 \\ \hline
 \end{tabular}
 }
 \caption{\label{fig:macro} Untar/delete times for \Kudos and FreeBSD, for soft
@@ -160,7 +160,7 @@ Linux 2.6.20.1 (ext3) & 19.6 \\ \hline % 16.590 20.533 19.713 19.174 19.129
 \end{figure}
 
 \Kudos\ is about 21\% faster than FreeBSD using soft updates for
-writes, and about 64\% faster for deletions.\footnote{Interestingly, FreeBSD 5.4
+writes, and about 41\% faster for deletions.\footnote{Interestingly, FreeBSD 5.4
 performs better than version 6.0 at these tests, particularly the delete test,
 but \Kudos\ is still faster than the untar test.}
 %
