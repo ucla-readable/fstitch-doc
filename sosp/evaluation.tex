@@ -17,14 +17,22 @@ Our tests use Linux 2.6.20.1 with ext2 and ext3, \Kudos\ with ext2, and
 FreeBSD 6.0 with UFS in soft updates mode, all created with default
 configurations.
 
+We have two tests which are repeated throughout this section: first, we untar
+the Linux 2.6.15 source code from \texttt{linux-2.6.15.tar} (218 MB), which is
+already decompressed and cached in RAM. Second, we delete the resulting source
+tree, after unmounting and remounting the file system.
+
 \subsection {Optimization Benefits}
 
-See Figures~\ref{f:optdata}
-and~\ref{fig:mergereq-cdf}.
-\todo{HP vs None untar results are not often near their average. Run
-  larger number of tests.}
+\Kudos\ benefits greatly from the optimizations discussed in
+Section~\ref{sec:patch:optimizations}. The total number of \chdescs\ created,
+amount of rollback data allocated, and system CPU time used are shown for the
+untar and rm tests in Figure~\ref{f:optdata}, with all combinations of using
+\nrb\ \chdescs\ and overlap merging. While both optimizations work well by
+themselves, the combination of the two is particularly effective at reducing the
+amount of rollback data.
 
-\begin{figure}
+\begin{figure}[htb]
 \small
 \begin{tabular}{@{}lrrr@{}}
 %& \multicolumn{3}{c}{\textbf{Untar}} &
@@ -127,13 +135,6 @@ without the journal. Deleting and adding a file resulted in writing
 
 \subsection {Macrobenchmarks}
 
-Our first benchmark test is to untar the Linux 2.6.15 source code from
-\texttt{linux-2.6.15.tar} (218 MB), which is already decompressed and
-cached in RAM.
-%
-As a second test, we then delete the resulting source tree, after
-unmounting and remounting the file system.
-%
 The times are listed in Figure~\ref{fig:macro} and include time to
 fully sync the changes to disk.
 
