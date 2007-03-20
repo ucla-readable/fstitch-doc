@@ -93,8 +93,8 @@ written to disk. We do this with and without soft updates. \Kudos\
 writes 122 blocks, while FreeBSD writes 135 blocks.
 
 Another test pits Linux ext2 and ext3 against \Kudos\ ext2 with soft updates,
-when extracting a large archive. Linux ext2 writes 523248 blocks; Linux ext3
-writes 523192; \Kudos\ writes 540472.
+when extracting a large archive. Linux ext2 writes 523,248 blocks; Linux ext3
+writes 523,192; \Kudos\ writes 540,472.
 
 We also look at a very small benchmark: removing a file from a
 directory and adding a new file to it. We compare the number of blocks
@@ -122,7 +122,7 @@ without the journal. Deleting and adding a file resulted in writing
 \subsection {Macrobenchmarks}
 
 Our first benchmark test is to untar the Linux 2.6.15 source code from
-\texttt{linux-2.6.15.tar}, which is already decompressed and cached in RAM. We
+\texttt{linux-2.6.15.tar} (218 MB), which is already decompressed and cached in RAM. We
 did this test running Linux 2.6.20.1 (using ext2 and ext3), FreeBSD 6.0 (using
 UFS, with and without soft updates), and \Kudos\ running as a Linux 2.6.20.1
 kernel module (using ext2, with and without soft updates). As a second test, we
@@ -154,6 +154,7 @@ System & Time (sec) \\ \hline\hline
 \Kudos\ (ext2 SU) & 46.6 \\ \hline % r3266: 46.173 46.555 46.495 46.479 47.371
 Linux 2.6.20.1 (ext2) & 16.9 \\ \hline % 10.602 16.983 17.033 16.905 16.798
 Linux 2.6.20.1 (ext3) & 19.6 \\ \hline % 16.590 20.533 19.713 19.174 19.129
+FreeBSD & 27.0 \\ \hline % 26.83 27.18
 \end{tabular}
 \caption{Postmark. TODO: describe and comment on performance.}
 \label{fig:postmark}
@@ -169,6 +170,8 @@ times slower for deletions.
 %
 This demonstrates that the overhead of using \chdescs\ in \Kudos\ is not
 entirely unreasonable, but has room for significant improvement.
+%
+\todo{Reference and discuss Figure~\ref{fig:postmark}.}
 %
 While \Kudos\ does still have some CPU usage and I/O delay problems, its
 performance has been steadily improving over time and we expect that it will
