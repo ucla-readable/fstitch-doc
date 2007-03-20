@@ -9,15 +9,15 @@ updates avoids the need for synchronous writes to disk or duplicate writes to
 a journal. Soft updates also guarantees a strong level of consistency after a
 crash, enough so that the system can avoid time-consuming file system
 consistency checks using a utility like \emph{fsck}. 
-
-Another approach to protecting the integrity of the file system is to write
+%
+A comparable approach to protecting the integrity of the file
+system~\cite{seltzer00journaling} is to write
 upcoming operations to a journal first. The content and the layout of the
 journal vary in each implementation, but in all cases, the system can use the
 journal to play out (or roll back) the operations that did not complete as a
 result of a crash. Thus, \emph{fsck} can be avoided by consulting the journal
-when recovering from a crash. Section \ref{sec:using:journal} explains
-journaling with \chdescs. \cite{seltzer00journaling} compares journaling and
-soft updates in practice.
+when recovering from a crash.  Section \ref{sec:using:journal} explains
+journaling with \chdescs.
 
 External synchrony~\cite{nightingale06rethink} builds on journaling to
 automatically provide strict file system operation ordering for applications,
@@ -27,16 +27,26 @@ control to them from the file system. If a process later performs some
 \emph{user-visible} operation like printing text to the screen or sending
 network traffic, the journal transaction containing the changes is forced to
 commit before the process can continue.
-
-\cite{sivathanu05ensuring}
+%
+External synchrony depends inherently on dependency tracking; dependencies
+among processes with outstanding data are tracked to ensure that
+uncommitted output never reaches a user.  Xsyncfs depends on a particular
+file system consistency methodology, namely journaling; \Kudos\ \patch\
+dependencies could be a natural implementation strategy for Xsyncfs
+dependencies, allowing them to apply to any file system.
+%
+Similar \patch-like dependencies are used to improve network file system
+performance in BlueFS~\cite{nightingale05speculative}.
 
 Customizable application-level consistency protocols have previously been
 considered in the context of distributed, parallel file systems by
 CAPFS~\cite{vilayannur05providing} and Echo~\cite{mann94coherent}.
 %
-CAPFS allows application writers to design plug-ins for the parallel file store,
-which define what actions to take before and after each client-side system call
-to enforce additional consistency policies.
+CAPFS allows application writers to design plug-ins for a parallel file store
+that define what actions to take before and after each client-side system
+call.
+%
+These plug-ins can enforce additional consistency policies.
 %
 Echo maintains a partial order on the locally cached updates to the remote file
 system, and guarantees that the server will store the updates accordingly. It
@@ -48,7 +58,7 @@ Both systems are based on the principle that not providing the right
 consistency protocol can cause unpredictable failures, yet enforcing
 unnecessary consistency protocols can be extremely expensive.
 %
-However, this is also true with a local file system -- and as a result,
+However, this is also true with a local file system, and as a result
 applications must use expensive interfaces like \texttt{fsync()} when they
 require specific consistency guarantees.
 %
@@ -84,9 +94,9 @@ benefits of both ideas.
 A variety of extensions to file systems and disk interfaces have been proposed
 in recent work, like the FS2 Free Space File System~\cite{huang05fs2},
 encrypting file systems like NCryptfs~\cite{wright03ncryptfs}, and type-safe
-disks~\cite{sivathanu06typesafe}. Although we have not implemented \Kudos\
-\modules\ for these extensions, we believe that the \Kudos\ \module\ system is
-flexible enough to allow straightforward implementations of these ideas.
+disks~\cite{sivathanu06typesafe}. The \Kudos\
+\module\ system may provide an interesting platform for implementations 
+of these ideas.
 %% NCryptfs has been written in a
 %% stackable way already, allowing it to be easily adapted for new underlying file
 %% systems -- but FS2 is currently specific to ext2, since it deals directly with
