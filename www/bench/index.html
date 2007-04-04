@@ -1,0 +1,88 @@
+<html>
+<head>
+<title>Kudos Tests</title>
+
+<script language="JavaScript"type="text/javascript" src="plots/time_tar.js"></script>
+<script language="JavaScript"type="text/javascript" src="plots/time_rm.js"></script>
+<script language="JavaScript"type="text/javascript" src="plots/time_postmark.js"></script>
+
+<script language="JavaScript" type="text/javascript"> <!--
+function addTimeTest(tblId, testData)
+{
+		var row = document.getElementById(tblId).insertRow(-1);
+		var sysName = testData[0] + ' ' + testData[1];
+		row.insertCell(-1).innerHTML = sysName;
+		row.insertCell(-1).innerHTML = testData[2];
+		row.insertCell(-1).innerHTML = testData[5];
+		row.insertCell(-1).innerHTML = testData[11];
+		row.insertCell(-1).innerHTML = testData[8];
+}
+
+function loadTimes()
+{
+	for (sys in time_tar_data)
+		addTimeTest('timeTarTable', time_tar_data[sys]);
+	for (sys in time_rm_data)
+		addTimeTest('timeRmTable', time_rm_data[sys]);
+	for (sys in time_postmark_data)
+		addTimeTest('timePostmarkTable', time_postmark_data[sys]);
+}
+--> </script>
+</head>
+<body onLoad='loadTimes()'>
+
+<a href="#time">Time</a> (<a href="#time_pit">Current</a>, <a href="#time_history">History</a>),
+<a href="#space">Space</a>
+
+<hr size="1" noshade>
+<a name="time">
+<h2>Time</h2>
+
+<a name="time_pit">
+<h3>Current Times</h3>
+<table border="1" id="timeTarTable">
+		<caption>Current tar times</caption>
+		<tr><th></th> <th>real</th> <th>sys</th> <th>io</th> <th>user</th></tr>
+</table>
+
+<table border="1" id="timeRmTable">
+		<caption>Current rm times</caption>
+		<tr><th></th> <th>real</th> <th>sys</th> <th>io</th> <th>user</th></tr>
+</table>
+
+<table border="1" id="timePostmarkTable">
+		<caption>Current postmark times</caption>
+		<tr><th></th> <th>real</th> <th>sys</th> <th>io</th> <th>user</th></tr>
+</table>
+
+<a name="time_history">
+<h3>Kudos History</h3>
+<img src="plots/time_tar.png">
+<img src="plots/time_rm.png">
+<img src="plots/time_postmark.png">
+
+<hr size="1" noshade>
+<a name="space">
+<h2>Space</h2>
+<img src="plots/space_tar.png">
+<img src="plots/space_rm.png">
+<img src="plots/space_postmark.png">
+
+<hr size="1" noshade>
+<h2>Chdesc Overhead</h2>
+Plot chdesc memory vs number of block writes?
+(Is this a good way to give us an idea of how well optimizations work
+among different tests?)
+
+<hr size="1" noshade>
+<a name="blockio">
+<h2>Block IO</h2>
+TODO.
+
+<hr size="1" noshade>
+<a name="su">
+<h2>Soft Update Correctness</h2>
+TODO.
+
+ </body>
+</html>
