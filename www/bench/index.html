@@ -10,6 +10,10 @@
 <script language="JavaScript"type="text/javascript" src="plots/space_rm.js"></script>
 <script language="JavaScript"type="text/javascript" src="plots/space_postmark.js"></script>
 
+<script language="JavaScript"type="text/javascript" src="plots/io_tar.js"></script>
+<script language="JavaScript"type="text/javascript" src="plots/io_rm.js"></script>
+<script language="JavaScript"type="text/javascript" src="plots/io_postmark.js"></script>
+
 <script language="JavaScript" type="text/javascript"> <!--
 function addTimeTest(tblId, testData)
 {
@@ -61,17 +65,40 @@ function loadSpace()
 		addSpaceTest('spaceTable', 'postmark', space_postmark_data[sys]);
 }
 
+function addIoTest(tblId, testData)
+{
+	var row = document.getElementById(tblId).insertRow(-1);
+	var sysName = testData[0] + ' ' + testData[1];
+	row.insertCell(-1).innerHTML = sysName;
+	row.insertCell(-1).innerHTML = testData[2].toFixed(1);
+	row.insertCell(-1).innerHTML = testData[5].toFixed(1);
+	row.insertCell(-1).innerHTML = testData[8].toFixed(1);
+	row.insertCell(-1).innerHTML = testData[11].toFixed(1);
+}
+
+function loadIo()
+{
+	for (sys in io_tar_data)
+		addIoTest('ioTarTable', io_tar_data[sys]);
+	for (sys in io_rm_data)
+		addIoTest('ioRmTable', io_rm_data[sys]);
+	for (sys in io_postmark_data)
+		addIoTest('ioPostmarkTable', io_postmark_data[sys]);
+}
+
 function loadData()
 {
 	loadTimes();
 	loadSpace();
+	loadIo();
 }
 --> </script>
 </head>
 <body onLoad='loadData()'>
 
 Time (<a href="#time_pit">Current</a>, <a href="#time_history">History</a>),
-Space (<a href="#space_pit">Current</a>, <a href="#space_history">History</a>)
+Space (<a href="#space_pit">Current</a>, <a href="#space_history">History</a>),
+I/O (<a href="#io_pit">Current</a>)
 
 <hr size="1" noshade>
 <a name="current">
@@ -80,17 +107,17 @@ Space (<a href="#space_pit">Current</a>, <a href="#space_history">History</a>)
 <a name="time_pit">
 <h3>Time</h3>
 <table border="1" id="timeTarTable">
-		<caption>Current tar times</caption>
+		<caption>tar</caption>
 		<tr><th></th> <th>real</th> <th>sys</th> <th>io</th> <th>user</th></tr>
 </table>
 
 <table border="1" id="timeRmTable">
-		<caption>Current rm times</caption>
+		<caption>rm</caption>
 		<tr><th></th> <th>real</th> <th>sys</th> <th>io</th> <th>user</th></tr>
 </table>
 
 <table border="1" id="timePostmarkTable">
-		<caption>Current postmark times</caption>
+		<caption>postmark</caption>
 		<tr><th></th> <th>real</th> <th>sys</th> <th>io</th> <th>user</th></tr>
 </table>
 
@@ -99,6 +126,24 @@ Space (<a href="#space_pit">Current</a>, <a href="#space_history">History</a>)
 <table border="1" id="spaceTable">
 		  <tr><th></th> <th>bits</th> <th>bytes</th> <th>noops</th> <th>all</th> <th>deps</th> <th>wrefs</th> <th>rollback</th>
 </table>
+
+<a name="io_pit">
+<h3>I/O</h3>
+<table border="1" id="ioTarTable">
+		<caption>tar</caption>
+		<tr><th></th> <th>write issues</th> <th>write kBs</th> <th>read issues</th> <th>read kBs</th></tr>
+</table>
+
+<table border="1" id="ioRmTable">
+		<caption>rm</caption>
+		<tr><th></th> <th>write issues</th> <th>write kBs</th> <th>read issues</th> <th>read kBs</th></tr>
+</table>
+
+<table border="1" id="ioPostmarkTable">
+		<caption>postmark</caption>
+		<tr><th></th> <th>write issues</th> <th>write kBs</th> <th>read issues</th> <th>read kBs</th></tr>
+</table>
+
 
 <hr size="1" noshade>
 <a name="history">
