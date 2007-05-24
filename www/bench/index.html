@@ -101,7 +101,7 @@ function loadData()
 
 Time (<a href="#time_pit">Current</a>, <a href="#time_history">History</a>),
 Space (<a href="#space_pit">Current</a>, <a href="#space_history">History</a>),
-I/O (<a href="#io_pit">Current</a>)
+I/O (<a href="#io_pit">Current</a>, <a href="#io_history">History</a>)
 
 <hr size="1" width="100%" noshade>
 <a name="current">
@@ -134,17 +134,17 @@ I/O (<a href="#io_pit">Current</a>)
 <h3>I/O</h3>
 <table border="1" id="ioTarTable">
 		<caption>tar</caption>
-		<tr><th></th> <th>write issues</th> <th>write kBs</th> <th>read issues</th> <th>read kBs</th></tr>
+		<tr><th></th> <th>write requests</th> <th>write kBs</th> <th>read requests</th> <th>read kBs</th></tr>
 </table>
 
 <table border="1" id="ioRmTable">
 		<caption>rm</caption>
-		<tr><th></th> <th>write issues</th> <th>write kBs</th> <th>read issues</th> <th>read kBs</th></tr>
+		<tr><th></th> <th>write requests</th> <th>write kBs</th> <th>read requests</th> <th>read kBs</th></tr>
 </table>
 
 <table border="1" id="ioPostmarkTable">
 		<caption>postmark</caption>
-		<tr><th></th> <th>write issues</th> <th>write kBs</th> <th>read issues</th> <th>read kBs</th></tr>
+		<tr><th></th> <th>write requests</th> <th>write kBs</th> <th>read requests</th> <th>read kBs</th></tr>
 </table>
 
 
@@ -166,6 +166,14 @@ I/O (<a href="#io_pit">Current</a>)
 <img src="plots/space_tar.png">
 <img src="plots/space_rm.png">
 <img src="plots/space_postmark.png">
+</p>
+
+<a name="io_history">
+<h3>I/O</h3>
+<p>
+<img src="plots/io_tar.png">
+<img src="plots/io_rm.png">
+<img src="plots/io_postmark.png">
 </p>
 
 <hr size="1" noshade>
