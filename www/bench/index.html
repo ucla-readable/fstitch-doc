@@ -72,6 +72,8 @@ function addIoTest(tblId, testData)
 	row.insertCell(-1).innerHTML = sysName;
 	row.insertCell(-1).innerHTML = testData[2].toFixed(1);
 	row.insertCell(-1).innerHTML = testData[5].toFixed(1);
+	row.insertCell(-1).innerHTML = testData[14].toFixed(1);
+	row.insertCell(-1).innerHTML = testData[17].toFixed(1);
 	row.insertCell(-1).innerHTML = testData[8].toFixed(1);
 	row.insertCell(-1).innerHTML = testData[11].toFixed(1);
 }
@@ -134,17 +136,17 @@ I/O (<a href="#io_pit">Current</a>, <a href="#io_history">History</a>)
 <h3>I/O</h3>
 <table border="1" id="ioTarTable">
 		<caption>tar</caption>
-		<tr><th></th> <th>write requests</th> <th>write kBs</th> <th>read requests</th> <th>read kBs</th></tr>
+		<tr><th></th> <th>write requests</th> <th>write kBs</th> <th>read requests</th> <th>read kBs</th> <th># multi-write sectors</th> <th># writes to multi-write sectors</th></tr>
 </table>
 
 <table border="1" id="ioRmTable">
 		<caption>rm</caption>
-		<tr><th></th> <th>write requests</th> <th>write kBs</th> <th>read requests</th> <th>read kBs</th></tr>
+		<tr><th></th> <th>write requests</th> <th>write kBs</th> <th>read requests</th> <th>read kBs</th> <th># multi-write sectors</th> <th># writes to multi-write sectors</th></tr>
 </table>
 
 <table border="1" id="ioPostmarkTable">
 		<caption>postmark</caption>
-		<tr><th></th> <th>write requests</th> <th>write kBs</th> <th>read requests</th> <th>read kBs</th></tr>
+		<tr><th></th> <th>write requests</th> <th>write kBs</th> <th>read requests</th> <th>read kBs</th> <th># multi-write sectors</th> <th># writes to multi-write sectors</th></tr>
 </table>
 
 
@@ -170,11 +172,20 @@ I/O (<a href="#io_pit">Current</a>, <a href="#io_history">History</a>)
 
 <a name="io_history">
 <h3>I/O</h3>
+<h4>All</h3>
 <p>
 <img src="plots/io_tar.png">
 <img src="plots/io_rm.png">
 <img src="plots/io_postmark.png">
 </p>
+
+<h4>Multi-writes</h3>
+<p>
+<img src="plots/io_multi_tar.png">
+<img src="plots/io_multi_rm.png">
+<img src="plots/io_multi_postmark.png">
+</p>
+
 
 <hr size="1" noshade>
 <h2>Chdesc Overhead</h2>
