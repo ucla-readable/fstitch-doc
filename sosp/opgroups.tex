@@ -147,7 +147,7 @@ system, and the uw-imapd IMAP mail server daemon.
 \paragraph{Gzip}
 \label{sec:patchgroup:gzip}
 
-Our first test showed that trivial consistency requirements were trivial to
+Our first test showed that simple consistency requirements were trivial to
 add.  We updated gzip to use \patchgroups\ that ensure the input file's
 removal is not committed before the output file's data is written, so that
 a crash does not lose both files. The update adds 10 lines of code to gzip.
