@@ -1,3 +1,8 @@
+key:
+# Summary of reviewer suggestion/request
+* Our thoughts and plans
+
+
 ==+== sosp2007 Paper Reviews
 
 ==+== =====================================================================
@@ -38,6 +43,8 @@ of the feasible. Their performance results show that there is still a
 ways to go to get patches to perform as well as existing Linux systems
 that use special-case consistency implementations.
 
+* TODO: do we like what they took away?
+
 ==+== F. Comments for author
 
 In general I like the paper. I think the idea is interesting, and you
@@ -47,6 +54,9 @@ so many others). If you can achieve the performance improvements that
 you are aiming for it sounds like this could become a practical
 abstraction for implementing stable storage systems.
 
+# Can you achieve similar performance?
+* tar and rm are now similar. We understand and have a plan for postmark.
+
 Here are some specific comments:
 
 You use the phrase "soft updates-like consistency" several
@@ -54,8 +64,14 @@ times. Aside from being a bit awkward, you don't define what it means
 until well after the first use. I think I first noticed it on page 3
 ("Rollback data" subsection).
 
+# "soft updates-like consistency" is awkward and should be defined earlier.
+* new phrase/name? introduce sooner? use later?
+
 In the Rollback data section, I found the discussion about circular
 dependencies a little hard to follow. May an example would help?
+
+# (what it says)
+* todo
 
 In Section 6, at the top of page 9, you write "When the function is
 called, the patch *p is set to the patch, if any, on which the
@@ -64,24 +80,40 @@ must be set to depend on the modification itself." Did you mean that
 *p must be set to the patch corresponding to the modification? (I
 don't understand what it means otherwise.)
 
+# Sentence is difficult to understand. Question about *p.
+* Simplify/make less abstract.
+
 In section 7.1 on the patchgroups interface, you describe restrictions
 to prevent cycles. So, can you create patchgroups p and q, then issue
 pg_depend(q,p), and then engage each of p and q? (Is the rule just
 that they can't be engaged before the "depend" call?) I found that a
 little confusing on first read.
 
+# How the patchgroup interface disallows cycles is unclear (but reviewer
+  probably did guess the answer)
+* State some or all of the rules? (Show table or state transition diagram?)
+
 Can patches in a patchgroup be sent to disk before a patchgroup is
 closed? Does closing a patchgroup do anything special?
+
+# More patchgroup interface questions
+* todo
 
 In the description of using patchgroups in Subversion, I think Figure
 8 would be more useful if you could tag the various components and
 dependencies in the figure and refer to them in the discussion.
+
+# svn patchgroup figure is difficult to understand
+* our intent is to show that it is complicated, and nothing more?
 
 Finally, in Section 8, in describing the implementation, it would help
 readers who are not Linux kernel experts (like me) to understand better how
 Dodder fits in if you could give a little more context about how the
 Linux kernel is structured around the buffer cache and file system
 layers.
+
+# more fully describe linux kernel structure and how kudos fits in
+* do it
 
 ==+== End Review
 
@@ -134,12 +166,22 @@ numbers (for Postmark) indicate that Dodder requires 47s, compared to
 17s and 20s, for ext2 and ext3 respectively; their results for
 microbenchmarks of untar and delete and similarly worrisome.  
 
+# kudos performance is not within reason
+* tar and rm are now similar to ext2 and ext3. We understand and have
+  a plan for postmark performance.
+
 Another weakness is that the authors have not performed a
 thorough evaluation.  The best way to compare performance would be to
 implement soft updates directly in ext2 and with Dodder, and compare
 the two; the authors do not do this.  Additionally, the authors should
 compare ext3 to Dodder with journaling, but they show no numbers for
 Dodder journaling.
+
+# the paper lacks direct comparisions. suggestion: implement and compare
+  against linux ext2 SU and compare journaling.
+* linux ext2 SU would be a large undertaking. we compare against UFS for
+  this reason (but using kudos in linux, not freebsd). how can we improve?
+  compare journaling.
 
 I am also disappointed with the evaulation of the case studies using
 patchgroups.  The gzip example could be solved with an fsync and the
@@ -153,6 +195,20 @@ that the authors are hiding poor performance with their indirect
 metric.  I would like to see performance results for all three case
 studies.
 
+# gzip and svn already/easily made safe
+* fsync: more than needed (goes to disk! even though we may subsequently rm)
+  svn: they are only correct with particular journal techniques. pgs provide
+       safety independently of fs consistency techniques.
+
+# no performance comparision for gzip and svn
+* do we care about their performance? if so, or if others might, measure it.
+  if not, state so?
+
+# imap perf metric (#writes) could be better: time
+* we used #writes to show results independently of kudos cpu overhead
+  and poor disk scheduling. but perhaps kudos is now fast enough.
+  show just time? show both?
+
 My final serious concern is that the motivation for patches is not
 strong.  Is a general abstraction really needed?  Where are the
 benefits?  (Certainly it is not a performance benefit.)  The authors
@@ -160,10 +216,14 @@ mention that patches give file system implementations some flexibility
 in how dependencies are enforced, but they do not explore this
 flexibility - they don't have results with multiple implementations.
 
+# improve patch motivation
+* todo
 
 I would like to see this paper accepted, under the assumption that the
 authors are able to improve the performance of Dodder and more
 thoroughly evaluate Dodder.
+
+* TODO: do we like what they took away?
 
 ==+== F. Comments for author
 
@@ -173,6 +233,9 @@ to improve the performance and the evaluation of your system.
 - Related Work: I'd like to see more comparison with Burnett's thesis.  Is Burnett's
   approach only for applications?  How does his interface differ from
   patches?
+
+# more comparision with Burnett's thesis
+* do it.
 
 - Much of the text would be easier to follow if you included more
   examples (though I understand that you are space constrained right
@@ -186,15 +249,28 @@ to improve the performance and the evaluation of your system.
   updates.  For Figure 3, could you provide an example that represents
   specific updates?
 
+# more examples, please:
+  - cyclic dependencies (at the block level? or how we avoid patch-level?)
+  - situations where optimizations do not apply
+  - more examples of common/interesting fs operations
+  - make figure 3 depict actual operation
+* todo
+
 - The authors consider the approach of carrying rollback data as a
   part of a patch, in case there is a circular dependency.  It seems
   another approach to breaking the dependency would be to create a
   copy of the page causing the circular dependency; is this
   equivalent?  how does this approach compare?
 
+# how does a particular alternative to patch rollback data compare?
+* todo (offhand: unless there is an optimization to take, less efficient)
+
 - Figures 4 and 5: I would have preferred a diagram that shows the file
   system data structures being manipulated (similar to Figure 2)
   instead.
+
+# would have preferred actual fs datastructures depicted
+* todo (do we think the extra detail is helpful, worth the space?)
 
 - Section 5, Journaling: It took me awhile to figure out what you
   meant by your last paragraph.  I think the problem is that this
@@ -203,13 +279,22 @@ to improve the performance and the evaluation of your system.
   journaling mode (if that is indeed the case, and not the default
   ordered journaling mode).
 
+# journal dependency preservation (and full-data mode) confusing
+* todo
+
 - Figure 6: The font for the interface specifications is too small
   (CFS, L2FS, BD).  
+
+# (what it says)
+* write once instead of twice, with bigger font? make both bigger? other?
 
 - I'd be interested in seeing the experiments exploring the
   sensitivity to the write-back cache policy for dirty blocks.  It
   certainly seems that performance could be improved by waiting until
   more patches are specified before flushing.
+
+# tell us more about write back cache eviction algorithms
+* todo
 
 - As stated above, I would like to see more detailed analysis of
   patchgroups.  First, I'd like to see all three applications
@@ -218,10 +303,16 @@ to improve the performance and the evaluation of your system.
   like an explanation for the performance differences and comments on
   any difference in ordering guarantees across the versions.
 
+# (mostly a repeat of earlier patchgroup comments)
+
 - You might want to consider how you could express shadow paging, as
   in WAFL, with patches.  Being able to demonstrate an additional
   consistency mechnanism would help convince readers of the generality
   of patches.  I believe this should be straight forward.
+
+# can kudos also do shadow paging?
+* todo (are there interesting uses/optimizations? wrt whether a block is
+  referenced?)
 
 ==+== End Review
 
@@ -256,6 +347,8 @@ implemented on top of the patch abstraction. The paper presents
 several optimizations that dramatically reduce the overhead of their
 patching implementation.
 
+* TODO: do we like what they took away?
+
 ==+== F. Comments for author
 
 This is a solid paper. My comments are below.
@@ -273,6 +366,9 @@ impact the applications that do not use the new functionality. I am
 not sure that the proposed solution passes this threshold. A more
 comprehensive discussion of this decision would help.
 
+# how does kudos justify the end-to-end principle?
+* todo
+
 Section 7.2 does a good job of evaluating the solution by showing that
 implementing it requires small changes to existing applications and
 the overhead is "reasonable". One thing that is missing though is
@@ -285,6 +381,9 @@ performance. It is true that in the end the overhead of implementing
 patching may offset these gains, but it would be still interesting to
 quantify the potential gains.
 
+# compare patchgroup performance
+* same todo as for another author
+
 Other comments and typos:
 
 - page 1, 2nd column, 3rd para: "optimizations that which" ->
@@ -292,16 +391,28 @@ Other comments and typos:
 
 - page 4, 2nd column, 4th para: "On the one hand" -> "On one hand"
 
+# grammar fixes
+* use them.
+
 - page 4: You say that your implementation "currently disallows any
   dependency cycles..." What is the impact of this constraint, if any?
 
+# what is the impact of disallowing patchgroup dependency cycles?
+* explain.
+
 - page 5: You should explain better Figure 2(a). It took me quite a
   bit of time to understand what each patch represents.
+
+# figure 2a and its patches took time to understand
+* explain more? or?
 
 - page 8, "Soft updates": While in the end it is clear from the text
   what kind of consistency you are referring to, it would be nice to
   avoid vague formulations such as "relative consistency" and "more
   serious inconsistencies"
+
+# phrase comments/suggestions
+* todo
 
 - page 8, sec 6: "There are has" -> "There are"
 
@@ -310,6 +421,9 @@ Other comments and typos:
 
 - page 10, "Gzip": Remove one occurrence of "trivial" from the first
   sentence.
+
+# grammar fixes
+* use them.
 
 ==+== End Review
 
@@ -359,17 +473,29 @@ Limitations
 
   o The motivation/significance of this work seems limited
 
+# (what it says)
+* todo (more fs implementation motivation? modules? patchgroups?)
+
   o This paper primarily cleans up and simplifies ideas from the soft
     updates paper rather than introducing a fundamentally new approach.
+
+# kudos only cleans up and simplfies soft updates ideas
+* todo (fundamentally new: explict deps? modules? patchgroups?)
 
   o Most of the writing is quite clear, but a few crucial points
    (regarding cycles and rollback) were not made clear to me even
    after several careful readings
 
+# rollback writing is not clear (third reviewer)
+* clarify rollback explanation
+
   o The performance hit is currently non-trivial, and I'm not sure
     that it will be an easy sell to get people to pay the cost of
     significantly worse performance in order to get the benefit of "a
     cleaner abstraction"
+
+# performance is bad
+* already improved tar and rm. still todo: improve postmark.
 
 Summary recommendation
 
@@ -385,6 +511,8 @@ Summary recommendation
   don't think it is in the top half of the (generally very good to
   excellent) papers I reviewed.
 
+* TODO: do we like what they took away?
+
 ==+== F. Comments for author
 
 Two high level points then a few detailed comments.
@@ -396,6 +524,8 @@ of reliability, but (a) I'm not entirely confinced this is a big loss
 and (b) you may end up with simpler specifications of systems above
 this layer. 
 
+# is this the right abstraction?
+* todo (argue why it is/can be interesting and useful)
 
 As the authors make clear in the title, this paper generalizes ideas
 from the 1999 USENIX soft updates paper. In particular, the basic
@@ -417,6 +547,9 @@ the costs of the general system are comparable to hand-tuned
 systems. (That will be even more convincing information that the work
 has a complete "deep" understanding of the issues.)
 
+# acceptable performance will better convince reader that kudos issues are
+  deeply understood
+* tar and rm now similar to linux. postmark planned (see earlier).
 
 
 Other comments
@@ -431,6 +564,13 @@ I got lost a few times in section 3, where the abstraction is defined
     suspect that the "at the same time as" clause only comes into play
     when two patches write the same block? (Otherwise I can't see how
     "at the same time as" can be realized...)
+
+# reviewer expected b<-a instead of b->a
+* can we further clarify this? each direction is obvious to some and not
+  others.
+# reviewer was not clear on how multiple patches can be comitted atomically
+* we aren't even sure that they can. but we assume they are as far as dep
+  preservation is concerned. should we state this assumption more obviously?
 
   o \paragraph{Rollback data}: "A series of file system operations may
     create dependencies that enforce a circular order among blocks,
@@ -453,10 +593,18 @@ I got lost a few times in section 3, where the abstraction is defined
     memory includes the effect of all outstanding writes. Now I
     understand the purpose of the rollback inf...
 
+# block level cycles is not obvious
+* the reviewer found our figure 3 and the SU paper insightful. explain
+  better at the start? (other reviewers had similar problem)
+
   o Near the end of page 3, it is not immediately obvious why
     Dep[Flight[b]] can/should include Flight[b]. I'm guessing this is
     handling the case of multiple outstanding patches to the same
     block?
+
+# unsure why Dep[Flight[b]] may include Flight[b]
+* reviewer guessed correctly. this goes back to what the disk will write
+  atomically. make it more obvious?
 
 Section 5 describes how this abstraction and architecture allow me to
 drop "soft updates" or "journaling" or "async writes" under the same
@@ -471,26 +619,39 @@ existing file systems. And this extra elegance and (perhaps)
 flexibility is not free -- we need to re-write our file systems and
 accept a performance hit. 
 
+# being able to switch among SU, journaling, and async is not compelling
+* todo
+
 Two comments on the subversion example (para 2 page 11) 
 
   o Subversion maintainers disabled sync at the client because it was
     "unacceptably slow". How does your implementation (with its
     slowdowns) compare to this known "unacceptably slow" option?
 
+# compare svn patchgroup perf
+* see first svn patchgroup todo.
+
   o We know how to fix the problem -- use a jornaling ordered/full
     data mode file system like ext3. Not clear that moving to patches
     is easier or better than this. 
 
-
+# we know how to make svn safe - use ext3 techniques. why are pgs better?
+* todo (give choice and have less strict ordering requirements. but does
+  kudos give these benefits?)
 
 The second version of exokernel (SOSP 97) tracked "tainted" blocks to
 enforce dependencies and included several optimizations to make this
 efficient. How does this approach differ?
 
+# compare SOSP 1997 exokernel's tainted block dependencies (and opts)
+* todo
 
 Several points hint that work could increase with the number of
 outstanding requests.  I would like to see some high-throughput
 experiments (e.g., lots of concurrent writes to a RAID).
+
+# compare against more concurrent workloads
+* todo
 
 ==+== End Review
 
@@ -526,6 +687,8 @@ provides APIs that applications can use to express their consistency
 requirements in terms of dependencies. The framework has been
 implemented in Linux and the paper provides some evaluation.
 
+* TODO: do we like what they took away?
+
 ==+== F. Comments for author
 
 The work described here is promising but it is not yet ready for
@@ -534,30 +697,63 @@ it could be a lot clearer and more honest. And the results themselves
 are awful. Bottom line is a 2-3X performance penalty - that's just too
 much. I advise the authors to fix the perf bugs and revise the paper.
 
+# eval should be clearer and more honest
+* what the reviewer means is not quite obvious...
+# 2-3x perf penalty is unacceptable
+* see first perf todo.
+
 Section 1 -
 file system correctness [8, 28] - what about citing the recent work
 from Dawson Engler's group?
+
+# add Engler citation to fs correctness work
+* sounds useful, though it is a different approach
+
 "that which"
+
+# grammar fix
+* fix it.
 
 Section 3 -
 It wasn't clear at the beginning of section 3 that a patch was
 updating a byte-range inside the block instead of the entire block. I
 didn't realize this until 3.2. Please make this clear earlier.
+
+# was not clear until 3.2 that patches can be smaller than entire blocks
+* fix this. eg we say "Patch p's block is the unit of the disk data to which
+  p applies."
+
 Rollback data - An example would really help.
+
+# rollback example request
+* see first rollback example todo.
 
 Figure 3 - So the p patches are to one block and the q patches to a
 different block? Say this explicitly.
 
+# (what it says)
+* (how) should we clarify this?
+
 Section 6 - "are has"
+
+# grammar fix
+* do it.
+
 "when the function returns, the patch *p must be
 set" - I'm not understanding this. So argument p is an in/out
 argument. I understand the input part, not the output.
+
+# second reviewer who did not find this clear
+* improve clarity.
 
 Section 7.1 - I would like a better explanation of engaging &
 disengaging patchgroups. How does this work with threads? Is engaging
 a patchgroup the only way to actually use it to hold dependencies?
 How does this relate to the requirement in section 4.1 about knowing a
 patch's dependencies when the patch is created?
+
+# second reviewer asking for more patchgroup interface details
+* todo (what do we think is important/useful?)
 
 Section 9 -
 
@@ -566,13 +762,24 @@ operating system with a different file system. The really interesting
 and fair comparison is Dodder to Linux/ext2, because the OS and the
 file system structures are the same.
 
+# why compare against FreeBSD/UFS?
+* UFS uses SU. can we make this more obvious? (maybe contrast ext2?)
+
 In that comparison, the Dodder results are terrible (see figures 10,
 11, 12) - Dodder is 2-3X worse. You need to fix this for Dodder to be
 interesting.
 
+# kudos 2-3x is terrible
+* see first perf todo.
+
 I don't understand the division between 9.2 and 9.3. The untar and rm
 tests are not microbenchmarks. Aren't there any appropriate "standard"
 benchmarks, like the old "modified Andrew" benchmark?
+
+# why are 9.2 and 9.3 different sections?
+* untar and rm probably do not belong in 9.2.
+# aren't there appropriate standard benchmarks (eg modified andrew)?
+* do this.
 
 "suboptimal cache eviction, as described above" - I assume you mean
 the reference at the end of section 6.1. I think it would be better to
@@ -581,18 +788,37 @@ references back & forth. Better still if you instrumented enough to
 really understand instead of guess, better still if you fixed the
 problem :-).
 
+# cache perf comments... void if #reqs becomes similar to linux.
+* #reqs for tar is now the similar.
+  #reqs for rm is slightly worse, but close.
+
 Figure 11 - provide system time as well as real time
+
+# (what it says)
+* do it?
 
 Figure 13 - Measuring IMAP is great. Comparing to FreeBSD is not
 interesting, please compare to Linux/ext2 instead. Number of blocks is
 OK but better to measure number of IO requests, overall time, system
 time.
 
+# (what it says)
+* do it. (mostly, we ran out of time.)
+
 Section 9.4 - Summarize/interpret the results from the figure.
+
+# interpret fig 13 results
+* todo
 
 Reference 5 - Where was this thesis done?
 
+# (what it says)
+* show where.
+
 Reference 14 - I couldn't find this TR. Please provide better citation.
+
+# unable to find PostMark tech report
+* give mirror url? mirror it ourselves?
 
 ==+== End Review
 
@@ -621,17 +847,41 @@ Reference 14 - I couldn't find this TR. Please provide better citation.
 
 The Doddler system is described which allows the kernel file system implementation and user space applications to explicitly declare the dependencies among writes to stable storage, i.e., the disks. Machinery in the kernel that is layered between the file system and the disk driver interprets these dependencies and assures that the on-disk state always includes all dependencies for any stable block. The file system implementation uses a variant of the dependency machinery that applies to disk blocks. Applications use a variant that applies to groups of file writes. An Linux kernel implementation is presented and the performance and correctness validated with various micro and macro benchmarks. The bottom line is that there are significant performance problems, but it may be possible to mitigate them by further clever optimizations. The explicit specification of the dependencies does seem to be a nice way to assure that the on disk data structures of both the file system and various applications are consistent.
 
+* TODO: do we like what they took away?
+
 ==+== F. Comments for author
 
 This is a fascinating system. I think the idea has potential as a good way to explicitly handle the dependencies for on-disk data to make the stable state of a computer system consistent. I have several significant issues with the write up, however.
    1) Until your got to "patch groups" on page 10 out of 14 I thought you were describing an SDK for writing various file and database system that operate directly on top of the disk. Since not many of these get written, I wasn't too interested. But patcg groups carries the ideas to the applications programmer, and suddenly it become much more useful in everyday programming. You need to describe this up from in the paper rather than bury it on page 10.
+
+# patchgroups make this paper interesting but are not described until the end
+* describe, or alude to, sooner?
+
    2) Patches contain the new values for a byte range in a disk block. You never tell us how the rest of the needed block is fetched and combined with the new values to form a complete new block to write back to disk.
+
+# misunderstanding of how patches are applied...
+* todo
+
    3) The discussion in section 3 under "Rollback data" is completely mysterious. I understand that when the dependencies are actually between objects within pages (e.g., I-nodes and directory descriptors) and not whole pages, then you can get false circular dependencies among the dirty pages containing these objects. I don't understand how the rollback data nor the algorithm vaguely described in this paragraph fixes the problem. And this has a huge impact on the credibility of the rest of the paper, as many of your performance optimizations are required exactly because the rollback data is voluminous and frequently unnecessary. You've got to make this all clearer. (I think it has something to do with the answer to      point 2.
+
+# do not understand how rollback data or algo fix the block-level cycle problem
+* todo
+
    4) The discussion to related work is confusing. At the end summarize how the work improves the state of the art, now that the reader has been reminded of the previous work.
+
+# related work discussion is confusing. compare kudos at the end.
+* todo
+
    5) You need to remind the read of the key point surrounding soft updates.
+
+# (what it says)
+* probably do it.
 
 Do these ideas carry over into the realm of distributed data storage. Seems like they should and perhaps you should look into it. 
 .
+
+# (what it says)
+* todo
 
 ==+== End Review
 
@@ -660,10 +910,26 @@ Do these ideas carry over into the realm of distributed data storage. Seems like
 
 This paper presents a way of describing dependencies between disk blocks to a buffer cache so that cache writeback policies can enforce them.  The work generalizes the “write before” relationship that is present in many storage systems.  The motivation, design, and implementation of the system is describe including a few case studies of applications using the mechanism and benchmarks comparing the performance against existing system.
 
+* TODO: do we like what they took away?
+
 ==+== F. Comments for author
 
 This paper is well written and does a good job of motivating, describing, and evaluating the work. The overall idea of formalizing the block cache writeback policy and giving control to application seems like a good one. 
 
 One problem with the idea is the evaluation section seems to point out that the idea has a rather high performance cost even with all the optimizations in place. With this large of performance difference between Dobber and the “hand coded” dependencies of journaling file systems, it seems unlikely to be adopted.
 
+# performance seems unacceptable
+* see first perf todo.
+
 ==+== End Review
+
+
+
+Main todo items (many people commented and/or involve lots of work):
+* Further emphasize motivation
+* Better explain SU ideas (primarily, block level cycles)
+* Make optimizations clearer (including more examples?)
+* Patchgroup interface presentation may need more details
+* Update paper with improved tar and rm perf
+* Improve postmark perf
+* Measure patchgroup perf
