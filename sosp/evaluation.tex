@@ -187,7 +187,7 @@ that the file system contained many references to inodes that had been
 deleted: the file system was corrupt.
 %
 With our soft updates dependencies, the file system was mostly consistent:
-fsync reported that inode reference counts were higher than the correct
+fsck reported that inode reference counts were higher than the correct
 values (an expected discrepancy after a soft updates crash).
 
 
