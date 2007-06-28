@@ -1,0 +1,295 @@
+===========================================================================
+                        SOSP Shadow 07 Review #169A
+                 Updated Monday 14 May 2007 2:24:02am PDT
+---------------------------------------------------------------------------
+             Paper #169: Generalized File System Dependencies
+---------------------------------------------------------------------------
+
+                      Overall merit: 2. Weak reject
+                            Novelty: 3. Incremental
+                            Writing: 3. Average
+                 Reviewer expertise: 2. Some familiarity
+
+                         ===== Paper summary =====
+
+The paper proposes a new filesystem data-structure, the patch, making
+explicit the dependencies between block writes. It allows to factorize and
+simplify code in filesystems dealing with complex write orderings of
+blocks.
+
+                      ===== Comments for author =====
+
+** Pro 
+
+It generalizes something which is always good. It provides a new
+intermediate data structure which makes something explicit instead of
+implicit which is often good too. The programmer does not have to
+infer and reason about the same information by inspecting the
+adjustments of the code instructions. Looking at a data structure is
+often better than looking at some code. It makes easier and more
+explicit some filesystem related tasks. It provides more flexibility
+for a few applications. Finally the paper introduce soft-updates to ext2
+(but
+is it better than the journalized ext3 ?)
+
+** Cons
+
+Is it a real problem ? It seems the paper mainly improves current
+approaches
+by simplifying and factorizing code between implementations using
+soft-updates and those using journaling. In fact it took me a long
+time before finding what is the problem the paper try to solve
+(and I am not sure I have really found it).
+
+It does not improve the speed and robustness of the current
+state-of-the-art filesystems. It does not seem to improve the
+applications that could benefit from a more flexible filesystem. The
+use of fsync does not seem to be bad since there is no numbers given
+in the paper on this issue. 
+
+** Comment
+
+The paper does not show enough why applications need better and
+more flexible services from the filesystem regarding consistency.
+Maybe a simple and concrete problem, with a simple example of code 
+using fsync can better illustrate the problem. When do applications
+need fsync ?
+
+
+** Related work 
+
+When talking about the inadequacy of filesystems to provide good
+services to database software in the introduction, you could cite a
+famous paper by StoneBraker
+"Operating system support for database management"
+
+When talking about filesystem correctness in the introduction, you
+could cite one recent work by Dawson Engler which uses model checking
+techniques to improve filesystem code in Linux.
+
+
+** Typo
+
+In 9.3: fsync -> fsck
+
+===========================================================================
+                        SOSP Shadow 07 Review #169B
+                 Updated Tuesday 15 May 2007 5:22:25am PDT
+---------------------------------------------------------------------------
+             Paper #169: Generalized File System Dependencies
+---------------------------------------------------------------------------
+
+                      Overall merit: 3. Weak accept
+                            Novelty: 4. Novel
+                            Writing: 4. Good
+                 Reviewer expertise: 3. Knowledgeable
+
+                         ===== Paper summary =====
+
+Correctness, particularly in relation to the complexities of write
+ordering, has been a major area of interest in systems papers
+intending to improve the design and implementation of file systems in
+recent years.  In this paper, the authors observe that write ordering
+and synchronization in both file systems are often either very
+specialized (and as a result, complicated), or inefficiently naive --
+involving file- for file system-wide flushes as consistency
+barriers.  They claim that the existence of a general purpose
+mechanism to state fine-grained dependencies between file system
+updates would allow both file systems and applications to easily
+identify dependencies in their code, and allow lower-level modules to
+correctly write data to disk, according to these dependencies, in an
+efficient way.
+
+The authors have implemented a system that does this as an extension
+for the linux 2.6.20.1 kernel, replacing all the Linux block and file
+code from about the gendisk interface up to the VFS interface.  VFS is
+adapted to allow dependencies to be expressed by applications.
+
+They implement their own modular file system, dodder, and implement
+both ext2 and BSD UFS on top of it.  They also modify 3 application
+examples to include dependencies.
+
+The system is based around the idea of expressing writes as "patches"
+to the disk, and specifying inter-patch dependencies.  The paper
+presents a collection of online optimizations that improve the
+performance of patches by reducing the number patch-based requests
+before generating requests to the disk.
+
+                      ===== Comments for author =====
+
+In terms of problem and approach, this is easily one of my favorite
+papers submitted to SOSP this year.  Making dependencies more explicit
+and building systems to efficiently resolve them is a really fun, and
+timely idea.  I rate this paper as a weak accept because of the
+general novelty of the authors attempt to concisely frame and attack
+the problem of storage consistency and performance trade-offs on these
+grounds.
+
+That said, there is a great deal of stuff that's not answered, and the
+work presented falls short of the papers goals on pretty much all
+accounts: correctness appears to have been achieved, but isn't
+actually validated; performance isn't very good; complexity -- in
+terms of both coding effort and online CPU/memory consumption -- is
+not evaluated.
+
+This is largely a "clean slate" paper: What if sync() wasn't the only
+FS write consistency interface for apps?  What if FS implementations
+didn't conflate all sorts of complicated aspects of implementation?
+What if we could re-implement all these legacy interfaces from the
+ground up?  Cool idea.  The thing is is that with sweeping interface
+changes, I'm willing to believe that you can do a lot better on
+correctness.  What I want to know is that you don't get that at the
+cost of everything else -- code complexity, and performance in
+particular.  You didn't really leave me with a lot of warm fuzzy
+feelings in this department.
+
+How much code is dodder?  How much work is it actually going to be to
+get parity with complicated bits of VFS, like virtual memory
+integration for mmap() to work that you don't currently support?  How
+did you validate the correctness and completeness or your
+implementation against EXT2 and UFS?  At several times you mention
+cunning things, like in 4.5 where you had to avoid chained
+dependencies -- how much of a burden of this sort of hacking is put on
+the implementer, do they need to have a pretty clear understanding of
+what your optimizers do to get reasonable performance out of their FS
+code?
+
+If this is a "general" approach to file system dependencies, it would
+have been persuasive to demonstrate that it does indeed generalize
+across a few more file systems.
+
+Write caching and in-flight request management are the core of your
+work in terms of getting performance, but there seems to be a
+fundamental issue here that you don't really dig in to as much as i
+would have liked.  How long to you cache for?  Presumably, the greater
+a request aperture that you hold in memory, the more you can collapse
+patches -- but then the longer you have to wait to write things.  How
+do you decide when to write?  Moreover, how much more memory and CPU
+does your system require do represent patches and roll back state in
+memory, and to compute all the optimizations?
+
+Nits:
+
+- You lead with some formalisms, and don't cite the logic of file
+systems work from FAST.  That paper talked about how modelling
+dependencies in FS code let you do a offline analysis to improve both
+performance and correctness.  How does your work relate to that?
+
+- In your evaluation:
+
+ - I would have liked to get a much clearer understanding of resource
+ overheads during the tests.  
+
+ - You postmark run was very short -- 500 files at a mean of 1M is
+ 500M, which sounds about right given your ext2 throughput and a
+ commodity disk.  That's a quarter of your host's memory, you need to
+ run this test long enough to overfill the buffer cache to convince me
+ that you don't explode under write-heavy workloads.
+
+ - You aren't always clear about which Dodder FS implementation you
+ are using.  A clear, side-by-side functionally equivalent comparrison
+ of UFS and ext2 each against their implementations in your stuff
+ would be helpful.  If this is what Figure 11 is trying to do then i
+ think you need to be a bit clearer in the text.
+
+- On the application examples:
+
+  - Getting the same consistency in the gzip case involves adding a
+  sync() before the unlink() call doesn't it?  Isn't this strictly
+  easier than the 10 lines that you require?  Can you show us teh 10
+  lines?
+
+  - Arguing that you are better than ext3-requiring semantics in the
+  subversion case is a little bit unusual, givan that subversion would
+  instead need to target your interfaces.  I take your point, but the
+  argument here is a bit strange.
+
+Overall, I really enjoyed the paper and what you are trying to do.  I
+think with a bit of work, this will be a really solid paper.
+
+===========================================================================
+                        SOSP Shadow 07 Review #169C
+                 Updated Friday 18 May 2007 7:17:54am PDT
+---------------------------------------------------------------------------
+             Paper #169: Generalized File System Dependencies
+---------------------------------------------------------------------------
+
+                      Overall merit: 4. Accept
+                            Novelty: 4. Novel
+                            Writing: 3. Average
+                 Reviewer expertise: 2. Some familiarity
+
+                         ===== Paper summary =====
+
+File systems and databases systems ensure on-disk consistency by following
+certain write-orderings in a system-dependent way. This paper describes a
+patch abstraction to represent such write dependencies in a generalized
+way. Patches represent the write orderings but not how to implement them.
+Various interesting optimizations that reduce the cost of representing and
+enforcing the patches are explained. The patch abstraction is implemented
+in Linux, where ext2 uses it to provide soft-updates-like consistency in
+an efficient manner.
+
+                      ===== Comments for author =====
+
+This is a nice paper explaining an important concept and providing a
+generalized solution to the problem of write dependencies. I like the
+abstract explanation of the patch concept and then the list of
+optimizations applied to improve the performance. It'd have been nicer if
+each abstract idea/optimization (currently described by examples like "p
+depends on q") can be accompanied by some real-world example (say, on
+"file create dir contains pointer to inode"). I'm surprised to see the
+concept of "shadow paging" (which is used in WAFL and Reiser4 to provide
+consistency) not being referred in the consistency section of your related
+work. In Figure 2 (a), I'd think that i_1' (set size) is also dependent on
+i_1 (attach block) -- why this is not so? Also, I think that the
+dependency g->s (group descriptor depending on super block for the updates
+in the number of free blocks) must follow (that is, depend on) i'' (set
+mtime).
+
+Overall, this is an important paper explaining a complicated concept of
+write ordering using a generalized framework and showing that it works
+with little overhead.
+
+===========================================================================
+                        SOSP Shadow 07 Review #169D
+                 Updated Saturday 9 Jun 2007 2:27:56am PDT
+---------------------------------------------------------------------------
+             Paper #169: Generalized File System Dependencies
+---------------------------------------------------------------------------
+
+                      Overall merit: 2. Weak reject
+                            Novelty: 3. Incremental
+                            Writing: 4. Good
+                 Reviewer expertise: 3. Knowledgeable
+
+                         ===== Paper summary =====
+
+This paper describes a low-level mechanism for enforcing the correct
+ordering of writes to disk in order to ensure on-disk consistency and fast
+recoverability.  The mechanism described is based around "patches," or
+block writes, and includes explicit tracking of dependencies between
+patches as well as the current state of a patch (in-memory, in-flight,
+on-disk).
+
+                      ===== Comments for author =====
+
+This seems like a potentially useful mechanism.  I like the fact that
+explicit tracking of dependencies can simplify the composition of multiple
+layers of file system architecture with various consistency requirements. 
+I like the ability to expose this same mechanism to higher-level
+applications.
+
+However, I found two issues to be detrimental:
+
+1) it's not clear to me that the system as demonstrated is practical: 
+disk accesses are already often the bottleneck in computer systems. 
+Doubling the number of disk writes and the time to execute common programs
+seems like it might be a large price to pay.
+
+2) to what degree does this explicit tracking of write ordering help
+prevent the kinds of file system bugs that have been discovered over the
+past few years through model-checking and other analyses?  It seems to me
+like the write-ordering could prevent some of these bugs, but not
+necessarily all.  In other words, how much more reliable might our file
+systems be if they used this patch system?
