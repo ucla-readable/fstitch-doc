@@ -53,20 +53,20 @@ TODO: do we like what they took away?
 {Performance}
 
 We have since improved Dodder performance for the tar and rm
-benchmarks and now surpass linux ext3 (which provides similar
-consistency guarantees) for  elapsed real time.
+benchmarks and now surpass Linux ext3 (which provides similar
+consistency guarantees) for elapsed real time.
 
 Currently for tar, Dodder ext2 with soft updates takes 9.3s real time,
-linux ext2 6.0s, and linux ext3 13.8s. For rm, Dodder ext2 with soft
-updates takes 1.8s, linux ext2 4.9s, and linux ext3 4.7s. We have
+Linux ext2 6.0s, and Linux ext3 13.8s. For rm, Dodder ext2 with soft
+updates takes 1.8s, Linux ext2 4.9s, and Linux ext3 4.7s. We have
 also further decreased patch and rollback data memory, by 1+ orders
 of magnitude for the tar and rm tests.
 
-However, Dodder still does not match linux ext2/3 in other areas.
-Dodder uses up to 4.8 times the cpu time that linux ext2/3 use for the
-tar and rm tests. And uses 20 times the real time (8.6s vs 0.4s)
-that linux ext2/3 use for the postmark test. Especially for the
-postmark workload, we believe we understand why Dodder is slower and
+However, Dodder still does not match Linux ext2/3 in other areas.
+Dodder uses up to 4.8 times the cpu time that Linux ext2/3 use for the
+tar and rm tests, and uses 20 times the real time (8.6s vs 0.4s)
+that Linux ext2/3 use for the Postmark test. Especially for the
+Postmark workload, we believe we understand why Dodder is slower and
 are actively working on improving its performance.
 
 > 
@@ -137,8 +137,8 @@ TODO: note that our intent is to show that it is complicated, and nothing more?
 > Linux kernel is structured around the buffer cache and file system
 > layers.
 
-We will add more information on how the linux kernel is structured
-and on how Dodder fits into linux.
+We will add more information on how the Linux kernel is structured
+and on how Dodder fits into Linux.
 
 > 
 > ==+== End Review
@@ -212,7 +212,7 @@ updates against FreeBSD UFS with soft updates for this very reason.
 {Evaluation}
 
 We plan to significantly expand (including additional standard benchmarks
-and adding separate system and I/O time measurements), and rewrite, the
+and adding separate system and I/O time measurements) and rewrite the
 paper's evaluation section.
 We plan to add Dodder journaling to the evaluation's comparisons.
 
@@ -236,7 +236,7 @@ serves as a conceptualy simple patchgroup example.
 
 TODO: subversion response:
 - with patchgroups svnwc is safe on less strict file systems (eg NTFS)
-- we did not aim to rewrite svnwc from the ground up...
+- we did not aim to rewrite svn wc from the ground up...
 
 We plan to add performance evaluation for both the gzip and subversion
 case studies.
@@ -249,7 +249,7 @@ case studies.
 > performance results for all three case studies.
 
 We originally showed #writes to compare the I/O requirements of Dodder and
-existing. However, cpu and I/O time requirements are also critical and
+existing. However, CPU and I/O time requirements are also critical and
 we plan to add these measurements to the evaluation.
 
 > 
@@ -426,8 +426,10 @@ TODO: do we like what they took away?
 > not sure that the proposed solution passes this threshold. A more
 > comprehensive discussion of this decision would help.
 
-# how does kudos justify the end-to-end principle?
-TODO
+TODO: how does kudos justify the end-to-end principle?
+(Note: Dodder is "very fast" when we unhook all dependencies, which
+potentially demonstrates that it does not negatively impact file systems
+that do not use the dependency mechanism.)
 
 > 
 > Section 7.2 does a good job of evaluating the solution by showing that
@@ -547,8 +549,8 @@ We disagree with this characterization. We view user controlled
 dependencies (patchgroups), the pervasiveness of patches throughout
 the system and the optimizations required to efficiently realize this,
 and the benefits of patches throughout the system as interesting and novel
-advances and of wider scope than soft updates. We hope better convey
-the reason for this view through by improving the paper's motivation
+advances and of wider scope than soft updates. We hope to better convey
+the reason for this view through improving the paper's motivation
 (see {Motivation}).
 TODO: is this a good response?
 
@@ -625,8 +627,8 @@ dependecies with journaling by-product. More?
 > has a complete "deep" understanding of the issues.)
 
 See {Performance}. Dodder now achieves this performance for elapsed real time
-for the tar and rm benchmarks and we are working on improving cpu time
-and postmark benchmark performance.
+for the tar and rm benchmarks and we are working on improving CPU time
+and Postmark benchmark performance.
  
 > 
 > Other comments
@@ -643,6 +645,7 @@ We have that some people perfer to write "b->a" and others "b<-a" to mean
 patch b should not be written before patch a. We believe "b->a" makes
 more sense and plan to leave the notation as is. However, perhaps we
 can make the meaning more obvious.
+TODO: this reviewer is probably confused about < vs. <=, not < vs. >
 
 >     I suspect that the "at the same time as" clause only comes into
 >     play when two patches write the same block? (Otherwise I can't
@@ -712,7 +715,7 @@ The subversion maintainers never implemented an "unacceptably slow"
 version of the subversion working copy library as far as we know.
 Because subversion has always used its current consistency approach,
 we do not think it would be interesting to include this as a
-comparison point.
+comparison point. However, also see {Performance}.
 
 > 
 >   o We know how to fix the problem -- use a jornaling ordered/full
@@ -894,7 +897,7 @@ one or two more standard benchmarks as part of {Evaluation}.
 We elected to address this point through its last route, fixing the
 problem.  Dodder ext2 with soft updates now makes fewer requests than
 ext3 for tar and a similar number of requests as ext3 for rm. Dodder
-still makes many more requests (1992 vs 12) for postmark than ext3,
+still makes many more requests (1992 vs 12) for Postmark than ext3,
 but we understand why (Dodder does not yet know when a dirty block
 need not be written) and plan to improve this aspect. See {Performance}.
 
@@ -919,7 +922,7 @@ We plan to do this.
 > 
 > Reference 5 - Where was this thesis done?
 
-We plan to add this information, it was done at the University
+We plan to add this information; it was done at the University
 of Wisconsin-Madison.
 
 > 
@@ -972,8 +975,8 @@ in the paper.
 > 
 >    2) Patches contain the new values for a byte range in a disk block. You never tell us how the rest of the needed block is fetched and combined with the new values to form a complete new block to write back to disk.
 
-Blocks are either completely read from disk (ie the block has existing
-data) or patches initialize the entire block (ie the block has no existing
+Blocks are either completely read from disk (i.e. the block has existing
+data) or patches initialize the entire block (i.e. the block has no existing
 data) before (subsequent) patches are applied. We will try to clarify this
 point.
 
@@ -1000,7 +1003,9 @@ We plan to do this. See {Soft Updates Explanation}.
 > Do these ideas carry over into the realm of distributed data storage. Seems like they should and perhaps you should look into it. 
 > .
 
-We think patches in distributed data storage is beyond this paper's scope.
+We think patches in distributed data storage is beyond this paper's scope,
+but we have in fact thought about it on a few occasions. We may follow up
+on this in the future.
 TODO: good response?
 
 > 
@@ -1048,7 +1053,7 @@ See {Performance}. We are addressing Dodder's performance.
 
 ==+== Primary todos
 
-From the above, our main todo items (those with many people who commented
+From the above, our main TODO items (those with many people who commented
 and/or we believe will involve substantial work) are as follows:
 * Update and better express Dodder's motivation
 * Better explain soft update ideas (primarily, block level cycles and related)
