@@ -37,9 +37,6 @@
 > of the feasible. Their performance results show that there is still a
 > ways to go to get patches to perform as well as existing Linux systems
 > that use special-case consistency implementations.
-
-TODO: do we like what they took away?
-
 > 
 > ==+== F. Comments for author
 > 
@@ -54,20 +51,34 @@ TODO: do we like what they took away?
 
 We have since improved Dodder performance for the tar and rm
 benchmarks and now surpass Linux ext3 (which provides similar
-consistency guarantees) for elapsed real time.
+consistency guarantees) for elapsed real time. Much of Dodder's time
+improvement since the paper's submission has come from improving
+things like the block allocation strategy! However, the point of soft
+updates is for it to perform almost as fast, or even faster than,
+asynchronous ordering, and Dodder ext2 with soft updates still trails
+Linux ext2 performance for the tar and postmark benchmarks.
 
 Currently for tar, Dodder ext2 with soft updates takes 9.3s real time,
 Linux ext2 6.0s, and Linux ext3 13.8s. For rm, Dodder ext2 with soft
-updates takes 1.8s, Linux ext2 4.9s, and Linux ext3 4.7s. We have
-also further decreased patch and rollback data memory, by 1+ orders
-of magnitude for the tar and rm tests.
+updates takes 1.8s, Linux ext2 4.9s, and Linux ext3 4.7s.
+
+We have also further decreased patch memory usage. Dodder now creates
+74,000 and 1,800 patches for the tar and rm benchmarks, compared to
+276,000 and 54,000 for paper submission and 537,000 and 193,000
+without optimizations. Patches now create 353 kB and 0 B of rollback
+data for the tar and rm benchmarks, compared to 1,269 kB and 655 kB for
+paper submission and 469,647 kB and 3,246 kB without optimizations.
 
 However, Dodder still does not match Linux ext2/3 in other areas.
 Dodder uses up to 4.8 times the cpu time that Linux ext2/3 use for the
-tar and rm tests, and uses 20 times the real time (8.6s vs 0.4s)
-that Linux ext2/3 use for the Postmark test. Especially for the
-Postmark workload, we believe we understand why Dodder is slower and
-are actively working on improving its performance.
+tar and rm benchmark, and uses 20 times the real time (8.6s vs 0.4s) for
+the Postmark benchmark. Dodder writes 93,558 kB for Postmark benchmark,
+whereas Linux ext2 writes 96 kB and Linux ext3 217 kB. Whereas Dodder
+writes all dirtied blocks for Postmark, Linux ext2 and Linux ext3 write
+only end result dirty blocks. We are actively working on an optimization
+to Dodder ext2 and patches to detect, and not write, dirty unreferenced
+blocks, which we believe will bring Dodder's performance in line with
+Linux ext2 and Linux ext3's.
 
 > 
 > Here are some specific comments:
@@ -79,7 +90,8 @@ are actively working on improving its performance.
 
 The phrase does feel awkward. We will try to improve this.
 The phrase "soft updates-like consistency" is actually not used until
-the "Rollback data" subsection.
+the "Rollback data" subsection. This issue is part of our need to
+generally better explain soft updates. See {Soft Updates Explanation}.
 
 > 
 > In the Rollback data section, I found the discussion about circular
@@ -90,7 +102,10 @@ the "Rollback data" subsection.
 All of the reviewers noted that they would like a more in depth and/or
 more clear explanation of soft updates, block-level dependency cycles,
 and change rollback. We plan to address this.
-TODO: note that we must tradeoff space for new material. ask for suggestions?
+
+We are concerned, however, about space. We may take advantage of any
+additional pages available, but would like your suggestions for parts
+of the paper to cut, if any.
  
 > 
 > In Section 6, at the top of page 9, you write "When the function is
@@ -203,18 +218,24 @@ See {Performance}. We are addressing Dodder's performance.
 > Dodder journaling.
 
 We do not plan to add soft updates to Linux's ext2 to compare against
-Dodder's ext2 with soft updates, because of available time and because
-such a comparison would not be very fair, given that we implemented
-both and neither would be in wide spread use at the time of comparison.
+Dodder's ext2 with soft updates, mostly because of available time.
 We do understand the reviewer's interest and compare Dodder ext2 with soft
 updates against FreeBSD UFS with soft updates for this very reason.
+However, this comparison is also flawed because of OS differences, as other
+reviewers point out. We plan to improve this in the final version by:
+TODO: concrete ideas
 
 {Evaluation}
 
-We plan to significantly expand (including additional standard benchmarks
-and adding separate system and I/O time measurements) and rewrite the
-paper's evaluation section.
-We plan to add Dodder journaling to the evaluation's comparisons.
+We and many of the reviewers feel that the submitted evaluation was
+lacking in breadth, depth, and clarity. We plan to significantly expand
+and rewrite the section to address these lackings. Specifically, we plan to:
+- add Dodder journaled ext2 to the benchmarks;
+- show the # dependencies created to Figure 9 (opt effectiveness);
+- break down real time to also show system and I/O time for the benchmarks;
+- add another standard macro-benchmark;
+- improve patchgroup evaluation similarly (see {Patchgroup Evaluation});
+- improve writing clarity.
 
 > 
 > I am also disappointed with the evaulation of the case studies using
@@ -234,12 +255,19 @@ the extracted file data written to disk will increase the time to
 gunzip unnecessarily and possibly significantly. This case study also
 serves as a conceptualy simple patchgroup example.
 
-TODO: subversion response:
-- with patchgroups svnwc is safe on less strict file systems (eg NTFS)
-- we did not aim to rewrite svn wc from the ground up...
+The subversion working copy case study goal is to decrease the block
+write ordering strictness of svn wc to improve performance, make
+svn wc safe against system crashes on systems that do not use as
+strict ordering requirements as Linux ext3 (e.g., NTFS), and to show
+how a larger piece of software already concerned with write ordering
+can be adapted to take advantage of patchgroups. We did not aim to
+rewrite svn wc from the ground up, though, in response to this reviewer's
+comments, we believe rewriting svn wc would perhaps increase
+the performance and simplify the software.
 
-We plan to add performance evaluation for both the gzip and subversion
-case studies.
+We plan to also measure time, and perhaps memory usage, to the IMAP
+benchmark evaluation. And we plan to also evaluate the performance of
+both the gzip and subversion modifications.
 
 > The IMAP example, which originally used syncs, is more compelling.
 > This is the only example that the authors show any performance
@@ -262,7 +290,7 @@ we plan to add these measurements to the evaluation.
 
 {Motivation}
 
-Many of the reviewers felt the paper's motivations were lacking. We believe
+Many of the reviewers felt the paper's motivation was lacking. We believe
 the paper should more strongly emphasize and motivate investigating
 using patches to describe all file system changes, including the benefits
 and drawbacks of doing so, and patchgroups.
@@ -275,9 +303,6 @@ TODO: improve preceding phrasing.
 
 See {Performance} and {Evaluation}. We plan to strongly improve both of
 these aspects.
-
-
-TODO: do we like what they took away?
 
 > 
 > ==+== F. Comments for author
@@ -415,9 +440,6 @@ What do you think?
 > implemented on top of the patch abstraction. The paper presents
 > several optimizations that dramatically reduce the overhead of their
 > patching implementation.
-
-TODO: do we like what they took away?
-
 > 
 > ==+== F. Comments for author
 > 
@@ -596,9 +618,6 @@ See {Performance}. We are addressing Dodder's performance.
 
 See above responses to these summary points.
 Practical impact: {Motivation}, novelty: {Novelty}, cost: {Performance}.
-
-
-TODO: do we like what they took away?
 
 > 
 > ==+== F. Comments for author
@@ -797,9 +816,6 @@ but are not sure there will be sufficient space for the additional value.
 > provides APIs that applications can use to express their consistency
 > requirements in terms of dependencies. The framework has been
 > implemented in Linux and the paper provides some evaluation.
-
-TODO: do we like what they took away?
-
 > 
 > ==+== F. Comments for author
 > 
@@ -971,8 +987,6 @@ report long ago. We plan to include an archive.org URL.)
 > 
 > The Doddler system is described which allows the kernel file system implementation and user space applications to explicitly declare the dependencies among writes to stable storage, i.e., the disks. Machinery in the kernel that is layered between the file system and the disk driver interprets these dependencies and assures that the on-disk state always includes all dependencies for any stable block. The file system implementation uses a variant of the dependency machinery that applies to disk blocks. Applications use a variant that applies to groups of file writes. An Linux kernel implementation is presented and the performance and correctness validated with various micro and macro benchmarks. The bottom line is that there are significant performance problems, but it may be possible to mitigate them by further clever optimizations. The explicit specification of the dependencies does seem to be a nice way to assure that the on disk data structures of both the file system and various applications are consistent.
 
-TODO: do we like what they took away?
-
 > 
 > ==+== F. Comments for author
 > 
@@ -1045,9 +1059,6 @@ on this in the future.
 > ==+== E. Paper summary
 > 
 > This paper presents a way of describing dependencies between disk blocks to a buffer cache so that cache writeback policies can enforce them.  The work generalizes the “write before” relationship that is present in many storage systems.  The motivation, design, and implementation of the system is describe including a few case studies of applications using the mechanism and benchmarks comparing the performance against existing system.
-
-TODO: do we like what they took away?
-
 > 
 > ==+== F. Comments for author
 > 
