@@ -304,7 +304,7 @@ We plan to address these questions.
 >   updates.  For Figure 3, could you provide an example that represents
 >   specific updates?
 
-See {Soft Updated Explanation}. We plan to improve our soft updates
+See {Soft Updates Explanation}. We plan to improve our soft updates
 explanation. We agree with these comments and plan to implement them
 to make the patch optimization techniques more understandable.
 
@@ -477,7 +477,7 @@ acyclic requirement.
 > - page 5: You should explain better Figure 2(a). It took me quite a
 >   bit of time to understand what each patch represents.
 
-TODO: explain more? or?
+We will try to improve these and simliar phrases.
 
 > 
 > - page 8, "Soft updates": While in the end it is clear from the text
@@ -569,7 +569,7 @@ TODO: is this a good response?
 >    (regarding cycles and rollback) were not made clear to me even
 >    after several careful readings
 
-See {Soft Updated Explanation}. We plan to clarify cycles and rollback.
+See {Soft Updates Explanation}. We plan to clarify cycles and rollback.
 
 > 
 >   o The performance hit is currently non-trivial, and I'm not sure
@@ -612,8 +612,11 @@ TODO: do we like what they took away?
 > and (b) you may end up with simpler specifications of systems above
 > this layer. 
 
-TODO: Note how we plan to change motiviation from instant journaling to
-dependecies with journaling by-product. More?
+Transactions are a different abstraction which have been explored in
+other work. Our aim is not to present an API for making fast file
+systems, but rather, to explore the optimizations and techniques
+necessary to use a soft updates-like design in a general way. We will
+try to clarify this more in the final paper.
 
 > 
 > As the authors make clear in the title, this paper generalizes ideas
@@ -651,11 +654,9 @@ and Postmark benchmark performance.
 >     confusing -- I would have expected the requirement to be "every
 >     patch in p.ddeps should be committed to disk before p itself."
 
-We have that some people perfer to write "b->a" and others "b<-a" to mean
-patch b should not be written before patch a. We believe "b->a" makes
-more sense and plan to leave the notation as is. However, perhaps we
-can make the meaning more obvious.
-TODO: this reviewer is probably confused about < vs. <=, not < vs. >
+This reviewer seems to be confused about the distinction between "<" and
+"<=" as applied to the partial order on patches implied by the
+dependencies. We will try to make this more clear to avoid this issue.
 
 >     I suspect that the "at the same time as" clause only comes into
 >     play when two patches write the same block? (Otherwise I can't
@@ -694,7 +695,7 @@ to (re)introduce soft updates concepts.
 >     handling the case of multiple outstanding patches to the same
 >     block?
 
-The reviewer is correct. We think this aspect is probably clear enough as is.
+The reviewer is correct. We will try to clarify this.
 
 > 
 > Section 5 describes how this abstraction and architecture allow me to
@@ -741,7 +742,6 @@ is safe on more systems and, perhaps, more efficient on already-safe
 systems. We believe a working copy library written from the start to
 use patchgroups would benefit even more, but we do not feel such
 a case study is in the scope of this paper.
-TODO: do we agree with the above?
 
 > 
 > The second version of exokernel (SOSP 97) tracked "tainted" blocks to
@@ -809,8 +809,10 @@ TODO: do we like what they took away?
 > are awful. Bottom line is a 2-3X performance penalty - that's just too
 > much. I advise the authors to fix the perf bugs and revise the paper.
 
-See {Evaluation}. We plan to rewrite this section and add more evaluation.
-Dodder performance has also increased, and we plan to further increase it.
+We agree that the evaluation section is the most problematic section in
+the paper (see {Evaluation} above). We plan to rewrite this section and
+add more evaluation. Dodder performance has also increased, and we plan
+to further increase it.
 
 > 
 > Section 1 -
@@ -892,7 +894,7 @@ figure's measurements and we are improving other performance aspects.
 > tests are not microbenchmarks. Aren't there any appropriate "standard"
 > benchmarks, like the old "modified Andrew" benchmark?
 
-The 9.2 and 9.3 division is incorrect and agree that untar and rm
+The 9.2 and 9.3 division is incorrect and we agree that untar and rm
 are not microbenchmarks, we plan to fix this. We also plan to add
 one or two more standard benchmarks as part of {Evaluation}.
 
@@ -996,7 +998,6 @@ point.
 We think this a misunderstanding or lack of understanding of soft updates
 and hope to address it by expanding our soft updates review.
 See {Soft Updates Explanation}.
-TODO: is this what they did not understand?
 
 > 
 >    4) The discussion to related work is confusing. At the end summarize how the work improves the state of the art, now that the reader has been reminded of the previous work.
@@ -1016,7 +1017,6 @@ We plan to do this. See {Soft Updates Explanation}.
 We think patches in distributed data storage is beyond this paper's scope,
 but we have in fact thought about it on a few occasions. We may follow up
 on this in the future.
-TODO: good response?
 
 > 
 > ==+== End Review
