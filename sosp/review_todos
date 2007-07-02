@@ -290,11 +290,20 @@ we plan to add these measurements to the evaluation.
 
 {Motivation}
 
-Many of the reviewers felt the paper's motivation was lacking. We believe
-the paper should more strongly emphasize and motivate investigating
-using patches to describe all file system changes, including the benefits
-and drawbacks of doing so, and patchgroups.
-TODO: improve preceding phrasing.
+Many of the reviewers felt that the paper's motivation was lacking.
+We believe the paper should more strongly emphasize and motivate
+patches as an enabling technology for new models --- e.g., patchgroups.
+In this paper we investigate using patches to describe all file system
+changes and describe the benefits of doing so (largely, patches permit
+explicit order specification and enable modular inspection and
+transformation of disk changes) as well as the drawbacks (at least,
+unoptimized cpu and memory overhead).
+
+We believe we should also more clearly convey the fact that Dodder is
+not a refinement of soft updates, but a generalization of the
+write-before relationship present in many storage systems. And perhaps
+more strongly emphasize Dodder's novel optimization techniques that
+makes the use of these generalizations feasible.
 
 > 
 > I would like to see this paper accepted, under the assumption that the
