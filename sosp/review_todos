@@ -317,8 +317,10 @@ to make the patch optimization techniques more understandable.
 
 This is an interesting alternative approach, but we believe the common
 patch and patch dependency case is better optimized by hard patches
-and patch merging.
-TODO: is this explanation good enough?
+and patch merging. Our intuition is that duplicating pages would
+increase, not reduce, memory pressure. Additionally, since patches can
+be rolled back independently, a page with two patches on it can be
+rolled back to a state where either patch is present without the other.
 
 > 
 > - Figures 4 and 5: I would have preferred a diagram that shows the file
@@ -343,7 +345,7 @@ ordered data modes; we will try to clarify this.
 > - Figure 6: The font for the interface specifications is too small
 >   (CFS, L2FS, BD).  
 
-We will address the small font size.
+We will address the small font size, perhaps by removing the figure.
 
 > 
 > - I'd be interested in seeing the experiments exploring the
@@ -351,7 +353,13 @@ We will address the small font size.
 >   certainly seems that performance could be improved by waiting until
 >   more patches are specified before flushing.
 
-TODO: what will we do?
+Out performance incestigations have actually reduced our belief that the
+write-back cache policy has such a large effect; for instance, we
+obtained a very large performance improvement recently by changing the
+block allocation policy of our ext2 module to help coalesce block
+regions which have similar dependencies and thus can be written
+together. We hope to have a much better handle on performance and what
+affects it most in the final version.
 
 > 
 > - As stated above, I would like to see more detailed analysis of
@@ -369,8 +377,10 @@ See {Patchgroup Evaluation}. We plan to address all three points.
 >   consistency mechnanism would help convince readers of the generality
 >   of patches.  I believe this should be straight forward.
 
-We will consider adding this consistency mechanism.
-TODO: is this a good response?
+We are not sure that this would contribute much to the paper; probably a
+better discussion of soft updates, patches, and patchgroups will help to
+demonstrate the flexibility of patches in the way this reviewer wants.
+What do you think?
 
 > 
 > ==+== End Review
