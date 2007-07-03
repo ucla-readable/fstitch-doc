@@ -71,14 +71,24 @@ paper submission and 469,647 kB and 3,246 kB without optimizations.
 
 However, Dodder still does not match Linux ext2/3 in other areas.
 Dodder uses up to 4.8 times the cpu time that Linux ext2/3 use for the
-tar and rm benchmark, and uses 20 times the real time (8.6s vs 0.4s) for
-the Postmark benchmark. Dodder writes 93,558 kB for Postmark benchmark,
-whereas Linux ext2 writes 96 kB and Linux ext3 217 kB. Whereas Dodder
-writes all dirtied blocks for Postmark, Linux ext2 and Linux ext3 write
-only end result dirty blocks. We are actively working on an optimization
-to Dodder ext2 and patches to detect, and not write, dirty unreferenced
-blocks, which we believe will bring Dodder's performance in line with
-Linux ext2 and Linux ext3's.
+tar and rm benchmark, and uses 20 times the real time (8.6s vs 0.4s)
+for a small Postmark run. Dodder writes 93,558 kB for a small Postmark
+run that fits in memory, whereas Linux ext2 writes 96 kB and Linux
+ext3 217 kB. Whereas Dodder writes all dirtied blocks for Postmark,
+Linux ext2 and Linux ext3 write only end result dirty blocks.
+
+We are actively working to improve Dodder's performance in the
+conditions Postmark exposes. First, we believe the primary reason that
+large Postmark runs (those that do not fit in memory) are slower than
+Linux is poor block allocation. We have partially addressed this
+already, as can be seen by the tar runtime decrease since submission,
+and plan to further improve block allocation to avoid reuse of
+recently freed blocks (which will reduce the number of block-level
+cycles and thus sectors written multiple times). We also hope to add
+an optimization to Dodder ext2 and patches to detect, and then not
+write, dirty (but now unreferenced) blocks. Though we believe this is
+only a small issue for large Postmark runs, since the amount of writes
+saved will be small compared to the number of necessary writes.
 
 > 
 > Here are some specific comments:
@@ -116,7 +126,6 @@ of the paper to cut, if any.
 > don't understand what it means otherwise.)
 
 We plan to clarify this patch interface convention explanation.
-(Also mentioned in review E.)
 
 > 
 > In section 7.1 on the patchgroups interface, you describe restrictions
@@ -142,8 +151,8 @@ See {Patchgroup Interface}. We plan to clarify this point.
 > 8 would be more useful if you could tag the various components and
 > dependencies in the figure and refer to them in the discussion.
 
-See {Patchgroup Interface}. We plan to clarify this point.
-TODO: note that our intent is to show that it is complicated, and nothing more?
+We will either try to clarify this point or we may drop the figure, in the
+case that we decide it does not add much to the subversion case study.
 
 > 
 > Finally, in Section 8, in describing the implementation, it would help
@@ -217,13 +226,15 @@ See {Performance}. We are addressing Dodder's performance.
 > compare ext3 to Dodder with journaling, but they show no numbers for
 > Dodder journaling.
 
-We do not plan to add soft updates to Linux's ext2 to compare against
-Dodder's ext2 with soft updates, mostly because of available time.
-We do understand the reviewer's interest and compare Dodder ext2 with soft
-updates against FreeBSD UFS with soft updates for this very reason.
-However, this comparison is also flawed because of OS differences, as other
-reviewers point out. We plan to improve this in the final version by:
-TODO: concrete ideas
+We understand the reviewer's interest, and compare Dodder ext2 with
+soft updates against FreeBSD UFS with soft updates for this very
+reason. However, this comparison is also flawed because of OS
+differences, as reviewers point out. While we do not feel that we have
+the time to add soft update ordering to Linux ext2, we may be able to
+add sufficient support to run just the tar benchmark. We also feel
+that this would provide almost as much of a performance insight as
+measuring all benchmarks. We would be interested to know how
+interesting and useful you feel this intermediate approach would be.
 
 {Evaluation}
 
@@ -253,7 +264,7 @@ The gzip case study goal is to avoid the fsync. A motivating scenario:
 if the extracted file is soon moved to another file system or deleted
 the extracted file data written to disk will increase the time to
 gunzip unnecessarily and possibly significantly. This case study also
-serves as a conceptualy simple patchgroup example.
+serves as a conceptually simple patchgroup example.
 
 The subversion working copy case study goal is to decrease the block
 write ordering strictness of svn wc to improve performance, make
@@ -405,7 +416,7 @@ We will address the small font size, perhaps by removing the figure.
 >   certainly seems that performance could be improved by waiting until
 >   more patches are specified before flushing.
 
-Out performance incestigations have actually reduced our belief that the
+Out performance investigations have actually reduced our belief that the
 write-back cache policy has such a large effect; for instance, we
 obtained a very large performance improvement recently by changing the
 block allocation policy of our ext2 module to help coalesce block
@@ -430,9 +441,9 @@ See {Patchgroup Evaluation}. We plan to address all three points.
 >   of patches.  I believe this should be straight forward.
 
 We are not sure that this would contribute much to the paper; probably a
-better discussion of soft updates, patches, and patchgroups will help to
-demonstrate the flexibility of patches in the way this reviewer wants.
-What do you think?
+better discussion of soft updates, journaling, patches, and patchgroups
+will help to demonstrate the flexibility of patches in the way this
+reviewer wants. What do you think?
 
 > 
 > ==+== End Review
@@ -501,7 +512,7 @@ provided by the patchgroup interface and the underlying patches.
 > the overhead is "reasonable". One thing that is missing though is
 > quantifying the savings due to the better control of dependencies
 > enabled by the patch abstraction. In both the case of the subversion
-> example and the UW IMPA example, using the patch abstraction allows
+> example and the UW IMAP example, using the patch abstraction allows
 > one to relax the dependencies imposed by the original
 > application. Intuitively, this should have a positive effect on
 > performance. It is true that in the end the overhead of implementing
@@ -531,7 +542,7 @@ acyclic requirement.
 > - page 5: You should explain better Figure 2(a). It took me quite a
 >   bit of time to understand what each patch represents.
 
-We will try to improve these and simliar phrases.
+We will try to improve these and similar phrases.
 
 > 
 > - page 8, "Soft updates": While in the end it is clear from the text
@@ -539,7 +550,7 @@ We will try to improve these and simliar phrases.
 >   avoid vague formulations such as "relative consistency" and "more
 >   serious inconsistencies"
 
-We will try to improve these and simliar phrases.
+We will try to improve these and similar phrases.
 
 > 
 > - page 8, sec 6: "There are has" -> "There are"
@@ -616,7 +627,6 @@ and the benefits of patches throughout the system as interesting and novel
 advances and of wider scope than soft updates. We hope to better convey
 the reason for this view through improving the paper's motivation
 (see {Motivation}).
-TODO: is this a good response?
 
 > 
 >   o Most of the writing is quite clear, but a few crucial points
@@ -663,11 +673,10 @@ Practical impact: {Motivation}, novelty: {Novelty}, cost: {Performance}.
 > and (b) you may end up with simpler specifications of systems above
 > this layer. 
 
-Transactions are a different abstraction which have been explored in
-other work. Our aim is not to present an API for making fast file
-systems, but rather, to explore the optimizations and techniques
-necessary to use a soft updates-like design in a general way. We will
-try to clarify this more in the final paper.
+We plan to resolve this question through our motivation improvements.
+Specifically, the goal the patch abstraction is to express the
+write-before relationship used in many storage systems. This is a
+different abstraction than transactions.
 
 > 
 > As the authors make clear in the title, this paper generalizes ideas
@@ -690,9 +699,12 @@ try to clarify this more in the final paper.
 > systems. (That will be even more convincing information that the work
 > has a complete "deep" understanding of the issues.)
 
-See {Performance}. Dodder now achieves this performance for elapsed real time
-for the tar and rm benchmarks and we are working on improving CPU time
-and Postmark benchmark performance.
+We believe our motivation improvements will resolve this weakness.
+There is some refinement in this work, at the level of motivation perhaps.
+But in implementation terms, the ideas in this paper are quite new (compare
+USENIX McKusick). But also, Dodder performance is now much closer to
+hand-tuned system performance for tar and rm and we are working towards
+improving Postmark.
  
 > 
 > Other comments
@@ -763,8 +775,9 @@ The reviewer is correct. We will try to clarify this.
 > accept a performance hit. 
 
 We somewhat agree with this reviewer's view. See {Motivation}. We plan
-to change the reason for journaling's interestingness from a standalone
-motivation to an example patch by-product. Also see {Performance}.
+to change the reason why instant journaling is an interesting
+contribution, from being a goal of the work to being an example
+benefit of patches.
 
 > 
 > Two comments on the subversion example (para 2 page 11) 
@@ -777,7 +790,8 @@ The subversion maintainers never implemented an "unacceptably slow"
 version of the subversion working copy library as far as we know.
 Because subversion has always used its current consistency approach,
 we do not think it would be interesting to include this as a
-comparison point. However, also see {Performance}.
+comparison point. Also see {Patchgroup Evaluation}. We plan to compare
+Dodder and Linux subversion performance.
 
 > 
 >   o We know how to fix the problem -- use a jornaling ordered/full
@@ -955,11 +969,9 @@ one or two more standard benchmarks as part of {Evaluation}.
 > problem :-).
 
 We elected to address this point through its last route, fixing the
-problem.  Dodder ext2 with soft updates now makes fewer requests than
-ext3 for tar and a similar number of requests as ext3 for rm. Dodder
-still makes many more requests (1992 vs 12) for Postmark than ext3,
-but we understand why (Dodder does not yet know when a dirty block
-need not be written) and plan to improve this aspect. See {Performance}.
+problem. We have actually found poor block allocation to have caused
+much of Dodder ext2's slowness when compared with Linux ext2 and ext3.
+Not cache eviction as we posited. {Performance} has more details.
 
 > 
 > Figure 11 - provide system time as well as real time
@@ -1114,8 +1126,6 @@ and/or we believe will involve substantial work) are as follows:
 * Add more details to patchgroups
 * Rewrite evaluation section
 * Improve Dodder performance
-
-TODO: What should we ask for help with?
 
 
 ==+== Schedule
