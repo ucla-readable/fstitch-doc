@@ -485,10 +485,15 @@ What do you think?
 > not sure that the proposed solution passes this threshold. A more
 > comprehensive discussion of this decision would help.
 
-TODO: how does kudos justify the end-to-end principle?
-(Note: Dodder is "very fast" when we unhook all dependencies, which
-potentially demonstrates that it does not negatively impact file systems
-that do not use the dependency mechanism.)
+The performance of Dodder has been improved substantially since the
+submitted version of the paper, and it is now the case that when all
+patch dependencies are disconnected ("not using the new functionality")
+Dodder is actually faster than Linux ext2 at the untar and rm tests. (We
+have not yet tried Postmark in this mode.) Dodder ext2 in soft updates
+mode is also faster than Linux ext3 at these tests. Finally, see
+{Performance}, as we believe that the final version of the paper will be
+able to show improved performance in our patchgroup case studies
+provided by the patchgroup interface and the underlying patches.
 
 > 
 > Section 7.2 does a good job of evaluating the solution by showing that
