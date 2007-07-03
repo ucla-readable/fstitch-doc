@@ -506,6 +506,12 @@ mode is also faster than Linux ext3 at these tests. Finally, see
 able to show improved performance in our patchgroup case studies
 provided by the patchgroup interface and the underlying patches.
 
+TODO: is this how we want to respond to this point? (Should we be more
+to the point and either say, "We agree that performance must be at
+least equal, are not there yet, but ...", or, "We believe Dodder is
+interesting even if performance is never quite equal, because ..."?
+Can we more directly address the actual end-to-end aspect of the comment?)
+
 > 
 > Section 7.2 does a good job of evaluating the solution by showing that
 > implementing it requires small changes to existing applications and
