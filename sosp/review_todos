@@ -323,7 +323,24 @@ these aspects.
 >   approach only for applications?  How does his interface differ from
 >   patches?
 
-We plan to address these questions.
+We hope to expand on the relationship between Burnett's thesis and our
+work. Our patchgroup interface is very similar to his interface to the
+kernel (graphwrite). However, the methods used to implement the
+interfaces are very different: his system tracks dependencies at the
+level of entire graphwrite() calls, associates dirty blocks with a
+unique ID returned by that call, and duplicates dirty blocks when
+necessary to preserve ordering. Our work tracks individual changes to
+blocks internally, allowing kernel modules a finer level of control, and
+only chooses to expose an interface similar to his to userspace as a
+means to simplify the sanity checking which is required of arbitrary
+user-submitted requests.
+
+Additionally, Burnett did not implement the system described in section
+4 of his thesis. Instead it is evaluated using trace-driven simulations.
+We have found that some aspects of real disks have significant impacts
+which his simulator may not take into account; for instance, the number
+of I/O requests to the disk, rather than the number of blocks read or
+written by each request, is generally the bottleneck in our tests.
 
 > 
 > - Much of the text would be easier to follow if you included more
@@ -349,10 +366,11 @@ to make the patch optimization techniques more understandable.
 >   copy of the page causing the circular dependency; is this
 >   equivalent?  how does this approach compare?
 
-This is an interesting alternative approach, but we believe the common
-patch and patch dependency case is better optimized by hard patches
-and patch merging. Our intuition is that duplicating pages would
-increase, not reduce, memory pressure. Additionally, since patches can
+This is an interesting alternative approach, used in Burnett's thesis
+(see above), but we believe the common patch and patch dependency case
+is better optimized by hard patches and patch merging. Our intuition is
+that duplicating pages would increase, not reduce, memory pressure when
+using fine-grained patch dependencies. Additionally, since patches can
 be rolled back independently, a page with two patches on it can be
 rolled back to a state where either patch is present without the other.
 
