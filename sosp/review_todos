@@ -1102,13 +1102,13 @@ on this in the future.
 > 
 > ==+== E. Paper summary
 > 
-> This paper presents a way of describing dependencies between disk blocks to a buffer cache so that cache writeback policies can enforce them.  The work generalizes the “write before” relationship that is present in many storage systems.  The motivation, design, and implementation of the system is describe including a few case studies of applications using the mechanism and benchmarks comparing the performance against existing system.
+> This paper presents a way of describing dependencies between disk blocks to a buffer cache so that cache writeback policies can enforce them.  The work generalizes the "write before" relationship that is present in many storage systems.  The motivation, design, and implementation of the system is describe including a few case studies of applications using the mechanism and benchmarks comparing the performance against existing system.
 > 
 > ==+== F. Comments for author
 > 
 > This paper is well written and does a good job of motivating, describing, and evaluating the work. The overall idea of formalizing the block cache writeback policy and giving control to application seems like a good one. 
 > 
-> One problem with the idea is the evaluation section seems to point out that the idea has a rather high performance cost even with all the optimizations in place. With this large of performance difference between Dobber and the “hand coded” dependencies of journaling file systems, it seems unlikely to be adopted.
+> One problem with the idea is the evaluation section seems to point out that the idea has a rather high performance cost even with all the optimizations in place. With this large of performance difference between Dobber and the "hand coded" dependencies of journaling file systems, it seems unlikely to be adopted.
 
 See {Performance}. We are addressing Dodder's performance.
 
