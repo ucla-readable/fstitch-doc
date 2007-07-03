@@ -1,6 +1,6 @@
 ==+== Primary todos
 
-From the above, our main TODO items (those with many people who commented
+From the below, our main to-do items (those with many people who commented
 and/or we believe will involve substantial work) are as follows:
 * Update and better express Dodder's motivation
 * Better explain soft update ideas (primarily, block level cycles and related)
