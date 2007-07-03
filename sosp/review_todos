@@ -1,3 +1,30 @@
+==+== Primary todos
+
+From the above, our main TODO items (those with many people who commented
+and/or we believe will involve substantial work) are as follows:
+* Update and better express Dodder's motivation
+* Better explain soft update ideas (primarily, block level cycles and related)
+* Make patch optimizations clearer (including more examples?)
+* Add more details to patchgroups
+* Rewrite evaluation section
+* Improve Dodder performance
+* PERHAPS: Add shadow paging as a consistency model
+
+
+==+== Schedule
+
+We plan to give you a draft near final, but with more performance
+improvements to go, the week before the final copy deadline.  Does that
+suffice?
+
+Also, points in our response for which we'd love your feedback are
+highlighted with ** .
+
+** Is there any part of the paper that you find particularly non-useful?
+   We have some ideas, but your feedback would also help.
+
+
+
 > ==+== sosp2007 Paper Reviews
 > 
 > ==+== =====================================================================
@@ -49,14 +76,16 @@
 
 {Performance}
 
-We have since improved Dodder performance for the tar and rm
-benchmarks and now surpass Linux ext3 (which provides similar
-consistency guarantees) for elapsed real time. Much of Dodder's time
-improvement since the paper's submission has come from improving
-things like the block allocation strategy! However, the point of soft
-updates is for it to perform almost as fast, or even faster than,
-asynchronous ordering, and Dodder ext2 with soft updates still trails
-Linux ext2 performance for the tar and postmark benchmarks.
+We have since improved Dodder performance for the tar and rm benchmarks and
+now surpass Linux ext3 (which provides similar consistency guarantees) for
+elapsed real time. Much of Dodder's time improvement since the paper's
+submission has come from improving aspects of the system that have nothing
+to do with Dodder -- such as our ext2 version's block allocation strategy.
+However, the point of soft updates is for it to perform almost as fast, or
+even faster than, asynchronous ordering, and Dodder ext2 with soft updates
+still trails Linux ext2 performance for the tar and postmark benchmarks.
+(For what it's wroth, on FreeBSD, UFS with soft updates is also slower on
+our benchmarks than UFS without them.)
 
 Currently for tar, Dodder ext2 with soft updates takes 9.3s real time,
 Linux ext2 6.0s, and Linux ext3 13.8s. For rm, Dodder ext2 with soft
@@ -69,13 +98,14 @@ without optimizations. Patches now create 353 kB and 0 B of rollback
 data for the tar and rm benchmarks, compared to 1,269 kB and 655 kB for
 paper submission and 469,647 kB and 3,246 kB without optimizations.
 
-However, Dodder still does not match Linux ext2/3 in other areas.
-Dodder uses up to 4.8 times the cpu time that Linux ext2/3 use for the
-tar and rm benchmark, and uses 20 times the real time (8.6s vs 0.4s)
-for a small Postmark run. Dodder writes 93,558 kB for a small Postmark
-run that fits in memory, whereas Linux ext2 writes 96 kB and Linux
-ext3 217 kB. Whereas Dodder writes all dirtied blocks for Postmark,
-Linux ext2 and Linux ext3 write only end result dirty blocks.
+However, Dodder still does not match Linux ext2/3 in other areas.  Dodder
+uses up to 4.8 times the cpu time that Linux ext2/3 use for the tar and rm
+benchmark, and uses 20 times the real time (8.6s vs 0.4s) for a small
+Postmark run. Dodder writes 93,558 kB for a small Postmark run that fits in
+memory, whereas Linux ext2 writes 96 kB and Linux ext3 217 kB. Whereas
+Dodder writes all dirtied blocks for Postmark, including blocks for files
+that are deleted in the course of the benchmark, Linux ext2 and Linux ext3
+write only end-result dirty blocks.
 
 We are actively working to improve Dodder's performance in the
 conditions Postmark exposes. First, we believe the primary reason that
@@ -90,6 +120,10 @@ write, dirty (but now unreferenced) blocks. Though we believe this is
 only a small issue for large Postmark runs, since the amount of writes
 saved will be small compared to the number of necessary writes.
 
+In summary, we recognize that performance is the major issue for our paper
+submission, have made progress already in addressing that issue, and will
+make as much further progress as we can!
+
 > 
 > Here are some specific comments:
 > 
@@ -98,10 +132,10 @@ saved will be small compared to the number of necessary writes.
 > until well after the first use. I think I first noticed it on page 3
 > ("Rollback data" subsection).
 
-The phrase does feel awkward. We will try to improve this.
-The phrase "soft updates-like consistency" is actually not used until
-the "Rollback data" subsection. This issue is part of our need to
-generally better explain soft updates. See {Soft Updates Explanation}.
+The phrase does feel awkward. We will try to improve this.  The phrase
+"soft updates-like consistency" is actually not used until the "Rollback
+data" subsection. This issue is part of our need to generally better
+explain soft updates. See {Soft Updates Explanation} below.
 
 > 
 > In the Rollback data section, I found the discussion about circular
@@ -113,9 +147,9 @@ All of the reviewers noted that they would like a more in depth and/or
 more clear explanation of soft updates, block-level dependency cycles,
 and change rollback. We plan to address this.
 
-We are concerned, however, about space. We may take advantage of any
-additional pages available, but would like your suggestions for parts
-of the paper to cut, if any.
+** We are concerned, however, about space. We may take advantage of any
+additional pages available, but would like your suggestions for parts of
+the paper to cut, if any.
  
 > 
 > In Section 6, at the top of page 9, you write "When the function is
@@ -226,7 +260,7 @@ See {Performance}. We are addressing Dodder's performance.
 > compare ext3 to Dodder with journaling, but they show no numbers for
 > Dodder journaling.
 
-We understand the reviewer's interest, and compare Dodder ext2 with
+** We understand the reviewer's interest, and compare Dodder ext2 with
 soft updates against FreeBSD UFS with soft updates for this very
 reason. However, this comparison is also flawed because of OS
 differences, as reviewers point out. While we do not feel that we have
@@ -416,7 +450,7 @@ We will address the small font size, perhaps by removing the figure.
 >   certainly seems that performance could be improved by waiting until
 >   more patches are specified before flushing.
 
-Out performance investigations have actually reduced our belief that the
+Our performance investigations have actually reduced our belief that the
 write-back cache policy has such a large effect; for instance, we
 obtained a very large performance improvement recently by changing the
 block allocation policy of our ext2 module to help coalesce block
@@ -440,7 +474,7 @@ See {Patchgroup Evaluation}. We plan to address all three points.
 >   consistency mechnanism would help convince readers of the generality
 >   of patches.  I believe this should be straight forward.
 
-We are not sure that this would contribute much to the paper; probably a
+** We are not sure that this would contribute much to the paper; probably a
 better discussion of soft updates, journaling, patches, and patchgroups
 will help to demonstrate the flexibility of patches in the way this
 reviewer wants. What do you think?
@@ -496,21 +530,16 @@ reviewer wants. What do you think?
 > not sure that the proposed solution passes this threshold. A more
 > comprehensive discussion of this decision would help.
 
-The performance of Dodder has been improved substantially since the
-submitted version of the paper, and it is now the case that when all
-patch dependencies are disconnected ("not using the new functionality")
-Dodder is actually faster than Linux ext2 at the untar and rm tests. (We
-have not yet tried Postmark in this mode.) Dodder ext2 in soft updates
-mode is also faster than Linux ext3 at these tests. Finally, see
-{Performance}, as we believe that the final version of the paper will be
-able to show improved performance in our patchgroup case studies
-provided by the patchgroup interface and the underlying patches.
-
-TODO: is this how we want to respond to this point? (Should we be more
-to the point and either say, "We agree that performance must be at
-least equal, are not there yet, but ...", or, "We believe Dodder is
-interesting even if performance is never quite equal, because ..."?
-Can we more directly address the actual end-to-end aspect of the comment?)
+This use of the end-to-end argument is evocative, but not commonplace.  We
+may add some discussion of this issue to the paper.  We agree that (1)
+Dodder's performance as of the submission (and to some extent even now) is
+bad enough to argue against real use of the patch abstraction; and (2) a
+real operating system with incremental deployment concerns would probably
+use Dodder-like ideas at a higher level, rather than restructuring its
+entire file system implementation around patches as we did.  Our
+implementation was not optimized for incremental deployment, or to minimize
+our work.  We wanted to see whether the idea would scale.  This point
+deserves expansion in the paper.
 
 > 
 > Section 7.2 does a good job of evaluating the solution by showing that
@@ -705,9 +734,9 @@ different abstraction than transactions.
 > systems. (That will be even more convincing information that the work
 > has a complete "deep" understanding of the issues.)
 
-We believe our motivation improvements will resolve this weakness.
+We believe our motivation improvements will help resolve this weakness.
 There is some refinement in this work, at the level of motivation perhaps.
-But in implementation terms, the ideas in this paper are quite new (compare
+But in implementation terms, the ideas in this paper are new (compare
 USENIX McKusick). But also, Dodder performance is now much closer to
 hand-tuned system performance for tar and rm and we are working towards
 improving Postmark.
@@ -804,7 +833,7 @@ Dodder and Linux subversion performance.
 >     data mode file system like ext3. Not clear that moving to patches
 >     is easier or better than this. 
 
-We plan to add performance measurements (see {Patchgroup Evaluation}).
+** We plan to add performance measurements (see {Patchgroup Evaluation}).
 The goal of this case study was to see how a large application with
 an existing consistency protocol could be adapted to take advantage
 of patchgroups. In subversion's case, the benefit is the client
@@ -1125,22 +1154,3 @@ See {Performance}. We are addressing Dodder's performance.
 
 > 
 > ==+== End Review
-
-
-==+== Primary todos
-
-From the above, our main TODO items (those with many people who commented
-and/or we believe will involve substantial work) are as follows:
-* Update and better express Dodder's motivation
-* Better explain soft update ideas (primarily, block level cycles and related)
-* Make patch optimizations clearer (including more examples?)
-* Add more details to patchgroups
-* Rewrite evaluation section
-* Improve Dodder performance
-
-
-==+== Schedule
-
-We plan to give you a draft near final, but with more performance
-improvements to go, the week before the final copy deadline.
-TODO: more.
