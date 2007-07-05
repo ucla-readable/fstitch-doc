@@ -1,9 +1,0 @@
-Technical work we might take on after the initial submission but by the
-final paper:
-- metadata-only journaling
-- cache syncing that does not also flush
-- opgroup and file syncing that do not flush all chdescs
-- more efficient cycle detection
-- less stringent opgroup operations?
-- improved large wb cache efficency (mainly: revision_slice_create() and revision_slice_chdesc_is_ready())
-- multiple linux_bd write consistency
