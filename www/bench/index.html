@@ -15,15 +15,19 @@
 <script language="JavaScript"type="text/javascript" src="plots/io_postmark.js"></script>
 
 <script language="JavaScript" type="text/javascript"> <!--
+function sysName(testData)
+{
+	return testData[0] + ' ' + testData[1] + ' ' + testData[2];
+}
+
 function addTimeTest(tblId, testData)
 {
 	var row = document.getElementById(tblId).insertRow(-1);
-	var sysName = testData[0] + ' ' + testData[1];
-	row.insertCell(-1).innerHTML = sysName;
-	row.insertCell(-1).innerHTML = testData[2];
-	row.insertCell(-1).innerHTML = testData[5];
-	row.insertCell(-1).innerHTML = testData[11];
-	row.insertCell(-1).innerHTML = testData[8];
+	row.insertCell(-1).innerHTML = sysName(testData);
+	row.insertCell(-1).innerHTML = testData[3];
+	row.insertCell(-1).innerHTML = testData[6];
+	row.insertCell(-1).innerHTML = testData[12];
+	row.insertCell(-1).innerHTML = testData[9];
 }
 
 function loadTimes()
@@ -36,15 +40,15 @@ function loadTimes()
 		addTimeTest('timePostmarkTable', time_postmark_data[sys]);
 }
 
-function addSpaceTest(tblId, name, testData)
+function addSpaceTest(tblId, testName, testData)
 {
 	var row = document.getElementById(tblId).insertRow(-1);
-	var rollbackIndex = 30;
-	row.insertCell(-1).innerHTML = name;
+	var rollbackIndex = 30; // don't write #items for this index
+	row.insertCell(-1).innerHTML = testName + ': ' + testData[2];
 	for (var i = 0; i <= rollbackIndex; i += 5)
 	{
-		var nitems = testData[i + 5];
-		var sizeof = testData[i + 6];
+		var nitems = testData[i + 6];
+		var sizeof = testData[i + 7];
 		var size = (nitems * sizeof / 1024).toFixed(0);
 		var str;
 		if (i != rollbackIndex)
@@ -68,14 +72,13 @@ function loadSpace()
 function addIoTest(tblId, testData)
 {
 	var row = document.getElementById(tblId).insertRow(-1);
-	var sysName = testData[0] + ' ' + testData[1];
-	row.insertCell(-1).innerHTML = sysName;
-	row.insertCell(-1).innerHTML = testData[2].toFixed(1);
-	row.insertCell(-1).innerHTML = testData[5].toFixed(1);
-	row.insertCell(-1).innerHTML = testData[14].toFixed(1);
-	row.insertCell(-1).innerHTML = testData[17].toFixed(1);
-	row.insertCell(-1).innerHTML = testData[8].toFixed(1);
-	row.insertCell(-1).innerHTML = testData[11].toFixed(1);
+	row.insertCell(-1).innerHTML = sysName(testData);
+	row.insertCell(-1).innerHTML = testData[3].toFixed(1);
+	row.insertCell(-1).innerHTML = testData[6].toFixed(1);
+	row.insertCell(-1).innerHTML = testData[15].toFixed(1);
+	row.insertCell(-1).innerHTML = testData[18].toFixed(1);
+	row.insertCell(-1).innerHTML = testData[9].toFixed(1);
+	row.insertCell(-1).innerHTML = testData[12].toFixed(1);
 }
 
 function loadIo()
