@@ -21,19 +21,19 @@ img.floatright { float: right; border: none; }
 br.floatright { clear: right; }
 </style>
 
-<script language="JavaScript"type="text/javascript" src="plots/time_tar.js"></script>
-<script language="JavaScript"type="text/javascript" src="plots/time_rm.js"></script>
-<script language="JavaScript"type="text/javascript" src="plots/time_postmark.js"></script>
+<script type="text/javascript" src="plots/time_tar.js"></script>
+<script type="text/javascript" src="plots/time_rm.js"></script>
+<script type="text/javascript" src="plots/time_postmark.js"></script>
 
-<script language="JavaScript"type="text/javascript" src="plots/space_tar.js"></script>
-<script language="JavaScript"type="text/javascript" src="plots/space_rm.js"></script>
-<script language="JavaScript"type="text/javascript" src="plots/space_postmark.js"></script>
+<script type="text/javascript" src="plots/space_tar.js"></script>
+<script type="text/javascript" src="plots/space_rm.js"></script>
+<script type="text/javascript" src="plots/space_postmark.js"></script>
 
-<script language="JavaScript"type="text/javascript" src="plots/io_tar.js"></script>
-<script language="JavaScript"type="text/javascript" src="plots/io_rm.js"></script>
-<script language="JavaScript"type="text/javascript" src="plots/io_postmark.js"></script>
+<script type="text/javascript" src="plots/io_tar.js"></script>
+<script type="text/javascript" src="plots/io_rm.js"></script>
+<script type="text/javascript" src="plots/io_postmark.js"></script>
 
-<script language="JavaScript" type="text/javascript"> <!--
+<script type="text/javascript"> <!--
 function sysName(testData)
 {
 	return testData[0] + ' ' + testData[1] + ' ' + testData[2];
@@ -138,7 +138,7 @@ function loadData()
 <body onLoad='loadData()'>
 
 <p>
-<img src="graph.png" class="floatright">
+<img src="graph.png" class="floatright" alt="graph icon">
 </p>
 
 <h1>Kudos Test Metrics</h1>
@@ -152,10 +152,11 @@ I/O (<a href="#io_pit">Current</a>, <a href="#io_history">History</a>)
 
 <hr>
 
-<a name="current">
+<div>
+<a name="current"></a>
 <h2>Current</h2>
 
-<a name="time_pit">
+<a name="time_pit"></a>
 <h3>Time</h3>
 <table id="timeTarTable">
 	<caption>tar</caption>
@@ -172,14 +173,14 @@ I/O (<a href="#io_pit">Current</a>, <a href="#io_history">History</a>)
 	<tr class="header"><th class="col"></th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
 </table>
 
-<a name="space_pit">
+<a name="space_pit"></a>
 <h3>Space</h3>
 <table id="spaceTable">
 	  <tr class="header"><th class="col"></th> <th class="col" colspan="2">bits</th> <th class="col" colspan="2">bytes</th> <th class="col" colspan="2">noops</th> <th class="col" colspan="2">all</th> <th class="col" colspan="2">deps</th> <th class="col" colspan="2">wrefs</th> <th class="col" colspan="2">rollback</th>
 	  <tr class="header"><th class="units"></th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th>
 </table>
 
-<a name="io_pit">
+<a name="io_pit"></a>
 <h3>I/O</h3>
 <table id="ioTarTable">
 	<caption>tar</caption>
@@ -198,39 +199,39 @@ I/O (<a href="#io_pit">Current</a>, <a href="#io_history">History</a>)
 
 
 <hr>
-<a name="history">
+<a name="history"></a>
 <h2>Kudos History</h2>
 
-<a name="time_history">
+<a name="time_history"></a>
 <h3>Time</h3>
 <p>
-<img src="plots/time_tar.png">
-<img src="plots/time_rm.png">
-<img src="plots/time_postmark.png">
+<img src="plots/time_tar.png" alt="time tar">
+<img src="plots/time_rm.png" alt="time rm">
+<img src="plots/time_postmark.png" alt="time postmark">
 </p>
 
-<a name="space_history">
+<a name="space_history"></a>
 <h3>Space</h3>
 <p>
-<img src="plots/space_tar.png">
-<img src="plots/space_rm.png">
-<img src="plots/space_postmark.png">
+<img src="plots/space_tar.png" alt="space tar">
+<img src="plots/space_rm.png" alt="space rm">
+<img src="plots/space_postmark.png" alt="space postmark">
 </p>
 
-<a name="io_history">
+<a name="io_history"></a>
 <h3>I/O</h3>
-<h4>All</h3>
+<h4>All</h4>
 <p>
-<img src="plots/io_tar.png">
-<img src="plots/io_rm.png">
-<img src="plots/io_postmark.png">
+<img src="plots/io_tar.png" alt="io tar">
+<img src="plots/io_rm.png" alt="io rm">
+<img src="plots/io_postmark.png" alt="io postmark">
 </p>
 
-<h4>Multi-writes</h3>
+<h4>Multi-writes</h4>
 <p>
-<img src="plots/io_multi_tar.png">
-<img src="plots/io_multi_rm.png">
-<img src="plots/io_multi_postmark.png">
+<img src="plots/io_multi_tar.png" alt="multi-io tar">
+<img src="plots/io_multi_rm.png" alt="multi-io rm">
+<img src="plots/io_multi_postmark.png" alt="multi-io postmark">
 </p>
 
 
@@ -241,9 +242,11 @@ Plot chdesc memory vs number of block writes?
 among different tests?)
 
 <hr>
-<a name="su">
+<a name="su"></a>
 <h2>Soft Update Correctness</h2>
 TODO.
 
- </body>
+</div>
+
+</body>
 </html>
