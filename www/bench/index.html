@@ -1,6 +1,22 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+	"http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
 <title>Kudos Test Metrics</title>
+
+<style type="text/css">
+table { border-collapse: collapse; border: 1px solid black; }
+table caption { background-color: white; font-style: italic; margin: 1ex 0 0.25ex 0; }
+table tr { background-color: rgb(255, 240, 230); border: 1px solid black; }
+table tr:hover { background-color: white; }
+table tr.header { border-bottom: 1px solid; }
+table th { background-color: white; border: 1px solid black; }
+table th#units { font-weight: normal; }
+table th.row { font-weight: normal; text-align: left; }
+table td { text-align: right; padding: 0.35ex 0.35em 0.35ex 0.35em; border: 1px solid black; }
+
+hr { size: 1px; border: 0; color: #9e9e9e; background-color: #9e9e9e; height: 0.1ex; width: 100%; }
+</style>
 
 <script language="JavaScript"type="text/javascript" src="plots/time_tar.js"></script>
 <script language="JavaScript"type="text/javascript" src="plots/time_rm.js"></script>
@@ -20,14 +36,29 @@ function sysName(testData)
 	return testData[0] + ' ' + testData[1] + ' ' + testData[2];
 }
 
+function appendRowHeader(row, text)
+{
+	var node = document.createElement("th");
+	node.className = "row";
+	node.appendChild(document.createTextNode(text));
+	row.appendChild(node);
+}
+
+function appendData(row, text)
+{
+	var node = document.createElement("td");
+	node.appendChild(document.createTextNode(text));
+	row.appendChild(node);
+}
+
 function addTimeTest(tblId, testData)
 {
 	var row = document.getElementById(tblId).insertRow(-1);
-	row.insertCell(-1).innerHTML = sysName(testData);
-	row.insertCell(-1).innerHTML = testData[3];
-	row.insertCell(-1).innerHTML = testData[6];
-	row.insertCell(-1).innerHTML = testData[12];
-	row.insertCell(-1).innerHTML = testData[9];
+	appendRowHeader(row, sysName(testData));
+	appendData(row, testData[3].toFixed(2));
+	appendData(row, testData[6].toFixed(2));
+	appendData(row, testData[12].toFixed(2));
+	appendData(row, testData[9].toFixed(2));
 }
 
 function loadTimes()
@@ -44,18 +75,20 @@ function addSpaceTest(tblId, testName, testData)
 {
 	var row = document.getElementById(tblId).insertRow(-1);
 	var rollbackIndex = 30; // don't write #items for this index
-	row.insertCell(-1).innerHTML = testName + ': ' + testData[2];
+	appendRowHeader(row, testName + ': ' + testData[2]);
 	for (var i = 0; i <= rollbackIndex; i += 5)
 	{
 		var nitems = testData[i + 6];
 		var sizeof = testData[i + 7];
 		var size = (nitems * sizeof / 1024).toFixed(0);
+		appendData(row, nitems);
+		appendData(row, size);
 		var str;
 		if (i != rollbackIndex)
 			str = nitems + ' (' + size + ' kB)';
 		else
 			str = size + ' kB';
-		row.insertCell(-1).innerHTML = str;
+		/*appendData(row, str);*/
 	}
 }
 
@@ -72,13 +105,13 @@ function loadSpace()
 function addIoTest(tblId, testData)
 {
 	var row = document.getElementById(tblId).insertRow(-1);
-	row.insertCell(-1).innerHTML = sysName(testData);
-	row.insertCell(-1).innerHTML = testData[3].toFixed(1);
-	row.insertCell(-1).innerHTML = testData[6].toFixed(1);
-	row.insertCell(-1).innerHTML = testData[15].toFixed(1);
-	row.insertCell(-1).innerHTML = testData[18].toFixed(1);
-	row.insertCell(-1).innerHTML = testData[9].toFixed(1);
-	row.insertCell(-1).innerHTML = testData[12].toFixed(1);
+	appendRowHeader(row, sysName(testData));
+	appendData(row, testData[3].toFixed(0));
+	appendData(row, testData[6].toFixed(0));
+	appendData(row, testData[15].toFixed(0));
+	appendData(row, testData[18].toFixed(0));
+	appendData(row, testData[9].toFixed(0));
+	appendData(row, testData[12].toFixed(0));
 }
 
 function loadIo()
@@ -108,52 +141,53 @@ Time (<a href="#time_pit">Current</a>, <a href="#time_history">History</a>),
 Space (<a href="#space_pit">Current</a>, <a href="#space_history">History</a>),
 I/O (<a href="#io_pit">Current</a>, <a href="#io_history">History</a>)
 
-<hr size="1" width="100%" noshade>
+<hr>
 <a name="current">
 <h2>Current</h2>
 
 <a name="time_pit">
 <h3>Time</h3>
-<table border="1" id="timeTarTable">
+<table id="timeTarTable">
 		<caption>tar</caption>
-		<tr><th></th> <th>real</th> <th>sys</th> <th>io</th> <th>user</th></tr>
+		<tr class="header"><th class="col"></th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
 </table>
 
-<table border="1" id="timeRmTable">
+<table id="timeRmTable">
 		<caption>rm</caption>
-		<tr><th></th> <th>real</th> <th>sys</th> <th>io</th> <th>user</th></tr>
+		<tr class="header"><th class="col"></th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
 </table>
 
-<table border="1" id="timePostmarkTable">
+<table id="timePostmarkTable">
 		<caption>postmark</caption>
-		<tr><th></th> <th>real</th> <th>sys</th> <th>io</th> <th>user</th></tr>
+		<tr class="header"><th class="col"></th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
 </table>
 
 <a name="space_pit">
 <h3>Space</h3>
-<table border="1" id="spaceTable">
-		  <tr><th></th> <th>bits</th> <th>bytes</th> <th>noops</th> <th>all</th> <th>deps</th> <th>wrefs</th> <th>rollback</th>
+<table id="spaceTable">
+		  <tr class="header"><th class="col"></th> <th class="col" colspan="2">bits</th> <th class="col" colspan="2">bytes</th> <th class="col" colspan="2">noops</th> <th class="col" colspan="2">all</th> <th class="col" colspan="2">deps</th> <th class="col" colspan="2">wrefs</th> <th class="col" colspan="2">rollback</th>
+		  <tr class="header"><th class="units"></th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th>
 </table>
 
 <a name="io_pit">
 <h3>I/O</h3>
-<table border="1" id="ioTarTable">
+<table id="ioTarTable">
 		<caption>tar</caption>
-		<tr><th></th> <th>write requests</th> <th>write kBs</th> <th>read requests</th> <th>read kBs</th> <th># multi-write sectors</th> <th># writes to multi-write sectors</th></tr>
+		<tr class="header"><th class="col"></th> <th class="col">write requests</th> <th class="col">write kBs</th> <th class="col">read requests</th> <th class="col">read kBs</th> <th class="col"># multi-write sectors</th> <th class="col"># writes to multi-write sectors</th></tr>
 </table>
 
-<table border="1" id="ioRmTable">
+<table id="ioRmTable">
 		<caption>rm</caption>
-		<tr><th></th> <th>write requests</th> <th>write kBs</th> <th>read requests</th> <th>read kBs</th> <th># multi-write sectors</th> <th># writes to multi-write sectors</th></tr>
+		<tr class="header"><th class="col"></th> <th class="col">write requests</th> <th class="col">write kBs</th> <th class="col">read requests</th> <th class="col">read kBs</th> <th class="col"># multi-write sectors</th> <th class="col"># writes to multi-write sectors</th></tr>
 </table>
 
-<table border="1" id="ioPostmarkTable">
+<table id="ioPostmarkTable">
 		<caption>postmark</caption>
-		<tr><th></th> <th>write requests</th> <th>write kBs</th> <th>read requests</th> <th>read kBs</th> <th># multi-write sectors</th> <th># writes to multi-write sectors</th></tr>
+		<tr class="header"><th class="col"></th> <th class="col">write requests</th> <th class="col">write kBs</th> <th class="col">read requests</th> <th class="col">read kBs</th> <th class="col"># multi-write sectors</th> <th class="col"># writes to multi-write sectors</th></tr>
 </table>
 
 
-<hr size="1" noshade>
+<hr>
 <a name="history">
 <h2>Kudos History</h2>
 
@@ -190,13 +224,13 @@ I/O (<a href="#io_pit">Current</a>, <a href="#io_history">History</a>)
 </p>
 
 
-<hr size="1" noshade>
+<hr>
 <h2>Chdesc Overhead</h2>
 Plot chdesc memory vs number of block writes?
 (Is this a good way to give us an idea of how well optimizations work
 among different tests?)
 
-<hr size="1" noshade>
+<hr>
 <a name="su">
 <h2>Soft Update Correctness</h2>
 TODO.
