@@ -7,10 +7,10 @@
 div.flow { float: left; }
 div.space { clear: both; }
 
-table { border-collapse: collapse; border: 1px solid black; margin-right: 10px; }
-table th.test { background-color: white; font-style: italic; margin: 5px 0px 1px 0px; }
+table { border-collapse: collapse; border: 1px solid black; margin: 0px 10px 10px 0px; color: #181818}
+table th.test { background-color: white; font-style: italic; }
 table tr { background-color: #FFF0E6; border: 1px solid black; }
-table tr:hover { background-color: #E6F0FF; font-weight: bold; }
+table tr:hover { background-color: #E6F0FF; color: black; }
 table tr.header { border-bottom: 1px solid; }
 table th { background-color: white; border: 1px solid black; }
 table th#units { font-weight: normal; }
@@ -190,17 +190,14 @@ I/O (<a href="#io_pit">Current</a>, <a href="#io_history">History</a>)
 <table id="ioTarTable">
 	<tr class="header"><th class="test">tar</th> <th class="col">write requests</th> <th class="col">write kBs</th> <th class="col">read requests</th> <th class="col">read kBs</th> <th class="col"># multi-write sectors</th> <th class="col"># writes to multi-write sectors</th></tr>
 </table>
-<br>
 
 <table id="ioRmTable">
 	<tr class="header"><th class="test">rm</th> <th class="col">write requests</th> <th class="col">write kBs</th> <th class="col">read requests</th> <th class="col">read kBs</th> <th class="col"># multi-write sectors</th> <th class="col"># writes to multi-write sectors</th></tr>
 </table>
-<br>
 
 <table id="ioPostmarkTable">
 	<tr class="header"><th class="test">postmark</th> <th class="col">write requests</th> <th class="col">write kBs</th> <th class="col">read requests</th> <th class="col">read kBs</th> <th class="col"># multi-write sectors</th> <th class="col"># writes to multi-write sectors</th></tr>
 </table>
-<br>
 
 
 <hr>
