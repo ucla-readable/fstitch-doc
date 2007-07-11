@@ -1,14 +1,16 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-	"http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>Kudos Test Metrics</title>
 
 <style type="text/css">
-table { border-collapse: collapse; border: 1px solid black; }
-table th.test { background-color: white; font-style: italic; margin: 5 0 1 0; }
+div.flow { float: left; }
+div.space { clear: both; }
+
+table { border-collapse: collapse; border: 1px solid black; margin-right: 10px; }
+table th.test { background-color: white; font-style: italic; margin: 5px 0px 1px 0px; }
 table tr { background-color: #FFF0E6; border: 1px solid black; }
-table tr:hover { background-color: #E6F0FF; }
+table tr:hover { background-color: #E6F0FF; font-weight: bold; }
 table tr.header { border-bottom: 1px solid; }
 table th { background-color: white; border: 1px solid black; }
 table th#units { font-weight: normal; }
@@ -152,26 +154,29 @@ I/O (<a href="#io_pit">Current</a>, <a href="#io_history">History</a>)
 
 <hr>
 
-<div>
 <a name="current"></a>
 <h2>Current</h2>
 
 <a name="time_pit"></a>
 <h3>Time</h3>
+<div class="flow">
 <table id="timeTarTable">
 	<tr class="header"><th class="test">tar</th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
 </table>
-<br>
+</div>
 
+<div class="flow">
 <table id="timeRmTable">
 	<tr class="header"><th class="test">rm</th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
 </table>
-<br>
+</div>
 
+<div class="flow">
 <table id="timePostmarkTable">
 	<tr class="header"><th class="test">postmark</th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
 </table>
-<br>
+</div>
+<div class="space"></div>
 
 <a name="space_pit"></a>
 <h3>Space</h3>
@@ -179,7 +184,6 @@ I/O (<a href="#io_pit">Current</a>, <a href="#io_history">History</a>)
 	  <tr class="header"><th class="col"></th> <th class="col" colspan="2">bits</th> <th class="col" colspan="2">bytes</th> <th class="col" colspan="2">noops</th> <th class="col" colspan="2">all</th> <th class="col" colspan="2">deps</th> <th class="col" colspan="2">wrefs</th> <th class="col" colspan="2">rollback</th>
 	  <tr class="header"><th class="units"></th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th>
 </table>
-<br>
 
 <a name="io_pit"></a>
 <h3>I/O</h3>
@@ -246,8 +250,6 @@ among different tests?)
 <a name="su"></a>
 <h2>Soft Update Correctness</h2>
 TODO.
-
-</div>
 
 </body>
 </html>
