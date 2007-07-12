@@ -4,6 +4,7 @@
 \usepackage[square,comma,numbers,sort&compress]{natbib}
 \usepackage{multirow}
 \usepackage{amsthm}
+\usepackage{fancyhdr}
 \frenchspacing
 
 % The names of commonly referenced things in our work which
@@ -88,7 +89,15 @@
 %\renewcommand{\topfraction}{1.00}
 %\renewcommand{\textfraction}{0.10}
 
-\pagestyle{plain}
+\pagestyle{fancyplain}
+\input{svnversion}
+\lhead{}
+\chead{}
+\rhead{}
+\lfoot{}
+\cfoot{\thepage}
+\rfoot{\svnversion{}}
+\renewcommand{\headrulewidth}{0pt}
 
 %\renewcommand{\topfraction}{.8}
 %\renewcommand{\bottomfraction}{.8}
@@ -115,8 +124,6 @@
 \date{}
 
 \begin{document}
-
-\input{svnversion}
 
 \normalsize
 
