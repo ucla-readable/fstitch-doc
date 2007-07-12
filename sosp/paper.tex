@@ -73,7 +73,7 @@
   \pdfinfo
   { 
     /Title (Generalized File System Dependencies)
-    /Author (Chris Frost, Eddie Kohler, and Mike Mammarella, {frost,kohler,mikem}@cs.ucla.edu)
+    /Author (Christopher Frost, Mike Mammarella, Eddie Kohler, Andrew de los Reyes, Shant Hovsepian, Andrew Matsuoka, and Lei Zhang {frost,mikem,kohler,adlr,shant}@cs.ucla.edu, matsuoka@cs.utexas.edu, leiz@cs.ucla.edu)
   }
   \pdfcompresslevel=9
 \else
@@ -95,26 +95,32 @@
 
 \newcommand{\todo}[1]{\footnote{\textbf{TODO}: #1}}
 
+\def\assast{\raise.2ex\hbox{$^\ast$}}
+
+\title{\sffamily\textbf{Generalized File System Dependencies} \svnversion}
+\author{\sffamily
+	Christopher Frost\assast
+	\qquad Mike Mammarella\assast
+	\qquad Eddie Kohler\assast \\
+	\sffamily Andrew de los Reyes$^\dag$
+	\quad Shant Hovsepian\assast
+	\quad Andrew Matsuoka$^\ddag$
+	\quad Lei Zhang$^\dag$ \\
+	\sffamily \fontsize{10pt}{10pt}\selectfont
+	\assast UCLA
+	\qquad $^\dag$ UCLA/Google
+	\qquad $^\ddag$ UCLA/UT Austin \\
+	\url{http://kudos.cs.ucla.edu/} \\
+}
+\date{}
+
 \begin{document}
 
 \input{svnversion}
 
 \normalsize
 
-\title{\sffamily\textbf{Generalized File System Dependencies} \svnversion}
-
-\author{}
-%\sffamily Chris Frost, Eddie Kohler, and Mike Mammarella \\
-%\noalign{\vskip2pt}
-%\sffamily{\fontsize{10pt}{10pt}\selectfont University of California, Los Angeles} \\
-%\noalign{\vskip2pt}
-%\sffamily{\{frost,kohler,mikem\}@cs.ucla.edu} \\
-%\noalign{\vskip-.25in}
-%\null}
-\date{}
 \maketitle
-
-\def\assast{\raise.2ex\hbox{$^\ast$}}
 
 \input{abstract}
 
