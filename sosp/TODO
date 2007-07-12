@@ -1,17 +1,11 @@
-Refocus paper
-Review OSDI reviews
-- common general feedback: "I cannot tell whether kudos reached its goals"
+* Paper
 
-Abstract/Intro:
-- One reviewer did not understand the paper until Conclusion's first sentence.
-  Add a sentence like it to the paper's start?
-	"Kudos provides a new way for file system implementations to
-	formalize write ordering requirements, allowing such software to be
-	divided into modules which cooperate loosely to implement strong
-	consistency guarantees."
+review_todos file
+
+Improve system name?
 
 Modules:
-- Explore modules not possible within a stackable file system (reviewer)
+- Explore modules not possible within a stackable file system (osdi reviewer)
 
 Opgroups:
 - Improve imap evaluation re reviews?
@@ -21,14 +15,7 @@ Opgroups:
 - Figure out: how does MacOSX HFS+ journaling work?
 
 Implementation:
-- Get us to pass fsck.ext2?
-
-Evaluation:
-- Show how patches make file system writing simpler? (One reviewer asked?)
-- Understand and describe why re our current numbers
-- Improve our current numbers
-  - Are unnecessarily strict dependencies hurting speed?
-  - Should we improve our disk write notification usage?
+- Note that the current implementation stores two copies of each block
 
 Related work:
 - Linux 2.6.17 sync_file_range range system call
@@ -36,14 +23,31 @@ Related work:
 - Cite ext2? http://web.mit.edu/tytso/www/linux/ext2intro.html
 
 Misc:
-- look at BSD implementation of soft updates; how does it work?
-- ufs implementation becomes a diagram
+- Look at BSD implementation of soft updates; how does it work?
 
 
-ACM wants us to show that we:
-* are attacking a significant problem,
-* have devised an interesting, compelling solution,
-* have demonstrated the practicality and benefits of the solution,
-* have drawn appropriate conclusions,
-* have clearly described what they have done, and
-* have clearly articulated the advances beyond previous work.
+* Kudos
+
+- Decrease cpu usage
+  - Update wb cache to traverse only ready and clean block lists
+  - Track down what uses cpu time
+- Ensure correct directory ordering (delete a; touch a)
+- Decrease dependency memory usage?
+- Make journal module's meta mode preserve patchgroup dependencies?
+- Import linux ext2 allocator?
+- Add patch undo?
+	- On hold because it needs dependency count tracking?
+- Add more consistency modules?
+
+
+* Benchmarking
+
+- Try benchmarks with larger cache
+- Add another standard benchmark
+- Start running correctness tests?
+- Measure imap benchmark
+- Add gzip benchmark
+- Add svn benchmark
+- Track other patch-related datastructure memory usage?
+  - bit overlap hash maps
+  - number of hard patches
