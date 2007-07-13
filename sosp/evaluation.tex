@@ -114,23 +114,6 @@ soft updates UFS. In one test, we create 100 small files in a directory and
 measure the number of blocks written to disk. \Kudos\ writes 122 blocks,
 while FreeBSD writes 135 blocks.
 
-Finally, Figure~\ref{fig:mergereq-cdf} plots a CDF of the sizes of disk
-write requests during the untar test. Here we can see one likely contributing
-factor to the speed difference between Linux and \Kudos: \Kudos\ makes over
-twice as many requests to the disk. We suspect that this is due to a suboptimal
-cache eviction algorithm, as described above.
-
-\begin{figure}[t]
-\vspace{-0.5\baselineskip}
-\centering{
-\includegraphics[width=\hsize]{merge_cdf}
-}
-\vspace{-0.5\baselineskip}
-\caption{\label{fig:mergereq-cdf} CDF of disk write request sizes for
-  Linux ext2 and \Kudos\ ext2 during the untar test. Linux totals 2021
-  requests to the disk, while \Kudos\ totals 4382 requests.}
-\end{figure}
-
 \subsection {Macrobenchmarks}
 \label{sec:eval:macro}
 
