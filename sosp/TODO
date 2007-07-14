@@ -20,7 +20,10 @@ Implementation:
 Related work:
 - Linux 2.6.17 sync_file_range range system call
 - fdatasync?
-- Cite ext2? http://web.mit.edu/tytso/www/linux/ext2intro.html
+- ext2?
+	http://web.mit.edu/tytso/www/linux/ext2intro.html
+	http://www.nongnu.org/ext2-doc/ext2.html
+- recent stackable: https://ols2006.108.redhat.com/2007/Reprints/sipek-Reprint.pdf ?
 
 Misc:
 - Look at BSD implementation of soft updates; how does it work?
