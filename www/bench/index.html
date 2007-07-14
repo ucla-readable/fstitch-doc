@@ -91,14 +91,9 @@ function addSpaceTest(tblId, testName, testData)
 		var nitems = testData[i + 6];
 		var sizeof = testData[i + 7];
 		var size = (nitems * sizeof / 1024).toFixed(0);
-		appendData(row, nitems);
-		appendData(row, size);
-		var str;
 		if (i != rollbackIndex)
-			str = nitems + ' (' + size + ' kB)';
-		else
-			str = size + ' kB';
-		/*appendData(row, str);*/
+			appendData(row, nitems);
+		appendData(row, size);
 	}
 }
 
@@ -196,8 +191,8 @@ I/O (<a href="#io_pit">Current</a>, <a href="#io_history">History</a>)
 <a name="space_pit"></a>
 <h3>Space</h3>
 <table id="spaceTable">
-	  <tr class="header"><th class="col"></th> <th class="col" colspan="2">bits</th> <th class="col" colspan="2">bytes</th> <th class="col" colspan="2">noops</th> <th class="col" colspan="2">all</th> <th class="col" colspan="2">deps</th> <th class="col" colspan="2">wrefs</th> <th class="col" colspan="2">rollback</th>
-	  <tr class="header"><th class="units"></th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th>
+	  <tr class="header"><th class="col"></th> <th class="col" colspan="2">bits</th> <th class="col" colspan="2">bytes</th> <th class="col" colspan="2">noops</th> <th class="col" colspan="2">all</th> <th class="col" colspan="2">deps</th> <th class="col" colspan="2">wrefs</th> <th class="col">rollback</th>
+	  <tr class="header"><th class="units"></th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">kB</th>
 </table>
 
 <a name="io_pit"></a>
