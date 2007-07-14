@@ -49,6 +49,7 @@ Misc:
 - Try benchmarks with larger cache
 - Add another standard benchmark
 - Start running correctness tests?
+- Add SU to Linux ext2?
 - Measure imap benchmark
 - Add gzip benchmark
 - Add svn benchmark
