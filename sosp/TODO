@@ -37,7 +37,6 @@ Misc:
   - Track down what uses cpu time
 - Ensure correct directory ordering (delete a; touch a)
 - Decrease dependency memory usage?
-- Make journal module's meta mode preserve patchgroup dependencies?
 - Import linux ext2 allocator?
 - Add patch undo?
 	- On hold because it needs dependency count tracking?
@@ -47,7 +46,7 @@ Misc:
 * Benchmarking
 
 - Try benchmarks with larger cache
-- Add another standard benchmark
+- Try benchmarks with unlink module
 - Start running correctness tests?
 - Add SU to Linux ext2?
 - Measure imap benchmark
