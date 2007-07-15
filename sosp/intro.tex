@@ -130,7 +130,8 @@ As a result, the loosely-coupled \modules\ that make up a file system
  soft updates and journaling.
 %
 Our file system modules impose soft updates-style \patch\
- requirements by default; we have also written a prototype journal module. 
+ requirements by default; we have also written a journal module that
+ can set up dependencies for either full or metadata-only journaling. 
 %
 Additionally, we give user-level applications controlled access to \patches,
 allowing applications to impose their own limited consistency
