@@ -41,7 +41,7 @@ Misc:
 - Add patch undo?
 	- On hold because it needs dependency count tracking?
 - Add more consistency modules?
-
+- Remove weak ref function callbacks functionality, if it is unused, to reduce the somewhat-large amount of space used for weak refs
 
 * Benchmarking
 
