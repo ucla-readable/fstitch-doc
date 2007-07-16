@@ -55,3 +55,4 @@ Misc:
 - Track other patch-related datastructure memory usage?
   - bit overlap hash maps
   - number of hard patches
+- Measure number of hard patches created
