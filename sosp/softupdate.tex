@@ -8,12 +8,13 @@
 %% correct organization.  
 %
 Soft updates enforces orderings between disk writes that maintain
-a relatively consistent file system state at all times, speeding reboot
-by avoiding \emph{fsck}.
+a ``relatively consistent'' file system state at all times, speeding
+reboot by avoiding \emph{fsck}.
 %
 Not all invariants can be preserved, so soft updates relaxes the least
 critical: a crash or sudden reboot can leak blocks or other disk
-structures, but will never create more serious inconsistencies.
+structures, but will never create inconsistencies that could lead to
+metadata corruption.
 %
 %% It is not generally possible to maintain this invariant,
 %% so in the ``soft updates''~\cite{ganger00soft} system this definition is

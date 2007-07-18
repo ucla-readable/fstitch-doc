@@ -59,11 +59,11 @@ the \LFS\ interface.
 Every \LFS\ function that might modify the file system takes a
 \texttt{\textit{patch\char`\_t **p}} argument.
 %
-When the function is called, the \patch\ \texttt{*p} is set to the \patch, if
-any, on which the modification should depend;
+Before the function is called, \texttt{*p} should be set to the \patch,
+if any, on which the modification should depend;
 %
-when the function returns, the \patch\ \texttt{*p} must be set to depend on
-the modification itself.
+when the function returns, \texttt{*p} will be set to some \patch\
+corresponding to the modification itself.
 %
 (\Noop\ \patches\ allow this interface to generalize to multiple
 dependencies.)

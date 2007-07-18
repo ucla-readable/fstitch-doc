@@ -1,18 +1,3 @@
-You use the phrase "soft updates-like consistency" several times.
-Aside from being a bit awkward, you don't define what it means until
-well after the first use. I think I first noticed it on page 3
-("Rollback data" subsection).
-
-In the Rollback data section, I found the discussion about circular
-dependencies a little hard to follow. May an example would help?
-
-In Section 6, at the top of page 9, you write "When the function is
-called, the patch *p is set to the patch, if any, on which the
-modification should depend; when the function returns, the patch *p
-must be set to depend on the modification itself." Did you mean that
-*p must be set to the patch corresponding to the modification? (I
-don't understand what it means otherwise.)
-
 In section 7.1 on the patchgroups interface, you describe restrictions
 to prevent cycles. So, can you create patchgroups p and q, then issue
 pg_depend(q,p), and then engage each of p and q? (Is the rule just
@@ -37,9 +22,7 @@ file system layers.
 Another weakness is that the authors have not performed a thorough
 evaluation. The best way to compare performance would be to implement
 soft updates directly in ext2 and with Dodder, and compare the two;
-the authors do not do this. Additionally, the authors should compare
-ext3 to Dodder with journaling, but they show no numbers for Dodder
-journaling.
+the authors do not do this.
 
 I am also disappointed with the evaulation of the case studies using
 patchgroups. The gzip example could be solved with an fsync and the
@@ -59,10 +42,6 @@ benefits? (Certainly it is not a performance benefit.) The authors
 mention that patches give file system implementations some flexibility
 in how dependencies are enforced, but they do not explore this
 flexibility - they don't have results with multiple implementations.
-
-Related Work: I'd like to see more comparison with Burnett's thesis.
-Is Burnett's approach only for applications? How does his interface
-differ from patches?
 
 Much of the text would be easier to follow if you included more
 examples (though I understand that you are space constrained right
@@ -146,11 +125,6 @@ dependency cycles..." What is the impact of this constraint, if any?
 page 5: You should explain better Figure 2(a). It took me quite a bit
 of time to understand what each patch represents.
 
-page 8, "Soft updates": While in the end it is clear from the text
-what kind of consistency you are referring to, it would be nice to
-avoid vague formulations such as "relative consistency" and "more
-serious inconsistencies"
-
 ===
 
 The motivation/significance of this work seems limited
@@ -192,14 +166,6 @@ complete "deep" understanding of the issues.)
 
 I got lost a few times in section 3, where the abstraction is defined
 
-second para p 3 "every patch in p.ddeps should be committed to disk
-either before, or at the same time as, p itself." This is confusing --
-I would have expected the requirement to be "every patch in p.ddeps
-should be committed to disk before p itself." I suspect that the "at
-the same time as" clause only comes into play when two patches write
-the same block? (Otherwise I can't see how "at the same time as" can
-be realized...)
-
 paragraph{Rollback data}: "A series of file system operations may
 create dependencies that enforce a circular order among blocks, even
 though the dependencies do not form a cycle [10]". It's been a while
@@ -220,10 +186,6 @@ refer to the same block --> if you have multiple outstanding writes,
 then the version of the block in memory includes the effect of all
 outstanding writes. Now I understand the purpose of the rollback
 inf...
-
-Near the end of page 3, it is not immediately obvious why
-Dep[Flight[b]] can/should include Flight[b]. I'm guessing this is
-handling the case of multiple outstanding patches to the same block?
 
 Section 5 describes how this abstraction and architecture allow me to
 drop "soft updates" or "journaling" or "async writes" under the same
@@ -264,14 +226,10 @@ recent work from Dawson Engler's group?
 Section 3 - It wasn't clear at the beginning of section 3 that a patch
 was updating a byte-range inside the block instead of the entire
 block. I didn't realize this until 3.2. Please make this clear
-earlier. Rollback data - An example would really help.
+earlier.
 
 Figure 3 - So the p patches are to one block and the q patches to a
 different block? Say this explicitly.
-
-Section 6 - "when the function returns, the patch *p must be set" -
-I'm not understanding this. So argument p is an in/out argument. I
-understand the input part, not the output.
 
 Section 7.1 - I would like a better explanation of engaging &
 disengaging patchgroups. How does this work with threads? Is engaging
@@ -286,10 +244,6 @@ operating system with a different file system. The really interesting
 and fair comparison is Dodder to Linux/ext2, because the OS and the
 file system structures are the same.
 
-I don't understand the division between 9.2 and 9.3. The untar and rm
-tests are not microbenchmarks. Aren't there any appropriate "standard"
-benchmarks, like the old "modified Andrew" benchmark?
-
 "suboptimal cache eviction, as described above" - I assume you mean
 the reference at the end of section 6.1. I think it would be better to
 move the discussion of cache performance to here to avoid the
@@ -297,16 +251,12 @@ references back & forth. Better still if you instrumented enough to
 really understand instead of guess, better still if you fixed the
 problem :-).
 
-Figure 11 - provide system time as well as real time
-
 Figure 13 - Measuring IMAP is great. Comparing to FreeBSD is not
 interesting, please compare to Linux/ext2 instead. Number of blocks is
 OK but better to measure number of IO requests, overall time, system
 time.
 
 Section 9.4 - Summarize/interpret the results from the figure.
-
-Reference 5 - Where was this thesis done?
 
 ===
 

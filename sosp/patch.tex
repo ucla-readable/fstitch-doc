@@ -68,6 +68,9 @@ The sets \PMem, \PInf, and \PDisk\ are defined to contain all \patches\ with
 That is, every \patch\ in $\PDDepset{p}$ should be committed to disk either
  before, or at the same time as, $p$ itself.
 %
+(Note that \patches\ $p$ and $q$ can only be committed at the same time if
+ they are on the same block.)
+%
 Dependencies are set by the file system based on the consistency
  semantics it wants to ensure.
 %
@@ -108,16 +111,25 @@ Given a \emph{set} of \patches\ $P$, we write $\PDepset{P}$ to mean the set's
 
 \textbf{Rollback data.}
 %
-Soft updates-like consistency orderings may require that the buffer cache
+Some arrangements of \patches\ may require that the buffer cache
 \emph{not} write one or more \patches\ on some block.
 %
 In particular, a series of file system operations may create dependencies
 that enforce a circular order among blocks, even though the dependencies
 themselves do not form a cycle~\cite{ganger00soft}.
 %
+For instance, a \patch\ writing the directory entry for a new file \texttt{f1}
+may depend on a \patch\ allocating an inode for it, and a \patch\ deleting the
+entry \texttt{f2} from the same directory may be depended upon by a \patch\
+freeing the inode for \texttt{f2}.
+%
+If the two inodes are stored in the same block, and the two directory entries
+are in the same block as well, each block will have a \patch\ depending on the
+other block.
+%
 This is problematic since blocks with circular dependencies can never be
 written: no block can be written first since each block depends on another.
-%
+
 For this reason, each \patch\ carries \emph{rollback} information that gives
 the previous version of the data altered by the \patch.
 %
@@ -194,6 +206,9 @@ by the \textbf{in-flight safety property:}
 This ensures that for any $b' \neq b$, $\PDepset{\PInf[b]} \cap
  \PDepset{\PInf[b']} \subseteq \PDisk$; the disk controller can safely
  write in-flight blocks in any order and still preserve disk safety.
+%
+(The union with $\PInf[b]$ is necessary for the case of multiple in-flight
+\patches\ on the same block.)
 
 
 The buffer cache must thus behave according to the following atomic action:
@@ -287,7 +302,11 @@ Unfortunately, this abstraction is extremely expensive.
 
 
 Consider an unoptimized version of \Kudos\ running an ext2 file system with
-soft updates-like dependencies.
+dependencies arranged according to the soft updates rules (i.e., never write a
+pointer to a structure until it has been initialized, never reuse such
+structures until all previous pointers to them have been overwritten, and
+never overwrite the last pointer to a live structure before a new pointer to
+it has been written).
 %
 Figure~\ref{fig:opt}a shows the \patches\ generated when an application appends
 16~kB of data to an existing empty file.
