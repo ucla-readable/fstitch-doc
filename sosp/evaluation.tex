@@ -150,7 +150,8 @@ times as fast as the widely used Linux ext3 ordered mode which does provide a
 comparable consistency guarantee. The \Kudos\ metadata journal mode is faster
 than both Linux ext3 journal modes, though \Kudos\ full journaling is slower.
 At the remove test, all \Kudos\ modes are substantially faster than all Linux
-modes, for reasons we have not yet identified.
+modes, due to differences in how \Kudos\ allocates inodes and blocks during
+the untar test.
 
 When looking only at the System CPU time, however, \Kudos\ can use up to
 5.6 times as much CPU as a similar Linux mode. This effect is partially
