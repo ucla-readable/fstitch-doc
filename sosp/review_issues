@@ -1,12 +1,3 @@
-In section 7.1 on the patchgroups interface, you describe restrictions
-to prevent cycles. So, can you create patchgroups p and q, then issue
-pg_depend(q,p), and then engage each of p and q? (Is the rule just
-that they can't be engaged before the "depend" call?) I found that a
-little confusing on first read.
-
-Can patches in a patchgroup be sent to disk before a patchgroup is
-closed? Does closing a patchgroup do anything special?
-
 In the description of using patchgroups in Subversion, I think Figure
 8 would be more useful if you could tag the various components and
 dependencies in the figure and refer to them in the discussion.
@@ -45,10 +36,8 @@ flexibility - they don't have results with multiple implementations.
 
 Much of the text would be easier to follow if you included more
 examples (though I understand that you are space constrained right
-now). For example, a case illustrating how the file system can create
-circular dependencies, even when the data itself does not (pg 3). I
-could have used more explanation for when hard patches cannot be
-applied; specifically, Figure 2 was useful for showing when the
+now). I could have used more explanation for when hard patches cannot
+be applied; specifically, Figure 2 was useful for showing when the
 optimizations could be applied, but I could use an example where they
 cannot be applied too. It would be useful to see the patches that
 result from more file and directory operations for soft updates. For
@@ -64,13 +53,6 @@ this approach compare?
 Figures 4 and 5: I would have preferred a diagram that shows the file
 system data structures being manipulated (similar to Figure 2)
 instead.
-
-Section 5, Journaling: It took me awhile to figure out what you meant
-by your last paragraph. I think the problem is that this discussion
-assumes knowledge of the Modules, not described until Section 6. I'd
-also say that your model is similar to ext3's *data* journaling mode
-(if that is indeed the case, and not the default ordered journaling
-mode).
 
 Figure 6: The font for the interface specifications is too small (CFS,
 L2FS, BD).
@@ -112,7 +94,7 @@ implementing it requires small changes to existing applications and
 the overhead is "reasonable". One thing that is missing though is
 quantifying the savings due to the better control of dependencies
 enabled by the patch abstraction. In both the case of the subversion
-example and the UW IMPA example, using the patch abstraction allows
+example and the UW IMAP example, using the patch abstraction allows
 one to relax the dependencies imposed by the original application.
 Intuitively, this should have a positive effect on performance. It is
 true that in the end the overhead of implementing patching may offset
@@ -128,13 +110,6 @@ of time to understand what each patch represents.
 ===
 
 The motivation/significance of this work seems limited
-
-This paper primarily cleans up and simplifies ideas from the soft
-updates paper rather than introducing a fundamentally new approach.
-
-Most of the writing is quite clear, but a few crucial points
-(regarding cycles and rollback) were not made clear to me even after
-several careful readings
 
 The performance hit is currently non-trivial, and I'm not sure that it
 will be an easy sell to get people to pay the cost of significantly
@@ -165,27 +140,6 @@ the costs of the general system are comparable to hand-tuned systems.
 complete "deep" understanding of the issues.)
 
 I got lost a few times in section 3, where the abstraction is defined
-
-paragraph{Rollback data}: "A series of file system operations may
-create dependencies that enforce a circular order among blocks, even
-though the dependencies do not form a cycle [10]". It's been a while
-since I read the soft updates paper, and this issue is not ringing a
-bell. Unfortunately, a lot (most?) of the complexity of the design
-seems to stem from this issue, so if a reader misses this point, it is
-hard to appreciate/understand the rest of the design. (Don't worry --
-I'll go back and review soft updates so that hopefully I can
-understand things better before I finish the review, but any revision
-should explain this issue more since otherwise you could lose a lot of
-readers.) [Later Figure 3 gives an example of a cycle
-p1~->qh~->ph...ah, I think I get it now -- you can have multiple
-oustanding updates to the same block so that the individual *updates*
-don't form a cycle, but there is a cycle across *blocks*...OK I
-finally see what you're doing -- you only keep one copy of the block
-in memory and apply writes to it; all patches for the same blockID
-refer to the same block --> if you have multiple outstanding writes,
-then the version of the block in memory includes the effect of all
-outstanding writes. Now I understand the purpose of the rollback
-inf...
 
 Section 5 describes how this abstraction and architecture allow me to
 drop "soft updates" or "journaling" or "async writes" under the same
@@ -223,19 +177,9 @@ experiments (e.g., lots of concurrent writes to a RAID).
 Section 1 - file system correctness [8, 28] - what about citing the
 recent work from Dawson Engler's group?
 
-Section 3 - It wasn't clear at the beginning of section 3 that a patch
-was updating a byte-range inside the block instead of the entire
-block. I didn't realize this until 3.2. Please make this clear
-earlier.
-
-Figure 3 - So the p patches are to one block and the q patches to a
-different block? Say this explicitly.
-
 Section 7.1 - I would like a better explanation of engaging &
 disengaging patchgroups. How does this work with threads? Is engaging
 a patchgroup the only way to actually use it to hold dependencies?
-How does this relate to the requirement in section 4.1 about knowing a
-patch's dependencies when the patch is created?
 
 Section 9 -
 
@@ -243,13 +187,6 @@ I don't see the value of comparing Dodder to FreeBSD. It's a different
 operating system with a different file system. The really interesting
 and fair comparison is Dodder to Linux/ext2, because the OS and the
 file system structures are the same.
-
-"suboptimal cache eviction, as described above" - I assume you mean
-the reference at the end of section 6.1. I think it would be better to
-move the discussion of cache performance to here to avoid the
-references back & forth. Better still if you instrumented enough to
-really understand instead of guess, better still if you fixed the
-problem :-).
 
 Figure 13 - Measuring IMAP is great. Comparing to FreeBSD is not
 interesting, please compare to Linux/ext2 instead. Number of blocks is
@@ -268,28 +205,11 @@ to the applications programmer, and suddenly it become much more
 useful in everyday programming. You need to describe this up from in
 the paper rather than bury it on page 10.
 
-2) Patches contain the new values for a byte range in a disk block.
-You never tell us how the rest of the needed block is fetched and
-combined with the new values to form a complete new block to write
-back to disk.
-
-3) The discussion in section 3 under "Rollback data" is completely
-mysterious. I understand that when the dependencies are actually
-between objects within pages (e.g., I-nodes and directory descriptors)
-and not whole pages, then you can get false circular dependencies
-among the dirty pages containing these objects. I don't understand how
-the rollback data nor the algorithm vaguely described in this
-paragraph fixes the problem. And this has a huge impact on the
-credibility of the rest of the paper, as many of your performance
-optimizations are required exactly because the rollback data is
-voluminous and frequently unnecessary. You've got to make this all
-clearer. (I think it has something to do with the answer to point 2.
-
 4) The discussion to related work is confusing. At the end summarize
 how the work improves the state of the art, now that the reader has
 been reminded of the previous work.
 
-5) You need to remind the read of the key point surrounding soft
+5) You need to remind the reader of the key point surrounding soft
 updates.
 
 Do these ideas carry over into the realm of distributed data storage?

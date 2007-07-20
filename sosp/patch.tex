@@ -111,7 +111,10 @@ Given a \emph{set} of \patches\ $P$, we write $\PDepset{P}$ to mean the set's
 
 \textbf{Rollback data.}
 %
-Some arrangements of \patches\ may require that the buffer cache
+When a \patch\ is created, the buffer cache's copy of the block data
+is modified in-place to reflect the specified change. However,
+%
+some arrangements of \patches\ may require that the buffer cache
 \emph{not} write one or more \patches\ on some block.
 %
 In particular, a series of file system operations may create dependencies
@@ -131,10 +134,11 @@ This is problematic since blocks with circular dependencies can never be
 written: no block can be written first since each block depends on another.
 
 For this reason, each \patch\ carries \emph{rollback} information that gives
-the previous version of the data altered by the \patch.
+the previous version of the range of block data altered by the \patch.
 %
 If a \patch\ $p$ is not written with its containing block, the system rolls
-back the \patch, which swaps the new data and the previous version.
+back the \patch, which swaps the new data and the previous version on
+the (single) copy of the block in the buffer cache.
 %
 Once the block is written, the system will roll the \patch\ forward and, when
 allowed, write the block again, this time including the \patch.

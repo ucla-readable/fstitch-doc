@@ -102,6 +102,7 @@ at all.
 \end{comment}
 
 
+\begin{comment}
 Our journal module prototype ignores incoming dependencies
 and enforces transactions based on high-level file system operations.
 %
@@ -111,3 +112,17 @@ specified by the file system above it.
 %
 It should be possible, however, to extend the journal module to obey
 dependencies.
+\end{comment}
+
+% Is it important to specify how we figure out where transaction boundaries
+% are? It seemed confusing to one reviewer due to this section preceeding the
+% modules section.
+
+Our journal module prototype can run in full data journal mode, where every
+updated block is written to the journal, or in metadata-only mode, where only
+blocks containing file system metadata are written to the journal. It removes
+most dependencies from incoming \patches\ and sets up new dependencies to
+implement a journal, thus uniformly enforcing a particular journal semantic
+regardless of the original semantic specified by the file system above it.
+\footnote{However, it does take care to ensure that the user-specified
+dependencies described in \S~\ref{sec:patchgroup} are not violated.}

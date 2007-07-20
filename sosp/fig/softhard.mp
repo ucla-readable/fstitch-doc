@@ -28,7 +28,7 @@ beginfig(1);
   fixelement(a,b,c,x,e);
 
   save d; d = 6;
-  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor .9white enddef;
+  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor .8white enddef;
   z1 = x.nw+(-d,d); z2 = (xpart c.e,ypart a.s)+(d,-d);
   blockbox(z1 -- (x2,y1) -- z2 -- (x1,y2) -- cycle);
   z3 = b.nw+(-d,d); z4 = b.se+(d,-d);
@@ -60,7 +60,7 @@ beginfig(2);
   fixelement(b,c,x,e);
 
   save d; d = 6;
-  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor .9white enddef;
+  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor .8white enddef;
   z1 = x.nw+(-d,d); z2 = (xpart c.e,ypart e.s)+(d,-d);
   blockbox(z1 -- (x2,y1) -- z2 -- (x1,y2) -- cycle);
   z3 = b.nw+(-d,d); z4 = b.se+(d,-d);
@@ -95,7 +95,7 @@ beginfig(3);
   fixelement(b,c,x,e,aa);
 
   save d; d = 6;
-  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor .9white enddef;
+  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor .8white enddef;
   z1 = x.nw+(-d,d); z2 = (xpart c.e,ypart e.s)+(d,-d);
   blockbox(z1 -- (x2,y1) -- z2 -- (x1,y2) -- cycle);
   z3 = b.nw+(-d,d); z4 = b.se+(d,-d);

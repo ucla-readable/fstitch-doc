@@ -61,11 +61,10 @@ basically the buffer cache \textit{Write block} action.)
 This simple optimization greatly improves I/O wait time, since the I/O
 requests are merged and reordered in Linux's elevator scheduler.
 %
-Nevertheless, our profiling results indicate significant opportunities for
-further optimization: for example, since the cache will write a block even
-if only one of its \patches\ is ready, it can choose to roll back
-\patches\ unnecessarily when a different order would have required fewer
-writes.
+Nevertheless, there may still be important opportunities for further
+optimization: for example, since the cache will write a block even if only
+one of its \patches\ is ready, it can choose to roll back \patches\
+unnecessarily when a different order would have required fewer writes.
 
 
 \begin{comment}

@@ -74,9 +74,12 @@ The call \texttt{\pgDepend(p, q)} makes \patchgroup\ \texttt{p} depend on
 delayed until all changes associated with \texttt{q} have committed.
 %
 \Patchgroups\ can be \emph{engaged} or \emph{disengaged}; all changes made by
-a process are associated with that process's engaged \patchgroups.
+a process are associated with that process's engaged \patchgroups\ and inherit
+the appropriate dependencies, but are otherwise just like other changes.
 %
-\pgSync\ forces an immediate write of a \patchgroup\ to disk.
+\pgSync\ forces an immediate write of a \patchgroup\ to disk, and \pgClose\
+disassociates a \patchgroup\ ID from the underlying \patches\ implementing it
+(but otherwise does not affect those \patches).
 %
 Whereas \Kudos\ \modules\ are presumed to not create cyclic
 dependencies, the kernel cannot safely trust user applications to be
@@ -84,10 +87,14 @@ so well behaved, so
 %
 the \patchgroup\ API restricts dependency manipulation so that cycles are
 inconstructible. For example, \texttt{\pgDepend(p, q)} returns an error if
-\texttt{p} has ever been engaged.
+\texttt{p} has \emph{ever} been engaged; if it succeeds, a subsequent
+\texttt{\pgEngage(q)} will return an error.\footnote{These rules are really
+just a strictly enforced version of the requirement from \S~\ref{sec:patch:nrb}
+that all dependencies must be specified up-front.}
 
 \Patchgroups\ and file descriptors are managed similarly; e.g. they are copied
-across \texttt{fork()} and preserved across \texttt{exec()}.
+across \texttt{fork()}, preserved across \texttt{exec()}, and closed on
+\texttt{exit()}.
 %
 This allows existing programs to interact with \patchgroups\ without
 knowing it, in the same way that programs do not have to know about
