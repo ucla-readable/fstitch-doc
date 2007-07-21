@@ -64,10 +64,11 @@ function addTimeTest(tblId, testData)
 {
 	var row = document.getElementById(tblId).insertRow(-1);
 	appendRowHeader(row, sysName(testData));
-	appendData(row, testData[3].toFixed(2));
-	appendData(row, testData[6].toFixed(2));
-	appendData(row, testData[12].toFixed(2));
-	appendData(row, testData[9].toFixed(2));
+	appendRowHeader(row, testData[3]);
+	appendData(row, testData[4].toFixed(2));
+	appendData(row, testData[7].toFixed(2));
+	appendData(row, testData[13].toFixed(2));
+	appendData(row, testData[10].toFixed(2));
 }
 
 function loadTimes()
@@ -87,10 +88,11 @@ function addSpaceTest(tblId, testName, testData)
 	var row = document.getElementById(tblId).insertRow(-1);
 	var rollbackIndex = 30; // don't write #items for this index
 	appendRowHeader(row, testName + ': ' + testData[2]);
+	appendRowHeader(row, testData[3]);
 	for (var i = 0; i <= rollbackIndex; i += 5)
 	{
-		var nitems = testData[i + 6];
-		var sizeof = testData[i + 7];
+		var nitems = testData[i + 7];
+		var sizeof = testData[i + 8];
 		var size = (nitems * sizeof / 1024).toFixed(0);
 		if (i != rollbackIndex)
 			appendData(row, nitems);
@@ -114,12 +116,13 @@ function addIoTest(tblId, testData)
 {
 	var row = document.getElementById(tblId).insertRow(-1);
 	appendRowHeader(row, sysName(testData));
-	appendData(row, testData[3].toFixed(0));
-	appendData(row, testData[6].toFixed(0));
-	appendData(row, testData[15].toFixed(0));
-	appendData(row, testData[18].toFixed(0));
-	appendData(row, testData[9].toFixed(0));
-	appendData(row, testData[12].toFixed(0));
+	appendRowHeader(row, testData[3]);
+	appendData(row, testData[4].toFixed(0));
+	appendData(row, testData[7].toFixed(0));
+	appendData(row, testData[16].toFixed(0));
+	appendData(row, testData[19].toFixed(0));
+	appendData(row, testData[10].toFixed(0));
+	appendData(row, testData[13].toFixed(0));
 }
 
 function loadIo()
@@ -166,25 +169,25 @@ I/O (<a href="#io_pit">Current</a>, <a href="#io_history">History</a>)
 <h3>Time</h3>
 <div class="flow">
 <table id="timeTarTable">
-	<tr class="header"><th class="test">tar</th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
+	<tr class="header"><th class="test">tar</th> <th class="test">rev</th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
 </table>
 </div>
 
 <div class="flow">
 <table id="timeRmTable">
-	<tr class="header"><th class="test">rm</th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
+	<tr class="header"><th class="test">rm</th> <th class="test">rev</th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
 </table>
 </div>
 
 <div class="flow">
 <table id="timePostmarkTable">
-	<tr class="header"><th class="test">postmark</th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
+	<tr class="header"><th class="test">postmark</th> <th class="test">rev</th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
 </table>
 </div>
 
 <div class="flow">
 <table id="timeAndrewTable">
-	<tr class="header"><th class="test">andrew</th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
+	<tr class="header"><th class="test">andrew</th> <th class="test">rev</th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
 </table>
 </div>
 <div class="space"></div>
@@ -192,8 +195,8 @@ I/O (<a href="#io_pit">Current</a>, <a href="#io_history">History</a>)
 <a name="space_pit"></a>
 <h3>Space</h3>
 <table id="spaceTable">
-	  <tr class="header"><th class="col"></th> <th class="col" colspan="2">bits</th> <th class="col" colspan="2">bytes</th> <th class="col" colspan="2">noops</th> <th class="col" colspan="2">all</th> <th class="col" colspan="2">deps</th> <th class="col" colspan="2">wrefs</th> <th class="col">rollback</th>
-	  <tr class="header"><th class="units"></th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">kB</th>
+	  <tr class="header"><th class="col"></th> <th class="test">rev</th> <th class="col" colspan="2">bits</th> <th class="col" colspan="2">bytes</th> <th class="col" colspan="2">noops</th> <th class="col" colspan="2">all</th> <th class="col" colspan="2">deps</th> <th class="col" colspan="2">wrefs</th> <th class="col">rollback</th>
+	  <tr class="header"><th class="units"></th> <th class="units"></th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">items</th> <th class="units">kB</th> <th class="units">kB</th>
 </table>
 
 <a name="io_pit"></a>
@@ -201,29 +204,29 @@ I/O (<a href="#io_pit">Current</a>, <a href="#io_history">History</a>)
 
 <div class="flow">
 <table id="ioTarTable">
-	<tr class="header"><th class="test">tar</th> <th class="col" colspan="2">writes</th> <th class="col" colspan="2">reads</th> <th class="col" colspan="2">multi-write sectors</th></tr>
-	<tr class="header"><th></th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">sectors</th> <th class="col">sector writes</th></tr>
+	<tr class="header"><th class="test">tar</th> <th class="test">rev</th> <th class="col" colspan="2">writes</th> <th class="col" colspan="2">reads</th> <th class="col" colspan="2">multi-write sectors</th></tr>
+	<tr class="header"><th></th> <th></th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">sectors</th> <th class="col">sector writes</th></tr>
 </table>
 </div>
 
 <div class="flow">
 <table id="ioRmTable">
-	<tr class="header"><th class="test">rm</th> <th class="col" colspan="2">writes</th> <th class="col" colspan="2">reads</th> <th class="col" colspan="2">multi-write sectors</th></tr>
-	<tr class="header"><th></th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">sectors</th> <th class="col">sector writes</th></tr>
+	<tr class="header"><th class="test">rm</th> <th class="test">rev</th> <th class="col" colspan="2">writes</th> <th class="col" colspan="2">reads</th> <th class="col" colspan="2">multi-write sectors</th></tr>
+	<tr class="header"><th></th> <th></th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">sectors</th> <th class="col">sector writes</th></tr>
 </table>
 </div>
 
 <div class="flow">
 <table id="ioPostmarkTable">
-	<tr class="header"><th class="test">postmark</th> <th class="col" colspan="2">writes</th> <th class="col" colspan="2">reads</th> <th class="col" colspan="2">multi-write sectors</th></tr>
-	<tr class="header"><th></th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">sectors</th> <th class="col">sector writes</th></tr>
+	<tr class="header"><th class="test">postmark</th> <th class="test">rev</th> <th class="col" colspan="2">writes</th> <th class="col" colspan="2">reads</th> <th class="col" colspan="2">multi-write sectors</th></tr>
+	<tr class="header"><th></th> <th></th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">sectors</th> <th class="col">sector writes</th></tr>
 </table>
 </div>
 
 <div class="flow">
 <table id="ioAndrewTable">
-	<tr class="header"><th class="test">andrew</th> <th class="col" colspan="2">writes</th> <th class="col" colspan="2">reads</th> <th class="col" colspan="2">multi-write sectors</th></tr>
-	<tr class="header"><th></th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">sectors</th> <th class="col">sector writes</th></tr>
+	<tr class="header"><th class="test">andrew</th> <th class="test">rev</th> <th class="col" colspan="2">writes</th> <th class="col" colspan="2">reads</th> <th class="col" colspan="2">multi-write sectors</th></tr>
+	<tr class="header"><th></th> <th></th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">sectors</th> <th class="col">sector writes</th></tr>
 </table>
 </div>
 <div class="space"></div>
