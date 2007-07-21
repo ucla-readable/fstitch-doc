@@ -77,13 +77,8 @@ Dependencies are set by the file system based on the consistency
 For example, a file system with asynchronous writes (and no durability
  guarantees) might write all \patches\ with $\PDDepset{p} = \emptyset$;
 %
-a file system implementing soft updates would arrange the dependencies
- accordingly;
-%
-and a file system implementing journaling would write a different set of
- dependencies, where the journal commit record would depend on the journal
- data and the writes to the main body of the file system would in turn
- depend on the commit record.
+a file system wishing to impose strictly ordered writes might set
+ $\PDDepset{p_n} = \{p_{n-1}\}$.
 %
 In summary, an upper file system layer defines an initial set of
  dependencies;
@@ -107,6 +102,19 @@ We say $p$ \emph{depends on} $q$, and write $p \PDepend q$, when there
 Given a \emph{set} of \patches\ $P$, we write $\PDepset{P}$ to mean the set's
  combined dependencies $\bigcup_{p\in P} \PDepset{p}$.
 
+\textbf{Example.}
+%
+Patches implementing a journal transaction could be arranged as follows:
+%
+the journal commit record $c$ would have $c \PDDepend \{j_{1\dots n}\}$,
+where each $j_i$ writes an entry into the journal.
+%
+Then the file system updates described in the journal would each have
+$u_i \PDDepend c$.
+%
+This arrangement of dependencies ensures that the commit record is not written
+to disk until all the journal data is present there, and that the updates to the
+file system itself are not written until the commit record is present on disk.
 
 
 \textbf{Rollback data.}
@@ -219,30 +227,39 @@ The buffer cache must thus behave according to the following atomic action:
 
 \begin{tabbing}
 \textit{Write block:} \\
-\quad Pick some block $b$ with $\PMem[b] \neq \emptyset$. \\
+\quad Pick some block $b$ with $\PMem[b] \neq \emptyset$ and $\PInf[b] =
+\emptyset$. \\
 \quad Pick some $P \subseteq \PMem[b]$ with $\PDepset{P} \subseteq P \cup
 \PDisk$. \\
-\quad For each $p \in P$, set $\PState{p} \gets \PInfst$. \\
-\quad For each $p \in \PMem[b]-P$, set $\PDDepset{p} \gets \PDDepset{p}
-\cup P$.
+\quad For each $p \in P$, set $\PState{p} \gets \PInfst$.
 \end{tabbing}
 
 \noindent
 %
-Since the disk controller can write in-flight blocks in any order, at most
-one version of a block can be in flight at any time.
-%
-Thus, the last step above forces any rolled-back \patches\ to wait in
-memory at least until the in-flight version of the block is written.
-%
-Likewise, any \patch\ created on a block with in-flight \patches\ must depend
-on those \patches.
-%
-(These dependencies are implicit in our implementation.)
+We require that $\PInf[b] = \emptyset$ since the disk controller can write
+in-flight blocks in any order, and thus at most one version of a block can
+be in flight at any time.
 %
 The buffer cache is also expected to write all blocks eventually, a
  liveness property.
 
+\textbf{Example.}
+%
+Suppose the buffer cache has \patches\ arranged as in the previous journal
+example, and that $\{j_i\} \subseteq \PDisk$, i.e., the journal entries have
+already been written to disk.
+%
+The buffer cache cannot write block $\PBlock{u_i}$ for any $i$, since $u_i
+\PDDepend c$ and $\PState{c} \neq \PDiskst$.
+%
+Its only option is to write $\PBlock{c}$ since $\PDepset{c} = \{j_i\}
+\subseteq \PDisk$.
+%
+So, via the action above, it sets $\PState{c} \gets \PDiskst$.
+%
+Later, when notification is received that $\PBlock{c}$ has been written to disk,
+$\PState{c}$ is set to $\PDiskst$ and the buffer cache then has the option to
+write any of $\PBlock{u_i}$.
 
 This model does not completely define the disk's behavior on system crash,
  in particular with respect to in-flight blocks.
@@ -284,7 +301,8 @@ cycles.
 %
 In practice, the \Kudos\ implementation currently disallows any dependency
 cycles, including cycles within a single block; this simplifies many graph
-traversals.
+traversals used to determine when optimizations may be applied, and has not
+yet caused any difficulty in implementing different consistency policies.
 
 
 \input{noop}

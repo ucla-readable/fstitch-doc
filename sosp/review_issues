@@ -38,6 +38,7 @@ result from more file and directory operations for soft updates. For
 Figure 3, could you provide an example that represents specific
 updates?
 
+--> discussion, alternate approaches
 The authors consider the approach of carrying rollback data as a part
 of a patch, in case there is a circular dependency. It seems another
 approach to breaking the dependency would be to create a copy of the
@@ -85,9 +86,6 @@ true that in the end the overhead of implementing patching may offset
 these gains, but it would be still interesting to quantify the
 potential gains.
 
-page 4: You say that your implementation "currently disallows any
-dependency cycles..." What is the impact of this constraint, if any?
-
 ===
 
 The motivation/significance of this work seems limited
@@ -119,8 +117,6 @@ paper would be stronger if the ideas can be refined to the point where
 the costs of the general system are comparable to hand-tuned systems.
 (That will be even more convincing information that the work has a
 complete "deep" understanding of the issues.)
-
-I got lost a few times in section 3, where the abstraction is defined
 
 Section 5 describes how this abstraction and architecture allow me to
 drop "soft updates" or "journaling" or "async writes" under the same
