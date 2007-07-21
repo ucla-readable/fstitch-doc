@@ -28,16 +28,19 @@ br.floatright { clear: right; }
 <script type="text/javascript" src="plots/time_rm.js"></script>
 <script type="text/javascript" src="plots/time_postmark.js"></script>
 <script type="text/javascript" src="plots/time_andrew.js"></script>
+<script type="text/javascript" src="plots/time_imap.js"></script>
 
 <script type="text/javascript" src="plots/space_tar.js"></script>
 <script type="text/javascript" src="plots/space_rm.js"></script>
 <script type="text/javascript" src="plots/space_postmark.js"></script>
 <script type="text/javascript" src="plots/space_andrew.js"></script>
+<script type="text/javascript" src="plots/space_imap.js"></script>
 
 <script type="text/javascript" src="plots/io_tar.js"></script>
 <script type="text/javascript" src="plots/io_rm.js"></script>
 <script type="text/javascript" src="plots/io_postmark.js"></script>
 <script type="text/javascript" src="plots/io_andrew.js"></script>
+<script type="text/javascript" src="plots/io_imap.js"></script>
 
 <script type="text/javascript"> <!--
 function sysName(testData)
@@ -81,6 +84,8 @@ function loadTimes()
 		addTimeTest('timePostmarkTable', time_postmark_data[sys]);
 	for (sys in time_andrew_data)
 		addTimeTest('timeAndrewTable', time_andrew_data[sys]);
+	for (sys in time_imap_data)
+		addTimeTest('timeImapTable', time_imap_data[sys]);
 }
 
 function addSpaceTest(tblId, testName, testData)
@@ -110,6 +115,8 @@ function loadSpace()
 		addSpaceTest('spaceTable', 'postmark', space_postmark_data[sys]);
 	for (sys in space_andrew_data)
 		addSpaceTest('spaceTable', 'andrew', space_andrew_data[sys]);
+	for (sys in space_imap_data)
+		addSpaceTest('spaceTable', 'imap', space_imap_data[sys]);
 }
 
 function addIoTest(tblId, testData)
@@ -135,6 +142,8 @@ function loadIo()
 		addIoTest('ioPostmarkTable', io_postmark_data[sys]);
 	for (sys in io_andrew_data)
 		addIoTest('ioAndrewTable', io_andrew_data[sys]);
+	for (sys in io_imap_data)
+		addIoTest('ioImapTable', io_imap_data[sys]);
 }
 
 function loadData()
@@ -190,6 +199,12 @@ I/O (<a href="#io_pit">Current</a>, <a href="#io_history">History</a>)
 	<tr class="header"><th class="test">andrew</th> <th class="test">rev</th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
 </table>
 </div>
+
+<div class="flow">
+<table id="timeImapTable">
+	<tr class="header"><th class="test">imap</th> <th class="test">rev</th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
+</table>
+</div>
 <div class="space"></div>
 
 <a name="space_pit"></a>
@@ -226,6 +241,13 @@ I/O (<a href="#io_pit">Current</a>, <a href="#io_history">History</a>)
 <div class="flow">
 <table id="ioAndrewTable">
 	<tr class="header"><th class="test">andrew</th> <th class="test">rev</th> <th class="col" colspan="2">writes</th> <th class="col" colspan="2">reads</th> <th class="col" colspan="2">multi-write sectors</th></tr>
+	<tr class="header"><th></th> <th></th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">sectors</th> <th class="col">sector writes</th></tr>
+</table>
+</div>
+
+<div class="flow">
+<table id="ioImapTable">
+	<tr class="header"><th class="test">imap</th> <th class="test">rev</th> <th class="col" colspan="2">writes</th> <th class="col" colspan="2">reads</th> <th class="col" colspan="2">multi-write sectors</th></tr>
 	<tr class="header"><th></th> <th></th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">sectors</th> <th class="col">sector writes</th></tr>
 </table>
 </div>
