@@ -75,7 +75,8 @@ delayed until all changes associated with \texttt{q} have committed.
 %
 \Patchgroups\ can be \emph{engaged} or \emph{disengaged}; all changes made by
 a process are associated with that process's engaged \patchgroups\ and inherit
-the appropriate dependencies, but are otherwise just like other changes.
+the appropriate dependencies, but are otherwise just like other changes --
+they can be written as soon as their dependencies have been written.
 %
 \pgSync\ forces an immediate write of a \patchgroup\ to disk, and \pgClose\
 disassociates a \patchgroup\ ID from the underlying \patches\ implementing it

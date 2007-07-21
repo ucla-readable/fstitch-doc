@@ -58,6 +58,11 @@ not simply of the number of writes. Third, I'd like an explanation for
 the performance differences and comments on any difference in ordering
 guarantees across the versions.
 
+You might want to consider how you could express shadow paging, as in
+WAFL, with patches. Being able to demonstrate an additional
+consistency mechnanism would help convince readers of the generality
+of patches. I believe this should be straight forward.
+
 ===
 
 While in general I like the paper, I am not sure whether the decision
@@ -149,6 +154,10 @@ The second version of exokernel (SOSP 97) tracked "tainted" blocks to
 enforce dependencies and included several optimizations to make this
 efficient. How does this approach differ?
 
+Several points hint that work could increase with the number of
+outstanding requests. I would like to see some high-throughput
+experiments (e.g., lots of concurrent writes to a RAID).
+
 ===
 
 Section 1 - file system correctness [8, 28] - what about citing the
@@ -184,6 +193,9 @@ the paper rather than bury it on page 10.
 
 5) You need to remind the reader of the key point surrounding soft
 updates.
+
+Do these ideas carry over into the realm of distributed data storage?
+Seems like they should and perhaps you should look into it.
 
 ===
 

@@ -27,9 +27,10 @@ We present the \patch\ abstraction, describe a number of important
  implementation of a storage subsystem that uses \patches\ to enforce
  consistency.
 %
-Our ext2 prototype is competitive with FreeBSD soft updates and allows
+Our ext2 prototype is competitive with Linux ext2 and ext3 and allows
  several novel configurations, such as ext2 with soft updates or correct
- dependency enforcement within a loopback file system.
+ dependency enforcement within a loopback file system, and provides a
+ simple interface for user applications to directly affect \patches.
 
 
 \begin{comment}

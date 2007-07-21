@@ -57,13 +57,22 @@ fewer rollbacks and more flexibility in write ordering.
 
 %% \subsubsection{\Patch\ List Ordering}
 
-Finally, the buffer cache and a few other modules perform better in the
+The buffer cache and a few other \modules\ perform better in the
 common case that the \patches\ on a block are listed in order of creation
 time.
 %
 This improves their performance from $O(n^2)$ to $O(n)$ in the number of
 \patches.
 %% in the common case that this order is preserved.
+
+Finally, block allocation policies can have a dramatic effect on the number of
+I/O requests required to write changes to the disk. For instance, with
+dependencies implementing soft updates, indirect block data cannot be written
+until the referenced blocks have been at least initialized. By allocating an
+indirect block in the middle of a range of data blocks for a file, the data
+blocks must be written as two smaller I/O requests since the indirect block
+cannot be written at the same time. Allocating the indirect block somewhere
+else allows the data blocks to be written in one larger I/O request.
 
 
 \begin{comment}

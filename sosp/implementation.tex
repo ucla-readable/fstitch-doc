@@ -13,19 +13,29 @@ The \Kudos\ prototype implementation runs as a Linux 2.6 kernel module.
 %% FUSE version.
 %
 It interfaces with the Linux kernel at the VFS layer and the generic block
-layer.
+device layer.
 %
 In between is a \Kudos\ module graph that replaces Linux's conventional
 file system layers and buffer cache.
-%
-We bypass all Linux caches as the simplest way to ensure that the
-\Kudos\ buffer cache obeys all necessary dependency orderings.
 %
 A small kernel patch informs \Kudos\ of process fork and exit events as
 required to update per-process \patchgroup\ state.
 
 
-\Kudos\ modules interact with Linux's generic block layer mainly via
+During initialization, the \Kudos\ kernel module registers a VFS file system
+type with Linux (like ``nfs'' or ``ext2'').
+%
+Each file system \Kudos\ detects on a specified disk device can then be mounted
+from Linux using a command like \mbox{\texttt{mount -t kfs kfs:\textit{name}
+/mnt/point}}.
+%
+Since \Kudos\ provides its own \patch-aware buffer cache, it sets
+\texttt{O\_SYNC} on all opened files as the simplest way to bypass the normal
+Linux cache and ensure that the \Kudos\ buffer cache obeys all necessary
+dependency orderings.
+
+
+\Kudos\ modules interact with Linux's generic block device layer mainly via
 \verb+generic_make_request+.
 %
 This function sends read or write requests to a Linux disk scheduler, which
@@ -96,15 +106,6 @@ it would choose to write data stored in its volatile cache. Additionally, FUA is
 a standard part of the SATA NCQ specification\todo{cite SATA spec}, so all SATA
 disks support it when using NCQ.
 \end{comment}
-
-
-The \Kudos\ Linux kernel module looks like a VFS file system to Linux, but
-unlike traditional file system modules, it is merely a front end to a \Kudos\
-\module\ graph. After initialization, individual \modules\ can make file
-systems available to mount though the VFS front end. Each file system can be
-mounted using a command like \mbox{\texttt{mount -t kfs kfs:\textit{name}
-/mnt/point}}.
-
 
 \begin{comment}
 The Linux kernel must be modified in order to

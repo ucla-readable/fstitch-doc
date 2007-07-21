@@ -119,3 +119,11 @@ of these ideas.
 %% systems -- but FS2 is currently specific to ext2, since it deals directly with
 %% low-level disk structures. The \Kudos\ \module\ interface should allow such an
 %% extension to be written in a portable way, giving it the same benefit.
+
+\paragraph{} \Kudos\ adds to this body of work by generalizing the ``write
+before'' relationship that is already present in many storage systems, and
+making it a pervasive primitive throughout the storage system. This allows
+many different consistency models to be created and combined in file system
+independent ways, and it provides a means for file system extensions to deal
+directly with consistency. It also allows the extension of this concept into
+userspace, so that even user applications can easily use this functionality.

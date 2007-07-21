@@ -315,16 +315,24 @@ it has been written).
 Figure~\ref{fig:opt}a shows the \patches\ generated when an application appends
 16~kB of data to an existing empty file.
 %
-This requires allocating four new 4~kB blocks, writing data to them,
-attaching them to the file's inode, changing the inode's file size and
-modification time, and updating the ``group descriptor'' and superblock to
-account for the allocated blocks.
+Each circle represents a single \patch. The shaded boxes indicate disk blocks.
 %
-The operation is broken into four one-block appends, each of which updates
-the inode; note, for example, how overlap dependencies force each
-modification of the inode's size to depend on the previous one.
+The arrows between \patches\ represent the dependency relationship \PDDepend.
+
+This change requires allocating four new 4~kB blocks (\patches\ $b_1$-$b_4$),
+writing data to them ($d_1$-$d_4$), attaching them to the file's inode (right
+$i_1$-$i_4$), changing the inode's file size and modification time (left
+$i_1$-$i_4$ and $i$), and updating the ``group descriptor'' and superblock to
+account for the allocated blocks ($g$ and $s$).
 %
-Eight blocks are written during the operation.
+The operation is broken into four one-block appends; the numeric subscripts in
+the \patch\ labels indicate with which each \patch\ is associated.
+%
+All of the one-block appends update the inode; note, for example, how overlap
+dependencies force each modification of the inode's size to depend on the
+previous one.
+
+A total of eight blocks are written during the operation.
 %
 \Kudos, however, represents the operation with 23 \patches\ and roughly 33000
 (!) bytes of rollback data.

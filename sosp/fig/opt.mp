@@ -34,10 +34,10 @@ beginfig(1);
   d1.dx=10;
 
   boxjoin(a.width = b.width = a.height);
-  patchit.bi1(btex $a_1$\strut etex, 0);
-  patchit.bi2(btex $a_2$\strut etex, 0);
-  patchit.bi3(btex $a_3$\strut etex, 0);
-  patchit.bi4(btex $a_4$\strut etex, 0);
+  patchit.bi1(btex $b_1$\strut etex, 0);
+  patchit.bi2(btex $b_2$\strut etex, 0);
+  patchit.bi3(btex $b_3$\strut etex, 0);
+  patchit.bi4(btex $b_4$\strut etex, 0);
   %bia.squatness=bib.squatness=bic.squatness=bid.squatness=0.6;
   bi1.dx=4;
 
@@ -144,10 +144,10 @@ beginfig(2);
   d1.dx=10;
 
   boxjoin(a.width = b.width = a.height);
-  patchit.bi1(btex $a_1$\strut etex, 0);
-  patchit.bi2(btex $a_2$\strut etex, 0);
-  patchit.bi3(btex $a_3$\strut etex, 0);
-  patchit.bi4(btex $a_4$\strut etex, 0);
+  patchit.bi1(btex $b_1$\strut etex, 0);
+  patchit.bi2(btex $b_2$\strut etex, 0);
+  patchit.bi3(btex $b_3$\strut etex, 0);
+  patchit.bi4(btex $b_4$\strut etex, 0);
   %bia.squatness=bib.squatness=bic.squatness=bid.squatness=0.6;
   bi1.dx=4;
 
@@ -230,10 +230,10 @@ beginfig(3);
   d1.dx=10;
 
   boxjoin(a.width = b.width = a.height);
-  patchit.bi1(btex $a_1$\strut etex, 0);
-  patchit.bi2(btex $a_2$\strut etex, 0);
-  patchit.bi3(btex $a_3$\strut etex, 0);
-  patchit.bi4(btex $a_4$\strut etex, 0);
+  patchit.bi1(btex $b_1$\strut etex, 0);
+  patchit.bi2(btex $b_2$\strut etex, 0);
+  patchit.bi3(btex $b_3$\strut etex, 0);
+  patchit.bi4(btex $b_4$\strut etex, 0);
   %bia.squatness=bib.squatness=bic.squatness=bid.squatness=0.6;
   bi1.dx=4;
 
@@ -349,7 +349,7 @@ beginfig(4);
   d1.dx=10;
 
   boxjoin();
-  patchit.bi(btex $a_{\text{1\dots4}}$\strut etex, 0);
+  patchit.bi(btex $b_{\text{1\dots4}}$\strut etex, 0);
   bi1.dx=4;
 
   patchit.group(btex $g$\strut etex, 0);
