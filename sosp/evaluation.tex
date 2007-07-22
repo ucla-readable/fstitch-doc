@@ -255,7 +255,9 @@ selects the source mailbox (with 100 messages, sized 2kB each),
 creates the new mailbox, copies each of the 100 messages to the new
 mailbox, marks each source message for deletion, expunges the marked
 messages, requests a check, and logs out. We compare using soft updates;
-Figure~\ref{fig:imap-compare} shows the results.
+Figure~\ref{fig:imap-compare} shows the results\footnote{TERTL readers:
+we plan to measure time for this and the other patchgroup tests and
+compare against Linux ext2 and ext3.}
 
 \begin{figure}[t]
 \centering{
