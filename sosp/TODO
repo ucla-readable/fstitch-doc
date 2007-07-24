@@ -4,6 +4,8 @@ review_todos file
 
 Improve system name?
 
+Kudos does make atomicity assumption (intra-block ordering and merging).
+
 Modules:
 - Explore modules not possible within a stackable file system (osdi reviewer)
 
@@ -38,21 +40,49 @@ Misc:
 - Ensure correct directory ordering (delete a; touch a)
 - Decrease dependency memory usage?
 - Import linux ext2 allocator?
+- Create large byte patches for journal bitmap blocks?
+  Or, enhance journaling mode to merge intra-txn patches?
+- Add more consistency modules?
 - Add patch undo?
 	- On hold because it needs dependency count tracking?
-- Add more consistency modules?
-- Remove weak ref function callbacks functionality, if it is unused, to reduce the somewhat-large amount of space used for weak refs
+	- Add 'clear inode bitmap'->'clear inode' dependency avoidance?
+- imap
+	- Move uwimap lock files to /tmp/? Or get equiv speedup within kudos?
+	- if we do not create lock files and do not use FUA, we:
+		- take the same amount of time as linux
+		- write and read the exact same amount
+		- get the same (really, slightly better) throughput
+		- have very similar block dispatch graphs
+		- patch graph comments:
+			- we can do seriously more merging
+				- long-ish noop chains make cycle detection perform poorly
+				- many noop chains make two patches on the same block depend
+				  on eachother and make them depend on another block
+				- have a->{b,noop} and b is on same block and has no befores. why is a not merged into b? because b has a noop after or two that make detection harder. (or incorrect?)
+				- can we pull superblock/groupdesc/other out of patchgroups?
 
 * Benchmarking
 
+- Increase postmark test size
 - Try benchmarks with larger cache
-- Try benchmarks with unlink module
 - Start running correctness tests?
 - Add SU to Linux ext2?
-- Measure imap benchmark
+- Add FUA to Linux ext2/ext3?
 - Add gzip benchmark
 - Add svn benchmark
 - Track other patch-related datastructure memory usage?
   - bit overlap hash maps
   - number of hard patches
 - Measure number of hard patches created
+- Update imap script to log sys only once (don't log the init)
+- Update delete dirent stats to output #deletes with non-NULL create ptr?
+
+* Important bugs
+
+- imap crashes kudos ext2 none, meta, and full
+- medium/large postmark crashes kudos
+
+
+* Unimportant bugs (unless they get in our way)
+
+- UU cannot sync during shutdown
