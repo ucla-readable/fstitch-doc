@@ -51,25 +51,25 @@ opportunities we hope to address in future work.
 None
         & 537,989		& 458.64~MB             & 4.42~sec \\
 \Nrb\ \patches\
-        & 537,131               & 205.68~MB             & 4.53~sec \\
+        & 464,825               & 205.62~MB             & 3.30~sec \\
 Overlap merging
-        & 253,839               & 255.45~MB             & 3.58~sec \\
+        & 112,634               & 254.00~MB             & 3.04~sec \\
 Both optimizations
-        & 276,829               & 1.24~MB               & 3.58~sec \\
+        &  67,478               & 0.34~MB               & 2.56~sec \\
 \hline
 \multicolumn{4}{@{}c@{}}{\textbf{Delete test}\raise2pt\hbox{\strut}} \\
 None
         & 193,062               & 3.17~MB               & 1.14~sec \\
 \Nrb\ \patches\
-        & 172,351               & 3.15~MB               & 1.08~sec \\
+        & 41,108                & 0.91~MB               & 0.35~sec \\
 Overlap merging
-        & 87,692                & 1.83~MB               & 0.85~sec \\
+        & 54,685                & 0.93~MB               & 0.55~sec \\
 Both optimizations
-        & 54,076                & 0.64~MB               & 0.75~sec \\
+        &  1,800                & 0.00~MB               & 0.32~sec \\
 \end{tabular}
 \caption{Effectiveness of \Kudos\ optimizations.  The combination of \nrb\
-\patches\ and overlap merging removes almost half the \patches\ and 99.73\% of
-the rollback data required to untar Linux.}
+\patches\ and overlap merging removes 87\% to 99\% of the \patches\ and
+99.93\% to 100\% of the rollback data required to untar Linux.}
 \label{f:optdata}
 \end{figure}
 
@@ -128,15 +128,15 @@ the changes to disk.
 \begin{tabular}{@{}lrr@{}}
 System & Untar (sec) & Delete (sec) \\ \hline
 % Results are from r3652
-\Kudos\ (soft updates) & 5.97 [2.79] & 1.00 [0.31] \\
-\Kudos\ (meta journal) & 9.56 [5.49] & 1.65 [0.77] \\
+\Kudos\ (soft updates) & 5.90 [2.56] & 1.03 [0.32] \\
+\Kudos\ (meta journal) & 8.70 [4.84] & 1.65 [0.75] \\
 \Kudos\ (full journal) & 13.40 [5.46] & 1.63 [0.77] \\
-\Kudos\ (async) & 4.46 [2.10] & 0.82 [0.31] \\ \hline
+\Kudos\ (async) & 4.38 [1.84] & 0.80 [0.29] \\ \hline
 %FreeBSD (soft updates) & 23.22 & 15.95 \\ 
 %FreeBSD (async) & 10.09 & 3.25 \\ \hline
-Linux (ext2) & 4.63 [0.73] & 4.52 [0.16] \\
-Linux (ext3 ordered) & 13.97 [1.02] & 4.31 [0.24] \\
-Linux (ext3 journal) & 11.40 [1.19] & 4.43 [0.22] \\
+Linux (ext2) & 4.50 [0.72] & 4.57 [0.16] \\
+Linux (ext3 ordered) & 13.86 [1.01] & 4.29 [0.25] \\
+Linux (ext3 journal) & 10.89 [1.12] & 4.32 [0.26] \\
 \end{tabular}
 }
 \caption{\label{fig:tar_rm_time} Untar and delete times. System CPU times are
