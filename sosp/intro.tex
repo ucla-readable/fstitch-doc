@@ -13,30 +13,10 @@ and cache sizes are large.
 The answer is a qualified yes.
 
 
-\begin{comment}
-Ongoing massive growth in both disk capacities and user and application
-storage requirements, combined with the increasing
-disparity between disk and processor speeds, has led to ongoing
-innovation in file system design.
-%
-File systems are expected to do more things: they can automatically encrypt
-stored data~\cite{wright03ncryptfs}, support extensible metadata, such as
-content indexes~\cite{gifford91semantic}, automatically
-version~\cite{soules03metadata,fast04versionfs,quinlan02venti,cornell04wayback},
-and even detect viruses~\cite{miretskiy04avfs}.
-%
-Improved disk interfaces can make use of file system usage patterns to
-improve
-performance~\cite{sivathanu03semantically-smart,sivathanu05database-aware}.
-\end{comment}
-
-
 As file system functionality increases, file system correctness is
  increasingly a focus of
  research~\cite{sivathanuetal05-logic,denehyetal05-journal-guided}.
 %
-%File systems must maintain dependency relationships between written blocks
-% to preserve file system correctness.
 File systems must commit blocks to stable storage in an order that
  preserves file system correctness.
 %
@@ -90,29 +70,23 @@ This work develops a new fundamental data type called a \emph{\patch},
 %
 This lets file system implementations and extensions examine and modify
  dependency structures independent of the file system's layout.
+
+
+\Patches\ can implement many consistency mechanisms, including
+ soft updates and journaling.
 %
-This generality comes at a cost, but that cost can be partially mitigated.
+Our file system modules impose soft updates-style \patch\
+ requirements by default; we have also written a journal module that
+ can change those dependencies to express either full or metadata-only
+ journaling.
 %
-Real file system implementations achieve consistency and write ordering
- relationships without sacrificing performance by using a variety of file
- system specific optimizations.
+Additionally, we give user-level applications controlled access to \patches,
+allowing applications to impose their own limited consistency
+ policies.
 %
-We found that a naive implementation using \patches\ scaled terribly,
- spending far more space and time on dependency manipulation than
- conventional systems.
-%
-We therefore developed a variety of dynamic optimizations that
- significantly reduce the memory and CPU overhead associated with \patches.
-%
-We describe \patches\ abstractly, state their behavior and safety
- properties, and reason about the correctness of our optimizations.
-%
-Finally, we demonstrate a prototype file system implementation using
- \patches\ called \Kudos.
-%
-For an untar-Linux benchmark that writes 253~MB of data, our optimizations
- can reduce the number of \patches\ created by half and the amount of
- rollback data memory required by 99.73\%. 
+Modifying an IMAP mail server to use this interface requires only localized
+ changes; the resulting server follows IMAP's consistency
+ requirements while writing fewer blocks to disk. % FIXME is this still true?
 
 
 The \Kudos\ storage system implementation is decomposed entirely into
@@ -130,31 +104,18 @@ As a result, the loosely-coupled \modules\ that implement a file system
  even though each \module\ only does a small part of the work.
 
 
-\Patches\ can implement many consistency mechanisms, including
- soft updates and journaling.
+This generality comes at a cost, but that cost can be partially mitigated.
 %
-Our file system modules impose soft updates-style \patch\
- requirements by default; we have also written a journal module that
- can change those dependencies to express either full or metadata-only
- journaling.
+Real file system implementations achieve consistency and write ordering
+ relationships without sacrificing performance by using a variety of file
+ system specific optimizations.
 %
-Additionally, we give user-level applications controlled access to \patches,
-allowing applications to impose their own limited consistency
- policies.
+We found that a naive implementation using \patches\ scaled terribly,
+ spending far more space and time on dependency manipulation than
+ conventional systems.
 %
-Modifying an IMAP mail server to use this interface requires only localized
- changes; the resulting server follows IMAP's consistency
- requirements while writing fewer blocks to disk.
-%
-Our prototype implementation is not yet as fast as we would like, but it
- is competitive with Linux on many of our benchmarks.
-
-\begin{comment}
- not ACID transactions: transactions should be independent, but any file
- system client can observe all active \patches), we believe that using
- \patches\ will allow the construction of consistent, modular, extensible
- file systems that are much easier to understand.
-\end{comment}
+We therefore developed a variety of dynamic optimizations that
+ significantly reduce the memory and CPU overhead associated with \patches.
 
 
 Our contributions include the generalized \patch\ design, the
@@ -164,11 +125,15 @@ Our contributions include the generalized \patch\ design, the
  and the \patchgroup\ mechanism that exports \patches\ to user space.
 
 
-%% They can also be extended, in a carefully controlled way, into userspace --
-%% enabling applications with custom consistency and performance requirements to
-%% specify explicit write ordering restrictions to be honored by the file system.
-%% We will show that this can give such applications several benefits over existing
-%% interfaces like \texttt{fsync()} which provide only coarse control over
-%% consistency, or which either impose high overhead (data journaling) or don't
-%% guarantee data consistency (soft updates, for example, ensures metadata
-%% consistency only).
+We describe \patches\ abstractly, state their behavior and safety
+ properties, and reason about the correctness of our optimizations.
+%
+Finally, we demonstrate a prototype file system implementation using
+ \patches\ called \Kudos.
+%
+For an untar-Linux benchmark that writes 253~MB of data, our optimizations
+ can reduce the number of \patches\ created by half and the amount of
+ rollback data memory required by 99.73\%. 
+%
+Our prototype is not yet as fast as we would like, but it is competitive
+ with Linux on many of our benchmarks.
