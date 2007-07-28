@@ -148,6 +148,8 @@ between engaged \patchgroups's \noop\ \patches.
 %
 Figure~\ref{fig:patchgroup-patches} shows an example \patch\ arrangement for
 two \patchgroups.
+\todo{Note how patchgroups are effectively implemented in SU, meta
+journaling, and full journaling?}
 
 \begin{figure}[t]
 \centering
@@ -170,7 +172,7 @@ two \patchgroups.
 
 We tested the \patchgroup\ interface by adding \patchgroup\ support to three
 applications: the gzip compression utility, the Subversion version control
-system, and the uw-imapd IMAP mail server daemon.
+system, and the UW IMAP mail server daemon.
 
 % discussion potential gains (in addition to actual gains)?
 
@@ -180,11 +182,13 @@ system, and the uw-imapd IMAP mail server daemon.
 Our first test showed that simple consistency requirements were trivial to
 add.  We updated gzip to use \patchgroups\ that ensure the input file's
 removal is not committed before the output file's data is written, so that
-a crash does not lose both files. The update adds 10 lines of code to gzip.
-
-% TODO: note fsync's deficiencies: rm of .gz makes write of .gz unnecessary,
-% later changes to .gz rewrite the changed blocks, gzip completion takes
-% longer. The normal reasons to delay writing a block.
+a crash does not lose both files. The update adds 10 lines of code to gzip
+v1.3.9.
+%
+\todo{Contrast with SU and journaling?
+SU: must sync prior to unlink; slower completion and later changes to
+output require additional writes.
+Ordered and full journaling: safe with no changes.}
 
 \paragraph{Subversion}
 \label{sec:patchgroup:svn}
@@ -192,7 +196,7 @@ a crash does not lose both files. The update adds 10 lines of code to gzip.
 % describe why pgs are easier/better than journaling
 
 The Subversion version control system's client~\cite{svn} manipulates a
-local \emph{working copy} of a possibly-remote source repository.
+local working copy of a source repository.
 %% In this case study we take an interest in how the Subversion version
 %% control system client~\cite{svn} manipulates a local checkout (a
 %% Subversion ``working copy'').
@@ -204,16 +208,16 @@ This safety is achieved using application-level write ahead journaling,
 where each entry in Subversion's journal is either idempotent or
 atomic.
 %
-Even with this precaution, however, a working copy operation may not be
-protected against an operating system or hardware crash.
+Depending on the file system, however, even with this precaution a
+working copy operation may not be protected against an operating
+system or hardware crash.
 %
-For example, the journal file is committed when it is moved from a
-temporary to its official location, but the file system might commit this
-rename to stable storage \emph{before} completely writing the journal
-file's data.
+For example, the journal file is marked as complete by moving it from
+its temporary to live location.
 %
-A system crash in between the complete commit of these two operations
-and the subsequent journal replay could corrupt the working copy.
+Should the file system completely commit (1) the file rename before
+(2) the file data, and crash inbetween (1) and (2), then a subsequent
+journal replay could corrupt the working copy.
 
 The working copy library could ensure a safe commit ordering by
 syncing files as necessary; the Subversion server (repository) library
@@ -230,7 +234,8 @@ as is implemented by ext3.
 First, all preceding writes to a file's data are committed before the file
 is renamed,
 %
-and second, metadata updates are committed in their system call order.
+and second, metadata updates are effectively committed in their system call
+order.
 %
 %% The combination of these properties ensures the creation of file $i$
 %% precedes the creation of file $(i+1)$.
@@ -257,10 +262,10 @@ file with conflicts.
 The use of the file rename property is replaced in two ways.
 %
 First, files created in a temporary location and then moved into their
-official location (e.g. directory status and journal files) now
+live location (e.g. directory status and journal files) now
 make the rename depend on the file data writes.
 %
-Second, files only referenced by official files (e.g. updated file
+Second, files only referenced by live files (e.g. updated file
 copies used by journal file entries) can live with a weaker ordering;
 the data for these files need only precede the installation of the
 referencing file.
@@ -278,9 +283,9 @@ Furthermore, most journal playback operations may commit
 independently of each other; only interacting operations, such as a
 file read and subsequent rename, need ordering.
 
-Once we understood Subversion's requirements, it took a day to add
+Once we understood Subversion v1.4.3's requirements, it took a day to add
 the 220 lines of code that enforce safety for conflicted updates (out of
-25000 in the working copy library).
+25,000 in the working copy library).
 
 \begin{figure}[t]
   \centering
@@ -292,9 +297,9 @@ the 220 lines of code that enforce safety for conflicted updates (out of
 \paragraph{UW IMAP}
 \label{sec:patchgroup:uwimap}
 
-Finally, we updated the University of Washington's IMAP mail server~\cite{uwimap} to
-ensure mail updates are committed to disk
-in safe and efficient orderings.
+Finally, we updated the University of Washington's IMAP mail server
+(v2004g)~\cite{uwimap} to ensure mail updates are committed to disk
+in safe and more efficient orderings.
 %
 The Internet Message Access Protocol (IMAP)~\cite{rfc3501} provides
 remote access to a mail server's email message store.
@@ -303,9 +308,9 @@ The most relevant IMAP commands synchronize changes to the server's
 disk (CHECK), copy a message from the selected mailbox to another
 mailbox (COPY), and delete messages marked for deletion (EXPUNGE).
 
-The imapd and mbox mail storage
-drivers were updated to use \patchgroups, ensuring that all disk changes occur in a safe
-ordering without enforcing any specific order.
+The imapd and mbox mail storage drivers were updated to use
+\patchgroups, ensuring that all disk writes occur in a safe ordering
+without enforcing a specific order.
 %
 The original server conservatively preserved command ordering by
 syncing the mailbox file after each CHECK on it or COPY into it. With
@@ -325,9 +330,9 @@ changes are committed in a safe ordering.
 
 These changes to UW IMAP simplify it in two ways:
 %
-ensuring change ordering correctness
+they ensure disk write ordering correctness
 %
-and making efficient usage of disk updates.
+and they make more efficient usage of disk writes.
 %
 As each command's changes now depend on the preceding command's
 changes, it is no longer required that all code
