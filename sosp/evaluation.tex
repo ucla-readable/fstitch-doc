@@ -18,7 +18,7 @@ soft updates and journaling, both created with default configurations.
 
 Two simple tests are repeated throughout this section: first, we untar
 the Linux 2.6.15 source code from \texttt{linux-2.6.15.tar} (218 MB), which is
-already decompressed and cached in RAM. Second, we delete the resulting source
+already cached in RAM. Second, we delete the resulting source
 tree, after unmounting and remounting the file system.
 
 \subsection {Optimization Benefits}
@@ -119,29 +119,69 @@ smaller account for about 51\% of all \rb\ \patches.}
 %writes 122 blocks, while FreeBSD writes 135 blocks.
 
 Times to untar and remove our Linux tarball are listed in
-Figure~\ref{fig:tar_rm_time} for several systems, including time to fully sync
+Figure~\ref{fig:bench_time} for several systems, including time to fully sync
 the changes to disk.
 
-% make this into a table
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering{
-\begin{tabular}{@{}lrr@{}}
-System & Untar (sec) & Delete (sec) \\ \hline
-% Results are from r3652
-\Kudos\ (soft updates) & 5.90 [2.56] & 1.03 [0.32] \\
-\Kudos\ (meta journal) & 8.70 [4.84] & 1.65 [0.75] \\
-\Kudos\ (full journal) & 13.40 [5.46] & 1.63 [0.77] \\
-\Kudos\ (async) & 4.38 [1.84] & 0.80 [0.29] \\ \hline
+\begin{tabular}{@{}l|rrr|rrr|rrr|rrr@{}}
+System & \multicolumn{3}{c|}{Untar} & \multicolumn{3}{c|}{Delete} & \multicolumn{3}{c|}{PostMark} & \multicolumn{3}{c}{Andrew} \\
+& \multicolumn{1}{c}{Real} & \multicolumn{1}{c}{Sys} & \multicolumn{1}{c|}{IO}
+& \multicolumn{1}{c}{Real} & \multicolumn{1}{c}{Sys} & \multicolumn{1}{c|}{IO}
+& \multicolumn{1}{c}{Real} & \multicolumn{1}{c}{Sys} & \multicolumn{1}{c|}{IO}
+& \multicolumn{1}{c}{Real} & \multicolumn{1}{c}{Sys} & \multicolumn{1}{c}{IO} \\ \hline
+
+% Results are from r3652 (except for IO times which are r3818)
+
+\Kudos\ (soft updates)
+& 5.90 & 2.56 & 3.19
+& 1.03 & 0.32 & 0.64
+& 129.72 & 50.88 & 1.88
+& 44.90 & 5.28 & 7.78 \\
+
+\Kudos\ (meta journal)
+& 8.70 & 4.84 & 3.93
+& 1.65 & 0.75 & 0.83
+& 210.36 & 111.50 & 1.77
+& 37.46 & 5.31 & 0.34 \\
+
+\Kudos\ (full journal)
+& 13.40 & 5.46 & 8.15
+& 1.63 & 0.77 & 0.81
+& 240.28 & 89.64 & 3.44
+& 37.93 & 5.38 & 0.45 \\
+
+\Kudos\ (async)
+& 4.38 & 1.84 & 2.61
+& 0.80 & 0.29 & 0.47
+& 121.74 & 26.39 & 0.92
+& 37.20 & 5.30 & 0.06 \\ \hline
+
 %FreeBSD (soft updates) & 23.22 & 15.95 \\ 
 %FreeBSD (async) & 10.09 & 3.25 \\ \hline
-Linux (ext2) & 4.50 [0.72] & 4.57 [0.16] \\
-Linux (ext3 ordered) & 13.86 [1.01] & 4.29 [0.25] \\
-Linux (ext3 journal) & 10.89 [1.12] & 4.32 [0.26] \\
+
+Linux (ext2)
+& 4.50 & 0.72 & 3.60
+& 4.57 & 0.16 & 4.38
+& 64.91 & 4.93 & 0.02
+& 37.30 & 4.86 & 0.68 \\
+
+Linux (ext3 ordered)
+& 13.86 & 1.01 & 12.64
+& 4.29 & 0.25 & 4.00
+& 67.12 & 9.13 & 0.02
+& 37.14 & 4.89 & 0.34 \\
+
+Linux (ext3 journal)
+& 10.89 & 1.12 & 9.53
+& 4.32 & 0.26 & 4.03
+& 125.13 & 11.18 & 2.29
+& 37.83 & 4.99 & 0.94 \\
 \end{tabular}
 }
-\caption{\label{fig:tar_rm_time} Untar and delete times. System CPU times are
-in square brackets.}
-\end{figure}
+\caption{\label{fig:bench_time} Untar, delete, PostMark, and Andrew
+  benchmark times.}
+\end{figure*}
 
 At the untar test, the \Kudos\ async mode is faster than Linux ext2, which
 provides a similar consistency guarantee. The \Kudos\ soft updates mode is
@@ -185,26 +225,8 @@ code, scanning and reading the directory tree with several text
 processing utilities, and then compiling the source code. The source
 code we use is the Ion window manager, version 2-20040729.
 
-Figure~\ref{fig:postmark} shows the times to run PostMark and the Andrew
+Figure~\ref{fig:bench_time} shows the times to run PostMark and the Andrew
 benchmark, and then synchronize their results to disk.
-
-\begin{figure}[t]
-\centering
-\begin{tabular}{@{}lrr@{}}
-System & PostMark (sec) & Andrew (sec) \\ \hline
-% Results are from r3652
-\Kudos\ (soft updates) & 129.72 [50.88] & 44.90 [5.28] \\
-\Kudos\ (meta journal) & 210.36 [111.50] & 37.46 [5.31] \\
-\Kudos\ (full journal) & 240.28 [89.64] & 37.93 [5.38] \\
-\Kudos\ (async) & 121.74 [26.39] & 37.20 [5.30] \\ \hline
-Linux (ext2) & 64.91 [4.93] & 37.30 [4.86] \\
-Linux (ext3 ordered) & 67.12 [9.13] & 37.14 [4.89] \\
-Linux (ext3 journal) & 125.13 [11.18] & 37.83 [4.99] \\
-\end{tabular}
-\caption{PostMark and Andrew benchmark times. System CPU times are in
-square brackets.}
-\label{fig:postmark}
-\end{figure}
 
 %\Kudos's PostMark performance, compared to Linux and FreeBSD, falls
 %into the middle of \S\ref{sec:eval:untardel}'s untar and delete
@@ -239,6 +261,12 @@ correct values (an expected discrepancy after a soft updates crash).
 
 \subsection {\Patchgroups}
 
+% #reviewers who want measurements of all case studies: 1
+% #reviewers who want measurements of at least svn and imap studies: 2
+% include time
+% comment on perf and any ordering guarantee differences
+% make svn client fsync() and compare?
+
 %\subsubsection {gzip}
 
 %\subsubsection {Subversion Case Study}
@@ -255,19 +283,25 @@ selects the source mailbox (with 100 messages, sized 2kB each),
 creates the new mailbox, copies each of the 100 messages to the new
 mailbox, marks each source message for deletion, expunges the marked
 messages, requests a check, and logs out. We compare using soft updates;
-Figure~\ref{fig:imap-compare} shows the results\footnote{TERTL readers:
-we plan to measure time for this and the other patchgroup tests and
-compare against Linux ext2 and ext3.}
+Figure~\ref{fig:imap-compare} shows the results.
 
 \begin{figure}[t]
 \centering{
-\begin{tabular}{@{}lr@{}}
-System & \# writes (blocks) \\ \hline
-\Kudos\ (with \patchgroups) & 919 \\
-\Kudos\ (w/o \patchgroups) & 1537 \\
-FreeBSD 5.4 & 2200 \\
+\begin{tabular}{@{}l|rrr|r@{}}
+System & Real & Sys & IO & Writes \\ \hline
+\Kudos\ (soft updates) & 25.5 & 1.2 & 25.6 & 3015 \\
+\Kudos\ (meta journal) & 1.5 & 0.5 & 0.3 & 32 \\
+\Kudos\ (full journal) & 1.5 & 0.5 & 0.3 & 33 \\
+\Kudos\ (async) & 1.2 & 0.4 & 0.1 & 18 \\ \hline
+\Kudos\ (w/o \patchgroups) & ? & ? & ? & ? \\ \hline
+Linux (ext2) & 1.5 & 0.3 & 0.5 & 2503 \\
+Linux (ext3 ordered) & 2.0 & 0.3 & 0.9 & 3025 \\
+Linux (ext3 journal) & 1.8 & 0.3 & 0.7 & 2531 \\ \hline
+Linux (ext2) & 16.7 & 0.3 & 15.7 & 2503 \\
+Linux (ext3 ordered) & 23.9 & 0.3 & 22.9 & 3025 \\
+Linux (ext3 journal) & 20.4 & 0.3 & 19.4 & 2531
 \end{tabular}
 }
-\caption{\label{fig:imap-compare} Number of block writes to move 100
-  IMAP messages.}
+\caption{\label{fig:imap-compare} IMAP benchmark: move 1000 messages
+  to a second folder.}
 \end{figure}
