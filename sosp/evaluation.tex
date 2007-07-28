@@ -124,63 +124,27 @@ the changes to disk.
 
 \begin{figure*}[t]
 \centering{
-\begin{tabular}{@{}l|rr|rr|rr|rr@{}}
-System & \multicolumn{2}{c|}{Untar} & \multicolumn{2}{c|}{Delete} & \multicolumn{2}{c|}{PostMark} & \multicolumn{2}{c}{Andrew} \\
-& \multicolumn{1}{c}{Real} & \multicolumn{1}{c|}{Sys}
-& \multicolumn{1}{c}{Real} & \multicolumn{1}{c|}{Sys}
-& \multicolumn{1}{c}{Real} & \multicolumn{1}{c|}{Sys}
-& \multicolumn{1}{c}{Real} & \multicolumn{1}{c}{Sys} \\ \hline
+\begin{tabular}{@{}lrrrr@{}}
+System & \multicolumn{1}{c}{Untar} & \multicolumn{1}{c}{Delete} & \multicolumn{1}{c}{PostMark} & \multicolumn{1}{c}{Andrew} \\ \hline
 
 % Results are from r3652 (except for all IO times and postmark which are r3818)
 
-\Kudos\ (soft updates)
-& 5.90 & 2.56
-& 1.03 & 0.32
-& 2.54 & 0.59
-& 44.90 & 5.28 \\
-
-\Kudos\ (meta journal)
-& 8.70 & 4.84
-& 1.65 & 0.75
-& 3.48 & 1.65
-& 37.46 & 5.31 \\
-
-\Kudos\ (full journal)
-& 13.40 & 5.46
-& 1.63 & 0.77
-& 5.26 & 1.74
-& 37.93 & 5.38 \\
-
-\Kudos\ (async)
-& 4.38 & 1.84
-& 0.80 & 0.29
-& 1.46 & 0.48
-& 37.20 & 5.30 \\ \hline
+\Kudos\ (soft updates) & 5.90 [2.56] & 1.03 [0.32] & 2.54 [0.59] & 44.90 [5.28] \\
+\Kudos\ (meta journal) & 8.70 [4.84] & 1.65 [0.75] & 3.48 [1.65] & 37.46 [5.31] \\
+\Kudos\ (full journal) & 13.40 [5.46] & 1.63 [0.77] & 5.26 [1.74] & 37.93 [5.38] \\
+\Kudos\ (async) & 4.38 [1.84] & 0.80 [0.29] & 1.46 [0.48] & 37.20 [5.30] \\ \hline
 
 %FreeBSD (soft updates) & 23.22 & 15.95 \\ 
 %FreeBSD (async) & 10.09 & 3.25 \\ \hline
 
-Linux (ext2)
-& 4.50 & 0.72
-& 4.57 & 0.16
-& 0.22 & 0.14
-& 37.30 & 4.86 \\
+Linux (ext2) & 4.50 [0.72] & 4.57 [0.16] & 0.22 [0.14] & 37.30 [4.86] \\
+Linux (ext3 ordered) & 13.86 [1.01] & 4.29 [0.25] & 0.32 [0.23] & 37.14 [4.89] \\
 
-Linux (ext3 ordered)
-& 13.86 & 1.01
-& 4.29 & 0.25
-& 0.32 & 0.23
-& 37.14 & 4.89 \\
-
-Linux (ext3 journal)
-& 10.89 & 1.12
-& 4.32 & 0.26
-& 2.66 & 0.31
-& 37.83 & 4.99 \\
+Linux (ext3 journal) & 10.89 [1.12] & 4.32 [0.26] & 2.66 [0.31] & 37.83 [4.99] \\
 \end{tabular}
 }
 \caption{\label{fig:bench_time} Untar, delete, PostMark, and Andrew
-  benchmark times.}
+  benchmark times. System CPU times are in square brackets.}
 \end{figure*}
 
 At the untar test, the \Kudos\ async mode is faster than Linux ext2, which
