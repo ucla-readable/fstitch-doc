@@ -36,8 +36,8 @@ For each block $b$, \Kudos\ maintains a list of all \patches\ with
 $\PBlock{p} = b$.
 %
 However, the implementation does not keep track of on-disk \patches; when
-\patch\ $p$ commits, \Kudos\ destroys $p$ and removes all dependencies $q
-\PDDepend p$.
+\patch\ $p$ commits, \Kudos\ destroys $p$'s data structure and removes all
+dependencies $q \PDDepend p$.
 %
 The resulting behavior follows our model.
 %
@@ -81,6 +81,8 @@ On the one hand, \noop\ \patches\ can represent quadratic sets of dependencies
  %% add $mn$ direct dependencies $p_i \PDDepend q_j$ or
  add an \noop\ \patch\ $x$ and $m+n$ direct dependencies
  $p_i \PDDepend x \PDDepend q_j$.
+%
+(This is useful for \patchgroups, described in \S\ref{sec:patchgroup}.)
 %
 On the other hand, some functions may have to traverse trees of \noop\
  \patches\ to determine true dependencies.

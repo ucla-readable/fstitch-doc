@@ -46,7 +46,7 @@ Each \patch\ $p$ encapsulates four important pieces of information: its
  \patches, since a \patch\ by definition can touch only one block.
 
 Each \patch\ is in one of three \textbf{states}: \emph{in memory}; \emph{in
- flight} to the disk controller, but not yet committed to disk; and
+ flight} to the disk controller, but not yet committed to disk; or
  \emph{on disk}.  The intermediate in-flight state is necessary because
  operating system software loses control of a \patch\ upon writing its block
  to disk.  $p$'s state is written $\PState{p} \in \{\PMemst, \PInfst,
@@ -66,10 +66,7 @@ The sets \PMem, \PInf, and \PDisk\ are defined to contain all \patches\ with
  other \patches\ on which $p$ ``depends''.
 %
 That is, every \patch\ in $\PDDepset{p}$ should be committed to disk either
- before, or at the same time as, $p$ itself.
-%
-(Note that \patches\ $p$ and $q$ can only be committed at the same time if
- they are on the same block.)
+ before, or atomically with $p$ (i.e. $p$ and $q$ are on the same block).
 %
 Dependencies are set by the file system based on the consistency
  semantics it wants to ensure.
@@ -100,7 +97,8 @@ We say $p$ \emph{depends on} $q$, and write $p \PDepend q$, when there
  p \PDepend q \}$; this is of course a superset of its direct dependencies.
 %
 Given a \emph{set} of \patches\ $P$, we write $\PDepset{P}$ to mean the set's
- combined dependencies $\bigcup_{p\in P} \PDepset{p}$.
+ combined dependencies $\bigcup_{p\in P} \PDepset{p}$. Our \patch\ notation
+ is summarized in Figure~\ref{fig:patchnot}.
 
 \textbf{Example.}
 %
@@ -153,9 +151,6 @@ allowed, write the block again, this time including the \patch.
 %
 Rollback information adds greatly to memory and CPU utilization, but it can
 often be optimized away, as we show below.
-
-%
-Our \patch\ notation is summarized in Figure~\ref{fig:patchnot}.
 
 \begin{figure}[t]
 \begin{small}
@@ -284,8 +279,8 @@ The \Kudos\ core makes no assumptions about block atomicity, instead relying
  for the given disk.
 
 
-The buffer cache can't handle cross-block dependency cycles since it must
-write data in units of blocks.
+The buffer cache can't handle cross-block \patch\ dependency cycles since
+it must write data in units of blocks.
 %
 Thus, if $p \PDepend q \PDepend p$, then $p$ and $q$ must be on the same
 block; otherwise, neither $p$ nor $q$ could ever get written.
@@ -352,7 +347,7 @@ previous one.
 
 A total of eight blocks are written during the operation.
 %
-\Kudos, however, represents the operation with 23 \patches\ and roughly 33000
+\Kudos, however, represents the operation with 23 \patches\ and roughly 33,000
 (!) bytes of rollback data.
 %
 The \patches\ slow down the buffer cache system by making graph traversals
@@ -365,7 +360,7 @@ need to be rolled back!
 
 
 This section shows how the actual \Kudos\ system uses generic \patch\
-properties and dependency analysis to reduce the 23 \patches\ and 33000 bytes
+properties and dependency analysis to reduce the 23 \patches\ and 33,000 bytes
 of rollback data in Figure~\ref{fig:opt}a to the 8 \patches\ and 0 bytes of
 rollback data in Figure~\ref{fig:opt}d.
 %

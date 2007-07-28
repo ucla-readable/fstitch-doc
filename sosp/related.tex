@@ -59,8 +59,8 @@ consistency protocol can cause unpredictable failures, yet enforcing
 unnecessary consistency protocols can be extremely expensive.
 %
 However, this is also true with a local file system, and as a result
-applications must use expensive interfaces like \texttt{fsync()} when they
-require specific consistency guarantees.
+applications currently use expensive interfaces like \texttt{fsync()} when
+they require specific consistency guarantees.
 %
 \Kudos\ brings this sort of customizable consistency to all applications, not
 just those using specialized distributed file systems.
@@ -78,9 +78,8 @@ checking which is required of arbitrary user-submitted requests.
 Additionally, Burnett's system is evaluated using trace-driven simulations
 rather than an implementation. We have found that some aspects of real disks
 have significant impacts which his simulator may not have taken into account;
-for instance, the number of I/O requests to the disk, rather than the number of
-blocks read or written by each request, is generally the bottleneck in our
-tests.
+for instance, we have found that the number of I/O requests to the disk, rather
+than the number of blocks read or written by each request, can be a bottleneck.
 
 % "allow the kernel to safely and efficiently handle any metadata layout without understanding the layout itself"
 % \cite{kaashoek97application}
@@ -120,10 +119,11 @@ of these ideas.
 %% low-level disk structures. The \Kudos\ \module\ interface should allow such an
 %% extension to be written in a portable way, giving it the same benefit.
 
-\paragraph{} \Kudos\ adds to this body of work by generalizing the ``write
-before'' relationship that is already present in many storage systems, and
-making it a pervasive primitive throughout the storage system. This allows
-many different consistency models to be created and combined in file system
-independent ways, and it provides a means for file system extensions to deal
-directly with consistency. It also allows the extension of this concept into
-userspace, so that even user applications can easily use this functionality.
+\paragraph{} \Kudos\ adds to this body of work by generalizing and making
+explicit the ``write before'' relationship that is already present in many
+storage systems, and making it a pervasive primitive throughout the storage
+system. This allows many different consistency models to be created and
+combined in file system independent ways, and it provides a means for file
+system extensions to deal directly with consistency. It also allows the
+extension of this concept into userspace, so that even user applications
+can easily use this functionality.
