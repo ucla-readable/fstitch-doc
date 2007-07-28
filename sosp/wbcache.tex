@@ -37,9 +37,9 @@ in-flight safety property: a block will not be written if none of its
 \patches\ are ready to write.
 %
 Once the write-back cache finds a block with ready \patches, all other
-\patches\ on that block are rolled back, the resulting block data is copied
+\patches\ on that block are reverted, the resulting block data is copied
 and sent to the disk driver, the ready \patches\ are marked in-flight, and
-the rolled-back \patches\ are rolled forward again.
+the reverted \patches\ are re-applied.
 %
 The block itself is also marked in-flight, ensuring that the cache will not
 try to write it again until the current version commits.
@@ -63,7 +63,7 @@ requests are merged and reordered in Linux's elevator scheduler.
 %
 Nevertheless, there may still be important opportunities for further
 optimization: for example, since the cache will write a block even if only
-one of its \patches\ is ready, it can choose to roll back \patches\
+one of its \patches\ is ready, it can choose to revert \patches\
 unnecessarily when a different order would have required fewer writes.
 
 
@@ -75,7 +75,7 @@ write-back cache may choose to write some \patches\ on a block while reverting
 others, since those others currently have outstanding dependencies. In this
 case, \modules\ below the write-back cache (i.e. closer to the disk) should view
 those \patches\ in the reverted state. \Kudos\ provides a block revisioning
-library function that automatically rolls back those \patches\ that should not
-be visible at a particular \module, and then rolls them forward again after that
+library function that automatically reverts those \patches\ that should not
+be visible at a particular \module, and then re-applies them after that
 \module\ is done with the block.
 \end{comment}

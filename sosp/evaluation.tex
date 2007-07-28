@@ -25,11 +25,11 @@ tree, after unmounting and remounting the file system.
 
 \Kudos\ benefits greatly from the optimizations discussed in
 Section~\ref{sec:patch:optimizations}. The total number of \patches\ created,
-amount of rollback data allocated, and system CPU time used are shown for the
+amount of undo data allocated, and system CPU time used are shown for the
 untar and rm tests in Figure~\ref{f:optdata}, with all combinations of using
 \nrb\ \patches\ and overlap merging. While both optimizations work well by
 themselves, the combination of the two is particularly effective at reducing the
-amount of rollback data.
+amount of undo data.
 %
 The system time column shows time spent executing code in kernel space
 during the untar or remove; this is mostly \Kudos\ overhead.  Linux's
@@ -45,7 +45,7 @@ opportunities we hope to address in future work.
 %& \multicolumn{3}{c}{\textbf{Untar}} &
 %\multicolumn{3}{c@{}}{\textbf{Delete}} \\
 \textbf{Optimization}
-        & \textbf{\# \patches} & \textbf{Rollback data} & \textbf{System time} \\
+        & \textbf{\# \patches} & \textbf{Undo data} & \textbf{System time} \\
 \hline
 \multicolumn{4}{@{}c@{}}{\textbf{Untar test}\raise2pt\hbox{\strut}} \\
 None
@@ -69,7 +69,7 @@ Both optimizations
 \end{tabular}
 \caption{Effectiveness of \Kudos\ optimizations.  The combination of \nrb\
 \patches\ and overlap merging removes 87\% to 99\% of the \patches\ and
-99.93\% to 100\% of the rollback data required to untar Linux.}
+99.93\% to 100\% of the undo data required to untar Linux.}
 \label{f:optdata}
 \end{figure}
 

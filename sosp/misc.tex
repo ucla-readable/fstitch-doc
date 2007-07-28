@@ -43,7 +43,7 @@ the superblock.
 The best results can be obtained from \emph{minimal} \patches\ that change
 one independent field at a time; \Kudos\ will merge these \patches\ when
 appropriate, but if they cannot be merged, minimal \patches\ will lead to
-fewer rollbacks and more flexibility in write ordering.
+fewer \patch\ revert operations and more flexibility in write ordering.
 
 
 %% the changes to update a field in an inode structure
@@ -82,8 +82,8 @@ process all the \patches\ in the list in some order determined by the dependency
 graph. It is generally the case that the \patches\ satisfying the property or
 the order in which the \patches\ should be processed can be determined very
 quickly by keeping the lists sorted. For instance, the library function which
-rolls \patches\ back needs to perform the rollbacks essentially in inverse
-creation order, so that rolling back a \patch\ which has since been overwritten
+reverts \patches\ needs to perform the revert operations essentially in inverse
+creation order, so that reverting a \patch\ which has since been overwritten
 by a later \patch\ does the right thing. Keeping the list of all \patches\ on a
 block sorted in creation order (which is very easy) makes this an efficient
 operation, while it might otherwise take $O(n^2)$ time to execute. Similarly,

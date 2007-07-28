@@ -45,21 +45,21 @@ previous one.
 A total of eight blocks are written during the operation.
 %
 \Kudos, however, represents the operation with 23 \patches\ and roughly 33,000
-(!) bytes of rollback data.
+(!) bytes of undo data.
 %
 The \patches\ slow down the buffer cache system by making graph traversals
 more expensive.
 %
-The 4096 bytes of rollback data per \patch\ stored for ``clear data'' and
+The 4096 bytes of undo data per \patch\ stored for ``clear data'' and
 ``write data'' \patches, which initialize and write data blocks, is
 particularly painful since in this example, data blocks \emph{never}
-need to be rolled back!
+need to be reverted!
 
 
 This section shows how the actual \Kudos\ system uses generic \patch\
 properties and dependency analysis to reduce the 23 \patches\ and 33,000 bytes
-of rollback data in Figure~\ref{fig:opt}a to the 8 \patches\ and 0 bytes of
-rollback data in Figure~\ref{fig:opt}d.
+of undo data in Figure~\ref{fig:opt}a to the 8 \patches\ and 0 bytes of
+undo data in Figure~\ref{fig:opt}d.
 %
 These optimizations apply transparently to any \Kudos\ file system.
 
@@ -90,7 +90,7 @@ disk's commit rate, by minimizing seeks and so forth.
 A naive implementation might calculate, for each in-memory block $b$, the
 largest set of \patches\ $P_b \subseteq \PMem[b]$ with $\PDepset{P_b}
 \subseteq P_b \cup \PDisk$, then evict some block close to previously
-written blocks and with few rolled-back \patches\ (where $\PMem[b] - P_b$
+written blocks and with few reverted \patches\ (where $\PMem[b] - P_b$
 is small).
 %
 This, however, would be extraordinarily expensive.
@@ -102,14 +102,14 @@ Doing so for each block, once per eviction, would take huge amounts of CPU
 time.
 
 
-\textbf{Rollback memory usage.}
+\textbf{Undo memory usage.}
 %
-Only a small fraction of \patches\ will ever need to be rolled back.
+Only a small fraction of \patches\ will ever need to be reverted.
 %
-For example, most data writes never need to be rolled back in any file
+For example, most data writes never need to be reverted in any file
 system.
 %
-If a \patch\ won't be rolled back under any circumstances, the memory and
+If a \patch\ won't be reverted under any circumstances, the memory and
 CPU time spent to preserve the old version is wasted.
 
 

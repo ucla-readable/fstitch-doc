@@ -3,23 +3,22 @@
 \subsection{\Nrb\ \Patches}
 \label{sec:patch:nrb}
 
-The first optimization reduces the space overhead of rollback data by
+The first optimization reduces the space overhead of undo data by
 detecting when it will never be necessary.
 %
 When a \patch\ $p$ is created, \Kudos\ conservatively detects whether $p$
-will ever need to be rolled back.
+will ever need to be reverted.
 %
 If not, $p$ is a \emph{\nrb\ \patch}: its data can be applied
-directly to the in-memory copy of the block without saving rollback data
+directly to the in-memory copy of the block without saving undo data
 for the previous version.
 
 
-Only \patches\ in a block-level dependency cycle might need to be rolled
-back.
+Only \patches\ in a block-level dependency cycle might need to be reverted.
 %
 However, some of the \patches\ in a cycle may be \nrb; only the crucial
 \patch\ that creates the cycle must be \rb, for that is the \patch\ that
-must be rolled back to create a valid write order.
+must be reverted to create a valid write order.
 %
 Thus, \patch\ $p$ may be \nrb\ if it will \emph{never} be the head of a
 block-level cycle: that is, if there will never exist true \patches\ $q$
@@ -108,17 +107,17 @@ If no such $P$ exists, then the cache must write a different block.
 Applying \nrb\ \patch\ rules to our example makes 14 of the 23 \patches\ \nrb\
 (Figure~\ref{fig:opt}b),
 %
-reducing the rollback data required by slightly more than half.
+reducing the undo data required by slightly more than half.
 
 
 \begin{comment}
 %
 To avoid this overhead, \Kudos\ identifies \patches\ that will never
-need to be rolled back and omits their previous data copies. We call
-these \emph{\nrb} \patches. (The opposite naturally being a \emph{\rb}
-\patch, when necessary to differentiate them.)
+need to be reverted and omits their undo data. We call these \emph{\nrb}
+\patches. (The opposite naturally being a \emph{\rb} \patch, when
+necessary to differentiate them.)
 %
-Since a \nrb\ \patch\ cannot be rolled back, a write of any \patches\
+Since a \nrb\ \patch\ cannot be reverted, a write of any \patches\
 on block $B$ must include all \nrb\ \patches\ on $B$. To accordingly
 update our formal model we define a new set of \patches, \PHard, which
 contains all \nrb\ \patches. We write \PHard[B] to restrict the set
@@ -136,12 +135,12 @@ to block $B$\todo{Introduce \PSoft\ and \PSoft[B].}:
 
 \paragraph{}
 To avoid (expensive) dependency traversals to determine whether a new
-\patch\ will need to be rolled back,
+\patch\ will need to be reverted,
 %
 \Kudos\ conservatively identifies \nrb\ \patches\ using only local
 dependency information.
 %
-\Kudos\ detects that a new \patch\ on block $b$ may need to be rolled back if:
+\Kudos\ detects that a new \patch\ on block $b$ may need to be reverted if:
 \todo{Which form is easier to read? Can we write \(\PMem - \PMem[b] - \PEmpty\) more concisely?}
 %
 \todo{Actually, our implementation also uses in flight \patches. Can we make
@@ -160,9 +159,9 @@ the presence of an external \after\ is a necessary condition for a new
 and many blocks have no \patches\ with external \afters\ (e.g. most
 file data blocks).
 
-While this algorithm detects whether a \patch\ may need to be rolled
-back, \Kudos\ must also be sure that no future dependency manipulation
-will cause the \patch\ to require a rollback.
+While this algorithm detects whether a \patch\ may need to be reverted,
+\Kudos\ must also be sure that no future dependency manipulation
+will cause the \patch\ to require being reverted.
 %
 We introduce Invariant~\ref{cdinvar:add-before} to support such reasoning:
 %

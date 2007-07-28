@@ -37,7 +37,7 @@ disk controller'' throughout to simplify our terminology.
 
 Each \patch\ $p$ encapsulates four important pieces of information: its
  \emph{block}, its \emph{state}, a set of \emph{direct dependencies}, and
- some \emph{rollback data}.
+ some \emph{undo data}.
 
 \Patch\ $p$'s \textbf{block}, written $\PBlock{p}$, is the unit of disk data
  to which $p$ applies.  The disk controller is assumed to execute writes one
@@ -115,7 +115,7 @@ to disk until all the journal data is present there, and that the updates to the
 file system itself are not written until the commit record is present on disk.
 
 
-\textbf{Rollback data.}
+\textbf{Undo data.}
 %
 When a \patch\ is created, the buffer cache's copy of the block data
 is modified in-place to reflect the specified change. However,
@@ -139,17 +139,17 @@ other block.
 This is problematic since blocks with circular dependencies can never be
 written: no block can be written first since each block depends on another.
 
-For this reason, each \patch\ carries \emph{rollback} information that gives
+For this reason, each \patch\ carries \emph{undo} information that gives
 the previous version of the range of block data altered by the \patch.
 %
-If a \patch\ $p$ is not written with its containing block, the system rolls
-back the \patch, which swaps the new data and the previous version on
-the (single) copy of the block in the buffer cache.
+If a \patch\ $p$ is not written with its containing block, the system reverts
+the \patch, which swaps the new data and the previous version on the (single)
+copy of the block in the buffer cache.
 %
-Once the block is written, the system will roll the \patch\ forward and, when
+Once the block is written, the system will re-apply the \patch\ and, when
 allowed, write the block again, this time including the \patch.
 %
-Rollback information adds greatly to memory and CPU utilization, but it can
+Undo information adds greatly to memory and CPU utilization, but it can
 often be optimized away, as we show below.
 
 \begin{figure}[t]

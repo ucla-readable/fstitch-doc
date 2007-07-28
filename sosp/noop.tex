@@ -14,8 +14,8 @@ direct dependencies ($\PDDepset{p}$), and the new data represented by the
 Most \patches\ specify the new data as a contiguous byte range, including an
 offset into the block and the \patch\ length in bytes.
 %
-The rollback data for very small \patches\ (4 bytes or less) is stored in the
-\patch\ structure itself; for larger \patches, rollback data is stored in
+The undo data for very small \patches\ (4 bytes or less) is stored in the
+\patch\ structure itself; for larger \patches, undo data is stored in
 separately allocated memory.
 %
 As a useful special case, \patches\ that flip one or more bits in a word (for
