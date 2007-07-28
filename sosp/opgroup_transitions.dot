@@ -1,0 +1,15 @@
+digraph pgtransitions
+{
+	rankdir=LR
+	"start" [label="",peripheries=2]
+	"b" [label="engaged"]
+	"c" [label=""]
+	"d" [label=""]
+	"start" -> "start" [label="gain before"]
+	"start" -> "d"
+	"start" -> "b" [label="engage"]
+	"b" -> "c" [label="disengage"]
+	"c" -> "b" [label="engage"]
+	"c" -> "d"
+	"d" -> "d" [label="gain after"]
+}

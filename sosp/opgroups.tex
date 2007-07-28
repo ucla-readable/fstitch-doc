@@ -19,14 +19,16 @@ a specified order.
 %
 Existing systems can ensure such orders in two ways:
 %
-applications may tell the file system \emph{how} to implement the ordering
-by requiring that all changes on a particular file (or the whole disk) be
-committed with \texttt{(f)sync}, or applications can simply require
-particular file system implementation semantics, such as journaling.
+applications can tell the file system \emph{how} to implement the
+ordering by requiring immediate syncs
+(e.g. \texttt{sync}, \texttt{fsync}, or \texttt{sync\_file\_range}),
+%
+or applications can require particular file system implementation
+semantics (e.g. journaling).
 %
 %
 The \patch\ abstraction, in contrast, can let a process specify
-\emph{what} ordering is required and leave the file system to implement
+\emph{what} ordering is required and leave the storage system to implement
 that ordering in the most appropriate way.
 
 
@@ -51,6 +53,7 @@ and apply it to three robust applications.
 \subsection{Interface and Implementation}
 \label{sec:patchgroup:interface}
 
+\todo{Mention threads?}
 \Patchgroups\ encapsulate sets of file system operations into units among
 which dependencies can be applied.
 %
@@ -61,45 +64,61 @@ The \patchgroup\ interface is as follows:
 \begin{scriptsize}
 \begin{alltt}
   typedef int pg_t;          pg_t \textbf{pg_create}(void);
-  int \textbf{pg_depend}(pg_t pg1, pg_t pg2);
-  int \textbf{pg_engage}(pg_t pg);    int \textbf{pg_disengage}(pg_t pg);
-  int \textbf{pg_sync}(pg_t pg);      int \textbf{pg_close}(pg_t pg);
+  int \textbf{pg_depend}(pg_t after, pg_t before);
+  int \textbf{pg_engage}(pg_t pg);    int  \textbf{pg_disengage}(pg_t pg);
+  int \textbf{pg_sync}(pg_t pg);      int  \textbf{pg_close}(pg_t pg);
 \end{alltt}
 \end{scriptsize}
 
 Each process has its own set of \patchgroups.
 %
-The call \texttt{\pgDepend(p, q)} makes \patchgroup\ \texttt{p} depend on
-\patchgroup\ \texttt{q}: every change associated with \texttt{p} will be
-delayed until all changes associated with \texttt{q} have committed.
+The call \texttt{\pgDepend(q, p)} makes \patchgroup\ \texttt{q} depend on
+\patchgroup\ \texttt{p}: all \patches\ associated with \texttt{p} will
+be committed prior to those associated with \texttt{q}.
 %
-\Patchgroups\ can be \emph{engaged} or \emph{disengaged}; all changes made by
-a process are associated with that process's engaged \patchgroups\ and inherit
-the appropriate dependencies, but are otherwise just like other changes --
-they can be written as soon as their dependencies have been written.
+The \patches\ associated with a \patchgroup\ are those created while
+the \patchgroup\ is engaged.
 %
-\pgSync\ forces an immediate write of a \patchgroup\ to disk, and \pgClose\
-disassociates a \patchgroup\ ID from the underlying \patches\ implementing it
-(but otherwise does not affect those \patches).
+\pgSync\ forces an immediate write of a \patchgroup\ to disk.
+%
+\pgCreate\ creates a new \patchgroup\ and returns its ID
+%
+and \pgClose\ disassociates a \patchgroup\ ID from the underlying
+\patches\ which implement it.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.7\hsize]{opgroup_transitions}
+\caption{\label{fig:patchgroup-transitions} Valid \patchgroup\
+  dependency operation state machine.}
+\end{figure}
 %
 Whereas \Kudos\ \modules\ are presumed to not create cyclic
 dependencies, the kernel cannot safely trust user applications to be
 so well behaved, so
 %
 the \patchgroup\ API restricts dependency manipulation so that cycles are
-inconstructible. For example, \texttt{\pgDepend(p, q)} returns an error if
-\texttt{p} has \emph{ever} been engaged; if it succeeds, a subsequent
-\texttt{\pgEngage(q)} will return an error.\footnote{These rules are really
+inconstructible.
+%
+Figure~\ref{fig:patchgroup-transitions} shows when a given
+\patchgroup\ dependency operation is valid.
+%
+For example, \texttt{\pgDepend(q, p)} returns an error if
+\texttt{q} has \emph{ever} been engaged; if it succeeds, a subsequent
+\texttt{\pgEngage(p)} will return an error.\footnote{These rules are really
 just a strictly enforced version of the requirement from \S~\ref{sec:patch:nrb}
 that all dependencies must be specified up-front.}
+%
+\todo{Explicitly mention that patchgroups allow specification of precisely
+happens-before? They cannot be used to ``hold patches'' in ram.}
 
-\Patchgroups\ and file descriptors are managed similarly; e.g. they are copied
+\Patchgroups\ and file descriptors are managed similarly---they are copied
 across \texttt{fork()}, preserved across \texttt{exec()}, and closed on
 \texttt{exit()}.
 %
-This allows existing programs to interact with \patchgroups\ without
-knowing it, in the same way that programs do not have to know about
-pipes for the shell to connect them in a pipeline.
+This allows existing, unaware programs to interact with \patchgroups\,
+in the same way that programs do not have to know about pipes for the
+shell to connect them in a pipeline.
 %
 For example, a \texttt{depend} program could apply \patchgroups\ to
 unmodified applications by setting up the \patchgroups\ before calling
@@ -120,11 +139,12 @@ to disk:
 \Patchgroup\ support is implemented by an \LFS\ module that lives above a file
 system module like ext2.
 %
-Each \patchgroup\ corresponds to a pair of \noop\ \patches, and inter-\patchgroup\
-dependencies affect these \patches.
+Each \patchgroup\ corresponds to a pair of containing \noop\ \patches,
+and inter-\patchgroup\ dependencies to dependencies inbetween these \noop\
+\patches.
 %
-When a \patchgroup\ is engaged, the \LFS\ module ensures that all file system
-changes are inserted between these \patches.
+The \LFS\ module ensures that all file system changes are inserted
+between engaged \patchgroups's \noop\ \patches.
 %
 Figure~\ref{fig:patchgroup-patches} shows an example \patch\ arrangement for
 two \patchgroups.
@@ -152,6 +172,8 @@ We tested the \patchgroup\ interface by adding \patchgroup\ support to three
 applications: the gzip compression utility, the Subversion version control
 system, and the uw-imapd IMAP mail server daemon.
 
+% discussion potential gains (in addition to actual gains)?
+
 \paragraph{Gzip}
 \label{sec:patchgroup:gzip}
 
@@ -160,8 +182,14 @@ add.  We updated gzip to use \patchgroups\ that ensure the input file's
 removal is not committed before the output file's data is written, so that
 a crash does not lose both files. The update adds 10 lines of code to gzip.
 
+% TODO: note fsync's deficiencies: rm of .gz makes write of .gz unnecessary,
+% later changes to .gz rewrite the changed blocks, gzip completion takes
+% longer. The normal reasons to delay writing a block.
+
 \paragraph{Subversion}
 \label{sec:patchgroup:svn}
+
+% describe why pgs are easier/better than journaling
 
 The Subversion version control system's client~\cite{svn} manipulates a
 local \emph{working copy} of a possibly-remote source repository.
@@ -246,7 +274,7 @@ updates, the actual order requirements are considerably less strict.
 For example, the updated file copies used by the journal may be
 committed independently of each other.
 %
-A second example, most journal playback operations may commit
+Furthermore, most journal playback operations may commit
 independently of each other; only interacting operations, such as a
 file read and subsequent rename, need ordering.
 
