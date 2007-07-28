@@ -1,6 +1,7 @@
 \documentclass[9pt,twocolumn,letterpaper]{article}
-\usepackage[nocopyright,9pt,sospmargins]{sigmin}
-\usepackage{amsmath,amssymb,alltt,comment,times,mathptmx,verbatim}
+\usepackage[9pt,sospmargins]{sigmin}
+\usepackage{amsmath,amssymb,alltt,comment,verbatim}
+\usepackage{times,mathptmx}
 \usepackage[square,comma,numbers,sort&compress]{natbib}
 \usepackage{multirow}
 \usepackage{amsthm}
@@ -105,11 +106,12 @@
 \newcommand{\todo}[1]{\footnote{\textbf{TODO}: #1}}
 
 \def\assast{\raise.2ex\hbox{$^\ast$}}
+\def\asscontact{\raise.2ex\hbox{$^\star$}}
 
 \title{\sffamily\textbf{Generalized File System Dependencies}}
 \author{\sffamily
-	Christopher Frost\assast
-	\qquad Mike Mammarella\assast
+	Christopher Frost\assast\asscontact
+	\qquad Mike Mammarella\assast\asscontact
 	\qquad Eddie Kohler\assast \\
 	\sffamily Andrew de los Reyes$^\dag$
 	\quad Shant Hovsepian\assast
@@ -117,18 +119,21 @@
 	\quad Lei Zhang$^\dag$ \\
 	\sffamily \fontsize{10pt}{10pt}\selectfont
 	\assast UCLA
-	\qquad $^\dag$ UCLA/Google
-	\qquad $^\ddag$ UCLA/UT Austin \\
+	\qquad $^\dag$Google
+	\qquad $^\ddag$UT Austin \\
 	\url{http://kudos.cs.ucla.edu/} \\
 }
 \date{}
 
-\begin{document}
+\conferenceinfo{SOSP'07,}{October 14--17, 2007, Stevenson, Washington, USA.} 
+\CopyrightYear{2007}
+\crdata{978-1-59593-591-5/07/0010} 
+\toappear{$^\star$Contact authors.\\
+This work was completed while all authors were at UCLA.
 
-\normalsize
-%\conferenceinfo{SOSP'07,} {October 14--17, 2007, Stevenson, Washington, USA.} 
-%\CopyrightYear{2007}
-%\crdata{978-1-59593-591-5/07/0010} 
+\defaulttoappear}
+
+\begin{document}
 
 \maketitle
 

@@ -17,8 +17,10 @@
 \if@sigmin@ninept \if@sigmin@tenpt \SizeError    \fi\fi
 \if@sigmin@ninept \if@sigmin@elevenpt \SizeError \fi\fi
 \if@sigmin@tenpt  \if@sigmin@elevenpt \SizeError \fi\fi
-\if@sigmin@ninept\else\if@sigmin@tenpt\else\if@sigmin@elevenpt\else
-\SizeError \fi\fi\fi
+\if@sigmin@ninept\else
+  \if@sigmin@tenpt\else
+    \if@sigmin@elevenpt\else
+      \SizeError \fi\fi\fi
 }%
 
 \if@sigmin@sospmar
@@ -206,7 +208,7 @@
 
 \def\category#1#2#3{%
 \ifnum\catcount=1
-\paragraph*{Categories and Subject Descriptors:}
+\paragraph*{Categories and Subject Descriptors:\\}
 \advance\catcount by 1\else{\unskip; }\fi
     \@ifnextchar [{\@category{#1}{#2}{#3}}{\@category{#1}{#2}{#3}[]}%
 }
@@ -250,12 +252,12 @@
 % forward 8pt.
 %\vskip-\textfloatsep\vskip8pt%
 %\rule[5pt]{\hsize}{.4pt}\par%
-\vskip10pt
+\vskip8pt
 \noindent\crnotice{\@toappear}%
 \end@float}
 
 \def\@toappear{} % Default setting blank - commands below change this.
-\long\def\toappear#1{\def\@toappear{\parbox[b]{\hsize}{#1}}}
+\long\def\toappear#1{\def\@toappear{\parbox[b]{\hsize}{\parskip2pt\relax#1}}}
 %\long\def\toappear#1{\def\@toappear{\parbox[b]{20pc}{\baselineskip 9pt#1}}}
 \def\toappearbox#1{\def\@toappear{\raisebox{5pt}{\framebox[20pc]{\parbox[b]{19pc}{#1}}}}}
 
@@ -284,8 +286,9 @@ redistribute to lists, requires prior specific permission and/or a fee.}
 \newtoks\copyrightetc 
 \global\copyrightetc{Copyright \the\copyrtyr\ ACM \the\acmcopyr\ \dots\$5.00}
 
-%\toappear{\the\boilerplate\par
-%{\confname{\the\conf}} \the\confinfo\par \the\copyrightetc.}
+\long\def\defaulttoappear{\the\boilerplate\par
+{\confname{\the\conf}} \the\confinfo\hfill\break \the\copyrightetc.}
+\toappear{\defaulttoappear}
 
 
 \global\def\section{\@startsection {section}{1}{\z@}%
@@ -312,10 +315,10 @@ redistribute to lists, requires prior specific permission and/or a fee.}
   \null
   \begin{center}%
   \let \footnote \thanks
-    {\fontsize{18pt}{19pt}\selectfont \@title \par}%
+    {\fontsize{18pt}{19pt}\sffamily\bfseries\selectfont \@title \par}%
     \vskip 0.9em%
     {\fontsize{11.8pt}{12pt}\selectfont
-      \lineskip .5em%
+      \lineskip .5em\sffamily%
       \begin{tabular}[t]{@{}c@{}}%
         \@author
       \end{tabular}\par}%
@@ -324,6 +327,9 @@ redistribute to lists, requires prior specific permission and/or a fee.}
   \end{center}%
   \par
   \vskip 1.9em}
+
+\def\affaddr#1{{\fontsize{10pt}{10.2pt}\selectfont#1}}
+\def\affemail#1{{\fontsize{11.8pt}{12pt}\selectfont#1}}
 
 % captions
 \makeatletter
@@ -388,5 +394,17 @@ redistribute to lists, requires prior specific permission and/or a fee.}
 \setlength{\partopsep}{0pt}%
 \setlength{\parskip}{0pt}}%
 {\end{itemize}}
+
+\def\paritemize{%
+        \setbox0\hbox{\textbullet}
+        \list{\textbullet}{%
+        \leftmargin\parindent
+        \labelwidth\parindent
+        \itemindent\z@
+        \listparindent\parindent
+        \parsep\z@
+}%
+}
+\let\endparitemize\endlist
 
 \makeatother
