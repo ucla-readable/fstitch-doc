@@ -313,8 +313,12 @@ The imapd and mbox mail storage drivers were updated to use
 without enforcing a specific order.
 %
 The original server conservatively preserved command ordering by
-syncing the mailbox file after each CHECK on it or COPY into it. With
-\patchgroups, each command's file system updates are executed under a
+syncing the mailbox file after each CHECK on it or COPY into it.
+%
+For example, Figure~\ref{fig:imap}a illustrates moving messages from
+one mailbox to another.
+%
+With \patchgroups, each command's file system updates are executed under a
 distinct \patchgroup\ and, through the \patchgroup, made to depend on the
 previous command's updates. This is necessary, for example, so that
 moving a message to another folder (accomplished by copying to the
@@ -327,6 +331,23 @@ updates. This enhancement to CHECK removes the requirement that COPY
 sync its destination mailbox: the client's CHECK request will ensure
 changes are committed to disk, and the \patchgroup\ dependencies ensure
 changes are committed in a safe ordering.
+%
+Figure~\ref{fig:imap}b illustrates using patches to move messages.
+%
+\todo{Does this figure convey what we want it to?}
+
+\begin{figure}[tb]
+\centering
+\begin{tabular}{ccc}
+\includegraphics[width=0.4\columnwidth]{imap_fsync} & &
+\includegraphics[width=0.4\columnwidth]{imap_pg}\\
+\textbf{a)} Unmodified, \texttt{fsync} & &
+\textbf{b)} \Patchgroups
+\end{tabular}
+\caption{UW IMAP server, without and with \patchgroups, moving three
+messages from mailbox.src to mailbox.dst.}
+\label{fig:imap}
+\end{figure}
 
 These changes to UW IMAP simplify it in two ways:
 %

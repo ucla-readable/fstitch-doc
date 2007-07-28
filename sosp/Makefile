@@ -23,7 +23,7 @@ TMP_PDF_IMAGES = fig/figures_1.pdf fig/figures_2.pdf fig/figures_3.pdf \
 	fig/opt_1.pdf fig/opt_2.pdf fig/opt_3.pdf fig/opt_4.pdf \
 	fig/softhard_1.pdf fig/softhard_2.pdf fig/softhard_3.pdf \
 	rb_chdesc_size.pdf nrb_merge.pdf opgroup_transitions.pdf svn_opgroups.pdf \
-	opts-patches.pdf opts-rollback.pdf
+	imap_fsync.pdf imap_pg.pdf opts-patches.pdf opts-rollback.pdf
 TMP_DVI_IMAGES = $(TMP_PDF_IMAGES:.pdf=.eps)
 
 PDF_IMAGES = $(TMP_PDF_IMAGES)
