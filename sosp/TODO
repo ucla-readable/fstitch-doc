@@ -30,6 +30,7 @@ Related work:
 Misc:
 - Look at BSD implementation of soft updates; how does it work?
 - Check that we did not forget any todos sent to kudos@ 
+- Be consistent with "Section" and "\S", "in-flight" and "in flight", etc.
 
 
 * Kudos

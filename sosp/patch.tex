@@ -66,7 +66,7 @@ The sets \PMem, \PInf, and \PDisk\ are defined to contain all \patches\ with
  other \patches\ on which $p$ ``depends''.
 %
 That is, every \patch\ in $\PDDepset{p}$ should be committed to disk either
- before, or atomically with $p$ (i.e. $p$ and $q$ are on the same block).
+ before $p$, or atomically with $p$ (i.e. $p$ and $q$ are on the same block).
 %
 Dependencies are set by the file system based on the consistency
  semantics it wants to ensure.
@@ -100,51 +100,26 @@ Given a \emph{set} of \patches\ $P$, we write $\PDepset{P}$ to mean the set's
  combined dependencies $\bigcup_{p\in P} \PDepset{p}$. Our \patch\ notation
  is summarized in Figure~\ref{fig:patchnot}.
 
-\textbf{Example.}
-%
-Patches implementing a journal transaction could be arranged as follows:
-%
-the journal commit record $c$ would have $c \PDDepend \{j_{1\dots n}\}$,
-where each $j_i$ writes an entry into the journal.
-%
-Then the file system updates described in the journal would each have
-$u_i \PDDepend c$.
-%
-This arrangement of dependencies ensures that the commit record is not written
-to disk until all the journal data is present there, and that the updates to the
-file system itself are not written until the commit record is present on disk.
-
 
 \textbf{Undo data.}
 %
 When a \patch\ is created, the buffer cache's copy of the block data
-is modified in-place to reflect the specified change. However,
+is modified in-place to reflect the change. However,
 %
 some arrangements of \patches\ may require that the buffer cache
-\emph{not} write one or more \patches\ on some block.
+%\emph{not} write one or more \patches\ on some block.
+first write a block with only some \patches\ applied, and then write a
+different block before being able to write the remaining \patches.
 %
-In particular, a series of file system operations may create dependencies
-that enforce a circular order among blocks, even though the dependencies
-themselves do not form a cycle~\cite{ganger00soft}.
-%
-For instance, a \patch\ writing the directory entry for a new file \texttt{f1}
-may depend on a \patch\ allocating an inode for it, and a \patch\ deleting the
-entry \texttt{f2} from the same directory may be depended upon by a \patch\
-freeing the inode for \texttt{f2}.
-%
-If the two inodes are stored in the same block, and the two directory entries
-are in the same block as well, each block will have a \patch\ depending on the
-other block.
-%
-This is problematic since blocks with circular dependencies can never be
-written: no block can be written first since each block depends on another.
+(An example of this is given in Section~\ref{sec:patch:examples}.)
+
 
 For this reason, each \patch\ carries \emph{undo} information that gives
 the previous version of the range of block data altered by the \patch.
 %
-If a \patch\ $p$ is not written with its containing block, the system reverts
-the \patch, which swaps the new data and the previous version on the (single)
-copy of the block in the buffer cache.
+If a \patch\ $p$ is not written with its containing block, the system
+\emph{reverts} the \patch, which swaps the new data and the previous
+version on the (single) copy of the block in the buffer cache.
 %
 Once the block is written, the system will re-apply the \patch\ and, when
 allowed, write the block again, this time including the \patch.
@@ -174,6 +149,117 @@ $\PDepset{p}$ & $p$'s dependencies: $\{ q \mid p \PDepend q \}$ \\
 
 \caption{\Patch\ notation.}
 \label{fig:patchnot}
+\end{figure}
+
+
+\subsection{Examples}
+\label{sec:patch:examples}
+
+\textbf{Journal transactions.}
+%
+In a journaling file system, changes to the file system are grouped into
+\emph{transactions} that commit atomically.
+%
+Each transaction leaves the disk in a consistent state, thus avoiding the need
+to check the file system when recovering from a failure.
+%
+All changes in a transaction are first copied into an on-disk log (called the
+\emph{journal}) before any of them are allowed to be written to the file
+system itself.
+%
+After writing the journal, a small \emph{commit record} is written atomically,
+which signals that the transaction is complete and that all its changes should
+be considered valid.
+%
+Once the commit record is written, the original changes can be written to the
+file system in any order, since if the system is interrupted it can consult
+the journal later and copy the data back out into the file system.
+%
+Finally, once all the changes have been written to the file system, the commit
+record can be erased, and that portion of the journal may be reused.
+
+Patches implementing a journal transaction could be arranged as follows:
+%
+a \patch\ $c$ writing the commit record would have $c \PDDepend \{d_{1\dots n}\}$,
+where each $d_i$ writes a copy of an updated file system block into the journal.
+%
+Then the file system updates would each have $u_i \PDDepend c$, and a \patch\ $e$
+erasing the commit record would have $e \PDDepend \{u_{1\dots m}\}$.
+%
+A journal transaction containing four disk blocks is depicted in
+Figure~\ref{fig:journal}.
+%
+Each circle represents a single \patch. The shaded boxes indicate disk blocks.
+%
+The arrows between \patches\ represent the dependency relationship \PDDepend.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\hsize]{fig/figures_2}
+  \caption{\label{fig:journal} Journal \patch\ subgraph for the
+    change in Figure~\ref{fig:softupdate}. The unlabeled circles are
+    \noop\ \patches.}
+\end{figure}
+
+This arrangement of dependencies ensures that the commit record is not written
+to disk until all the journal data is present there, that the updates to the
+file system itself are not written until the commit record is present on disk,
+and that the commit record is not erased until the entire transaction is
+complete.
+
+This example also contains an instance of a \patch\ which will need to be
+reverted: $e$, which overwrites the commit record written by $c$ (and thus
+$\PBlock{c} = \PBlock{e}$), cannot be written with $c$ since $e \PDDepend
+\{u_{1\dots m}\} \PDDepend c$.
+%
+So, we must revert $e$ and write $\PBlock{e}$ with only $c$ applied, then
+write each $u_i$, and finally write $\PBlock{e}$ again in order to write $e$.
+
+\textbf{Soft updates.}
+%
+A file system using soft updates aims to prevent most kinds of inconsistencies
+from ever being present on the disk at all, by carefully ordering its writes
+according to three simple rules~\cite{ganger00soft}:
+
+\begin{enumerate}
+\item \label{rule:pointer} Never write a pointer to a structure until it has been initialized
+\item \label{rule:reuse} Never reuse such structures until all previous pointers to them have been overwritten
+\item \label{rule:overwrite} Never overwrite the last pointer to a live structure before a new pointer to it has been written
+\end{enumerate}
+
+\noindent
+By following these rules, a file system limits the possible inconsistencies
+present on the disk at any time to only leaked resources (e.g. blocks or inodes
+marked as in use but unreferenced). The file system can be used immediately,
+and a background scan can locate and recover the leaked resources while the
+system is in use.
+
+The soft updates rules map directly to \patch\ dependencies.
+%
+For example, appending a block to an empty file in an FFS-like file system
+requires allocating a block by writing a bit to the block bitmap ($a$),
+initializing the block by writing zeroes to it ($z$), writing the block number
+to the inode for the file ($n$), and updating the file's size ($s$).
+%
+By rule \ref{rule:pointer}, we need $n \PDDepend a$ and $n \PDDepend z$, since
+$a$ and $z$ together initialize the new block.
+%
+By rule \ref{rule:reuse} we also need to make sure that $z$ depends on any
+previous deallocation of the same block, so that it is not overwritten while
+it is still in use.
+%
+A simple way to accomplish this is to let $z \PDDepend a$.
+%
+Finally, we can let $s \PDDepend z$ so that no file ever contains accessible
+uninitialized data.
+%
+Figure~\ref{fig:softupdate} depicts this arrangement.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=92pt]{fig/figures_3}
+  \caption{\label{fig:softupdate} Soft updates \patches\
+  for appending one block to an empty file in an FFS-like file system.}
 \end{figure}
 
 

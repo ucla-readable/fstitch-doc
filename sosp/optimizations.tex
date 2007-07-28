@@ -16,11 +16,7 @@ Unfortunately, this abstraction is extremely expensive.
 
 
 Consider an unoptimized version of \Kudos\ running an ext2 file system with
-dependencies arranged according to the soft updates rules (i.e., never write a
-pointer to a structure until it has been initialized, never reuse such
-structures until all previous pointers to them have been overwritten, and
-never overwrite the last pointer to a live structure before a new pointer to
-it has been written).
+dependencies arranged according to the soft updates rules.
 %
 Figure~\ref{fig:opt}a shows the \patches\ generated when an application appends
 16~kB of data to an existing empty file.

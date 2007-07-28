@@ -3,6 +3,8 @@
 \paragraph{Journaling}
 \label{sec:using:journal}
 
+\begin{comment}
+% This paragraph is basically replicated in sec:patch:examples
 In a journaling file system, changes to disk structures are grouped into
 \emph{transactions} that commit atomically.
 %
@@ -20,6 +22,7 @@ file system from its possibly-incomplete state.
 Once all the transaction's changes are written, a \emph{completion record}
 is written to the journal to mark the transaction as complete; that portion
 of the journal may now be reused.
+\end{comment}
 
 \begin{comment}
 the journal point the transaction itself has the commit record
@@ -46,8 +49,8 @@ The journal format is similar to ext3's~\cite{tweedie98journaling}: a
 transaction contains a list of block numbers, the data to be written to
 those blocks, and finally a single commit record.
 %
-Figure~\ref{fig:journal} shows how the journal module transforms the
-\patches\ in Figure~\ref{fig:softupdate} into journaling semantics.
+%Figure~\ref{fig:journal} shows how the journal module transforms the
+%\patches\ in Figure~\ref{fig:softupdate} into journaling semantics.
 %
 Note that the journal must modify existing \patches' direct dependencies;
 this is allowed since the new dependencies will never introduce a
@@ -73,6 +76,7 @@ violating this rule is a static proof that no cycle can result from doing so
 journal \module\ by hand.
 \end{comment}
 
+\begin{comment}
 \begin{figure}
   \centering
   \includegraphics[width=\hsize]{fig/figures_2}
@@ -80,6 +84,7 @@ journal \module\ by hand.
     change in Figure~\ref{fig:softupdate}. The unlabeled circles are
     \noop\ \patches.}
 \end{figure}
+\end{comment}
 
 \begin{comment}
 Figure~\ref{fig:journal} shows the \patch\ configuration which is created

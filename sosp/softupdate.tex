@@ -3,6 +3,8 @@
 \paragraph{Soft updates}
 \label{sec:using:softupdate}
 
+\begin{comment}
+% This paragraph is basically replicated in sec:patch:examples
 %% Generally, a file system image is consistent if a program like \emph{fsck}
 %% would report no errors -- that is, all the structures are in a completely
 %% correct organization.  
@@ -30,6 +32,7 @@ metadata corruption.
 %% while a reference to a structure still exists on the disk, accomplishes this
 %% easily. 
 %
+\end{comment}
 In the BSD UFS implementation of soft updates, each UFS operation is
 represented in memory by a structure encapsulating the disk changes
 necessary to implement that operation. As a result, many
@@ -52,20 +55,13 @@ a block from a file, one ($p$) to clear the block reference from the file's
 block list and one ($q$) to mark the block as free; adding the $q \PDDepend
 p$ dependency straightforwardly implements soft updates semantics.
 %
+Another example is given in Section~\ref{sec:patch:examples}.
+
+\begin{comment}
 Figure~\ref{fig:softupdate} shows another example, the \patches\ generated in
 UFS when a file is extended by one block.\footnote{The dependencies differ
 from the ext2 dependencies for a similar operation in Figure~\ref{f:opt}
 because of a difference in file system semantics.}
-
-\begin{comment}
-appr to the
-block out when a block is removed from a file, we create (at least) two
-\patches\ in most file systems: one that clears out the reference to that
-block number in the file's list of blocks, and one that marks the block as
-free. By hooking up the second \patch\ to depend upon the first, we can
-implement the soft updates semantic straightforwardly. Another example is
-depicted in Figure~\ref{fig:softupdate}.
-\end{comment}
 
 \begin{figure}[t]
   \centering
@@ -77,6 +73,7 @@ depicted in Figure~\ref{fig:softupdate}.
   Updating the inode's size depends on writing the block
   pointer.}
 \end{figure}
+\end{comment}
 
 %% The difference between soft updates and \Kudos\ is that soft updates tracks
 %% these updates to the disk image at the level of file system operations, which
