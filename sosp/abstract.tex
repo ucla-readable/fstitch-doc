@@ -1,8 +1,8 @@
 \begin{abstract}
 
 File systems ensure that their data is kept consistent through careful
- write ordering, where one block cannot be written until another is safely
- committed to stable storage.
+ write ordering, where certain disk blocks must be committed to stable
+ storage before other blocks.
 %
 Previous file systems have enforced write orderings in system-dependent
  ways, either with rules specialized for each file system
@@ -13,17 +13,18 @@ We present a general \emph{\patch} abstraction that can represent any
  write ordering in a file system agnostic manner.
 %
 A \patch-based file system implementation expresses dependencies among
- writes, but not how those dependencies should be enforced.
+ writes, but does not enforce specific block write orders that satisfy
+ those dependencies.
 %
-File system \modules\ can examine, preserve, and modify write
+Storage system \modules\ can examine, preserve, and modify write
  orderings.
 %
 Generalized file system dependencies are naturally exportable to user
  level, allowing applications to specify their own consistency protocols
- for the file system to follow.
+ for the storage system to follow.
 
 We present the \patch\ abstraction, describe a number of important
- optimizations for \patch-based file systems, and present a Linux kernel
+ optimizations for \patch-based storage systems, and present a Linux kernel
  implementation of a storage subsystem that uses \patches\ to enforce
  consistency.
 %

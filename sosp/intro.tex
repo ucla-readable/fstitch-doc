@@ -6,8 +6,9 @@
 
 This paper aims to evaluate whether a simple, unified abstraction that
 represents all modifications to stable storage, including
-\emph{dependencies} among modifications, could support an entire file
-system, where modifications are common and cache sizes are large.
+\emph{dependencies} among modifications, can be used to efficiently
+implement a complete file system layer, where modifications are common
+and cache sizes are large.
 %
 The answer is a qualified yes.
 
@@ -34,8 +35,10 @@ As file system functionality increases, file system correctness is
  increasingly a focus of
  research~\cite{sivathanuetal05-logic,denehyetal05-journal-guided}.
 %
-File systems must maintain dependency relationships between written blocks
- to preserve file system correctness.
+%File systems must maintain dependency relationships between written blocks
+% to preserve file system correctness.
+File systems must commit blocks to stable storage in an order that
+ preserves file system correctness.
 %
 This is difficult enough for file system
  implementers~\cite{tweedie98journaling,mckusick99soft}, but further
@@ -71,7 +74,7 @@ However, different extensions within a file system, or different
  unnecessarily denied the opportunity to reorder
  writes.
 %
-A better choice might be an abstraction that could express many consistency
+A better choice might be an abstraction that can express many consistency
  models.
 
 
@@ -82,18 +85,21 @@ This work develops a new fundamental data type called a \emph{\patch},
 \Patches\ were inspired by the dependency abstraction from BSD's soft
  updates~\cite{ganger00soft}, but whereas the soft updates implementation
  involves many structures specific to the UFS file
- system~\cite{mckusick99soft}, \patches\ are fully general, simply
- specifying how a range of data should be changed.
+ system~\cite{mckusick99soft}, \patches\ are fully general,
+ specifying only how a range of bytes should be changed.
 %
 This lets file system implementations and extensions examine and modify
  dependency structures independent of the file system's layout.
 %
-This generality comes at a cost, but the cost can be partially mitigated.
+This generality comes at a cost, but that cost can be partially mitigated.
 %
 Real file system implementations achieve consistency and write ordering
- relationships using a variety of file system specific optimizations, and
- we found that a naive implementation scaled terribly poorly, spending far
- more space and time on dependency manipulation than conventional systems.
+ relationships without sacrificing performance by using a variety of file
+ system specific optimizations.
+%
+We found that a naive implementation using \patches\ scaled terribly,
+ spending far more space and time on dependency manipulation than
+ conventional systems.
 %
 We therefore developed a variety of dynamic optimizations that
  significantly reduce the memory and CPU overhead associated with \patches.
@@ -109,21 +115,19 @@ For an untar-Linux benchmark that writes 253~MB of data, our optimizations
  rollback data memory required by 99.73\%. 
 
 
-The \Kudos\ file system implementation is decomposed entirely into
+The \Kudos\ storage system implementation is decomposed entirely into
  pluggable \modules\ that manipulate \patches, hopefully making the system
  as a whole more configurable, extensible, and easier to understand.
 %
-Any file system \module\ can generate \patches; other modules can examine
+Any storage system \module\ can generate \patches; other modules can examine
  them and modify them when required.
 %
-\Patch\ dependency requirements are obeyed by all other file system
- layers, allowing them to be passed through layers such as loopback block
- devices.
+\Patch\ dependencies are obeyed by all other storage system layers, allowing
+ them to be passed through layers such as loopback block devices.
 %
-As a result, the loosely-coupled \modules\ that make up a file system
- implementation can cooperate to implement strong and often complex
- consistency guarantees, even though each individual \module\ does a
- relatively small part of the work.
+As a result, the loosely-coupled \modules\ that implement a file system
+ can cooperate to enforce strong and often complex consistency guarantees,
+ even though each \module\ only does a small part of the work.
 
 
 \Patches\ can implement many consistency mechanisms, including
@@ -131,7 +135,8 @@ As a result, the loosely-coupled \modules\ that make up a file system
 %
 Our file system modules impose soft updates-style \patch\
  requirements by default; we have also written a journal module that
- can set up dependencies for either full or metadata-only journaling. 
+ can change those dependencies to express either full or metadata-only
+ journaling.
 %
 Additionally, we give user-level applications controlled access to \patches,
 allowing applications to impose their own limited consistency
@@ -142,7 +147,7 @@ Modifying an IMAP mail server to use this interface requires only localized
  requirements while writing fewer blocks to disk.
 %
 Our prototype implementation is not yet as fast as we would like, but it
- already runs some of our benchmarks faster than Linux on the same hardware.
+ is competitive with Linux on many of our benchmarks.
 
 \begin{comment}
  not ACID transactions: transactions should be independent, but any file
@@ -153,10 +158,10 @@ Our prototype implementation is not yet as fast as we would like, but it
 
 
 Our contributions include the generalized \patch\ design, the
- optimizations we have developed for dealing with \patches, the formal
- model of \patches, the \module\ interfaces in our \Kudos\ prototype,
- several of the individual \Kudos\ \modules\ like the journal, and the
- \patchgroup\ interface that exports \patches\ to user space.
+ optimizations we have developed for making \patches\ more efficient,
+ the formal model of \patches, the \module\ interfaces in our \Kudos\
+ prototype, several of the individual \Kudos\ \modules\ like the journal,
+ and the \patchgroup\ mechanism that exports \patches\ to user space.
 
 
 %% They can also be extended, in a carefully controlled way, into userspace --
