@@ -40,7 +40,7 @@ Each \patch\ $p$ encapsulates four important pieces of information: its
  some \emph{rollback data}.
 
 \Patch\ $p$'s \textbf{block}, written $\PBlock{p}$, is the unit of disk data
- to which $p$ applies.  The disk controller is assumed to execute writes a
+ to which $p$ applies.  The disk controller is assumed to execute writes one
  block at a time (although not necessarily atomically; see below).  A file system
  change that affects $n$ blocks must be represented using at least $n$
  \patches, since a \patch\ by definition can touch only one block.

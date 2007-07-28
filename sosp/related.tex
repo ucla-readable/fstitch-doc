@@ -30,9 +30,10 @@ commit before the process can continue.
 %
 External synchrony depends inherently on dependency tracking; dependencies
 among processes with outstanding data are tracked to ensure that
-uncommitted output never reaches a user.  Xsyncfs depends on a particular
-file system consistency methodology, namely journaling; \Kudos\ \patch\
-dependencies could be a natural implementation strategy for Xsyncfs
+uncommitted output never reaches a user. However, it also depends on a
+particular file system consistency methodology, namely journaling, and it
+is implemented only in an ext3-like file system called xsyncfs. \Kudos\
+\patch\ dependencies could be a natural implementation strategy for its
 dependencies, allowing them to apply to any file system.
 %
 Similar \patch-like dependencies are used to improve network file system

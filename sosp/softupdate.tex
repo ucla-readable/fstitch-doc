@@ -48,7 +48,7 @@ The \patches\ that make up a file system operation are connected to specify
 the order in which the changes must be written to disk.
 %
 For instance, most file systems require at least two \patches\ to remove
-block from a file, one ($p$) to clear the block reference from the file's
+a block from a file, one ($p$) to clear the block reference from the file's
 block list and one ($q$) to mark the block as free; adding the $q \PDDepend
 p$ dependency straightforwardly implements soft updates semantics.
 %
