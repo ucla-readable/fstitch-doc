@@ -124,59 +124,59 @@ the changes to disk.
 
 \begin{figure*}[t]
 \centering{
-\begin{tabular}{@{}l|rrr|rrr|rrr|rrr@{}}
-System & \multicolumn{3}{c|}{Untar} & \multicolumn{3}{c|}{Delete} & \multicolumn{3}{c|}{PostMark} & \multicolumn{3}{c}{Andrew} \\
-& \multicolumn{1}{c}{Real} & \multicolumn{1}{c}{Sys} & \multicolumn{1}{c|}{IO}
-& \multicolumn{1}{c}{Real} & \multicolumn{1}{c}{Sys} & \multicolumn{1}{c|}{IO}
-& \multicolumn{1}{c}{Real} & \multicolumn{1}{c}{Sys} & \multicolumn{1}{c|}{IO}
-& \multicolumn{1}{c}{Real} & \multicolumn{1}{c}{Sys} & \multicolumn{1}{c}{IO} \\ \hline
+\begin{tabular}{@{}l|rr|rr|rr|rr@{}}
+System & \multicolumn{2}{c|}{Untar} & \multicolumn{2}{c|}{Delete} & \multicolumn{2}{c|}{PostMark} & \multicolumn{2}{c}{Andrew} \\
+& \multicolumn{1}{c}{Real} & \multicolumn{1}{c|}{Sys}
+& \multicolumn{1}{c}{Real} & \multicolumn{1}{c|}{Sys}
+& \multicolumn{1}{c}{Real} & \multicolumn{1}{c|}{Sys}
+& \multicolumn{1}{c}{Real} & \multicolumn{1}{c}{Sys} \\ \hline
 
 % Results are from r3652 (except for all IO times and postmark which are r3818)
 
 \Kudos\ (soft updates)
-& 5.90 & 2.56 & 3.19
-& 1.03 & 0.32 & 0.64
-& 2.54 & 0.59 & 1.88
-& 44.90 & 5.28 & 7.78 \\
+& 5.90 & 2.56
+& 1.03 & 0.32
+& 2.54 & 0.59
+& 44.90 & 5.28 \\
 
 \Kudos\ (meta journal)
-& 8.70 & 4.84 & 3.93
-& 1.65 & 0.75 & 0.83
-& 3.48 & 1.65 & 1.77
-& 37.46 & 5.31 & 0.34 \\
+& 8.70 & 4.84
+& 1.65 & 0.75
+& 3.48 & 1.65
+& 37.46 & 5.31 \\
 
 \Kudos\ (full journal)
-& 13.40 & 5.46 & 8.15
-& 1.63 & 0.77 & 0.81
-& 5.26 & 1.74 & 3.44
-& 37.93 & 5.38 & 0.45 \\
+& 13.40 & 5.46
+& 1.63 & 0.77
+& 5.26 & 1.74
+& 37.93 & 5.38 \\
 
 \Kudos\ (async)
-& 4.38 & 1.84 & 2.61
-& 0.80 & 0.29 & 0.47
-& 1.46 & 0.48 & 0.92
-& 37.20 & 5.30 & 0.06 \\ \hline
+& 4.38 & 1.84
+& 0.80 & 0.29
+& 1.46 & 0.48
+& 37.20 & 5.30 \\ \hline
 
 %FreeBSD (soft updates) & 23.22 & 15.95 \\ 
 %FreeBSD (async) & 10.09 & 3.25 \\ \hline
 
 Linux (ext2)
-& 4.50 & 0.72 & 3.60
-& 4.57 & 0.16 & 4.38
-& 0.22 & 0.14 & 0.02
-& 37.30 & 4.86 & 0.68 \\
+& 4.50 & 0.72
+& 4.57 & 0.16
+& 0.22 & 0.14
+& 37.30 & 4.86 \\
 
 Linux (ext3 ordered)
-& 13.86 & 1.01 & 12.64
-& 4.29 & 0.25 & 4.00
-& 0.32 & 0.23 & 0.02
-& 37.14 & 4.89 & 0.34 \\
+& 13.86 & 1.01
+& 4.29 & 0.25
+& 0.32 & 0.23
+& 37.14 & 4.89 \\
 
 Linux (ext3 journal)
-& 10.89 & 1.12 & 9.53
-& 4.32 & 0.26 & 4.03
-& 2.66 & 0.31 & 2.29
-& 37.83 & 4.99 & 0.94 \\
+& 10.89 & 1.12
+& 4.32 & 0.26
+& 2.66 & 0.31
+& 37.83 & 4.99 \\
 \end{tabular}
 }
 \caption{\label{fig:bench_time} Untar, delete, PostMark, and Andrew
