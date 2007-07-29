@@ -9,6 +9,49 @@ Previous file systems have enforced write orderings in system-dependent
  structure~\cite{ganger00soft} or with a journal, which enforces a
  particular consistency protocol.
 %
+These mechanisms all implicitly define some ``write before'' relationship
+ over modifications to stable storage.
+%
+We present a general \emph{\patch} abstraction that makes this relationship
+ explicit, and represents it in a file system agnostic manner.
+%
+A \patch-based file system implementation expresses dependencies among
+ writes, but does not enforce specific block write orders that satisfy
+ those dependencies.
+%
+Storage system \modules\ can examine, preserve, and modify the dependency
+ structure.
+%
+These generalized file system dependencies are naturally exportable to
+ user level, allowing applications to specify their own consistency
+ protocols for the storage system to follow.
+
+We present the \patch\ abstraction, describe a number of important
+ optimizations for \patch-based storage systems, and present a Linux kernel
+ implementation of a storage subsystem that uses \patches\ to enforce
+ consistency.
+%
+Our ext2 prototype is competitive with Linux ext2 and ext3 and allows
+ several novel configurations, such as ext2 with soft updates or correct
+ dependency enforcement within a loopback file system.
+%
+Finally, we demonstrate three applications which we have modified to
+ take advantage of our user level \patch\ interface, called \patchgroups,
+ to provide strong consistency guarantees without micromanaging writes to
+ the disk.
+
+
+\begin{comment}
+
+File systems ensure that their data is kept consistent through careful
+ write ordering, where certain disk blocks must be committed to stable
+ storage before other blocks.
+%
+Previous file systems have enforced write orderings in system-dependent
+ ways, either with rules specialized for each file system
+ structure~\cite{ganger00soft} or with a journal, which enforces a
+ particular consistency protocol.
+%
 We present a general \emph{\patch} abstraction that can represent any
  write ordering in a file system agnostic manner.
 %
@@ -32,6 +75,8 @@ Our ext2 prototype is competitive with Linux ext2 and ext3 and allows
  several novel configurations, such as ext2 with soft updates or correct
  dependency enforcement within a loopback file system, and provides a
  simple interface for user applications to directly affect \patches.
+
+\end{comment}
 
 
 \begin{comment}
