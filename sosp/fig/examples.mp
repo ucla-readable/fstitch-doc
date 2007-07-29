@@ -66,12 +66,12 @@ beginfig(1);
   linecap := butt;
   draw (xpart jd1.w-20,.5[y1,y3]) -- (xpart jc1.e+20,.5[y1,y3]) withpen connectionpen scaled .5 withcolor blockcolor;
 
-  x1=(xpart bi1.w)-8; x2=(xpart bi1.e)+8;
-  %label.bot(btex \textsc{Main File System} etex, .5[(xpart jd1.s,y2),(xpart jc1.s,y2)]-(0,16));
+  x1=(xpart bi1.w)-12; x2=(xpart bi1.e)+12;
+  label.bot(btex \textsc{Main File System}\strut etex, .5[(xpart jd1.s,y2),(xpart jc1.s,y2)]-(0,16));
   blockbox((x1,y1) -- (x2,y1) -- (x2,y2) -- (x1,y2) -- cycle);
   label.bot(btex \mlabel{bitmap block}\strut etex scaled 0.9, (.5[x1,x2],y2-1));
 
-  x1:=(xpart bk1.w)-6; x2:=(xpart bk1.e)+6;
+  x1:=(xpart bk1.w)-11; x2:=(xpart bk1.e)+11;
   blockbox((x1,y1) -- (x2,y1) -- (x2,y2) -- (x1,y2) -- cycle);
   label.bot(btex \mlabel{inode block}\strut etex scaled 0.9, (.5[x1,x2],y2-1));
 
@@ -157,12 +157,12 @@ beginfig(2);
   linecap := butt;
   draw (xpart jd1.w-20,.5[y1,y3]) -- (xpart jc1.e+20,.5[y1,y3]) withpen connectionpen scaled .5 withcolor blockcolor;
 
-  x1=(xpart bi1.w)-8; x2=(xpart bi1.e)+8;
-  %label.bot(btex \textsc{Main File System} etex, .5[(xpart jd1.s,y2),(xpart jc1.s,y2)]-(0,16));
+  x1=(xpart bi1.w)-12; x2=(xpart bi1.e)+12;
+  label.bot(btex \textsc{Main File System}\strut etex, .5[(xpart jd1.s,y2),(xpart jc1.s,y2)]-(0,16));
   blockbox((x1,y1) -- (x2,y1) -- (x2,y2) -- (x1,y2) -- cycle);
   label.bot(btex \mlabel{bitmap block}\strut etex scaled 0.9, (.5[x1,x2],y2-1));
 
-  x1:=(xpart bk1.w)-6; x2:=(xpart bk1.e)+6;
+  x1:=(xpart bk1.w)-11; x2:=(xpart bk1.e)+11;
   blockbox((x1,y1) -- (x2,y1) -- (x2,y2) -- (x1,y2) -- cycle);
   label.bot(btex \mlabel{inode block}\strut etex scaled 0.9, (.5[x1,x2],y2-1));
 
