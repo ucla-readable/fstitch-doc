@@ -44,47 +44,47 @@ opportunities we hope to address in future work.
 \begin{tabular}{@{}lrrr@{}}
 \textbf{Optimization}
         & \textbf{\# \patches} & \textbf{Undo data} & \textbf{System time} \\
-% Results are r3842
+% Results are from r3857
 \hline
 \multicolumn{4}{@{}c@{}}{\textbf{Untar test}\raise2pt\hbox{\strut}} \\
 None
-        & 619,742               & 470.43~MB             & 3.66~sec \\
+        & 619,741               & 470.04~MB             & 3.60~sec \\
 \Nrb\ \patches\
-        & 464,014               & 210.88~MB             & 3.24~sec \\
+        & 446,013               & 210.88~MB             & 3.22~sec \\
 Overlap merging
-        & 112,640               & 260.14~MB             & 2.61~sec \\
+        & 112,644               & 260.14~MB             & 2.66~sec \\
 Both optimizations
-        &  67,495               & 0.34~MB               & 2.55~sec \\
+        &  67,498               & 0.34~MB               & 2.32~sec \\
 \hline
 \multicolumn{4}{@{}c@{}}{\textbf{Delete test}\raise2pt\hbox{\strut}} \\
 None
-        & 299,089               & 1.46~MB               & 0.84~sec \\
+        & 299,089               & 1.46~MB               & 0.91~sec \\
 \Nrb\ \patches\
-        & 41,108                & 0.93~MB               & 0.30~sec \\
+        & 41,108                & 0.93~MB               & 0.31~sec \\
 Overlap merging
-        & 54,656                & 0.96~MB               & 0.46~sec \\
+        & 54,656                & 0.96~MB               & 0.36~sec \\
 Both optimizations
-        &  1,800                & 0.00~MB               & 0.27~sec \\
+        &  1,800                & 0.00~MB               & 0.21~sec \\
 \hline
 \multicolumn{4}{@{}c@{}}{\textbf{PostMark test}\raise2pt\hbox{\strut}} \\
 None
-        & 250,370               & 176.56~MB             & 1.51~sec \\
+        & 250,370               & 176.56~MB             & 1.46~sec \\
 \Nrb\ \patches\
-        & 155,484               & 86.14~MB              & 1.14~sec \\
+        & 155,484               & 86.14~MB              & 1.16~sec \\
 Overlap merging
-        &  49,136               & 90.26~MB              & 0.88~sec \\
+        &  48,184               & 90.27~MB              & 0.75~sec \\
 Both optimizations
-        &  22,620               & 0.00~MB               & 0.66~sec \\
+        &  22,620               & 0.00~MB               & 0.54~sec \\
 \hline
 \multicolumn{4}{@{}c@{}}{\textbf{Andrew test}\raise2pt\hbox{\strut}} \\
 None
-        &  70,921               & 65.63~MB              & 5.48~sec \\
+        &  70,911               & 65.63~MB              & 5.44~sec \\
 \Nrb\ \patches\
-        &  50,332               & 37.05~MB              & 5.47~sec \\
+        &  50,349               & 37.05~MB              & 5.66~sec \\
 Overlap merging
-        &  15,481               & 37.95~MB              & 5.28~sec \\
+        &  15,545               & 37.95~MB              & 5.45~sec \\
 Both optimizations
-        &  18,986               & 9.45~MB               & 5.27~sec \\
+        &  18,954               & 9.45~MB               & 5.51~sec \\
 \end{tabular}
 \caption{Effectiveness of \Kudos\ optimizations.}
 \label{f:optdata}
@@ -143,15 +143,12 @@ the changes to disk.
 \centering{
 \begin{tabular}{@{}lrrrr@{}}
 System & \multicolumn{1}{c}{Untar} & \multicolumn{1}{c}{Delete} & \multicolumn{1}{c}{PostMark} & \multicolumn{1}{c}{Andrew} \\ \hline
-
-% Results are from r3652 (except for all IO times and postmark which are r3818)
-
-\Kudos\ (async) & 4.4 [1.8] & 0.8 [0.3] & 1.5 [0.5] & 37.2 [5.3] \\
-\Kudos\ (soft updates) & 5.9 [2.6] & 1.0 [0.3] & 2.5 [0.6] & 44.9 [5.3] \\
-\Kudos\ (meta journal) & 8.7 [4.8] & 1.6 [0.8] & 3.5 [1.6] & 37.5 [5.3] \\
-\Kudos\ (full journal) & 13.4 [5.5] & 1.6 [0.8] & 5.3 [1.7] & 37.9 [5.4] \\
-% r3818 with CHDESC_ACCOUNT:
-\Kudos\ (full journal, NOFUA) & 10.4 [5.0] & 1.2 [0.6] & 4.3 [1.9] & 37.6 [5.6] \\ \hline
+% Results are from r3857
+\Kudos\ (async) & 4.3 [1.6] & 0.7 [0.2] & 1.4 [0.5] & 37.2 [5.2] \\
+\Kudos\ (soft updates) & 5.9 [2.2] & 0.9 [0.2] & 2.5 [0.5] & 45.1 [5.3] \\
+\Kudos\ (meta journal) & 8.8 [3.5] & 1.4 [0.5] & 3.4 [1.7] & 37.6 [5.4] \\
+\Kudos\ (full journal) & 12.6 [4.3] & 1.4 [0.5] & 5.2 [1.6] & 37.8 [5.5] \\
+\Kudos\ (full journal, NOFUA) & 10.0 [4.6] & 1.2 [0.5] & 4.4 [2.0] & 37.6 [5.5] \\ \hline
 
 %FreeBSD (soft updates) & 23.22 & 15.95 \\ 
 %FreeBSD (async) & 10.09 & 3.25 \\ \hline
@@ -294,7 +291,8 @@ Linux (ext3 journal) & 1.8 [0.3] & 2,531 \\ \hline
 
 Linux (ext2) & 16.7 [0.3] & 2,503 \\
 Linux (ext3 ordered) & 23.9 [0.3] & 3,025 \\
-Linux (ext3 journal) & 20.4 [0.3] & 2,531
+Linux (ext3 journal) & 20.4 [0.3] & 2,531 \\ \hline
+Linux (ext3 journal) & min fsyncs & ? \\
 \end{tabular}
 \caption{\label{fig:imap-compare} IMAP benchmark: move 1000 messages
   to a second folder. Times are in seconds, writes in number of requests.
