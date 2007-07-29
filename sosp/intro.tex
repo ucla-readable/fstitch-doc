@@ -4,11 +4,21 @@
 \label{sec:intro}
 
 
+\begin{comment}
 This paper aims to evaluate whether a simple, unified abstraction that
 represents all modifications to stable storage, including
 \emph{dependencies} among modifications, can be used to efficiently
 implement a complete file system layer, where modifications are common
 and cache sizes are large.
+%
+The answer is a qualified yes.
+\end{comment}
+
+This paper aims to evaluate whether a simple, unified abstraction that
+explicitly represents both a ``write before'' relationship among
+buffered changes to stable storage, as well as the changes themselves,
+can be used to efficiently implement a complete file system layer, where
+modifications are common and cache sizes are large.
 %
 The answer is a qualified yes.
 
@@ -51,8 +61,7 @@ Proposed systems for improving file system integrity and consistency differ
 However, different extensions within a file system, or different
  applications over the file system, may require different types of
  consistency semantics, and performance suffers when lower layers are
- unnecessarily denied the opportunity to reorder
- writes.
+ unnecessarily denied the opportunity to reorder writes.
 %
 A better choice might be an abstraction that can express many consistency
  models.
@@ -68,25 +77,34 @@ This work develops a new fundamental data type called a \emph{\patch},
  system~\cite{mckusick99soft}, \patches\ are fully general,
  specifying only how a range of bytes should be changed.
 %
-This lets file system implementations and extensions examine and modify
- dependency structures independent of the file system's layout.
+This lets file system implementations specify \emph{what} the desired
+ write before relationship is between the changes without dictating (or
+ worrying about) \emph{how} to write blocks to stable storage to implement
+ that policy, and it lets other storage system modules examine and
+ modify dependency structures independent of the file system's layout.
+
+
+Additionally, we present a user-level interface called \patchgroups,
+ which provides applications with controlled access to \patches---allowing
+ them to impose their own limited consistency policies for the storage
+ system to follow.
+%
+Modifying an IMAP mail server to use this interface requires only localized
+ changes; the resulting server follows IMAP's consistency requirements
+ while writing fewer blocks to disk. \todo{update this claim}
 
 
 \Patches\ can implement many consistency mechanisms, including
  soft updates and journaling.
 %
-Our file system modules impose soft updates-style \patch\
- requirements by default; we have also written a journal module that
- can change those dependencies to express either full or metadata-only
- journaling.
+Our file system modules impose soft updates-style \patch\ requirements by
+ default, since doing so requires some knowledge of the file system's
+ structures; we have also written a journal module that can change
+ existing dependencies to express either full or metadata-only journaling.
 %
-Additionally, we give user-level applications controlled access to \patches,
-allowing applications to impose their own limited consistency
- policies.
-%
-Modifying an IMAP mail server to use this interface requires only localized
- changes; the resulting server follows IMAP's consistency
- requirements while writing fewer blocks to disk. % FIXME is this still true?
+A file system module not interested in supporting soft updates support
+ could instead impose no \patch\ requirements, and count on the journal
+ module to provide a consistency guarantee.
 
 
 The \Kudos\ storage system implementation is decomposed entirely into
@@ -106,7 +124,7 @@ As a result, the loosely-coupled \modules\ that implement a file system
 
 This generality comes at a cost, but that cost can be partially mitigated.
 %
-Real file system implementations achieve consistency and write ordering
+Real file system implementations achieve consistency and write before
  relationships without sacrificing performance by using a variety of file
  system specific optimizations.
 %
@@ -120,9 +138,10 @@ We therefore developed a variety of dynamic optimizations that
 
 Our contributions include the generalized \patch\ design, the
  optimizations we have developed for making \patches\ more efficient,
- the formal model of \patches, the \module\ interfaces in our \Kudos\
- prototype, several of the individual \Kudos\ \modules\ like the journal,
- and the \patchgroup\ mechanism that exports \patches\ to user space.
+ the formal model of \patches, the \patchgroup\ mechanism that exports
+ \patches\ to user space, the \module\ interfaces in our \Kudos\
+ prototype, and several of the individual \Kudos\ \modules\ like the
+ journal.
 
 
 We describe \patches\ abstractly, state their behavior and safety
