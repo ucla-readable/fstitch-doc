@@ -42,34 +42,51 @@ opportunities we hope to address in future work.
 \begin{figure}[t]
 \small
 \begin{tabular}{@{}lrrr@{}}
-%& \multicolumn{3}{c}{\textbf{Untar}} &
-%\multicolumn{3}{c@{}}{\textbf{Delete}} \\
 \textbf{Optimization}
         & \textbf{\# \patches} & \textbf{Undo data} & \textbf{System time} \\
+% Results are r3842
 \hline
 \multicolumn{4}{@{}c@{}}{\textbf{Untar test}\raise2pt\hbox{\strut}} \\
 None
-        & 537,989		& 458.64~MB             & 4.42~sec \\
+        & 619,742               & 470.43~MB             & 3.66~sec \\
 \Nrb\ \patches\
-        & 464,825               & 205.62~MB             & 3.30~sec \\
+        & 464,014               & 210.88~MB             & 3.24~sec \\
 Overlap merging
-        & 112,634               & 254.00~MB             & 3.04~sec \\
+        & 112,640               & 260.14~MB             & 2.61~sec \\
 Both optimizations
-        &  67,478               & 0.34~MB               & 2.56~sec \\
+        &  67,495               & 0.34~MB               & 2.55~sec \\
 \hline
 \multicolumn{4}{@{}c@{}}{\textbf{Delete test}\raise2pt\hbox{\strut}} \\
 None
-        & 193,062               & 3.17~MB               & 1.14~sec \\
+        & 299,089               & 1.46~MB               & 0.84~sec \\
 \Nrb\ \patches\
-        & 41,108                & 0.91~MB               & 0.35~sec \\
+        & 41,108                & 0.93~MB               & 0.30~sec \\
 Overlap merging
-        & 54,685                & 0.93~MB               & 0.55~sec \\
+        & 54,656                & 0.96~MB               & 0.46~sec \\
 Both optimizations
-        &  1,800                & 0.00~MB               & 0.32~sec \\
+        &  1,800                & 0.00~MB               & 0.27~sec \\
+\hline
+\multicolumn{4}{@{}c@{}}{\textbf{PostMark test}\raise2pt\hbox{\strut}} \\
+None
+        & 250,370               & 176.56~MB             & 1.51~sec \\
+\Nrb\ \patches\
+        & 155,484               & 86.14~MB              & 1.14~sec \\
+Overlap merging
+        &  49,136               & 90.26~MB              & 0.88~sec \\
+Both optimizations
+        &  22,620               & 0.00~MB               & 0.66~sec \\
+\hline
+\multicolumn{4}{@{}c@{}}{\textbf{Andrew test}\raise2pt\hbox{\strut}} \\
+None
+        &  70,921               & 65.63~MB              & 5.48~sec \\
+\Nrb\ \patches\
+        &  50,332               & 37.05~MB              & 5.47~sec \\
+Overlap merging
+        &  15,481               & 37.95~MB              & 5.28~sec \\
+Both optimizations
+        &  18,986               & 9.45~MB               & 5.27~sec \\
 \end{tabular}
-\caption{Effectiveness of \Kudos\ optimizations.  The combination of \nrb\
-\patches\ and overlap merging removes 87\% to 99\% of the \patches\ and
-99.93\% to 100\% of the undo data required to untar Linux.}
+\caption{Effectiveness of \Kudos\ optimizations.}
 \label{f:optdata}
 \end{figure}
 
@@ -133,20 +150,21 @@ System & \multicolumn{1}{c}{Untar} & \multicolumn{1}{c}{Delete} & \multicolumn{1
 \Kudos\ (soft updates) & 5.9 [2.6] & 1.0 [0.3] & 2.5 [0.6] & 44.9 [5.3] \\
 \Kudos\ (meta journal) & 8.7 [4.8] & 1.6 [0.8] & 3.5 [1.6] & 37.5 [5.3] \\
 \Kudos\ (full journal) & 13.4 [5.5] & 1.6 [0.8] & 5.3 [1.7] & 37.9 [5.4] \\
-\Kudos\ (full journal, WB) & ? & ? & ? & ? \\ \hline
+\Kudos\ (full journal, NOFUA) & ? & ? & ? & ? \\ \hline
 
 %FreeBSD (soft updates) & 23.22 & 15.95 \\ 
 %FreeBSD (async) & 10.09 & 3.25 \\ \hline
 
 Linux (ext2) & 4.5 [0.7] & 4.6 [0.2] & 0.2 [0.1] & 37.3 [4.9] \\
 Linux (ext3 ordered) & 13.9 [1.0] & 4.3 [0.2] & 0.3 [0.2] & 37.1 [4.9] \\
-
 Linux (ext3 journal) & 10.9 [1.1] & 4.3 [0.3] & 2.7 [0.3] & 37.8 [5.0] \\
 Linux (ext3 journal, WT) & 12.7 [1.2] & 4.5 [0.2] & 3.4 [0.3] & 38.8 [5.0] \\
 \end{tabular}
 }
 \caption{\label{fig:bench_time} Untar, delete, PostMark, and Andrew
-  benchmark times. System CPU times are in square brackets.}
+  benchmark times (seconds). System CPU times are in square brackets.\newline
+Kudos times are for FUA, except for ``NOFUA.''
+Linux times are for a WB drive cache, except for ``WT.''}
 \end{figure*}
 
 At the untar test, the \Kudos\ async mode is faster than Linux ext2, which
@@ -253,21 +271,32 @@ Figure~\ref{fig:imap-compare} shows the results.
 
 \begin{figure}[t]
 \centering{
-\begin{tabular}{@{}l|rrr|r@{}}
-System & Real & Sys & IO & Writes \\ \hline
-\Kudos\ (soft updates) & 25.5 & 1.2 & 25.6 & 3015 \\
-\Kudos\ (meta journal) & 1.5 & 0.5 & 0.3 & 32 \\
-\Kudos\ (full journal) & 1.5 & 0.5 & 0.3 & 33 \\
-\Kudos\ (async) & 1.2 & 0.4 & 0.1 & 18 \\ \hline
-\Kudos\ (w/o \patchgroups) & ? & ? & ? & ? \\ \hline
-Linux (ext2) & 1.5 & 0.3 & 0.5 & 2503 \\
-Linux (ext3 ordered) & 2.0 & 0.3 & 0.9 & 3025 \\
-Linux (ext3 journal) & 1.8 & 0.3 & 0.7 & 2531 \\ \hline
-Linux (ext2) & 16.7 & 0.3 & 15.7 & 2503 \\
-Linux (ext3 ordered) & 23.9 & 0.3 & 22.9 & 3025 \\
-Linux (ext3 journal) & 20.4 & 0.3 & 19.4 & 2531
+\begin{tabular}{@{}lrr@{}}
+System & Time & Writes \\ \hline
+% Results are r3818
+
+\Kudos\ (async) & ? & ? \\
+\Kudos\ (soft updates) & ? & ? \\
+\Kudos\ (meta journal) & ? & ? \\
+\Kudos\ (full journal) & ? & ? \\ \hline
+
+\Kudos\ (async) & 1.2 [0.4] & 18 \\
+\Kudos\ (soft updates) & 25.5 [1.2] & 3,015 \\
+\Kudos\ (meta journal) & 1.5 [0.5] & 32 \\
+\Kudos\ (full journal) & 1.5 [0.5] & 33 \\ \hline
+
+\Kudos\ (w/o \patchgroups) & ? & ? \\ \hline
+
+Linux (ext2) & 1.5 [0.3] & 2,503 \\
+Linux (ext3 ordered) & 2.0 [0.3] & 3,025 \\
+Linux (ext3 journal) & 1.8 [0.3] & 2,531 \\ \hline
+
+Linux (ext2) & 16.7 [0.3] & 2,503 \\
+Linux (ext3 ordered) & 23.9 [0.3] & 3,025 \\
+Linux (ext3 journal) & 20.4 [0.3] & 2,531
 \end{tabular}
 }
 \caption{\label{fig:imap-compare} IMAP benchmark: move 1000 messages
-  to a second folder.}
+  to a second folder. Times are in seconds, writes in number of requests.
+  System CPU times are in square brackets.}
 \end{figure}
