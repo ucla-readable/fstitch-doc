@@ -193,12 +193,10 @@ Each circle represents a single \patch. The shaded boxes indicate disk blocks.
 %
 The arrows between \patches\ represent the dependency relationship \PDDepend.
 
-\begin{figure}
+\begin{figure}[htb]
   \centering
   \includegraphics[width=\hsize]{fig/figures_2}
-  \caption{\label{fig:journal} Journal \patch\ subgraph for the
-    change in Figure~\ref{fig:softupdate}. The unlabeled circles are
-    \noop\ \patches.}
+  \caption{\label{fig:journal} An example journal transaction using \patches.}
 \end{figure}
 
 This arrangement of dependencies ensures that the commit record is not written
@@ -255,7 +253,7 @@ uninitialized data.
 %
 Figure~\ref{fig:softupdate} depicts this arrangement.
 
-\begin{figure}[t]
+\begin{figure}[htb]
   \centering
   \includegraphics[width=92pt]{fig/figures_3}
   \caption{\label{fig:softupdate} Soft updates \patches\
