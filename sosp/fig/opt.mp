@@ -8,6 +8,7 @@ etex;
 picture emptyqueue; emptyqueue := btex \phantom{\elementlabel{Queue}} etex;
 picture vemptyqueue; vemptyqueue := emptyqueue rotated 90 xscaled .4;
 hardborderscale = 3;
+color blockcolor; blockcolor = 0.8white;
 
 beginfig(1);
   boxjoin(a.width = b.width = a.height; a.s = b.n + (0,30));
@@ -65,7 +66,7 @@ beginfig(1);
   fixelement(bk1,bk2,bk3,bk4,sz1,sz2,sz3,sz4,d1,d2,d3,d4,i1,i2,i3,i4,bi1,bi2,bi3,bi4,mtime,sblk,group);
 
   d = 6;
-  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor .8white enddef;
+  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor blockcolor enddef;
   ylab = ypart i1.ne + 3d;
   z1 = (xpart mtime.w,ypart bk1.nw)+(-1.2d,2d); z2 = sz4.se + (1.5d,-d);
   blockbox(z1 -- (x2,y1) -- z2 -- (x1,y2) -- cycle);
@@ -180,7 +181,7 @@ beginfig(2);
   fixelement(bk1,bk2,bk3,bk4,sz1,sz2,sz3,sz4,d1,d2,d3,d4,i1,i2,i3,i4,bi1,bi2,bi3,bi4,mtime,sblk,group);
 
   d = 6;
-  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor .8white enddef;
+  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor blockcolor enddef;
   z1 = (xpart mtime.w,ypart bk1.nw)+(-1.2d,d); z2 = sz4.se + (1.5d,-d);
   blockbox(z1 -- (x2,y1) -- z2 -- (x1,y2) -- cycle);
 
@@ -265,7 +266,7 @@ beginfig(3);
   fixelement(in,d1,d2,d3,d4,i1,i2,i3,i4,bi1,bi2,bi3,bi4,sblk,group);
 
   d = 6;
-  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor .8white enddef;
+  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor blockcolor enddef;
   blockbox(in.nw+(-d,d) -- in.ne+(d,d) -- in.se+(d,-d) -- in.sw+(-d,-d) -- cycle);
 
   forsuffixes $=1,2,3,4:
@@ -371,7 +372,7 @@ beginfig(4);
   fixelement(in,d1,d2,d3,d4,bi,sblk,group);
 
   d = 6;
-  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor .8white enddef;
+  def blockbox(text t) = draw t withpen pencircle scaled 3 withcolor blockcolor enddef;
 
   forsuffixes $=d1,d2,d3,d4,in,bi,sblk,group:
     blockbox($.nw+(-d,d) -- $.ne+(d,d) -- $.se+(d,-d) -- $.sw+(-d,-d) -- cycle);
