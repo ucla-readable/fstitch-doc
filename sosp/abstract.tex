@@ -1,23 +1,25 @@
 \begin{abstract}
 
-The reliability of a file system to correctly store and later provide
- access to data is one of its most important properties.
+%% The reliability of a file system to correctly store and later provide
+%%  access to data is one of its most important properties.
+%% %
+%% File systems today deal with many challenges that make implementing this
+%%  reliability difficult: power losses, software failures, and even user
+%%  intervention all pose significant threats.
+%% %
+%% In order to avoid time-consuming and potentially ineffective manual
+%%  checks like \emph{fsck} when recovering from failures, file systems use
+%%  a variety of techniques.
 %
-File systems today deal with many challenges that make implementing this
- reliability difficult: power losses, software failures, and even user
- intervention all pose significant threats.
+Reliable file systems fundamentally rely on a ``write before'' relationship
+ among buffered changes to the data in stable storage.
 %
-In order to avoid time-consuming and potentially ineffective manual
- checks like \emph{fsck} when recovering from failures, file systems use
- a variety of techniques.
+For example, a journal commit record must be written before any changes are
+ written to the main body of the file system; soft
+ updates~\cite{ganger00soft} and other consistency enforcement mechanisms
+ have similar constraints.
 %
-These mechanisms all rely on a critical, yet often implicitly specified,
- ``write before'' relationship among buffered changes to the data in
- stable storage.
-%
-Further, these relationships are implemented in system-dependent ways,
- either with rules specialized for each file system
- structure~\cite{ganger00soft} or with a journal.
+These relationships are implemented in system-dependent ways.
 %
 We present a general \emph{\patch} abstraction that makes this relationship
  explicit, and represents it in a file system agnostic manner.
