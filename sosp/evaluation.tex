@@ -271,15 +271,15 @@ messages, requests a check, and logs out. We compare using soft updates;
 Figure~\ref{fig:imap-compare} shows the results.
 
 \begin{figure}[t]
-\centering{
+\centering
 \begin{tabular}{@{}lrr@{}}
 System & Time & Writes \\ \hline
 % Results are r3818
 
-\Kudos\ (async) & ? & ? \\
-\Kudos\ (soft updates) & ? & ? \\
-\Kudos\ (meta journal) & ? & ? \\
-\Kudos\ (full journal) & ? & ? \\ \hline
+\Kudos\ (async) & 1.6 [0.3] & 2,503 \\
+\Kudos\ (soft updates) & 11.5 [0.4] & 3,015 \\
+\Kudos\ (meta journal) & 1.4 [0.5] & 33 \\
+\Kudos\ (full journal) & 1.4 [0.5] & 33 \\ \hline
 
 \Kudos\ (async) & 1.2 [0.4] & 18 \\
 \Kudos\ (soft updates) & 25.5 [1.2] & 3,015 \\
@@ -296,7 +296,6 @@ Linux (ext2) & 16.7 [0.3] & 2,503 \\
 Linux (ext3 ordered) & 23.9 [0.3] & 3,025 \\
 Linux (ext3 journal) & 20.4 [0.3] & 2,531
 \end{tabular}
-}
 \caption{\label{fig:imap-compare} IMAP benchmark: move 1000 messages
   to a second folder. Times are in seconds, writes in number of requests.
   System CPU times are in square brackets.}
