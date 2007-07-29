@@ -1,23 +1,30 @@
 \begin{abstract}
 
-File systems ensure that their data is kept consistent through careful
- write ordering, where certain disk blocks must be committed to stable
- storage before other blocks.
+The reliability of a file system to correctly store and later provide
+ access to data is one of its most important properties.
 %
-Previous file systems have enforced write orderings in system-dependent
- ways, either with rules specialized for each file system
- structure~\cite{ganger00soft} or with a journal, which enforces a
- particular consistency protocol.
+File systems today deal with many challenges that make implementing this
+ reliability difficult: power losses, software failures, and even user
+ intervention all pose significant threats.
 %
-These mechanisms all implicitly define some ``write before'' relationship
- over modifications to stable storage.
+In order to avoid time-consuming and potentially ineffective manual
+ checks like \emph{fsck} when recovering from failures, file systems use
+ a variety of techniques.
+%
+These mechanisms all rely on a critical, yet often implicitly specified,
+ ``write before'' relationship among buffered changes to the data in
+ stable storage.
+%
+Further, these relationships are implemented in system-dependent ways,
+ either with rules specialized for each file system
+ structure~\cite{ganger00soft} or with a journal.
 %
 We present a general \emph{\patch} abstraction that makes this relationship
  explicit, and represents it in a file system agnostic manner.
 %
 A \patch-based file system implementation expresses dependencies among
- writes, but does not enforce specific block write orders that satisfy
- those dependencies.
+ writes to stable storage, but does not enforce specific block write orders
+ that satisfy those dependencies.
 %
 Storage system \modules\ can examine, preserve, and modify the dependency
  structure.
