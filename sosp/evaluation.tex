@@ -1,20 +1,24 @@
 \section {Evaluation}
 \label{sec:evaluation}
 
-Our evaluation shows that a \Kudos\ \patch-based file system layer has
+Our evaluation shows that a \Kudos\ \patch-based storage system has
 overall performance that is within reason, even though it is slower than
-Linux in some benchmarks.  We also demonstrate the effectiveness of
-\patchgroups\ on some of our sample applications. All tests were run on a
-Dell Precision 380 with a 3.2GHz Pentium 4 CPU, 2GB of RAM, and a Seagate
-ST3320620AS 320GB 7200RPM SATA2 disk.
+Linux in some benchmarks. We also demonstrate the effectiveness of
+\patchgroups\ on some of our sample applications.
+
+\subsection{Experimental Setup}
+
+All tests were run on a Dell Precision 380 with a 3.2GHz Pentium 4
+CPU, 2GB of RAM, and a Seagate ST3320620AS 320GB 7200RPM SATA2 disk.
 %
 All tests use a 10 GB file system.
 %
 %Our tests use Linux 2.6.20.1 with ext2 and ext3, \Kudos\ with ext2 with
 %soft updates and journaling, and FreeBSD 6.0 with UFS in soft updates mode,
 %all created with default configurations.
-Our tests use Linux 2.6.20.1 with ext2/3 and \Kudos\ with ext2 with
-soft updates and journaling, both created with default configurations.
+Our tests use the Linux 2.6.20.1 kernel. We examine Linux ext2 and ext3
+(in ordered and journal modes) and \Kudos\ ext2 (in soft updates, metadata
+journal, and full journal modes), all created with default configurations.
 
 Two simple tests are repeated throughout this section: first, we untar
 the Linux 2.6.15 source code from \texttt{linux-2.6.15.tar} (218 MB), which is
@@ -273,22 +277,31 @@ Figure~\ref{fig:imap-compare} shows the results.
 System & Time & Writes \\ \hline
 % Results are r3818
 
+% NOFUA
 \Kudos\ (async) & 1.6 [0.3] & 2,503 \\
 \Kudos\ (soft updates) & 11.5 [0.4] & 3,015 \\
 \Kudos\ (meta journal) & 1.4 [0.5] & 33 \\
 \Kudos\ (full journal) & 1.4 [0.5] & 33 \\ \hline
 
+% FUA
 \Kudos\ (async) & 1.2 [0.4] & 18 \\
 \Kudos\ (soft updates) & 25.5 [1.2] & 3,015 \\
 \Kudos\ (meta journal) & 1.5 [0.5] & 32 \\
 \Kudos\ (full journal) & 1.5 [0.5] & 33 \\ \hline
 
-\Kudos\ (w/o \patchgroups) & ? & ? \\ \hline
+% without patchgroups, FUA
+% r3862
+\Kudos\ (async) & 1.6 [0.3] & 2,503 \\
+\Kudos\ (soft updates) & 64.9 [0.3] & 8,367 \\
+\Kudos\ (meta journal) & 51.3 [0.4] & 7,111 \\
+\Kudos\ (full journal) & 51.4 [0.4] & 7,117 \\ \hline
 
+% WB
 Linux (ext2) & 1.5 [0.3] & 2,503 \\
 Linux (ext3 ordered) & 2.0 [0.3] & 3,025 \\
 Linux (ext3 journal) & 1.8 [0.3] & 2,531 \\ \hline
 
+% WT
 Linux (ext2) & 16.7 [0.3] & 2,503 \\
 Linux (ext3 ordered) & 23.9 [0.3] & 3,025 \\
 Linux (ext3 journal) & 20.4 [0.3] & 2,531 \\ \hline
