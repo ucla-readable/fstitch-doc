@@ -225,8 +225,8 @@ beginfig(3);
   bi1.dx=4;
 
   bi1.height=bi1.width; d1.height=d1.width; sz1.height=sz1.width;
-  bk1.s - sz1.n = (-10,2);
-  bi1.c - .5[bk1.c,sz1.c] = (0,75);
+  bk1.s - sz1.n = (-12,12);
+  bi1.c - .5[bk1.c,sz1.c] = (-3,75);
   d1.w - .5[bi1.c,.5[bk1.c,sz1.c]] = (50,0);
 
   fixelement(d1,bk1,sz1,bi1);
@@ -237,9 +237,9 @@ beginfig(3);
   width = d1.width + 2e;
   z1 = bi1.c + (-width,height)/2;  z2 = bi1.c - (-width,height)/2;
   blockbox((x1,y1) -- (x2,y1) -- (x2,y2) -- (x1,y2) -- cycle);
-  z3 = .5[bk1.c,sz1.c] + (-width,height)/2;  z4 = .5[bk1.c,sz1.c] - (-width,height)/2;
+  z3 = .5[bk1.c,sz1.c] + (-1.3width,1.2height)/2;  z4 = .5[bk1.c,sz1.c] - (-width,1.4height)/2;
   blockbox((x3,y3) -- (x4,y3) -- (x4,y4) -- (x3,y4) -- cycle);
-  z5 = d1.c + (-width,height)/2;  z6 = d1.c - (-width,height)/2;
+  z5 = d1.c + (-width,1.1height)/2;  z6 = d1.c - (-width,1height)/2;
   blockbox((x5,y5) -- (x6,y5) -- (x6,y6) -- (x5,y6) -- cycle);
 
   drawelement(d1,bk1,sz1,bi1);
@@ -250,6 +250,11 @@ beginfig(3);
   label.bot(btex \mlabel{inode block}\strut etex scaled 0.9, (.5[x3,x4],y4-1));
   label.top(btex \mlabel{data block}\strut etex scaled 0.9, (.5[x5,x6],y5-1));
 
+  label.top(btex \mlabel{alloc block} etex scaled 0.65, bi1.n-(0,2));
+  label.top(btex \mlabel{clear data} etex scaled 0.65, d1.n-(0,2));
+  label.bot(btex \mlabel{attach block} etex scaled 0.65, bk1.s-(0,-1.5));
+  label.bot(btex \mlabel{set size} etex scaled 0.65, sz1.s-(0,-1.5));
+  
   drawconnpatch(bk1,bi1)(..);
   drawconnpatch(bk1,d1)(..);
   drawconnpatch(d1,bi1)(..);
