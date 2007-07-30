@@ -1,17 +1,16 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-\Kudos\ provides a new way for file system implementations to formalize
-write ordering requirements, allowing file system software to be divided
-into \modules\ that cooperate loosely to implement strong consistency
-guarantees. We also explored several optimizations to the \patch\
-abstraction that significantly improve performance.  \Patches\
-simplify the design of consistency protocols like
-journaling and soft updates by separating the specification and enforcement
-of write ordering requirements. Additionally, \patches\ can be extended
-outside the file system implementation into userspace, allowing
-applications to specify in a limited way what their specific consistency
-requirements are, providing the file system implementation more freedom to
-reorder writes without violating the application's needs. 
-Extending the \patch\ abstraction into user space may be able to improve
-the efficiency of applications with specific write ordering requirements.
+\Kudos\ provides a new way for file system implementations to formalize the
+``write before'' relationship among buffered changes to stable storage, allowing
+file system software to be divided into \modules\ that cooperate loosely to
+implement strong consistency guarantees. We also explored several optimizations
+to the \patch\ abstraction that significantly improve performance. \Patches\
+simplify the design of consistency protocols like journaling and soft updates by
+separating the specification and enforcement of write ordering requirements.
+Additionally, \patches\ can be extended outside the file system implementation
+into userspace, allowing applications to specify in a limited way what their
+specific consistency requirements are, providing the file system implementation
+more freedom to reorder writes without violating the application's needs.
+Extending the \patch\ abstraction into user space may be able to improve the
+efficiency of applications with specific write ordering requirements.
