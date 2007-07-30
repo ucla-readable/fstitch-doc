@@ -21,12 +21,12 @@ We examine Linux ext2 and ext3 (in ordered and journal modes) and
 \Kudos\ ext2 (in asynchronous, soft updates, metadata journal, and
 full journal modes), all created with default configurations.
 %
-There is a notable difference between the default configuration
-\Kudos\ and Linux ext2/3 write durability assumptions. Whereas \Kudos\
-presumes a write is durable after it is on the disk platter, Linux
-ext2 and ext3 presume a write is durable after it is in the disk
-cache. Both systems can run with either durability assumption,
-however, and we report non-default configuration results as well.
+There is a notable write durability difference between the default
+\Kudos\ and Linux ext2/3 configurations. A system can presume a write
+is durable after it is on the disk platter (safe) or after it is in
+the disk cache (unsafe). \Kudos\ defaults to safe and Linux ext2 and
+ext3 to unsafe, but both systems can run with either durability
+assumption and we report both results.
 %
 All timing results, except where otherwise noted, are the mean over three runs.
 
