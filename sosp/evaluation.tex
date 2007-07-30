@@ -22,11 +22,10 @@ We examine Linux ext2 and ext3 (in ordered and journal modes) and
 full journal modes), all created with default configurations.
 %
 There is a notable write durability difference between the default
-\Kudos\ and Linux ext2/3 configurations. A system can presume a write
-is durable after it is on the disk platter (safe) or after it is in
-the disk cache (unsafe). \Kudos\ defaults to safe and Linux ext2 and
-ext3 to unsafe, but both systems can run with either durability
-assumption and we report both results.
+\Kudos\ and Linux ext2/3 configurations: \Kudos\ presumes a write is
+durable after is is on the disk platter (safe) and Linux ext2 and ext3
+after it is in the disk cache (unsafe). However, both systems can run
+with either durability assumption---we report both results for each.
 %
 All timing results, except where otherwise noted, are the mean over three runs.
 
@@ -44,13 +43,13 @@ The \emph{PostMark benchmark} emulates the small file workloads seen
 on email and netnews servers~\cite{postmark}. We use PostMark v1.5,
 configured to create 500 files ranging in size from 500~B to 200~kB;
 perform 500 transactions consisting of file reads, writes, creates,
-and deletes; deletes its files; and finally syncs.
+and deletes; delete its files; and finally sync.
 %
 The modified \emph{Andrew benchmark} emulates a software development
 workload.  The benchmark creates a directory hierarchy, copies a
 source tree, reads the extracted files, compiles the extracted files,
-and syncs. The source code we use for the Andrew benchmark is the Ion
-window manager, version 2-20040729.
+and syncs. The source code we use for the modified Andrew benchmark is
+the Ion window manager, version 2-20040729.
 
 \subsection {Optimization Benefits}
 
@@ -120,7 +119,7 @@ and system CPU time used.
 Figure~\ref{f:optdata} shows these results for the untar, delete,
 PostMark, and Andrew benchmarks for \Kudos\ ext2 in soft updates mode,
 with all combinations of using \nrb\ \patches\ and overlap merging.
-Results are each from a single run.
+Each result is from a single run.
 %
 While both optimizations work well alone, the combination of the two
 is particularly effective at reducing the amount of undo data.
@@ -131,7 +130,7 @@ the number of \patches\ created is reduced by 73--99\%,
 %
 and system CPU time is reduced by up to 63\%.
 %
-\todo{Why does postmark create more patches with both optimizations
+\todo{Why does Andrew create more patches with both optimizations
   than with just overlap merging? Because of the unoptimized \texttt{rename}?}
 
 \begin{comment}
@@ -191,8 +190,8 @@ in Figure~\ref{fig:bench_time}.
 
 \benchtable{}
 
-At the untar benchmark, the \Kudos\ async mode is faster than Linux
-ext2, both provide a similar consistency guarantee.
+At the untar benchmark, the \Kudos\ asynchronous mode is faster than
+Linux ext2; both provide a similar consistency guarantee.
 %
 \Kudos\ soft updates mode is 50\% slower, but provides a much stronger
 consistency guarantee; it provides comparable consistency guarantees
@@ -204,15 +203,15 @@ ordered data mode and is 40\% faster.
 The \Kudos\ full journal mode is 17\% slower than Linux ext3 in full
 journal mode.
 %
-However, when run with the same durability assumptions \Kudos\ and
-Linux ext3 in full journal modes run more similarly.
+However, when run with the same durability assumptions, \Kudos\ and
+Linux ext3 in full journal modes are similar.
 
 While \Kudos\ compares favorably for total time, during each test
 \Kudos\ uses significantly more CPU time than Linux ext2 or ext3
 do---up to four times the CPU time.
 %
 Higher CPU requirements are an important concern and, though they were
-the focus of many of our optimization efforts, remain a strong issue
+the focus of many of our optimization efforts, remain a weakness
 for \Kudos.
 %
 Additionally, while \Kudos\ I/O times are lower than Linux ext2/3 I/O
@@ -233,13 +232,13 @@ We next evaluate overall performance using the PostMark benchmark.
 Unlike the tar and delete benchmarks, \Kudos\ is slower than Linux
 ext2 and ext3 in all configurations.
 %
-We believe the primary contributor to this difference comes is a
-difference in the amount of I/O. Linux ext2 and Linux ext3 in ordered
-journal mode detect that most dirty blocks are no longer referenced at
-the end of the test, and so do not write them to disk (writing only
-0.1--0.2~MB). In contrast, \Kudos\ and Linux ext3 in full journal mode
-do not and so do write these blocks (writing 90--180~MB and 120~MB,
-respectively).
+We believe the primary contributor to this difference is a difference
+in the amount of data written to disk. Linux ext2 and Linux ext3 in
+ordered journal mode detect that most dirty blocks are no longer
+referenced at the end of the test, and so do not write them to disk
+(writing only 0.1--0.2~MB). In contrast, \Kudos\ and Linux ext3 in
+full journal mode do not and so do write these blocks (writing
+90--180~MB and 120~MB, respectively).
 %
 While we believe that \Kudos\ probably can be improved to make this
 optimization, we have not implemented it.
@@ -297,7 +296,7 @@ configurations).
 We benchmark
 %
 \Kudos\ and Linux with the unmodified server (fsync after each message
-copy,
+copy),
 %
 \Kudos\ with the \patchgroup-enabled server (sync only at the end),
 %
@@ -317,7 +316,7 @@ Safe journaled \Kudos\ with \patchgroups\ performs at least as well as
 all other \Kudos\ and all Linux configurations, including the unsafe
 configurations. Safe journaled \Kudos\ with \patchgroups\ is 11--13
 times faster than safe Linux ext2 or ext3 with the unmodified server
-and even 0--20\% faster than even unsafe Linux ext2 or ext3.
+and even up to 20\% faster than unsafe Linux ext2 or ext3.
 %
 \Kudos\ soft updates mode with \patchgroups\ is significantly slower
 than \Kudos\ journal modes. As the number of write requests indicate,
