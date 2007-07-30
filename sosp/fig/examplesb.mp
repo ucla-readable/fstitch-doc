@@ -2,6 +2,8 @@ input patches;
 verbatimtex %&latex
 \documentclass[12pt]{article}
 \usepackage{elemfig,amsmath}
+\def\S{}
+%\def\S{_1}
 
 \begin{document}
 etex;
@@ -22,23 +24,23 @@ beginfig(1);
   save d,e,height,width;
   
   boxjoin(a.width = b.width = a.height);
-  patchit.d1(btex $d_1$\strut etex, 0);
+  patchit.d1(btex $d\S$\strut etex, 0);
   d1.dx=10;
 
   boxjoin(a.width = b.width = a.height);
-  patchit.bk1(btex $i_1$\strut etex, 0);
-  patchit.sz1(btex $i_1'$\strut etex, 0);
+  patchit.bk1(btex $i\S$\strut etex, 0);
+  patchit.sz1(btex $i\S'$\strut etex, 0);
   bk1.dx=6;
 
   boxjoin(a.width = b.width = a.height);
-  patchit.bi1(btex $b_1$\strut etex, 0);
+  patchit.bi1(btex $b\S$\strut etex, 0);
   bi1.dx=4;
 
   boxjoin(a.width = b.width = a.height);
   patchit.jd1(btex $d_{1\text{J}}$\strut etex, 0);
   patchit.ji1(btex $i_{1\text{J}}$\strut etex, 0);
   patchit.jb1(btex $b_{1\text{J}}$\strut etex, 0);
-  patchit.jc1(btex $\textit{cmt}_1$\strut etex, 0);
+  patchit.jc1(btex $\textit{cmt}\S$\strut etex, 0);
   jd1.dx=10;
 
   jc1.height=jc1.width; bi1.height=bi1.width; d1.height=d1.width; sz1.height=sz1.width;
@@ -94,24 +96,24 @@ beginfig(2);
   save d,e,height,width,jx; pair jx[].nw,jx[].ne,jx[].sw,jx[].se,jx[].c,jx[].w;
   
   boxjoin(a.width = b.width = a.height);
-  patchit.d1(btex $d_1$\strut etex, 0);
+  patchit.d1(btex $d\S$\strut etex, 0);
   d1.dx=10;
 
   boxjoin(a.width = b.width = a.height);
-  patchit.bk1(btex $i_1$\strut etex, 0);
-  patchit.sz1(btex $i_1'$\strut etex, 0);
+  patchit.bk1(btex $i\S$\strut etex, 0);
+  patchit.sz1(btex $i\S'$\strut etex, 0);
   bk1.dx=6;
 
   boxjoin(a.width = b.width = a.height);
-  patchit.bi1(btex $b_1$\strut etex, 0);
+  patchit.bi1(btex $b\S$\strut etex, 0);
   bi1.dx=4;
 
   boxjoin(a.width = b.width = a.height);
   patchit.jd1(btex $d_{1\text{J}}$\strut etex, 0);
   patchit.ji1(btex $i_{1\text{J}}$\strut etex, 0);
   patchit.jb1(btex $b_{1\text{J}}$\strut etex, 0);
-  patchit.jc1(btex $\textit{cmt}_1$\strut etex, 0);
-  patchit.jcp1(btex $\textit{cmp}_1$\strut etex, 0);
+  patchit.jc1(btex $\textit{cmt}\S$\strut etex, 0);
+  patchit.jcp1(btex $\textit{cmp}\S$\strut etex, 0);
   jd1.dx=10;
 
   jcp1.height=jcp1.width; bi1.height=bi1.width; d1.height=d1.width; sz1.height=sz1.width;
@@ -133,7 +135,7 @@ beginfig(2);
     drawconnpatch(d1,jc1)({dir -110}..sz1.w-(0,20)..{dir 125}) scaled 0.8;
   enddef;
 
-  % Clip cmt_1 vs. cmp_1
+  % Clip cmt\S vs. cmp\S
   color oldarrow; oldarrow = .9white;
   save pk, pp; picture pk[]; path pp[]; pk1 = nullpicture;
   wogna;
@@ -210,16 +212,16 @@ beginfig(3);
   save d,e,height,width,jx; pair jx[].nw,jx[].ne,jx[].sw,jx[].se,jx[].c,jx[].w;
   
   boxjoin(a.width = b.width = a.height);
-  patchit.d1(btex $d_1$\strut etex, 0);
+  patchit.d1(btex $d\S$\strut etex, 0);
   d1.dx=10;
 
   boxjoin(a.width = b.width = a.height);
-  patchit.bk1(btex $i_1$\strut etex, 0);
-  patchit.sz1(btex $i_1'$\strut etex, 0);
+  patchit.bk1(btex $i\S$\strut etex, 0);
+  patchit.sz1(btex $i\S'$\strut etex, 0);
   bk1.dx=6;
 
   boxjoin(a.width = b.width = a.height);
-  patchit.bi1(btex $b_1$\strut etex, 0);
+  patchit.bi1(btex $b\S$\strut etex, 0);
   bi1.dx=4;
 
   bi1.height=bi1.width; d1.height=d1.width; sz1.height=sz1.width;
