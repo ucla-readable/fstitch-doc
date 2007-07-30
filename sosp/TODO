@@ -39,6 +39,7 @@ Misc:
 - Add patch undo?
 	- On hold because it needs dependency count tracking?
 - patchgroups: what if an application doesn't care about mtime?
+- optimize renames (to make SU andrew faster and make patch opts work better?)
 
 * Benchmarking
 
