@@ -67,10 +67,11 @@ While it is already difficult for file system implementers to provide
 %
 Stackable file systems~\cite{zadok00fist,zadok99extending,heidemann94filesystem,rosenthal90evolving},
  for instance, may place extensions over an existing file system
- responsible for maintaining consistency, but some extensions, like
- creating a file containing metadata information about a directory,
- can introduce ordering requirements difficult to express at the
- VFS layer.
+ responsible for maintaining consistency.
+%
+However, some extensions, like creating a file containing metadata
+ information about a directory, can introduce ordering requirements
+ difficult to express at the VFS layer.
 %
 \Patches\ provide a simple and effective way for such extensions to
  express their requirements of the storage system, adding to the
@@ -158,20 +159,24 @@ We therefore developed a variety of dynamic optimizations that
 Our contributions include the generalized \patch\ design, the
  optimizations we have developed for making \patches\ more efficient,
  the formal model of \patches, the \patchgroup\ mechanism that exports
- \patches\ to user space, the \module\ interfaces in our \Kudos\
- prototype, and several of the individual \Kudos\ \modules\ like the
- journal.
+ \patches\ to user space, and several of the individual modules we
+ have developed, like the journal.
 
 
 We describe \patches\ abstractly, state their behavior and safety
- properties, and reason about the correctness of our optimizations.
+ properties, give examples of their use, and reason about the
+ correctness of our optimizations.
 %
 Finally, we demonstrate a prototype file system implementation using
  \patches\ called \Kudos.
 %
+\Kudos\ is decomposed entirely into pluggable modules that manipulate
+ \patches, hopefully making the system as a whole more configurable,
+ extensible, and easier to understand.
+%
 For an untar-Linux benchmark that writes 253~MB of data, our optimizations
- can reduce the number of \patches\ created by half and the amount of
- undo data memory required by 99.73\%. 
+ can reduce the number of \patches\ \Kudos\ creates by half and the amount of
+ undo data memory it allocates by 99.73\%. 
 %
 Our prototype is not yet as fast as we would like, but it is competitive
  with Linux on many of our benchmarks.
