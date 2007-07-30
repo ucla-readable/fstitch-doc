@@ -116,7 +116,7 @@ happens-before? They cannot be used to ``hold patches'' in ram.}
 across \texttt{fork()}, preserved across \texttt{exec()}, and closed on
 \texttt{exit()}.
 %
-This allows existing, unaware programs to interact with \patchgroups\,
+This allows existing, unaware programs to interact with \patchgroups,
 in the same way that programs do not have to know about pipes for the
 shell to connect them in a pipeline.
 %
@@ -140,11 +140,11 @@ to disk:
 system module like ext2.
 %
 Each \patchgroup\ corresponds to a pair of containing \noop\ \patches,
-and inter-\patchgroup\ dependencies to dependencies inbetween these \noop\
+and inter-\patchgroup\ dependencies to dependencies between these \noop\
 \patches.
 %
 The \LFS\ module ensures that all file system changes are inserted
-between engaged \patchgroups's \noop\ \patches.
+between engaged \patchgroups' \noop\ \patches.
 %
 Figure~\ref{fig:patchgroup-patches} shows an example \patch\ arrangement for
 two \patchgroups.
@@ -160,6 +160,21 @@ journaling, and full journaling?}
   by \texttt{pg~depend(p, q)}.  Each of $a_i$, $b$, and $c$ corresponds to
   a different file system change.}
 \end{figure}
+
+While these simple dependencies are all that is necessary when using soft
+updates as the underlying consistency model, some extra work is required in the
+journal module to support \patchgroups.
+%
+When using a journal, writing the commit record atomically commits a
+transaction; additional \patchgroup-specified dependencies for the data in each
+transaction must be shifted to the commit record itself.
+%
+These dependencies then collapse into dependencies of the commit record on
+itself, or to previous commit records---both dependencies which already exist.
+%
+Finally, for a metadata journal, blocks which are modified as part of a
+\patchgroup\ must also be included in the transaction, making the metadata
+journal act like a full journal for those data blocks.
 
 \subsection{Case Studies}
 \label{sec:patchgroup:casestudies}
