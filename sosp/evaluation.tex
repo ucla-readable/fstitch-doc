@@ -163,7 +163,7 @@ smaller account for about 51\% of all \rb\ \patches.}
 \textbf{System} & \multicolumn{1}{c}{\textbf{Untar}} & \multicolumn{1}{c}{\textbf{Delete}} & \multicolumn{1}{c}{\textbf{PostMark}} & \multicolumn{1}{c}{\textbf{Andrew}} \\ \hline
 % Results are from r3862 and NDEBUG, except for WB from r3857 and no NDEBUG
 % (though NDEBUG does not seem to really change any of the numbers)
-\emph{\Kudos\ ext2} & & & & \\
+\emph{\Kudos\ ext2}\raise2pt\hbox{\strut} & & & & \\
 \safe{async} & \safe{4.0 [1.5]} & \safe{0.7 [0.2]} & \safe{1.4 [0.5]} & \safe{37.3 [5.4]} \\
 \safe{soft updates} & \safe{6.1 [2.2]} & \safe{0.9 [0.2]} & \safe{2.4 [0.5]} & \safe{45.2 [5.4]} \\
 \safe{meta journal} & \safe{8.1 [3.8]} & \safe{1.4 [0.5]} & \safe{3.6 [1.6]} & \safe{37.6 [5.4]} \\
@@ -173,7 +173,7 @@ smaller account for about 51\% of all \rb\ \patches.}
 %FreeBSD (soft updates) & 23.22 & 15.95 \\ 
 %FreeBSD (async) & 10.09 & 3.25 \\ \hline
 
-\emph{Linux} & & & & \\
+\emph{Linux}\raise2pt\hbox{\strut} & & & & \\
 \unsafe{ext2} & \unsafe{4.5 [0.7]} & \unsafe{4.6 [0.2]} & \unsafe{0.2 [0.1]} & \unsafe{37.3 [4.9]} \\
 \unsafe{ext3 ordered} & \unsafe{13.9 [1.0]} & \unsafe{4.3 [0.2]} & \unsafe{0.3 [0.2]} & \unsafe{37.1 [4.9]} \\
 \unsafe{ext3 journal} & \unsafe{10.9 [1.1]} & \unsafe{4.3 [0.3]} & \unsafe{2.7 [0.3]} & \unsafe{37.8 [5.0]} \\
@@ -272,67 +272,112 @@ consistent: fsck reported that inode reference counts were higher than the
 correct values (an expected discrepancy after a soft updates crash).
 
 \subsection {\Patchgroups}
+\label{sec:evaluation:uwimap}
 
 % #reviewers who want measurements of all case studies: 1
 % #reviewers who want measurements of at least svn and imap studies: 2
-% include time
-% comment on perf and any ordering guarantee differences
-% make svn client fsync() and compare?
 
-%\subsubsection {gzip}
+To evaluate the performance of the \patchgroup-enabled UW IMAP mail
+server (\S\ref{sec:patchgroup:uwimap}) we benchmark a client moving
+1,000 messages. The client selects the source mailbox (containing
+1,000 2~kB messages), creates the new mailbox, copies each message to
+the new mailbox and marks each source message for deletion, expunges
+the marked messages, commits the mailboxes, and logs out.
 
-%\subsubsection {Subversion Case Study}
-%
-%Complexity of implementation, reliance on specific FS semantics (i.e. ext3)
-%even with all that jumping through hoops - broken on NTFS, for example.
-%Straightforward to get correctness with \patchgroups; counts only on a simple API.
-
-\label{sec:evaluation:uwimap}
-We implemented a preliminary assessment of the \patchgroup-enabled UW IMAP mail server
-(\S\ref{sec:patchgroup:uwimap}) by comparing the number of block writes
-that \Kudos\ makes relative to FreeBSD to move 100 emails. The test
-selects the source mailbox (with 100 messages, sized 2kB each),
-creates the new mailbox, copies each of the 100 messages to the new
-mailbox, marks each source message for deletion, expunges the marked
-messages, requests a check, and logs out. We compare using soft updates;
 Figure~\ref{fig:imap-compare} shows the results.
+%
+We divide configurations into the two categories unsafe (drive cache
+durability only, a message can be lost if the system crashes) and safe
+(drive platter durability).
+%
+We report total time, system CPU time, and the number of disk write
+requests (an indicator of the number of required seeks in safe
+configurations).
+%
+We benchmark
+%
+\Kudos\ and Linux with the unmodified server (fsync after each message
+copy,
+%
+\Kudos\ with the \patchgroup-enabled server (sync only at the end),
+%
+and Linux with a server modified to presume a fully journaled file
+system (fsync only at the end).
+%
+Figure~\ref{fig:imap-compare} omits duplicate results, reporting
+each of the following with one entry:
+%
+\Kudos\ meta and full journal modes,
+%
+Linux ordered and journal modes,
+%
+and unsafe/safe \Kudos\ asynchronous mode with/without \patchgroups.
+
+Safe journaled \Kudos\ with \patchgroups\ performs at least as well as
+all other \Kudos\ and all Linux configurations, including the unsafe
+configurations. Safe journaled \Kudos\ with \patchgroups\ is 11--13
+times faster than safe Linux ext2 or ext3 with the unmodified server
+and even 0--20\% faster than even unsafe Linux ext2 or ext3.
+%
+\Kudos\ soft updates mode with \patchgroups\ is significantly slower
+than \Kudos\ journal modes. As the number of write requests indicate,
+each of its \patchgroups\ requires multiple write requests (e.g. to
+update the destination mailbox and the destination mailbox's
+modification time). In contrast, journaling is able to commit a large
+number of copies atomically, using only a small constant number of
+requests.
+%
+\Kudos\ with the unmodified server makes significantly many more
+requests than Linux ext2/3; we believe this is due to \Kudos\ also
+committing file system summary information that Linux does not commit
+for the \texttt{fsync} system call.
 
 \begin{figure}[t]
 \centering
 \begin{tabular}{@{}lrr@{}}
 \textbf{System} & \textbf{Time} & \textbf{Writes} \\ \hline
+
 % Results are from r3862
 
+\multicolumn{3}{@{}c@{}}{\textbf{Unsafe}\raise2pt\hbox{\strut}} \\
+
 % NOFUA
-\Kudos\ (async) & 1.6 [0.3] & 2,503 \\
-\Kudos\ (soft updates) & 11.4 [0.4] & 3,015 \\
-\Kudos\ (meta journal) & 1.4 [0.4] & 33 \\
-\Kudos\ (full journal) & 1.4 [0.4] & 33 \\ \hline
-
-% FUA
-\Kudos\ (async) & 1.6 [0.3] & 2,503 \\
-\Kudos\ (soft updates) & 27.5 [1.1] & 3,015 \\
-\Kudos\ (meta journal) & 1.5 [0.4] & 32 \\
-\Kudos\ (full journal) & 1.5 [0.4] & 32 \\ \hline
-
-% without patchgroups, FUA
-\Kudos\ (async) & 1.6 [0.3] & 2,503 \\
-\Kudos\ (soft updates) & 64.9 [0.3] & 8,367 \\
-\Kudos\ (meta journal) & 51.3 [0.4] & 7,111 \\
-\Kudos\ (full journal) & 51.4 [0.4] & 7,117 \\ \hline
+\Kudos\ async (pg) & 1.6 [0.3] & 2,503 \\
+%\Kudos\ soft updates (pg) & 11.4 [0.4] & 3,015 \\
+%\Kudos\ meta journal (pg) & 1.4 [0.4] & 33 \\
+\Kudos\ full journal (pg) & 1.4 [0.4] & 33 \\
 
 % WB
-Linux (ext2) & 1.5 [0.3] & 2,503 \\
-Linux (ext3 ordered) & 2.0 [0.3] & 3,025 \\
-Linux (ext3 journal) & 1.8 [0.3] & 2,531 \\ \hline
+Linux ext2 (fsyncs) & 1.5 [0.3] & 2,503 \\
+%Linux ext3 ordered (fsyncs) & 2.0 [0.3] & 3,025 \\
+Linux ext3 journal (fsyncs) & 1.8 [0.3] & 2,531 \\ \hline
+
+\multicolumn{3}{@{}c@{}}{\textbf{Safe}\raise2pt\hbox{\strut}} \\
+
+% FUA
+%\Kudos\ async (pg) & 1.6 [0.3] & 2,503 \\
+\Kudos\ soft updates (pg) & 27.5 [1.1] & 3,015 \\
+%\Kudos\ meta journal (pg) & 1.5 [0.4] & 32 \\
+\Kudos\ full journal (pg) & 1.5 [0.4] & 32 \\
+
+% WT, one fsync
+Linux ext3 journal (fsync) & ? & ? \\
+
+% FUA, without patchgroups
+%\Kudos\ async (pg) & 1.6 [0.3] & 2,503 \\
+\Kudos\ soft updates (fsyncs) & 64.9 [0.3] & 8,367 \\
+%\Kudos\ meta journal (pg) & 51.3 [0.4] & 7,111 \\
+\Kudos\ full journal (fsyncs) & 51.4 [0.4] & 7,117 \\
 
 % WT
-Linux (ext2) & 16.7 [0.3] & 2,503 \\
-Linux (ext3 ordered) & 23.9 [0.3] & 3,025 \\
-Linux (ext3 journal) & 20.4 [0.3] & 2,531 \\ \hline
-Linux (ext3 journal) & min fsyncs & ? \\
+Linux ext2 (fsyncs) & 16.7 [0.3] & 2,503 \\
+%Linux ext3 ordered (fsyncs) & 23.9 [0.3] & 3,025 \\
+Linux ext3 journal (fsyncs) & 20.4 [0.3] & 2,531 \\
+
 \end{tabular}
-\caption{\label{fig:imap-compare} IMAP benchmark: move 1000 messages
-  to a second folder. Times are in seconds, writes in number of requests.
-  System CPU times are in square brackets.}
+\caption{\label{fig:imap-compare} IMAP benchmark: move 1,000 messages.
+  Times are in seconds, writes in number of requests.  System CPU
+  times are in square brackets. Consistency protocols: ``fsyncs'' is
+  the unmodified server, ``pg'' uses patchgroups, and ``fsync'' presumes
+  a fully journaled file system.}
 \end{figure}
