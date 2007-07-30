@@ -155,13 +155,17 @@ $\PDepset{p}$ & $p$'s dependencies: $\{ q \mid p \PDepend q \}$ \\
 \subsection{Examples}
 \label{sec:patch:examples}
 
+To help illustrate how \patches\ can be used to implement existing consistency
+models, we will outline in this section how two widely-used protocols, soft
+updates and journaling, can be translated into \patches.
+
 \textbf{Journal transactions.}
 %
 In a journaling file system, changes to the file system are grouped into
 \emph{transactions} that commit atomically.
 %
-Each transaction leaves the disk in a consistent state, thus avoiding the need
-to check the file system when recovering from a failure.
+%Each transaction leaves the disk in a consistent state, thus avoiding the need
+%to check the file system when recovering from a failure.
 %
 All changes in a transaction are first copied into an on-disk log (called the
 \emph{journal}) before any of them are allowed to be written to the file
@@ -246,27 +250,27 @@ system is in use.
 The soft updates rules map directly to \patch\ dependencies.
 %
 For example, appending a block to an empty file in an FFS-like file system
-requires allocating a block by writing a bit to the block bitmap ($a$),
-initializing the block by writing zeroes to it ($z$), writing the block number
-to the inode for the file ($n$), and updating the file's size ($s$).
+requires allocating a block by writing a bit to the block bitmap ($b_1$),
+initializing the block by writing zeroes to it ($d_1$), writing the block number
+to the inode for the file ($i_1$), and updating the file's size ($i_1'$).
 %
-By rule \ref{rule:pointer}, we need $n \PDDepend a$ and $n \PDDepend z$, since
-$a$ and $z$ together initialize the new block.
+By rule \ref{rule:pointer}, we need $i_1 \PDDepend b_1$ and $i_1 \PDDepend d_1$,
+since $b_1$ and $d_1$ together initialize the new block.
 %
-By rule \ref{rule:reuse} we also need to make sure that $z$ depends on any
+By rule \ref{rule:reuse} we also need to make sure that $d_1$ depends on any
 previous deallocation of the same block, so that it is not overwritten while
 it is still in use.
 %
-A simple way to accomplish this is to let $z \PDDepend a$.
+A simple way to accomplish this is to let $d_1 \PDDepend b_1$.
 %
-Finally, we can let $s \PDDepend z$ so that no file ever contains accessible
-uninitialized data.
+Finally, we can let $i_1' \PDDepend d_1$ so that no file ever contains
+accessible uninitialized data.
 %
 Figure~\ref{fig:softupdate} depicts this arrangement.
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=92pt]{fig/figures_3}
+  \includegraphics[width=92pt]{fig/examplesb_3}
   \caption{\label{fig:softupdate} Soft updates \patches\
   for appending one block to an empty file in an FFS-like file system.}
 \end{figure}
