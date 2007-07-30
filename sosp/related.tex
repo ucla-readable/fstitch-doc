@@ -80,7 +80,8 @@ Additionally, Burnett's system is evaluated using trace-driven simulations
 rather than an implementation. We have found that some aspects of real disks
 have significant impacts which his simulator may not have taken into account;
 for instance, we have found that the number of I/O requests to the disk, rather
-than the number of blocks read or written by each request, can be a bottleneck.
+than the theoretical seek time or the number of blocks accessed, can be a
+bottleneck.
 
 % "allow the kernel to safely and efficiently handle any metadata layout without understanding the layout itself"
 % \cite{kaashoek97application}
