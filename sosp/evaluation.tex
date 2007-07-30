@@ -18,8 +18,15 @@ All tests use a 10~GB file system and the Linux 2.6.20.1 kernel
 with the Ubuntu v6.06 distribution.
 %
 We examine Linux ext2 and ext3 (in ordered and journal modes) and
-\Kudos\ ext2 (in async, soft updates, metadata journal, and full
-journal modes), all created with default configurations.
+\Kudos\ ext2 (in asynchronous, soft updates, metadata journal, and
+full journal modes), all created with default configurations.
+%
+There is a notable difference between the default configuration
+\Kudos\ and Linux ext2/3 write durability assumptions. Whereas \Kudos\
+presumes a write is durable after it is on the disk platter, Linux
+ext2 and ext3 presume a write is durable after it is in the disk
+cache. Both systems can run with either durability assumption,
+however, and we report non-default configuration results as well.
 %
 All timing results, except where otherwise noted, are the mean over three runs.
 
@@ -29,8 +36,9 @@ benchmarks.
 The \emph{tar benchmark} untars and syncs the Linux 2.6.15 source code
 from the cached file \texttt{linux-2.6.15.tar} (218~MB).
 %
-The \emph{delete benchmark} deletes the result of the tar benchmark
-and syncs, after unmounting and then remounting the file system.
+The \emph{delete benchmark}, after unmounting and remounting the file
+system following the tar benchmark, deletes the result of the tar
+benchmark and syncs.
 %
 The \emph{PostMark benchmark} emulates the small file workloads seen
 on email and netnews servers~\cite{postmark}. We use PostMark v1.5,
@@ -46,28 +54,8 @@ window manager, version 2-20040729.
 
 \subsection {Optimization Benefits}
 
-We evaluate the effectiveness of the \patch\ optimizations discussed in
-Section~\ref{sec:patch:optimizations}, in terms of
-%
-the total number of \patches\ created, amount of undo data allocated,
-and system CPU time used.
-%
-Figure~\ref{f:optdata} shows these results for the untar, delete,
-PostMark, and Andrew benchmarks for \Kudos\ ext2 in soft updates mode,
-with all combinations of using \nrb\ \patches\ and overlap merging.
-%
-While both optimizations work well alone, the combination of the two
-is particularly effective at reducing the amount of undo data.
-%
-Undo data memory usage is reduced by 85--100\%,
-%
-the number of \patches\ created is reduced by 73--99\%,
-%
-and system CPU time is reduced by up to 63\%.
-%
-\todo{Why does postmark create more patches with both optimizations
-  than with just overlap merging? Because of the unoptimized \texttt{rename}?}
-
+% this table is a command so that we can move its placement without conflicts
+\newcommand{\opttable}{
 \begin{figure}[t]
 \centering
 \small
@@ -119,7 +107,31 @@ Both optimizations
 \caption{Effectiveness of \Kudos\ optimizations.}
 \label{f:optdata}
 \end{figure}
+}
 
+\opttable{}
+
+We evaluate the effectiveness of the \patch\ optimizations discussed in
+Section~\ref{sec:patch:optimizations}, in terms of
+%
+the total number of \patches\ created, amount of undo data allocated,
+and system CPU time used.
+%
+Figure~\ref{f:optdata} shows these results for the untar, delete,
+PostMark, and Andrew benchmarks for \Kudos\ ext2 in soft updates mode,
+with all combinations of using \nrb\ \patches\ and overlap merging.
+%
+While both optimizations work well alone, the combination of the two
+is particularly effective at reducing the amount of undo data.
+%
+Undo data memory usage is reduced by 85--100\%,
+%
+the number of \patches\ created is reduced by 73--99\%,
+%
+and system CPU time is reduced by up to 63\%.
+%
+\todo{Why does postmark create more patches with both optimizations
+  than with just overlap merging? Because of the unoptimized \texttt{rename}?}
 
 \begin{comment}
 \begin{figure}[t]
@@ -138,55 +150,8 @@ smaller account for about 51\% of all \rb\ \patches.}
 \subsection {Benchmarks}
 \label{sec:eval:bench}
 
-We compare \Kudos\ and Linux ext2 and ext3 for the tar, delete,
-PostMark, and Andrew benchmarks. Times for these benchmarks are listed
-in Figure~\ref{fig:bench_time}.
-
-At the untar test, the \Kudos\ async mode is faster than Linux ext2, which
-provides a similar consistency guarantee. The \Kudos\ soft updates mode is
-only 15\% slower but provides a much stronger guarantee, and it is about 2.3
-times as fast as the widely used Linux ext3 ordered mode which does provide a
-comparable consistency guarantee. The \Kudos\ metadata journal mode is faster
-than both Linux ext3 journal modes, though \Kudos\ full journaling is slower.
-At the remove test, all \Kudos\ modes are substantially faster than all Linux
-modes, due to differences in how \Kudos\ allocates inodes and blocks during
-the untar test.
-
-When looking only at the System CPU time, however, \Kudos\ can use up to
-5.6 times as much CPU as a similar Linux mode. This effect is partially
-mitigated by smaller I/O times, but it is an important concern and has
-been the focus of most of our later optimizations.
-
-%This demonstrates that the overhead of using \patches\ in \Kudos\ is not
-%entirely unreasonable, but has room for significant improvement.
-%
-%% While \Kudos\ does still have some CPU usage and I/O delay problems, its
-%% performance has been steadily improving over time and we expect that it will
-%% continue to improve as we optimize it further.
-%
-%% There are more optimization opportunities that can likely bring us much closer
-%% in performance to Linux. 
-
-We next evaluate overall performance using the PostMark benchmark,
-designed to simulate the small file workloads seen on email and
-netnews servers~\cite{postmark}.
-%
-We use PostMark 1.5, configured to use 4kB reads and writes and to
-create 100 files ranging in size from 500 B to 16 MB; perform 500
-transactions consisting of file reads, writes, creates, and deletes;
-and finally delete its files. PostMark is a single process, single
-threaded program that performs these file system operations as quickly
-as possible.
-
-
-% The system time column shows time spent executing code in kernel space
-% during the untar or remove; this is mostly \Kudos\ overhead.  Linux's
-% system time numbers during a comparable test are much lower.  Profiling
-% numbers indicate optimization opportunities in some of \Kudos's auxiliary
-% libraries, such as its hash table, as well as more significant optimization
-% opportunities we hope to address in future work.
-
-
+% this table is a command so that we can move its placement without conflicts
+\newcommand{\benchtable}{
 \begin{figure}[tb]
 \centering
 \small
@@ -210,11 +175,71 @@ ext3 ordered & 13.9 [1.0] & 4.3 [0.2] & 0.3 [0.2] & 37.1 [4.9] \\
 ext3 journal & 10.9 [1.1] & 4.3 [0.3] & 2.7 [0.3] & 37.8 [5.0] \\
 ext3 journal, WT & 12.7 [1.2] & 4.5 [0.2] & 3.4 [0.3] & 38.8 [5.0] \\
 \end{tabular}
-\caption{\label{fig:bench_time} Untar, delete, PostMark, and Andrew
-  benchmark times (seconds). System CPU times are in square brackets.
-  Kudos times are for a WT drive cache, except for ``WB,'' and Linux
-  times are for a WB drive cache, except for ``WT.''}
+\caption{\label{fig:bench_time} Benchmark times (seconds). System CPU
+  times are in square brackets.  Kudos times are for a WT drive cache,
+  except for ``WB,'' and Linux times are for a WB drive cache, except
+  for ``WT.''}
 \end{figure}
+}
+
+We compare \Kudos\ and Linux ext2 and ext3 for the tar, delete,
+PostMark, and Andrew benchmarks. Times for these benchmarks are listed
+in Figure~\ref{fig:bench_time}.
+
+\benchtable{}
+
+At the untar benchmark, the \Kudos\ async mode is faster than Linux
+ext2, both provide a similar consistency guarantee.
+%
+\Kudos\ soft updates mode is 50\% slower, but provides a much stronger
+consistency guarantee; it provides comprabable consistency guarantees
+to the widely used Linux ext3 in ordered data mode but is 50\% faster.
+%
+The \Kudos\ metadata journal mode is most similar to Linux ext3 in
+ordered data mode and is 40\% faster.
+%
+The \Kudos\ full journal mode is 17\% slower than Linux ext3 in full
+journal mode.
+%
+However, when run with the same durability assumptions \Kudos\ and
+Linux ext3 in full journal modes run more similarly.
+
+While \Kudos\ compares favorably for total time, during each test
+\Kudos\ uses significantly more CPU time than Linux ext2 or ext3
+do---up to four times the CPU time.
+%
+Higher CPU requirements are an important concern and, though they were
+the focus of many of our optimization efforts, remain a strong issue
+for \Kudos.
+%
+Additionally, while \Kudos\ I/O times are lower than Linux ext2/3 I/O
+times, we have found that small block allocation strategy changes can
+significantly affect I/O time for many of these benchmarks. This further
+emphasizes the importance of the system CPU time difference.
+
+%This demonstrates that the overhead of using \patches\ in \Kudos\ is not
+%entirely unreasonable, but has room for significant improvement.
+
+The delete benchmark results are similar to the tar benchmark's,
+except that \Kudos\ total time is less than Linux ext2/3 total time
+for all configurations. \Kudos\ I/O times are substantially lower
+than Linux ext2/3 I/O times because of the block layout differences in
+the tar benchmark.
+
+We next evaluate overall performance using the PostMark benchmark.
+Unlike the tar and delete benchmarks, \Kudos\ is slower than Linux
+ext2 and ext3 in all configurations.
+%
+We believe the primary contributor to this difference comes is a
+difference in the amount of I/O. Linux ext2 and Linux ext3 in ordered
+journal mode detect that most dirty blocks are no longer referenced at
+the end of the test, and so do not write them to disk (writing only
+0.1--0.2~MB). In contrast, \Kudos\ and Linux ext3 in full journal mode
+do not and so do write these blocks (writing 90--180~MB and 120~MB,
+respectively).
+%
+While we believe that \Kudos\ probably can be improved to make this
+optimization, we have not implemented it.
 
 Finally, we evaluate performance using a modified Andrew benchmark,
 which simulates a development workstation by extracting some source
