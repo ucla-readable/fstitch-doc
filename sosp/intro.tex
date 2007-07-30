@@ -85,9 +85,9 @@ Robust applications, including databases, mail servers, and source code
  management tools, must choose between several mediocre options.
 %
 They can accept the performance penalty of expensive system calls like
- \texttt{fsync} and \texttt{sync}, or use tedious and fragile sequences
- of operations that count on particular file system semantics, or they
- can rely on specialized raw-disk interfaces.
+ \texttt{fsync} and \texttt{sync}, use tedious and fragile sequences
+ of operations that count on particular file system semantics, or
+ rely on specialized raw-disk interfaces.
 %
 \Patchgroups\ allow applications the same benefit that \patches\ provide
  for kernel-level file system implementations and extensions.
@@ -174,9 +174,9 @@ Finally, we demonstrate a prototype file system implementation using
  \patches, hopefully making the system as a whole more configurable,
  extensible, and easier to understand.
 %
-For an untar-Linux benchmark that writes 253~MB of data, our optimizations
- can reduce the number of \patches\ \Kudos\ creates by half and the amount of
- undo data memory it allocates by 99.73\%. 
+Our benchmarks show that our optimizations can reduce the number of
+ \patches\ \Kudos\ creates by 73-99.4\% and the amount of undo data
+ memory it allocates by 85-100\%.
 %
 Our prototype is not yet as fast as we would like, but it is competitive
  with Linux on many of our benchmarks.
