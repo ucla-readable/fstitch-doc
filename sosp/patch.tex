@@ -178,40 +178,51 @@ the journal later and copy the data back out into the file system.
 Finally, once all the changes have been written to the file system, the commit
 record can be erased, and that portion of the journal may be reused.
 
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=.8\hsize]{fig/examplesb_2}
+  \caption{\label{fig:journal} An example journal transaction using \patches.}
+\end{figure}
+
 Patches implementing a journal transaction could be arranged as follows:
 %
-a \patch\ $c$ writing the commit record would have $c \PDDepend \{d_{1\dots n}\}$,
-where each $d_i$ writes a copy of an updated file system block into the journal.
+suppose we have \patch\ $b_1$ modifying a bitmap block, $i_1$ and $i_1'$
+modifying an inode block, and $d_1$ modifying a data block.
 %
-Then the file system updates would each have $u_i \PDDepend c$, and a \patch\ $e$
-erasing the commit record would have $e \PDDepend \{u_{1\dots m}\}$.
+Copies of these blocks are written into the journal area using \patches\
+$d_{1\textrm{J}}$, $i_{1\textrm{J}}$, and $b_{1\textrm{J}}$, each on its
+own block.
 %
-A journal transaction containing four disk blocks is depicted in
-Figure~\ref{fig:journal}.
+The commit record is created on a fourth block in the journal area with
+\patch\ $cmt_1$, and we let $cmt_1 \PDDepend \{d_{1\textrm{J}}$,
+$i_{1\textrm{J}}$, $b_{1\textrm{J}}\}$.
+%
+Then we let $\{b_1$, $i_1$, $i_1'$, $d_1\} \PDDepend cmt_1$.
+%
+Finally, we overwrite the commit record with a completion record with a
+\patch\ $cmp_1$, and we let $cmp_1 \PDDepend \{b_1$, $i_1$, $i_1'$,
+$d_1\}$.
+%
+These \patches\ are depicted in Figure~\ref{fig:journal}.
 %
 Each circle represents a single \patch. The shaded boxes indicate disk blocks.
 %
 The arrows between \patches\ represent the dependency relationship \PDDepend.
 
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=\hsize]{fig/figures_2}
-  \caption{\label{fig:journal} An example journal transaction using \patches.}
-\end{figure}
-
 This arrangement of dependencies ensures that the commit record is not written
 to disk until all the journal data is present there, that the updates to the
 file system itself are not written until the commit record is present on disk,
-and that the commit record is not erased until the entire transaction is
+and that the completion record is not written until the entire transaction is
 complete.
 
 This example also contains an instance of a \patch\ which will need to be
-reverted: $e$, which overwrites the commit record written by $c$ (and thus
-$\PBlock{c} = \PBlock{e}$), cannot be written with $c$ since $e \PDDepend
-\{u_{1\dots m}\} \PDDepend c$.
+reverted: $cmp_1$, which overwrites the commit record written by $cmt_1$ (and
+thus $\PBlock{cmp_1} = \PBlock{cmt_1}$), cannot be written with $cmt_1$ since
+$cmp_1 \PDDepend \{b_1$, $i_1$, $i_1'$, $d_1\} \PDDepend cmt_1$.
 %
-So, we must revert $e$ and write $\PBlock{e}$ with only $c$ applied, then
-write each $u_i$, and finally write $\PBlock{e}$ again in order to write $e$.
+So, we must revert $cmp_1$ and write $\PBlock{cmp_1}$ with only $cmt_1$ applied,
+then write $b_1$, $i_1$, $i_1'$, and $d_1$, and finally write $\PBlock{cmp_1}$
+again in order to write $cmp_1$.
 
 \textbf{Soft updates.}
 %
