@@ -8,8 +8,7 @@ Modules:
 - Explore modules not possible within a stackable file system (osdi reviewer)
 
 Opgroups:
-- Improve imap evaluation re reviews?
-  - Add macro benchmarks
+- Add macro imap benchmarks?
 - Compare data journaling (unnecessarily strict) vs minimal opgroups
 - Do svn+opgroups crash test?
 - Figure out: how does MacOSX HFS+ journaling work?
@@ -27,7 +26,12 @@ Misc:
 - Look at BSD implementation of soft updates; how does it work?
 - Check that we did not forget any todos sent to kudos@ 
 - Be consistent with "Section" and "\S", "in-flight" and "in flight", etc.
+- Update overlap merge algorithm description
 - Note that our journal + patches implementation is not optimally efficient
+- Note size of a patch? Note #deps and size?
+- Remove svn figure?
+- More fully explain allocator differences and the effects
+- Decide how to cite email threads (esp reference's title)
 
 * Kudos
 
@@ -39,9 +43,8 @@ Misc:
 - Add patch undo?
 	- On hold because it needs dependency count tracking?
 - patchgroups: what if an application doesn't care about mtime?
-- optimize renames (to make SU andrew faster and make patch opts work better?)
+- Optimize renames (to make SU andrew faster and make patch opts work better?)
 - Optimize journal patches
-- decided on how to cite email threads (esp reference title)
 
 * Benchmarking
 
@@ -49,12 +52,15 @@ Misc:
 - Try benchmarks with larger cache
 - Start running correctness tests?
 - Add SU to Linux ext2?
-- Add FUA to Linux ext2/ext3?
 - Add gzip benchmark
 - Add svn benchmark
 - Track other patch-related datastructure memory usage?
   - bit overlap hash maps
   - number of hard patches
+- Benchmark journal ext3 imap with min fsyncs
+- Increase number of runs from 1 or 3 to maybe 10
+- Check that NOFUA==WB and FUA==WT
+	- Benchmark ext3 with barriers?
 
 * Important bugs
 
