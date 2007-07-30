@@ -40,6 +40,7 @@ Misc:
 	- On hold because it needs dependency count tracking?
 - patchgroups: what if an application doesn't care about mtime?
 - optimize renames (to make SU andrew faster and make patch opts work better?)
+- Optimize journal patches
 - decided on how to cite email threads (esp reference title)
 
 * Benchmarking
