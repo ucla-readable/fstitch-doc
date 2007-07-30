@@ -1,13 +1,30 @@
 \section {Evaluation}
 \label{sec:evaluation}
 
-Our evaluation shows that a \Kudos\ \patch-based storage system has
-overall performance that is within reason, even though it is slower
-than Linux in some benchmarks. We also evaluate \patch\ optimizations,
-and demonstrate the effectiveness of \patchgroups\ for the UW IMAP
-mail server.
+We evaluate
 %
-\todo{Revise me}
+the effectiveness of \patch\ optimizations,
+%
+the performance of the \Kudos\ implementation relative to Linux ext2
+and ext3,
+%
+the correctness of the \Kudos\ implementation,
+%
+and the performance of \patchgroups.
+%
+This evaluation shows
+%
+that \patch\ optimizations significantly reduce \patch\ memory and CPU
+requirements,
+%
+that a \Kudos\ \patch-based storage system has overall performance
+that is within reason, even though it is slower than Linux in some
+benchmarks,
+%
+that \Kudos\ file systems are consistent after system crashs,
+%
+and that a \patchgroup-enabled IMAP server performs as well as or
+better than the unmodified server.
 
 \subsection{Methodology}
 
@@ -237,8 +254,8 @@ in the amount of data written to disk. Linux ext2 and Linux ext3 in
 ordered journal mode detect that most dirty blocks are no longer
 referenced at the end of the test, and so do not write them to disk
 (writing only 0.1--0.2~MB). In contrast, \Kudos\ and Linux ext3 in
-full journal mode do not and so do write these blocks (writing
-90--180~MB and 120~MB, respectively).
+full journal mode do not do this and therefore write these blocks
+(writing 90--180~MB and 120~MB, respectively).
 %
 While we believe that \Kudos\ probably can be improved to make this
 optimization, we have not implemented it.
@@ -286,7 +303,7 @@ the marked messages, commits the mailboxes, and logs out.
 Figure~\ref{fig:imap-compare} shows the results.
 %
 We divide configurations into the two categories unsafe (drive cache
-durability only, a message can be lost if the system crashes) and safe
+durability only, a message can be lost if the system loses power) and safe
 (drive platter durability).
 %
 We report total time, system CPU time, and the number of disk write
@@ -303,8 +320,8 @@ copy),
 and Linux with a server modified to presume a fully journaled file
 system (fsync only at the end).
 %
-Figure~\ref{fig:imap-compare} omits duplicate results, reporting
-each of the following with one entry:
+Figure~\ref{fig:imap-compare} groups similar results, reporting each
+of the following with one entry:
 %
 \Kudos\ meta and full journal modes,
 %
