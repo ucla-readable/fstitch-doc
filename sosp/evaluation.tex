@@ -3,50 +3,73 @@
 
 Our evaluation shows that a \Kudos\ \patch-based storage system has
 overall performance that is within reason, even though it is slower
-than Linux in some benchmarks. We also demonstrate the effectiveness
-of \patchgroups\ on some of our sample applications.
+than Linux in some benchmarks. We also evaluate \patch\ optimizations,
+and demonstrate the effectiveness of \patchgroups\ for the UW IMAP
+mail server.
+%
+\todo{Revise me}
 
-\subsection{Experimental Setup}
+\subsection{Methodology}
 
 All tests were run on a Dell Precision 380 with a 3.2GHz Pentium 4
 CPU, 2GB of RAM, and a Seagate ST3320620AS 320GB 7200RPM SATA2 disk.
 %
-All tests use a 10 GB file system.
+All tests use a 10~GB file system and the Linux 2.6.20.1 kernel
+with the Ubuntu v6.06 distribution.
 %
-%Our tests use Linux 2.6.20.1 with ext2 and ext3, \Kudos\ with ext2 with
-%soft updates and journaling, and FreeBSD 6.0 with UFS in soft updates mode,
-%all created with default configurations.
-Our tests use the Linux 2.6.20.1 kernel. We examine Linux ext2 and ext3
-(in ordered and journal modes) and \Kudos\ ext2 (in async, soft updates,
-metadata journal, and full journal modes), all created with default
-configurations.
+We examine Linux ext2 and ext3 (in ordered and journal modes) and
+\Kudos\ ext2 (in async, soft updates, metadata journal, and full
+journal modes), all created with default configurations.
 %
-All timing results, unless otherwise noted, are the mean of three runs.
+All timing results, except where otherwise noted, are the mean over three runs.
 
-Two simple tests are repeated throughout this section: first, we untar
-the Linux 2.6.15 source code from \texttt{linux-2.6.15.tar} (218 MB), which is
-already cached in RAM. Second, we delete the resulting source
-tree, after unmounting and remounting the file system.
+To evaluate \patch\ optimizations and \Kudos\ as a whole we ran four
+benchmarks.
+%
+The \emph{tar benchmark} untars and syncs the Linux 2.6.15 source code
+from the cached file \texttt{linux-2.6.15.tar} (218~MB).
+%
+The \emph{delete benchmark} deletes the result of the tar benchmark
+and syncs, after unmounting and then remounting the file system.
+%
+The \emph{PostMark benchmark} emulates the small file workloads seen
+on email and netnews servers~\cite{postmark}. We use PostMark v1.5,
+configured to create 500 files ranging in size from 500~B to 200~kB;
+perform 500 transactions consisting of file reads, writes, creates,
+and deletes; deletes its files; and finally syncs.
+%
+The modified \emph{Andrew benchmark} emulates a software development
+workload.  The benchmark creates a directory hierarchy, copies a
+source tree, reads the extracted files, compiles the extracted files,
+and syncs. The source code we use for the Andrew benchmark is the Ion
+window manager, version 2-20040729.
 
 \subsection {Optimization Benefits}
 
-\Kudos\ benefits greatly from the optimizations discussed in
-Section~\ref{sec:patch:optimizations}. The total number of \patches\ created,
-amount of undo data allocated, and system CPU time used are shown for the
-untar and rm tests in Figure~\ref{f:optdata}, with all combinations of using
-\nrb\ \patches\ and overlap merging. While both optimizations work well by
-themselves, the combination of the two is particularly effective at reducing the
-amount of undo data.
+We evaluate the effectiveness of the \patch\ optimizations discussed in
+Section~\ref{sec:patch:optimizations}, in terms of
 %
-The system time column shows time spent executing code in kernel space
-during the untar or remove; this is mostly \Kudos\ overhead.  Linux's
-system time numbers during a comparable test are much lower.  Profiling
-numbers indicate optimization opportunities in some of \Kudos's auxiliary
-libraries, such as its hash table, as well as more significant optimization
-opportunities we hope to address in future work.
-
+the total number of \patches\ created, amount of undo data allocated,
+and system CPU time used.
+%
+Figure~\ref{f:optdata} shows these results for the untar, delete,
+PostMark, and Andrew benchmarks for \Kudos\ ext2 in soft updates mode,
+with all combinations of using \nrb\ \patches\ and overlap merging.
+%
+While both optimizations work well alone, the combination of the two
+is particularly effective at reducing the amount of undo data.
+%
+Undo data memory usage is reduced by 85--100\%,
+%
+the number of \patches\ created is reduced by 73--99\%,
+%
+and system CPU time is reduced by up to 63\%.
+%
+\todo{Why does postmark create more patches with both optimizations
+  than with just overlap merging? Because of the unoptimized \texttt{rename}?}
 
 \begin{figure}[t]
+\centering
 \small
 \begin{tabular}{@{}lrrr@{}}
 \textbf{Optimization}
@@ -91,30 +114,12 @@ None
 Overlap merging
         &  15,545               & 37.95~MB              & 5.45~sec \\
 Both optimizations
-        &  18,954               & 9.45~MB               & 5.51~sec \\
+        &  18,954               & 9.45~MB               & 5.41~sec \\
 \end{tabular}
 \caption{Effectiveness of \Kudos\ optimizations.}
 \label{f:optdata}
 \end{figure}
 
-
-\begin{comment}
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{opts-patches}
-\includegraphics[width=\columnwidth]{opts-rollback}
-\begin{tabular}{@{}l|r|r@{}}
-Optimization & Untar (sys sec) & Delete (sys sec) \\ \hline\hline
-None & 4.42 & 1.14 \\ \hline\hline
-\Nrb\ \Patches\ & 4.53 & 1.08 \\
-Overlap Merge & 3.58 & 0.85 \\ \hline\hline
-HP $+$ OM & 3.58 & 0.75 \\
-\end{tabular}
-\caption{Effects of \nrb\ \patches\ with \nrb\ merging and overlap
-merging for the untar and rm tests.}
-\label{fig:opts}
-\end{figure}
-\end{comment}
 
 \begin{comment}
 \begin{figure}[t]
@@ -133,44 +138,9 @@ smaller account for about 51\% of all \rb\ \patches.}
 \subsection {Benchmarks}
 \label{sec:eval:bench}
 
-%Our first microbenchmark measures the number of blocks written by Linux ext2
-%and ext3 and \Kudos\ ext2 with soft updates during the untar test. Linux ext2
-%writes 523,248 blocks; Linux ext3 writes 523,192; \Kudos\ writes 540,472.
-
-%We also tested that \Kudos's soft updates ext2 writes a similar number of
-%blocks as FreeBSD's soft updates UFS. In one test, we create 100 small files
-%in a directory and measure the number of blocks written to disk. \Kudos\
-%writes 122 blocks, while FreeBSD writes 135 blocks.
-
-Times to untar and remove our Linux tarball are listed in
-Figure~\ref{fig:bench_time} for several systems, including time to fully sync
-the changes to disk.
-
-\begin{figure*}[t]
-\centering{
-\begin{tabular}{@{}lrrrr@{}}
-System & \multicolumn{1}{c}{Untar} & \multicolumn{1}{c}{Delete} & \multicolumn{1}{c}{PostMark} & \multicolumn{1}{c}{Andrew} \\ \hline
-% Results are from r3857
-\Kudos\ (async) & 4.3 [1.6] & 0.7 [0.2] & 1.4 [0.5] & 37.2 [5.2] \\
-\Kudos\ (soft updates) & 5.9 [2.2] & 0.9 [0.2] & 2.5 [0.5] & 45.1 [5.3] \\
-\Kudos\ (meta journal) & 8.8 [3.5] & 1.4 [0.5] & 3.4 [1.7] & 37.6 [5.4] \\
-\Kudos\ (full journal) & 12.6 [4.3] & 1.4 [0.5] & 5.2 [1.6] & 37.8 [5.5] \\
-\Kudos\ (full journal, NOFUA) & 10.0 [4.6] & 1.2 [0.5] & 4.4 [2.0] & 37.6 [5.5] \\ \hline
-
-%FreeBSD (soft updates) & 23.22 & 15.95 \\ 
-%FreeBSD (async) & 10.09 & 3.25 \\ \hline
-
-Linux (ext2) & 4.5 [0.7] & 4.6 [0.2] & 0.2 [0.1] & 37.3 [4.9] \\
-Linux (ext3 ordered) & 13.9 [1.0] & 4.3 [0.2] & 0.3 [0.2] & 37.1 [4.9] \\
-Linux (ext3 journal) & 10.9 [1.1] & 4.3 [0.3] & 2.7 [0.3] & 37.8 [5.0] \\
-Linux (ext3 journal, WT) & 12.7 [1.2] & 4.5 [0.2] & 3.4 [0.3] & 38.8 [5.0] \\
-\end{tabular}
-}
-\caption{\label{fig:bench_time} Untar, delete, PostMark, and Andrew
-  benchmark times (seconds). System CPU times are in square brackets.\newline
-Kudos times are for FUA, except for ``NOFUA.''
-Linux times are for a WB drive cache, except for ``WT.''}
-\end{figure*}
+We compare \Kudos\ and Linux ext2 and ext3 for the tar, delete,
+PostMark, and Andrew benchmarks. Times for these benchmarks are listed
+in Figure~\ref{fig:bench_time}.
 
 At the untar test, the \Kudos\ async mode is faster than Linux ext2, which
 provides a similar consistency guarantee. The \Kudos\ soft updates mode is
@@ -207,6 +177,44 @@ transactions consisting of file reads, writes, creates, and deletes;
 and finally delete its files. PostMark is a single process, single
 threaded program that performs these file system operations as quickly
 as possible.
+
+
+% The system time column shows time spent executing code in kernel space
+% during the untar or remove; this is mostly \Kudos\ overhead.  Linux's
+% system time numbers during a comparable test are much lower.  Profiling
+% numbers indicate optimization opportunities in some of \Kudos's auxiliary
+% libraries, such as its hash table, as well as more significant optimization
+% opportunities we hope to address in future work.
+
+
+\begin{figure}[tb]
+\centering
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\textbf{System} & \multicolumn{1}{c}{\textbf{Untar}} & \multicolumn{1}{c}{\textbf{Delete}} & \multicolumn{1}{c}{\textbf{PostMark}} & \multicolumn{1}{c}{\textbf{Andrew}} \\ \hline
+% Results are from r3862 and NDEBUG, except for WB from r3857 and no NDEBUG
+% (though NDEBUG does not seem to really change any of the numbers)
+\emph{\Kudos\ ext2} & & & & \\
+async & 4.0 [1.5] & 0.7 [0.2] & 1.4 [0.5] & 37.3 [5.4] \\
+soft updates & 6.1 [2.2] & 0.9 [0.2] & 2.4 [0.5] & 45.2 [5.4] \\
+meta journal & 8.1 [3.8] & 1.4 [0.5] & 3.6 [1.6] & 37.6 [5.4] \\
+full journal, WB & 10.0 [4.6] & 1.2 [0.5] & 4.4 [2.0] & 37.6 [5.5] \\
+full journal & 12.8 [4.2] & 1.4 [0.5] & 5.2 [1.7] & 37.8 [5.4] \\ \hline
+
+%FreeBSD (soft updates) & 23.22 & 15.95 \\ 
+%FreeBSD (async) & 10.09 & 3.25 \\ \hline
+
+\emph{Linux} & & & & \\
+ext2 & 4.5 [0.7] & 4.6 [0.2] & 0.2 [0.1] & 37.3 [4.9] \\
+ext3 ordered & 13.9 [1.0] & 4.3 [0.2] & 0.3 [0.2] & 37.1 [4.9] \\
+ext3 journal & 10.9 [1.1] & 4.3 [0.3] & 2.7 [0.3] & 37.8 [5.0] \\
+ext3 journal, WT & 12.7 [1.2] & 4.5 [0.2] & 3.4 [0.3] & 38.8 [5.0] \\
+\end{tabular}
+\caption{\label{fig:bench_time} Untar, delete, PostMark, and Andrew
+  benchmark times (seconds). System CPU times are in square brackets.
+  Kudos times are for a WT drive cache, except for ``WB,'' and Linux
+  times are for a WB drive cache, except for ``WT.''}
+\end{figure}
 
 Finally, we evaluate performance using a modified Andrew benchmark,
 which simulates a development workstation by extracting some source
@@ -277,7 +285,7 @@ Figure~\ref{fig:imap-compare} shows the results.
 \begin{figure}[t]
 \centering
 \begin{tabular}{@{}lrr@{}}
-System & Time & Writes \\ \hline
+\textbf{System} & \textbf{Time} & \textbf{Writes} \\ \hline
 % Results are from r3862
 
 % NOFUA

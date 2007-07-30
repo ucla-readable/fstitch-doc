@@ -25,7 +25,7 @@ TMP_PDF_IMAGES = fig/figures_1.pdf fig/figures_2.pdf fig/figures_3.pdf \
 	fig/examples_1.pdf fig/examples_2.pdf \
 	fig/examplesb_1.pdf fig/examplesb_2.pdf \
 	rb_chdesc_size.pdf nrb_merge.pdf opgroup_transitions.pdf svn_opgroups.pdf \
-	imap_fsync.pdf imap_pg.pdf opts-patches.pdf opts-rollback.pdf
+	imap_fsync.pdf imap_pg.pdf
 TMP_DVI_IMAGES = $(TMP_PDF_IMAGES:.pdf=.eps)
 
 PDF_IMAGES = $(TMP_PDF_IMAGES)
@@ -45,11 +45,6 @@ paper.pdf: $(MAINFILE) $(MAINFILE:.tex=.bbl) $(PDF_IMAGES) svnversion.tex always
 
 svnversion.tex: svnversion.tmpl always
 	sed "s/SVNVERSION/`svnversion .`/" svnversion.tmpl > svnversion.tex
-
-opts-patches.eps: opts.gp data/opts
-	(cd `dirname "$<"`; ./$<)
-opts-rollback.eps: opts.gp data/opts
-	(cd `dirname "$<"`; ./$<)
 
 %.aux: %.tex $(TEXSRCS) $(DVI_IMAGES) fonts.sty
 	$(LATEX) $<
