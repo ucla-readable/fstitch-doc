@@ -13,29 +13,36 @@ and cache sizes are large.
 The answer is a qualified yes.
 \end{comment}
 
+
+As file system functionality increases, maintaining file system
+ correctness in the presence of failures is increasingly a focus of
+ research~\cite{sivathanuetal05-logic,denehyetal05-journal-guided}.
+%
+File systems today deal with many challenges that make implementing this
+ property difficult: power losses, software failures, and even user
+ intervention all pose significant threats.
+%
+In order to avoid time-consuming and potentially ineffective manual
+ checks like \emph{fsck} when recovering from failures, file systems use
+ a variety of techniques, like journaling, which all rely on an often
+ implicit ``write before'' relationship among buffered changes to the
+ data in stable storage.
+%
 This paper aims to evaluate whether a simple, unified abstraction that
-explicitly represents both a ``write before'' relationship among
-buffered changes to stable storage, as well as the changes themselves,
-can be used to efficiently implement a complete file system layer, where
-modifications are common and cache sizes are large.
+ explicitly represents both this relationship and the changes themselves
+ can be used to efficiently implement a complete file system layer,
+ where modifications are common and cache sizes are large.
 %
 The answer is a qualified yes.
 
 
-As file system functionality increases, file system correctness is
- increasingly a focus of
- research~\cite{sivathanuetal05-logic,denehyetal05-journal-guided}.
-%
-File systems must commit blocks to stable storage in an order that
- preserves file system correctness.
-%
-This is difficult enough for file system
- implementers~\cite{tweedie98journaling,mckusick99soft}, but further
- complicated by file system extensions and special disk interfaces~\cite{soules03metadata,fast04versionfs,quinlan02venti,cornell04wayback,wright03ncryptfs,sivathanu03semantically-smart,sivathanu05database-aware}.
+Preserving the correctness of a file system image in stable storage is
+ difficult enough for file system implementers~\cite{tweedie98journaling,mckusick99soft},
+ but further complicated by file system extensions and special disk
+ interfaces~\cite{soules03metadata,fast04versionfs,quinlan02venti,cornell04wayback,wright03ncryptfs,sivathanu03semantically-smart,sivathanu05database-aware}.
 %
 Although stackable file
  systems~\cite{zadok00fist,zadok99extending,heidemann94filesystem,rosenthal90evolving}
- %% can aid in preserving consistency by 
  place extensions over an existing file system responsible for maintaining
  consistency, some extensions---for instance, creating a file containing
  metadata information about a directory---can introduce ordering
@@ -53,8 +60,7 @@ Robust applications, including databases, mail servers, and source code
 
 Proposed systems for improving file system integrity and consistency differ
  mainly in the kind of consistency they aim to impose, ranging from
- metadata consistency to full data journaling
- and even full ACID
+ metadata consistency to full data journaling and even full ACID
  transactions~\cite{gal05transactional,liskov04transactional}.
 %
 However, different extensions within a file system, or different
@@ -62,10 +68,12 @@ However, different extensions within a file system, or different
  consistency semantics, and performance suffers when lower layers are
  unnecessarily denied the opportunity to reorder writes.
 %
+Some Google applications, for instance, get better locality by avoiding the
+ use of a journal, and can tolerate the additional time spent doing (rare)
+ consistency checks~\cite{googleext2}.
+%
 A better choice might be an abstraction that can express many consistency
  models.
-%
-\todo{Cite Google not using journaling because of its overhead~\cite{googleext2}?}
 
 
 This work develops a new fundamental data type called a \emph{\patch},
