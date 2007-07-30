@@ -190,22 +190,22 @@ record can be erased, and that portion of the journal may be reused.
 
 Patches implementing a journal transaction could be arranged as follows:
 %
-suppose we have \patch\ $b_1$ modifying a bitmap block, $i_1$ and $i_1'$
-modifying an inode block, and $d_1$ modifying a data block.
+suppose we have \patch\ $b$ modifying a bitmap block, $i$ and $i'$
+modifying an inode block, and $d$ modifying a data block.
 %
 Copies of these blocks are written into the journal area using \patches\
-$d_{1\textrm{J}}$, $i_{1\textrm{J}}$, and $b_{1\textrm{J}}$, each on its
+$d_\textrm{J}$, $i_\textrm{J}$, and $b_\textrm{J}$, each on its
 own block.
 %
 The commit record is created on a fourth block in the journal area with
-\patch\ $cmt_1$, and we let $cmt_1 \PDDepend \{d_{1\textrm{J}}$,
-$i_{1\textrm{J}}$, $b_{1\textrm{J}}\}$.
+\patch\ $cmt$, and we let $cmt \PDDepend \{d_\textrm{J}$,
+$i_\textrm{J}$, $b_\textrm{J}\}$.
 %
-Then we let $\{b_1$, $i_1$, $i_1'$, $d_1\} \PDDepend cmt_1$.
+Then we let $\{b$, $i$, $i'$, $d\} \PDDepend cmt$.
 %
 Finally, we overwrite the commit record with a completion record with a
-\patch\ $cmp_1$, and we let $cmp_1 \PDDepend \{b_1$, $i_1$, $i_1'$,
-$d_1\}$.
+\patch\ $cmp$, and we let $cmp \PDDepend \{b$, $i$, $i'$,
+$d\}$.
 %
 These \patches\ are depicted in Figure~\ref{fig:journal}.
 %
@@ -220,13 +220,13 @@ and that the completion record is not written until the entire transaction is
 complete.
 
 This example also contains an instance of a \patch\ which will need to be
-reverted: $cmp_1$, which overwrites the commit record written by $cmt_1$ (and
-thus $\PBlock{cmp_1} = \PBlock{cmt_1}$), cannot be written with $cmt_1$ since
-$cmp_1 \PDDepend \{b_1$, $i_1$, $i_1'$, $d_1\} \PDDepend cmt_1$.
+reverted: $cmp$, which overwrites the commit record written by $cmt$ (and
+thus $\PBlock{cmp} = \PBlock{cmt}$), cannot be written with $cmt$ since
+$cmp \PDDepend \{b$, $i$, $i'$, $d\} \PDDepend cmt$.
 %
-So, we must revert $cmp_1$ and write $\PBlock{cmp_1}$ with only $cmt_1$ applied,
-then write $b_1$, $i_1$, $i_1'$, and $d_1$, and finally write $\PBlock{cmp_1}$
-again in order to write $cmp_1$.
+So, we must revert $cmp$ and write $\PBlock{cmp}$ with only $cmt$ applied,
+then write $b$, $i$, $i'$, and $d$, and finally write $\PBlock{cmp}$
+again in order to write $cmp$.
 
 \textbf{Soft updates.}
 %
@@ -250,20 +250,20 @@ system is in use.
 The soft updates rules map directly to \patch\ dependencies.
 %
 For example, appending a block to an empty file in an FFS-like file system
-requires allocating a block by writing a bit to the block bitmap ($b_1$),
-initializing the block by writing zeroes to it ($d_1$), writing the block number
-to the inode for the file ($i_1$), and updating the file's size ($i_1'$).
+requires allocating a block by writing a bit to the block bitmap ($b$),
+initializing the block by writing zeroes to it ($d$), writing the block number
+to the inode for the file ($i$), and updating the file's size ($i'$).
 %
-By rule \ref{rule:pointer}, we need $i_1 \PDDepend b_1$ and $i_1 \PDDepend d_1$,
-since $b_1$ and $d_1$ together initialize the new block.
+By rule \ref{rule:pointer}, we need $i \PDDepend b$ and $i \PDDepend d$,
+since $b$ and $d$ together initialize the new block.
 %
-By rule \ref{rule:reuse} we also need to make sure that $d_1$ depends on any
+By rule \ref{rule:reuse} we also need to make sure that $d$ depends on any
 previous deallocation of the same block, so that it is not overwritten while
 it is still in use.
 %
-A simple way to accomplish this is to let $d_1 \PDDepend b_1$.
+A simple way to accomplish this is to let $d \PDDepend b$.
 %
-Finally, we can let $i_1' \PDDepend d_1$ so that no file ever contains
+Finally, we can let $i' \PDDepend d$ so that no file ever contains
 accessible uninitialized data.
 %
 Figure~\ref{fig:softupdate} depicts this arrangement.

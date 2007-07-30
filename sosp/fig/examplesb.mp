@@ -109,9 +109,9 @@ beginfig(2);
   bi1.dx=4;
 
   boxjoin(a.width = b.width = a.height);
-  patchit.jd1(btex $d_{1\text{J}}$\strut etex, 0);
-  patchit.ji1(btex $i_{1\text{J}}$\strut etex, 0);
-  patchit.jb1(btex $b_{1\text{J}}$\strut etex, 0);
+  patchit.jd1(btex $d_{\text{J}}$\strut etex, 0);
+  patchit.ji1(btex $i_{\text{J}}$\strut etex, 0);
+  patchit.jb1(btex $b_{\text{J}}$\strut etex, 0);
   patchit.jc1(btex $\textit{cmt}\S$\strut etex, 0);
   patchit.jcp1(btex $\textit{cmp}\S$\strut etex, 0);
   jd1.dx=10;
