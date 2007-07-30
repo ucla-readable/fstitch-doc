@@ -206,4 +206,52 @@ beginfig(2);
   drawelement(jcp1,bi1,bk1,sz1,d1);
 endfig;
 
+beginfig(3);
+  save d,e,height,width,jx; pair jx[].nw,jx[].ne,jx[].sw,jx[].se,jx[].c,jx[].w;
+  
+  boxjoin(a.width = b.width = a.height);
+  patchit.d1(btex $d_1$\strut etex, 0);
+  d1.dx=10;
+
+  boxjoin(a.width = b.width = a.height);
+  patchit.bk1(btex $i_1$\strut etex, 0);
+  patchit.sz1(btex $i_1'$\strut etex, 0);
+  bk1.dx=6;
+
+  boxjoin(a.width = b.width = a.height);
+  patchit.bi1(btex $b_1$\strut etex, 0);
+  bi1.dx=4;
+
+  bi1.height=bi1.width; d1.height=d1.width; sz1.height=sz1.width;
+  bk1.s - sz1.n = (-10,2);
+  bi1.c - .5[bk1.c,sz1.c] = (0,75);
+  d1.w - .5[bi1.c,.5[bk1.c,sz1.c]] = (50,0);
+
+  fixelement(d1,bk1,sz1,bi1);
+
+  % Block boxes
+  d = e = 8; d'=22;
+  height = .85(d1.height + d' + d);
+  width = d1.width + 2e;
+  z1 = bi1.c + (-width,height)/2;  z2 = bi1.c - (-width,height)/2;
+  blockbox((x1,y1) -- (x2,y1) -- (x2,y2) -- (x1,y2) -- cycle);
+  z3 = .5[bk1.c,sz1.c] + (-width,height)/2;  z4 = .5[bk1.c,sz1.c] - (-width,height)/2;
+  blockbox((x3,y3) -- (x4,y3) -- (x4,y4) -- (x3,y4) -- cycle);
+  z5 = d1.c + (-width,height)/2;  z6 = d1.c - (-width,height)/2;
+  blockbox((x5,y5) -- (x6,y5) -- (x6,y6) -- (x5,y6) -- cycle);
+
+  drawelement(d1,bk1,sz1,bi1);
+
+  linecap := butt;
+
+  label.top(btex \mlabel{bitmap block}\strut etex scaled 0.9, (.5[x1,x2],y1-1));
+  label.bot(btex \mlabel{inode block}\strut etex scaled 0.9, (.5[x3,x4],y4-1));
+  label.top(btex \mlabel{data block}\strut etex scaled 0.9, (.5[x5,x6],y5-1));
+
+  drawconnpatch(bk1,bi1)(..);
+  drawconnpatch(bk1,d1)(..);
+  drawconnpatch(d1,bi1)(..);
+  drawconnpatch(sz1,d1)(..);
+endfig;
+
 end
