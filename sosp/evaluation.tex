@@ -11,8 +11,8 @@ mail server.
 
 \subsection{Methodology}
 
-All tests were run on a Dell Precision 380 with a 3.2GHz Pentium 4
-CPU, 2GB of RAM, and a Seagate ST3320620AS 320GB 7200RPM SATA2 disk.
+All tests were run on a Dell Precision 380 with a 3.2~GHz Pentium 4
+CPU, 2~GB of RAM, and a Seagate ST3320620AS 320~GB 7200~RPM SATA2 disk.
 %
 All tests use a 10~GB file system and the Linux 2.6.20.1 kernel
 with the Ubuntu v6.06 distribution.
@@ -120,6 +120,7 @@ and system CPU time used.
 Figure~\ref{f:optdata} shows these results for the untar, delete,
 PostMark, and Andrew benchmarks for \Kudos\ ext2 in soft updates mode,
 with all combinations of using \nrb\ \patches\ and overlap merging.
+Results are each from a single run.
 %
 While both optimizations work well alone, the combination of the two
 is particularly effective at reducing the amount of undo data.
@@ -192,7 +193,7 @@ At the untar benchmark, the \Kudos\ async mode is faster than Linux
 ext2, both provide a similar consistency guarantee.
 %
 \Kudos\ soft updates mode is 50\% slower, but provides a much stronger
-consistency guarantee; it provides comprabable consistency guarantees
+consistency guarantee; it provides comparable consistency guarantees
 to the widely used Linux ext3 in ordered data mode but is 50\% faster.
 %
 The \Kudos\ metadata journal mode is most similar to Linux ext3 in
@@ -240,30 +241,17 @@ respectively).
 %
 While we believe that \Kudos\ probably can be improved to make this
 optimization, we have not implemented it.
+%
+\todo{Use larger PostMark benchmark. Or note that a larger benchmark would
+show less of an I/O difference.}
 
-Finally, we evaluate performance using a modified Andrew benchmark,
-which simulates a development workstation by extracting some source
-code, scanning and reading the directory tree with several text
-processing utilities, and then compiling the source code. The source
-code we use is the Ion window manager, version 2-20040729.
-
-Figure~\ref{fig:bench_time} shows the times to run PostMark and the Andrew
-benchmark, and then synchronize their results to disk.
-
-%\Kudos's PostMark performance, compared to Linux and FreeBSD, falls
-%into the middle of \S\ref{sec:eval:untardel}'s untar and delete
-%benchmarks. As PostMark combines file creation and deletion, its
-%results follow for similar reasons as the untar and delete benchmarks'.
-
-\Kudos\ appears to do well at the Andrew benchmark in all but the soft
-updates case, where it spends a larger amount of I/O time than the other
-modes. However, its performance at PostMark is much worse, generally
-twice as slow as Linux with a comparable consistency guarantee, and it
-exhibits the same larger CPU time as the untar and delete tests. The
-extra I/O time in this case is due to the fact that Linux is normally
-able to recognize operations that cancel out in the file system cache,
-and avoid writing them to disk altogether. \Kudos\ does not yet support
-this feature, so it writes many more unnecessary blocks.
+Finally, we evaluate performance using a modified Andrew benchmark.
+\Kudos\ and Linux ext2/3 perform similarly in total time,
+%
+except for \Kudos\ in soft updates mode. In this mode \Kudos\ issues
+an order of magnitude more write requests, we believe due to \Kudos's
+unoptimized \texttt{rename} implementation which uses unnecessarily
+strict dependencies between directory entries and inodes.
 
 \subsection {Correctness}
 \label{sec:eval:correctness}
