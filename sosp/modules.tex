@@ -62,15 +62,17 @@ int (*append_file_block)(LFS_t *module,
 \end{alltt}
 \end{small}
 
-\noindent%
+\noindent
 This design lets \LFS\ modules examine and modify the dependency structure.
+
+\input{journal}
 
 \input{wbcache}
 
-\subsection{Loopback Module}
+\subsection{Loopback Device}
 \label{sec:modules:loop}
 
-The loopback module is a BD module that uses a file in an \LFS\ module as
+The loopback device is a BD module that uses a file in an \LFS\ module as
 its underlying data store. It is very similar to the device of the same
 name in Linux, but with one critical difference: it is aware of \patches.
 %
@@ -140,3 +142,12 @@ Unlike FreeBSD's soft updates implementation, once these modules set up the
 desired dependencies for the \patches\ they create, they no longer need to
 concern themselves with those \patches---the block device subsystem will track
 and enforce the dependencies.
+
+\subsection{Asynchronous writes}
+\label{sec:modules:unlink}
+
+Finally, we also wrote a trivial module that removes all dependencies from
+incoming \patches, allowing the buffer cache to write blocks in any order.
+%
+This implements similar semantics to existing file systems like ext2 in
+asynchronous write mode.

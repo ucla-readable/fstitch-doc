@@ -275,6 +275,13 @@ Figure~\ref{fig:softupdate} depicts this arrangement.
   for appending one block to an empty file in an FFS-like file system.}
 \end{figure}
 
+In contrast, in the BSD UFS implementation of soft updates, each UFS operation
+is represented in memory by a structure encapsulating the disk changes necessary
+to implement that operation. As a result, many specialized data structures
+represent the different possible file system operations. These structures, their
+relationships to one another, and their uses for tracking and enforcing
+dependencies are quite complex~\cite{mckusick99soft}.
+
 
 \subsection{Obeying Dependencies}
 \label{sec:patch:dependencies}
