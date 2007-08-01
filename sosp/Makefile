@@ -11,10 +11,10 @@ PDFLATEX = pdflatex
 MAINFILE = paper.tex
 
 TEXSRCS = abstract.tex conclusion.tex discussion.tex evaluation.tex \
-	ext2.tex implementation.tex optimizations.tex intro.tex journal.tex \
+	implementation.tex optimizations.tex intro.tex journal.tex \
 	modules.tex noop.tex nrb.tex merge.tex misc.tex opgroups.tex \
-	paper.tex readylist.tex related.tex softupdate.tex ufs.tex \
-	uhfs.tex using.tex wbcache.tex patch.tex svnversion.tex
+	paper.tex readylist.tex related.tex softupdate.tex \
+	using.tex wbcache.tex patch.tex svnversion.tex
 
 BIBS = paper.bib kmaster.bib
 
