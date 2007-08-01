@@ -3,23 +3,39 @@
 
 Soft updates, journaling, and other consistency models
 correspond to different \patch\ arrangements.
-%% , so these features can be added to
-%% the system as \modules\ which appropriately connect or reconnect the \patches.
 %
 \Kudos's current file system \modules\ generate dependencies corresponding
 to soft updates orderings by default~\cite{ganger00soft}.
 %
 Adding an independent journal \module\ rearranges the \patches\ to provide
 journaling semantics.
-%
-%% for maximum speed and minimum durability, a \module\ that disconnects
-%% \patch\ dependencies can be added.
-%
-%% Many other semantics could be supported by the addition of similar modules. In
-%% this section, we will discuss how \patches\ are used to implement different
-%% consistency semantics in \Kudos.
 
-\input{softupdate}
+\paragraph{Soft updates}
+\label{sec:using:softupdate}
+
+In the BSD UFS implementation of soft updates, each UFS operation is
+represented in memory by a structure encapsulating the disk changes
+necessary to implement that operation. As a result, many
+specialized data structures represent the different possible file system
+operations. These structures, their relationships to one another, and their uses
+for tracking and enforcing dependencies are quite
+complex~\cite{mckusick99soft}.
+
+\Kudos, in contrast, represents all dependencies by \patches\ and relies on
+general optimizations to reduce memory usage.
+%
+The resulting system is not as optimized as the BSD implementation, but
+much simpler to specify and easier for other modules to manipulate.
+%
+The \patches\ that make up a file system operation are connected to specify
+the order in which the changes must be written to disk.
+%
+For instance, most file systems require at least two \patches\ to remove
+a block from a file, one ($p$) to clear the block reference from the file's
+block list and one ($q$) to mark the block as free; adding the $q \PDDepend
+p$ dependency straightforwardly implements soft updates semantics.
+%
+Another example is given in Section~\ref{sec:patch:examples}.
 
 \input{journal}
 
@@ -31,12 +47,3 @@ incoming \patches, allowing the buffer cache to write blocks in any order.
 %
 This implements similar semantics to existing file systems like ext2 in
 asynchronous write mode.
-
-%% In the event that no consistency semantics are desired, for instance to compare
-%% a prototype implementation of a system for working with explicit dependency
-%% information to an existing asynchronous file system like ext2, \Kudos\ provides
-%% a \module\ which unlinks the dependencies from all \patches\ passing through it.
-%% By using this \module, the \patch\ graph will not enforce any ordering at all,
-%% and the buffer cache will be free to write blocks in any order. \Patches\ are
-%% not really necessary to implement this ``consistency'' protocol, but they
-%% nevertheless support it as a degenerate case.

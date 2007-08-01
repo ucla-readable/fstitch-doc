@@ -3,27 +3,6 @@
 \paragraph{Journaling}
 \label{sec:using:journal}
 
-\begin{comment}
-% This paragraph is basically replicated in sec:patch:examples
-In a journaling file system, changes to disk structures are grouped into
-\emph{transactions} that commit atomically.
-%
-Any change in a transaction is first copied into an on-disk journal.
-%
-A single \emph{commit record} block is written to the journal once the
-transaction's changes are stably committed there.
-%
-This record commits the transaction itself, allowing its changes to be
-written into the main body of the file system in any order.
-%
-If the system crashes, the journal information is used to recover the main
-file system from its possibly-incomplete state.
-%
-Once all the transaction's changes are written, a \emph{completion record}
-is written to the journal to mark the transaction as complete; that portion
-of the journal may now be reused.
-\end{comment}
-
 The \Kudos\ journal module sits below a regular file system and transforms
 incoming \patches\ into journal transactions.
 %
@@ -40,9 +19,6 @@ dependencies described in \S\ref{sec:patchgroup} are not violated.}
 The journal format is similar to ext3's~\cite{tweedie98journaling}: a
 transaction contains a list of block numbers, the data to be written to
 those blocks, and finally a single commit record.
-%
-%Figure~\ref{fig:journal} shows how the journal module transforms the
-%\patches\ in Figure~\ref{fig:softupdate} into journaling semantics.
 %
 Note that the journal must modify existing \patches' direct dependencies;
 this is allowed since the new dependencies will never introduce a
@@ -64,33 +40,11 @@ merging within a transaction. This temporary dependency is removed when the
 real commit record is created and its dependencies are set up as described
 above.
 
-\begin{comment}
-Almost all of this description of journaling translates directly into \patch\
-dependencies. The incoming \patches\ must be rearranged to implement the new
-structure, but for the most part this transformation is straightforward. There
-are two special considerations which the journal \module\ must address, however.
-
-First, with soft updates, \patches\ can always be written to the disk when
-flushing the cache, while the journal must be able to ``lock'' \patches\ into
-the cache while transactions are in progress. To accomplish this, the journal
-\module\ uses a managed \noop\ \patch, as outlined in
-Section~\ref{sec:patch:noop}.
-
-Second, the commit record is created at the end of the transaction, but the file
-system changes created during the transaction must be made to depend on it.
-Ordinarily this is not permitted (see \S\ref{sec:patch:nrb}). The condition for
-violating this rule is a static proof that no cycle can result from doing so
-(immediately or in the future); we have determined this to be the case for the
-journal \module\ by hand.
-\end{comment}
-
-\begin{comment}
-Due to this design, the journal \module\ is completely independent of any
-specific file system. It is a block device \module\ that automatically journals
-whatever file system is stored on it. In fact, the incoming \patches\ need not
-be arranged for soft updates, or for that matter in any particular configuration
-at all.
-\end{comment}
+%Due to this design, the journal \module\ is completely independent of any
+%specific file system. It is a block device \module\ that automatically journals
+%whatever file system is stored on it. In fact, the incoming \patches\ need not
+%be arranged for soft updates, or for that matter in any particular configuration
+%at all.
 
 % Is it important to specify how we figure out where transaction boundaries
 % are? It seemed confusing to one reviewer due to this section preceeding the
