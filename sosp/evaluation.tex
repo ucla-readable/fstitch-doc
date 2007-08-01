@@ -368,9 +368,9 @@ for the \texttt{fsync} system call.
 \Kudos\ full journal (pg) & 1.3 [0.5] & 33 \\
 
 % WB
-Linux ext2 (fsyncs) & 1.5 [0.3] & 2,503 \\
-%Linux ext3 ordered (fsyncs) & 2.0 [0.3] & 3,025 \\
-Linux ext3 journal (fsyncs) & 1.8 [0.3] & 2,531 \\ \hline
+Linux ext2 (fsync) & 1.5 [0.3] & 2,503 \\
+%Linux ext3 ordered (fsync) & 2.0 [0.3] & 3,025 \\
+Linux ext3 journal (fsync) & 1.8 [0.3] & 2,531 \\ \hline
 
 \multicolumn{3}{@{}c@{}}{\textbf{Safe}\raise2pt\hbox{\strut}} \\
 
@@ -379,26 +379,26 @@ Linux ext3 journal (fsyncs) & 1.8 [0.3] & 2,531 \\ \hline
 \Kudos\ soft updates (pg) & 27.2 [1.2] & 3,015 \\
 %\Kudos\ meta journal (pg) & 1.5 [0.4] & 32 \\
 \Kudos\ full journal (pg) & 1.5 [0.5] & 32 \\
-\Kudos\ full journal (fsync) & 1.4 [0.4] & 31 \\
+\Kudos\ full journal (linear) & 1.4 [0.4] & 31 \\
 
 % WT, fsyncs to CHECK/CLOSE
-Linux ext3 journal (fsync) & 1.2 [0.3] & 26 \\
+Linux ext3 journal (linear) & 1.2 [0.3] & 26 \\
 
 % FUA, without patchgroups
 %\Kudos\ async (pg) & 1.6 [0.3] & 2,503 \\
-\Kudos\ soft updates (fsyncs) & 65.0 [0.3] & 8,083 \\
+\Kudos\ soft updates (fsync) & 65.0 [0.3] & 8,083 \\
 %\Kudos\ meta journal (pg) & 51.3 [0.4] & 7,111 \\
-\Kudos\ full journal (fsyncs) & 51.0 [0.5] & 7,114 \\
+\Kudos\ full journal (fsync) & 51.0 [0.5] & 7,114 \\
 
 % WT
-Linux ext2 (fsyncs) & 16.7 [0.3] & 2,503 \\
-%Linux ext3 ordered (fsyncs) & 23.9 [0.3] & 3,025 \\
-Linux ext3 journal (fsyncs) & 20.4 [0.3] & 2,531 \\
+Linux ext2 (fsync) & 16.7 [0.3] & 2,503 \\
+%Linux ext3 ordered (fsync) & 23.9 [0.3] & 3,025 \\
+Linux ext3 journal (fsync) & 20.4 [0.3] & 2,531 \\
 
 \end{tabular}
 \caption{\label{fig:imap-compare} IMAP benchmark: move 1,000 messages.
   Times are in seconds, writes in number of requests.  System CPU
-  times are in square brackets. Consistency protocols: ``fsyncs'' is
-  the unmodified server, ``pg'' uses patchgroups, and ``fsync'' presumes
+  times are in square brackets. Consistency protocols: ``fsync'' is
+  the unmodified server, ``pg'' uses patchgroups, and ``linear'' presumes
   a fully journaled file system.}
 \end{figure}
