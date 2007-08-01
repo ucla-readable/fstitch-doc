@@ -4,17 +4,8 @@ review_todos file
 
 Improve system name?
 
-Modules:
-- Explore modules not possible within a stackable file system (osdi reviewer)
-
-Opgroups:
-- Add macro imap benchmarks?
-- Compare data journaling (unnecessarily strict) vs minimal opgroups
-- Do svn+opgroups crash test?
-- Figure out: how does MacOSX HFS+ journaling work?
-
-Implementation:
-- Note that the current implementation stores two copies of each block
+Title:
+- Write "We <heart> Kudos" in teeny tiny letters somewhere?
 
 Related work:
 - ext2?
@@ -22,15 +13,32 @@ Related work:
 	http://www.nongnu.org/ext2-doc/ext2.html
 - recent stackable: https://ols2006.108.redhat.com/2007/Reprints/sipek-Reprint.pdf ?
 
+Optimizations:
+- Update overlap merge algorithm description
+
+Patchgroups:
+- Remove svn figure?
+- Note that our journal + patches implementation is not optimally efficient
+- Add macro imap benchmarks?
+- Compare data journaling (unnecessarily strict) vs minimal opgroups
+- Do svn+opgroups crash test?
+- Figure out: how does MacOSX HFS+ journaling work?
+
+Modules:
+- Explore modules not possible within a stackable file system (osdi reviewer)
+
+Implementation:
+- Note that the current implementation stores two copies of each block
+
+Eval:
+- Describe what uses system time
+- More fully explain allocator differences and the effects
+- Note size of a patch? Note #deps and size?
+
 Misc:
 - Look at BSD implementation of soft updates; how does it work?
-- Check that we did not forget any todos sent to kudos@ 
+- Check that we did not forget any todos sent to kudos@
 - Be consistent with "Section" and "\S", "in-flight" and "in flight", etc.
-- Update overlap merge algorithm description
-- Note that our journal + patches implementation is not optimally efficient
-- Note size of a patch? Note #deps and size?
-- Remove svn figure?
-- More fully explain allocator differences and the effects
 - Decide how to cite email threads (esp reference's title)
 
 * Kudos
@@ -59,23 +67,6 @@ Misc:
 - Track other patch-related datastructure memory usage?
   - bit overlap hash maps
   - number of hard patches
-- Increase number of runs from 1 or 3 to maybe 10
+- Increase number of runs from 3 to maybe 10
 - Check that NOFUA==WB and FUA==WT
 	- Benchmark ext3 with barriers?
-
-* Important bugs
-
-- medium/large postmark crashes kudos journaling
-
-
-* Unimportant bugs (unless they get in our way)
-
-- UU cannot sync during shutdown
-
-
-learn dep structure of imap su
-
-Up next:
-- Increase postmark test size
-- Update paper's results
-- Update overlap merge algo discussion
