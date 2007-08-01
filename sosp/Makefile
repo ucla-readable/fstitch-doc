@@ -14,7 +14,7 @@ TEXSRCS = abstract.tex conclusion.tex discussion.tex evaluation.tex \
 	ext2.tex implementation.tex optimizations.tex intro.tex journal.tex \
 	modules.tex noop.tex nrb.tex merge.tex misc.tex opgroups.tex \
 	paper.tex readylist.tex related.tex softupdate.tex ufs.tex \
-	uhfs.tex using.tex wbcache.tex svnversion.tex
+	uhfs.tex using.tex wbcache.tex patch.tex svnversion.tex
 
 BIBS = paper.bib kmaster.bib
 
@@ -35,20 +35,23 @@ PDF_PRIMARY =
 
 all: paper.pdf paper.dvi
 
-paper.dvi: $(MAINFILE) $(MAINFILE:.tex=.bbl) $(DVI_IMAGES) svnversion.tex always
+paper.dvi: $(MAINFILE) $(MAINFILE:.tex=.bbl) $(DVI_IMAGES) svnversion.tex
 	$(LATEX) $<
 	@while grep Rerun paper.log >/dev/null 2>&1; do echo $(LATEX) $<; $(LATEX) $<; done
+	touch -r paper.bbl paper.aux
 
-paper.pdf: $(MAINFILE) $(MAINFILE:.tex=.bbl) $(PDF_IMAGES) svnversion.tex always
+paper.pdf: $(MAINFILE) $(MAINFILE:.tex=.bbl) $(PDF_IMAGES) svnversion.tex
 	$(PDFLATEX) $<
 	@while grep Rerun paper.log >/dev/null 2>&1; do echo $(PDFLATEX) $<; $(PDFLATEX) $<; done
+	touch -r paper.bbl paper.aux
 
 svnversion.tex: svnversion.tmpl always
-	sed "s/SVNVERSION/`svnversion .`/" svnversion.tmpl > svnversion.tex
+	sed "s/SVNVERSION/`svnversion .`/" svnversion.tmpl > svnversion.tmp
+	cmp -s svnversion.tmp svnversion.tex && rm svnversion.tmp || mv svnversion.tmp svnversion.tex
 
 %.aux: %.tex $(TEXSRCS) $(DVI_IMAGES) fonts.sty
 	$(LATEX) $<
-bib: $(MAINFILE:.tex=.aux) always
+bib: $(MAINFILE:.tex=.aux) $(BIBS)
 	$(BIBTEX) -min-crossrefs=1000 $<
 %.bbl: %.aux $(BIBS)
 	$(MAKE) bib
