@@ -44,7 +44,7 @@ durable after is is on the disk platter (safe) and Linux ext2 and ext3
 after it is in the disk cache (unsafe). However, both systems can run
 with either durability assumption---we report both results for each.
 %
-All timing results, except where otherwise noted, are the mean over three runs.
+All timing results are the mean over three runs.
 
 To evaluate \patch\ optimizations and \Kudos\ as a whole we ran four
 benchmarks.
@@ -78,24 +78,24 @@ the Ion window manager, version 2-20040729.
 \begin{tabular}{@{}lrrr@{}}
 \textbf{Optimization}
         & \textbf{\# \patches} & \textbf{Undo data} & \textbf{System time} \\
-% Results are from r3919
+% Results are from r3931
 % NOTE: also update numbers in \patchoptundo and \patchoptcount
 \hline
 \multicolumn{4}{@{}c@{}}{\textbf{Untar test}\raise2pt\hbox{\strut}} \\
 None
-        & 619,743               & 470.43~MB             & 3.43~sec \\
+        & 619,740               & 470.43~MB             & 3.44~sec \\
 \Nrb\ \patches\
-        & 445,880               & 210.88~MB             & 3.00~sec \\
+        & 445,927               & 210.88~MB             & 3.09~sec \\
 Overlap merging
-        & 109,156               & 260.00~MB             & 2.27~sec \\
+        & 109,152               & 260.00~MB             & 2.18~sec \\
 Both optimizations
-        &  67,361               & 0.33~MB               & 2.45~sec \\
+        &  67,363               & 0.33~MB               & 2.33~sec \\
 \hline
 \multicolumn{4}{@{}c@{}}{\textbf{Delete test}\raise2pt\hbox{\strut}} \\
 None
-        & 299,089               & 1.46~MB               & 0.83~sec \\
+        & 299,089               & 1.46~MB               & 0.85~sec \\
 \Nrb\ \patches\
-        & 41,113                & 0.93~MB               & 0.27~sec \\
+        & 41,113                & 0.93~MB               & 0.29~sec \\
 Overlap merging
         & 54,665                & 0.96~MB               & 0.33~sec \\
 Both optimizations
@@ -103,23 +103,23 @@ Both optimizations
 \hline
 \multicolumn{4}{@{}c@{}}{\textbf{PostMark test}\raise2pt\hbox{\strut}} \\
 None
-        & 250,371               & 176.56~MB             & 1.48~sec \\
+        & 250,370               & 176.56~MB             & 1.49~sec \\
 \Nrb\ \patches\
         & 155,484               & 86.14~MB              & 1.12~sec \\
 Overlap merging
-        &  48,158               & 90.27~MB              & 0.71~sec \\
+        &  48,157               & 90.27~MB              & 0.72~sec \\
 Both optimizations
-        &  22,620               & 0.00~MB               & 0.54~sec \\
+        &  22,620               & 0.00~MB               & 0.53~sec \\
 \hline
 \multicolumn{4}{@{}c@{}}{\textbf{Andrew test}\raise2pt\hbox{\strut}} \\
 None
-        &  70,923               & 65.63~MB              & 5.49~sec \\
+        &  70,922               & 65.63~MB              & 5.38~sec \\
 \Nrb\ \patches\
-        &  50,369               & 37.05~MB              & 5.48~sec \\
+        &  50,381               & 37.05~MB              & 5.43~sec \\
 Overlap merging
-        &  12,527               & 28.57~MB              & 5.24~sec \\
+        &  12,438               & 28.57~MB              & 5.34~sec \\
 Both optimizations
-        &  11,178               & 0.03~MB               & 5.14~sec \\
+        &  11,180               & 0.03~MB               & 5.35~sec \\
 \end{tabular}
 \caption{Effectiveness of \Kudos\ optimizations.}
 \label{f:optdata}
@@ -137,7 +137,6 @@ and system CPU time used.
 Figure~\ref{f:optdata} shows these results for the untar, delete,
 PostMark, and Andrew benchmarks for \Kudos\ ext2 in soft updates mode,
 with all combinations of using \nrb\ \patches\ and overlap merging.
-Each result is from a single run.
 %
 While both optimizations work well alone, the combination of the two
 is particularly effective at reducing the amount of undo data.
