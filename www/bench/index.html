@@ -43,9 +43,14 @@ br.floatright { clear: right; }
 <script type="text/javascript" src="plots/io_imap.js"></script>
 
 <script type="text/javascript"> <!--
+// number of system parameters
+var sysLen = 6;
+
 function sysName(testData)
 {
-	return testData[0] + ' ' + testData[1] + ' ' + testData[2];
+	if(testData[0] == "linux" && testData[1] == "safe")
+		return testData[0] + ' ' + testData[1] + ' ' + testData[2] + ' ' + testData[3];
+	return testData[0] + ' ' + testData[2] + ' ' + testData[3];
 }
 
 function appendRowHeader(row, text)
@@ -67,11 +72,11 @@ function addTimeTest(tblId, testData)
 {
 	var row = document.getElementById(tblId).insertRow(-1);
 	appendRowHeader(row, sysName(testData));
-	appendRowHeader(row, testData[3]);
-	appendData(row, testData[4].toFixed(2));
-	appendData(row, testData[7].toFixed(2));
-	appendData(row, testData[13].toFixed(2));
-	appendData(row, testData[10].toFixed(2));
+	appendRowHeader(row, testData[5]);
+	appendData(row, testData[sysLen].toFixed(2));
+	appendData(row, testData[sysLen + 3].toFixed(2));
+	appendData(row, testData[sysLen + 9].toFixed(2));
+	appendData(row, testData[sysLen + 6].toFixed(2));
 }
 
 function loadTimes()
@@ -93,11 +98,11 @@ function addSpaceTest(tblId, testName, testData)
 	var row = document.getElementById(tblId).insertRow(-1);
 	var rollbackIndex = 25; // don't write #items for this index
 	appendRowHeader(row, testName + ': ' + testData[2]);
-	appendRowHeader(row, testData[3]);
+	appendRowHeader(row, testData[5]);
 	for (var i = 0; i <= rollbackIndex; i += 5)
 	{
-		var nitems = testData[i + 7];
-		var sizeof = testData[i + 8];
+		var nitems = testData[i + sysLen + 3];
+		var sizeof = testData[i + sysLen + 4];
 		var size = (nitems * sizeof / 1024).toFixed(0);
 		if (i != rollbackIndex)
 			appendData(row, nitems);
@@ -123,13 +128,13 @@ function addIoTest(tblId, testData)
 {
 	var row = document.getElementById(tblId).insertRow(-1);
 	appendRowHeader(row, sysName(testData));
-	appendRowHeader(row, testData[3]);
-	appendData(row, testData[4].toFixed(0));
-	appendData(row, testData[7].toFixed(0));
-	appendData(row, testData[16].toFixed(0));
-	appendData(row, testData[19].toFixed(0));
-	appendData(row, testData[10].toFixed(0));
-	appendData(row, testData[13].toFixed(0));
+	appendRowHeader(row, testData[5]);
+	appendData(row, testData[sysLen].toFixed(0));
+	appendData(row, testData[sysLen + 3].toFixed(0));
+	appendData(row, testData[sysLen + 12].toFixed(0));
+	appendData(row, testData[sysLen + 15].toFixed(0));
+	appendData(row, testData[sysLen + 6].toFixed(0));
+	appendData(row, testData[sysLen + 9].toFixed(0));
 }
 
 function loadIo()
