@@ -1,3 +1,5 @@
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
 \section{\Modules}
 \label{sec:modules}
 
@@ -11,7 +13,86 @@ functions which are fairly obvious from their names and need no further
 description.
 \end{comment}
 
-\input{interfaces}
+%% \subsection {Interfaces}
+\label{sec:modules:interfaces}
+
+\begin{comment}
+New \modules\ are
+simple to write, and by changing the \module\ arrangement, a broad range of
+behaviors can be implemented. It's also easy to tell what behavior a given
+arrangement will give just by looking at the connections between the \modules.
+\end{comment}
+
+A complete \Kudos\ configuration is composed of many \modules, making it
+in some sense a finer-grained variant of a stackable file system.
+%
+There are three major types of \modules.
+%
+Closest to the disk are block device (BD) \modules, which have a fairly
+conventional block device interface with interfaces such as ``read block'' and
+``flush''. 
+%
+Closest to the system call interface are \emph{common file system} (CFS)
+\modules, which have an interface similar to VFS~\cite{kleiman86vnodes}. 
+%
+\Kudos\ also supports an intermediate interface between BD and CFS.
+%
+This \emph{low-level file system} (\LFS) interface helps divide file system
+implementations into code common across block-structured file systems and
+code specific to a given file system layout.
+%
+\begin{comment}
+A
+\Kudos\ file system designer combines modules with all three interfaces in many
+ways -- a departure from stackable file systems, which act only at the VFS/CFS
+layer. \Kudos\ \modules\ are implemented in C using structures of function
+pointers to achieve object oriented behavior, very much like the rest of the
+Linux kernel.
+\end{comment}
+%
+The \LFS\ interface has functions to allocate blocks, add blocks to files,
+allocate file names, and other file system micro-operations. A \module\
+implementing the \LFS\ interface defines how bits are laid out on the disk, but
+doesn't have to know how to combine the micro-operations into larger, more
+familiar file system operations. A generic CFS-to-\LFS\ \module\ called UHFS
+(``universal high-level file system'') decomposes the larger file write, read,
+append, and other standard operations into \LFS\ micro-operations. 
+%
+File system extensions like those often implemented by stackable file
+systems would generally use the CFS interface; for example, we wrote a
+simple CFS module that provides case-insensitive access to a case-sensitive
+file system.
+%
+File system implementations, such as our ext2 and UFS implementations, use
+the \LFS\ interface.
+
+
+\Patches\ are explicitly part of the \LFS\ interface.
+%
+Every \LFS\ function that might modify the file system takes a
+\texttt{\textit{patch\char`\_t **p}} argument.
+%
+Before the function is called, \texttt{*p} should be set to the \patch,
+if any, on which the modification should depend;
+%
+when the function returns, \texttt{*p} will be set to some \patch\
+corresponding to the modification itself.
+%
+(\Noop\ \patches\ allow this interface to generalize to multiple
+dependencies.)
+%
+For example, this function is called to append a block to an \LFS\ inode
+(which is called ``\verb+fdesc_t+''):
+
+\begin{small}
+\begin{alltt}
+int (*append_file_block)(LFS_t *module, 
+   fdesc_t *file, uint32_t block, patch_t **p);
+\end{alltt}
+\end{small}
+
+\noindent%
+This design lets \LFS\ modules examine and modify the dependency structure.
 
 %% \input{uhfs}
 
