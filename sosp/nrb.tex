@@ -10,7 +10,8 @@ When a \patch\ $p$ is created, \Kudos\ conservatively detects whether $p$
 will ever need to be reverted.
 %
 If not, $p$ is a \emph{\nrb\ \patch}: its data can be applied
-directly to the in-memory copy of the block without saving undo data
+%directly
+to the in-memory copy of the block without saving undo data
 for the previous version.
 
 
@@ -54,9 +55,7 @@ created.\footnote{The actual rule is somewhat more flexible: modules may add
   new direct dependencies if they guarantee that those dependencies
   don't introduce any new block-level cycles.  As one example, if no
   \patch\ depends on some \noop\ \patch\ $p$, then adding a new $p
-  \PDDepend q$ dependency can't introduce a cycle.  Additionally,
-  modules can specify at creation time that a \patch\ is not allowed to
-  become \nrb, because dependencies might be added to it later.}
+  \PDDepend q$ dependency can't introduce a cycle.}
 %
 Since every \patch\ follows this rule, all possible block-level cycles $p
 \PDepend q \PDepend p'$ are visible at creation time.

@@ -36,9 +36,9 @@ This section describes \emph{\patchgroups}, which extend \patches\ to user
 space and let applications express dependencies among file system
 operations.
 %
-Compared to a dictated order, this lets the file system optimize commit
-orderings, but is still relatively independent of the underlying file
-system.
+Compared to forcing block writes in the application, this lets the file
+system buffer, combine, and reorder block writes, but is still relatively
+independent of the underlying file system.
 %
 For example, \patchgroups\ even allow an application to specify
 dependencies among raw block device writes.
@@ -148,8 +148,6 @@ between engaged \patchgroups' \noop\ \patches.
 %
 Figure~\ref{fig:patchgroup-patches} shows an example \patch\ arrangement for
 two \patchgroups.
-\todo{Note how patchgroups are effectively implemented in SU, meta
-journaling, and full journaling?}
 
 \begin{figure}[t]
 \centering
@@ -194,7 +192,7 @@ system, and the UW IMAP mail server daemon.
 \paragraph{Gzip}
 \label{sec:patchgroup:gzip}
 
-Our first test showed that simple consistency requirements were trivial to
+Our first test showed that simple consistency requirements were simple to
 add.  We updated gzip to use \patchgroups\ that ensure the input file's
 removal is not committed before the output file's data is written, so that
 a crash does not lose both files. The update adds 10 lines of code to gzip
@@ -323,7 +321,7 @@ The most relevant IMAP commands synchronize changes to the server's
 disk (CHECK), copy a message from the selected mailbox to another
 mailbox (COPY), and delete messages marked for deletion (EXPUNGE).
 
-The imapd and mbox mail storage drivers were updated to use
+We updated the imapd and mbox mail storage drivers to use
 \patchgroups, ensuring that all disk writes occur in a safe ordering
 without enforcing a specific order.
 %

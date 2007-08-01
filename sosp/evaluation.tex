@@ -15,13 +15,13 @@ and the performance of \patchgroups.
 This evaluation shows
 %
 that \patch\ optimizations significantly reduce \patch\ memory and CPU
-requirements,
+requirements;
 %
 that a \Kudos\ \patch-based storage system has overall performance
 that is within reason, even though it is slower than Linux in some
-benchmarks,
+benchmarks;
 %
-that \Kudos\ file systems are consistent after system crashs,
+that \Kudos\ file systems are consistent after system crashs;
 %
 and that a \patchgroup-enabled IMAP server performs as well as or
 better than the unmodified server.
@@ -146,9 +146,6 @@ Undo data memory usage is reduced by 85--100\%,
 the number of \patches\ created is reduced by 73--99\%,
 %
 and system CPU time is reduced by up to 63\%.
-%
-\todo{Why does Andrew create more patches with both optimizations
-  than with just overlap merging? Because of the unoptimized \texttt{rename}?}
 
 \begin{comment}
 \begin{figure}[t]
@@ -264,12 +261,9 @@ optimization, we have not implemented it.
 show less of an I/O difference.}
 
 Finally, we evaluate performance using a modified Andrew benchmark.
-\Kudos\ and Linux ext2/3 perform similarly in total time,
-%
-except for \Kudos\ in soft updates mode. In this mode \Kudos\ issues
-an order of magnitude more write requests, we believe due to \Kudos's
-unoptimized \texttt{rename} implementation which uses unnecessarily
-strict dependencies between directory entries and inodes.
+\Kudos\ and Linux ext2/3 perform similarly in total time. This benchmark
+differs from the others in that there is a significant amount of time spent
+in userspace running the compiler: about 31.9 seconds.
 
 \subsection {Correctness}
 \label{sec:eval:correctness}

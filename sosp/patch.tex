@@ -125,7 +125,7 @@ Once the block is written, the system will re-apply the \patch\ and, when
 allowed, write the block again, this time including the \patch.
 %
 Undo information adds greatly to memory and CPU utilization, but it can
-often be optimized away, as we show below.
+often be optimized away, as we show in Section~\ref{sec:patch:optimizations}.
 
 \begin{figure}[t]
 \begin{small}
@@ -339,21 +339,24 @@ The buffer cache is also expected to write all blocks eventually, a
 
 \textbf{Example.}
 %
-Suppose the buffer cache has \patches\ arranged as in the previous journal
-example, and that $\{j_i\} \subseteq \PDisk$, i.e., the journal entries have
-already been written to disk.
+Suppose the buffer cache has \patches\ arranged as in the journal example from
+Section~\ref{sec:patch:examples}, and that $\{d_\textrm{J}$, $i_\textrm{J}$,
+$b_\textrm{J}\} \subseteq \PDisk$, i.e., the journal entries have already been
+written to disk.
 %
-The buffer cache cannot write block $\PBlock{u_i}$ for any $i$, since $u_i
-\PDDepend c$ and $\PState{c} \neq \PDiskst$.
+The buffer cache cannot write block $\PBlock{b}$, $\PBlock{i}$, or $\PBlock{d}$,
+since $\{b$, $i$, $i'$, $d\} \PDDepend cmt$ and $\PState{cmt} \neq \PDiskst$.
 %
-Its only option is to write $\PBlock{c}$ since $\PDepset{c} = \{j_i\}
-\subseteq \PDisk$.
+Its only option is to write $\PBlock{cmt}$ since $\PDepset{cmt} =
+\{d_\textrm{J}$, $i_\textrm{J}$, $b_\textrm{J}\} \subseteq \PDisk$.
 %
-So, via the action above, it sets $\PState{c} \gets \PDiskst$.
+So, via the action above, it picks $P = \{cmt\}$ and sets $\PState{cmt} \gets
+\PInfst$. (Note that $cmp \not \in P$ since it has unmet dependencies, so it
+will be reverted before sending the block data to the disk controller.)
 %
 Later, when notification is received that $\PBlock{c}$ has been written to disk,
 $\PState{c}$ is set to $\PDiskst$ and the buffer cache then has the option to
-write any of $\PBlock{u_i}$.
+write any of $\PBlock{b}$, $\PBlock{i}$, or $\PBlock{d}$.
 
 This model does not completely define the disk's behavior on system crash,
  in particular with respect to in-flight blocks.

@@ -5,7 +5,7 @@
 
 File operations such as block allocations, inode updates, and directory updates
 create many distinct \patches. Keeping track of these
-\patches\ and their dependencies requires significant amounts of memory and
+\patches\ and their dependencies requires a significant amount of memory and
 CPU time.
 %
 \Kudos\ therefore \emph{merges} \patches\ when possible, drastically reducing
@@ -35,7 +35,7 @@ $p$'s data to the block and setting $\PDDepset{h} \gets \PDDepset{h} \cup
 \PDDepset{p}$.
 %
 Although this changes $h$'s direct dependency set, that change cannot
-introduce any new block-level cycles or $p$ would not have been \nrb\ in the
+introduce any new block-level cycles or $p$ could not have been \nrb\ in the
 first place.
 %
 The existing \nrb\ \patch\ $h$ is returned to the caller.
@@ -365,6 +365,7 @@ to the minimum of 8 and the amount of undo data to the minimum of 0.
 In our experiments, we observe that \nrb\ \patches\ and our \patch\ merging
 optimizations reduce the amount of memory allocated for undo data in
 soft updates orderings by up to 99.73\%.
+\todo{Give a figure for journaling also!}
 
 
 \begin{comment}

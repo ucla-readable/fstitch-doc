@@ -63,10 +63,10 @@ However, this is also true with a local file system, and as a result
 applications currently use expensive interfaces like \texttt{fsync()} when
 they require specific consistency guarantees.
 %
-\Kudos\ brings this sort of customizable consistency to all applications, not
-just those using specialized distributed file systems.
+\Kudos\ \patchgroups\ bring this sort of customizable consistency to all
+applications, not just those using specialized distributed file systems.
 
-A similar application interface to \Kudos\ \patchgroups\ is explored in
+A similar application interface to \patchgroups\ is explored in
 Section~4 of Burnett's thesis~\cite{burnett06information}. However, the methods
 used to implement the interfaces are very different: Burnett's system tracks
 dependencies at the level of entire system calls, associates dirty blocks with

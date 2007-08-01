@@ -33,7 +33,7 @@ algorithms propagate this state change automatically.)
 
 
 Some \patches\ in $P$ may depend on other \patches\ in $P$; however, since
-\Kudos\ eliminates all dependency cycles, if $P$ is nonempty then at least
+\Kudos\ does not allow dependency cycles, if $P$ is nonempty then at least
 one \patch\ in $P$ depends only on other blocks.
 %
 When that \patch\ $p$ becomes ready, it will be added to $P$, and \Kudos\
