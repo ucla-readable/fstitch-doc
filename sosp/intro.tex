@@ -47,9 +47,9 @@ We present a new fundamental data type called a \emph{\patch},
  specifying only how a range of bytes should be changed.
 %
 This lets file system implementations specify \emph{what} the desired
- write before relationship is between the changes without dictating (or
- worrying about) \emph{how} to write blocks to stable storage to implement
- that policy.
+ write before relationship is between the changes without dictating
+% (or worrying about)
+ \emph{how} to write blocks to stable storage to implement that policy.
 %
 It also lets other storage system components examine and
  modify dependency structures independent of the file system's layout.

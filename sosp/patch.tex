@@ -101,7 +101,7 @@ Given a \emph{set} of \patches\ $P$, we write $\PDepset{P}$ to mean the set's
  is summarized in Figure~\ref{fig:patchnot}.
 
 
-\textbf{Undo data.}
+\paragraph{Undo data}
 %
 When a \patch\ is created, the buffer cache's copy of the block data
 is modified in-place to reflect the change. However,
@@ -159,7 +159,7 @@ To help illustrate how \patches\ can be used to implement existing consistency
 models, we will outline in this section how two widely-used protocols, soft
 updates and journaling, can be translated into \patches.
 
-\textbf{Journal transactions.}
+\paragraph{Journal transactions}
 %
 In a journaling file system, changes to the file system are grouped into
 \emph{transactions} that commit atomically.
@@ -228,7 +228,7 @@ So, we must revert $cmp$ and write $\PBlock{cmp}$ with only $cmt$ applied,
 then write $b$, $i$, $i'$, and $d$, and finally write $\PBlock{cmp}$
 again in order to write $cmp$.
 
-\textbf{Soft updates.}
+\paragraph{Soft updates}
 %
 A file system using soft updates aims to prevent most kinds of inconsistencies
 from ever being present on the disk at all, by carefully ordering its writes
@@ -337,7 +337,7 @@ be in flight at any time.
 The buffer cache is also expected to write all blocks eventually, a
  liveness property.
 
-\textbf{Example.}
+\paragraph{Example}
 %
 Suppose the buffer cache has \patches\ arranged as in the journal example from
 Section~\ref{sec:patch:examples}, and that $\{d_\textrm{J}$, $i_\textrm{J}$,
