@@ -38,13 +38,15 @@ Misc:
 - Decrease cpu usage
 - Ensure correct directory ordering (delete a; touch a)
 - Import linux ext2 allocator?
-- Eenhance journaling mode to merge intra-txn patches?
+- Enhance journaling mode to merge intra-txn patches?
 - Add more consistency modules?
 - Add patch undo?
 	- On hold because it needs dependency count tracking?
+	- But maybe do not write dirty but freed data blocks?
 - patchgroups: what if an application doesn't care about mtime?
 - Optimize renames (to make SU andrew faster and make patch opts work better?)
 - Optimize journal patches
+- Speed up revision_tail_* if it is still slow (iteration)
 
 * Benchmarking
 
@@ -57,7 +59,6 @@ Misc:
 - Track other patch-related datastructure memory usage?
   - bit overlap hash maps
   - number of hard patches
-- Benchmark journal ext3 imap with min fsyncs
 - Increase number of runs from 1 or 3 to maybe 10
 - Check that NOFUA==WB and FUA==WT
 	- Benchmark ext3 with barriers?
@@ -70,3 +71,11 @@ Misc:
 * Unimportant bugs (unless they get in our way)
 
 - UU cannot sync during shutdown
+
+
+learn dep structure of imap su
+
+Up next:
+- Increase postmark test size
+- Update paper's results
+- Update overlap merge algo discussion
