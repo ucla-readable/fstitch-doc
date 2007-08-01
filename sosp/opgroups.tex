@@ -113,8 +113,8 @@ that all dependencies must be specified up-front.}
 happens-before? They cannot be used to ``hold patches'' in ram.}
 
 \Patchgroups\ and file descriptors are managed similarly---they are copied
-across \texttt{fork()}, preserved across \texttt{exec()}, and closed on
-\texttt{exit()}.
+across \texttt{fork}, preserved across \texttt{exec}, and closed on
+\texttt{exit}.
 %
 This allows existing, unaware programs to interact with \patchgroups,
 in the same way that programs do not have to know about pipes for the
