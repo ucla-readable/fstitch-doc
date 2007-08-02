@@ -137,13 +137,14 @@ and system CPU time used.
 Figure~\ref{f:optdata} shows these results for the untar, delete,
 PostMark, and Andrew benchmarks for \Kudos\ ext2 in soft updates mode,
 with all combinations of using \nrb\ \patches\ and overlap merging.
+The results for metadata and full data journaling are similar.
 %
 While both optimizations work well alone, the combination of the two
 is particularly effective at reducing the amount of undo data.
 %
 Undo data memory usage is reduced by \patchoptundo,
 %
-the number of \patches\ created is reduced \patchoptcount,
+the number of \patches\ created is reduced by \patchoptcount,
 %
 and system CPU time is reduced by up to 77\%.
 
