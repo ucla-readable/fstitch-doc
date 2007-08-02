@@ -298,8 +298,9 @@ into \noop{}s? (Must modify \nrb-\nrb\ algo usage.)}
 The final type of merging merges \rb\ \patches\ with other \patches,
 \nrb\ or \rb, when they overlap.
 %
-Bitmap blocks and inodes accumulate many nearby and overlapping \patches\
-as data is appended to or truncated from a file.
+Bitmap blocks, inodes, and directory entries accumulate many nearby
+and overlapping \patches\ as data is appended to or truncated from a
+file and as files are created and removed.
 %
 Figure~\ref{fig:opt} shows how even data blocks can collect overlapping
 dependencies: actual data writes $d'_j$ overlap, and therefore depend on,
@@ -325,20 +326,56 @@ us check this property: that is, if no block-level cycle $p_1 \PDepend x
 will ever exist.
 
 
-
 As with \nrb\ \patch\ creation, the \Kudos\ implementation checks a simpler
 property that requires less graph traversal.
 %
 It checks that every path starting at $p_1$ fits at least one of the
 following cases:
 
+%byte overlap selection details, in case we want to describe them:
+% - if overlap one other byte patch, it is target
+% - if overlap two byte patches and one is the hard, non-hard is target
+% - else fail
+
+%bit overlap merge details, in case we want to describe them:
+% try to merge into bits if there are inram bit changes in this word:
+% overlap:
+% - if overlap one other bit patch (bit-wise), it is target
+% - if overlap one other bit patch (word-wise), it is target
+% - else fail
+% if target overlaps a byte patch, fail
+%
+% dependency cycle check, look at the single p->q:
+% if add_overlap_depend_head_is_ok(target, q), merge
+% else fail
+% 
+% else if there are no bit changes in this word:
+% - if there is a hard patch, it is the only patch, and
+%    add_overlap_depend_head_is_ok(hard, q), merge into hard
+%
+% function add_overlap_depend_head_is_ok(overlap, head)
+% - if !head, head = overlap, or head notin ram, return true
+% - if |Deps(overlap)|, return true
+% - if head in Deps(overlap), truen true (check first two befores)
+% - if |Deps(head)| = 0, return true
+% - let Y = { y | exists x, y: target->x->y and q->y } (branch at most 2, |Y| <= 3)
+%   then foreach z in Deps(q) - Y:
+%   - if z = target, return false
+%   - if Deps(z) > 1, return false
+%   - if Deps(z) !<= Y, return false
+% return true
+
 \begin{xcompactitemize}
-\item $p_1 \PDDepend q$, where $q \not\in \PMem$.
 \item $p_1 \PDDepend p_2$.
 \item $p_1 \PDDepend h$, where $h$ is the \nrb\ \patch\ on $\PBlock{p_1}$.
-\item $p_1 \PDDepend q$, where $q$ depends on no other \patch.
-\item $p_1 \PDDepend q \PDDepend r$, where $r$ depends on no other \patch,
-  $q$ depends on nothing but $r$, and $\PBlock{r} \neq \PBlock{p_1}$.
+\item $p_1 \PDDepend q$, where $q \not\in \PMem$.
+% This rule is covered by the next (but we do do this check for speed)
+%\item $p_1 \PDDepend q$, where $q$ depends on no other \patch.
+\item $p_1 \PDDepend q$, where $p_2 \PDDepend q$.
+\item $p_1 \PDDepend q$, where $\PDepset{q} \subseteq \PDepset{p_2}$
+  and $|\PDepset{q}| \leq 2$.
+\item Has length at most 10, traverses no node with more than 10
+  direct dependencies, and does not traverse $p_2$.\todo{Yuck\ldots}
 \end{xcompactitemize}
 
 \noindent
@@ -349,12 +386,12 @@ merged into $p_2$ where they overlap.
 %
 (This may require growing $p_2$ to cover $p_1$'s data range.)
 %
-We initially began with a simpler check, namely that $p_1$ \emph{only}
-depended on $p_2$, but extending the check to length-2 non-branching paths
-allowed much more merging (further extensions did not).
+It also simplifies the implementation somewhat to limit overlap
+merging to the case when $p_1$ does not overlap with any other
+\patches, and to limit $p \PDDepend q$ existence checks to just $p$'s
+and $q$'s two oldest and newest dependencies.
 %
-It also simplifies the implementation somewhat to limit overlap merging to
-the case when neither $p_1$ nor $p_2$ overlaps with any other \patch.
+The rules to overlap merge two bit \patches\ are similar.
 
 
 
