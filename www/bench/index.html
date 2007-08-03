@@ -29,18 +29,21 @@ br.floatright { clear: right; }
 <script type="text/javascript" src="plots/time_postmark.js"></script>
 <script type="text/javascript" src="plots/time_andrew.js"></script>
 <script type="text/javascript" src="plots/time_imap.js"></script>
+<script type="text/javascript" src="plots/time_svn.js"></script>
 
 <script type="text/javascript" src="plots/space_tar.js"></script>
 <script type="text/javascript" src="plots/space_rm.js"></script>
 <script type="text/javascript" src="plots/space_postmark.js"></script>
 <script type="text/javascript" src="plots/space_andrew.js"></script>
 <script type="text/javascript" src="plots/space_imap.js"></script>
+<script type="text/javascript" src="plots/space_svn.js"></script>
 
 <script type="text/javascript" src="plots/io_tar.js"></script>
 <script type="text/javascript" src="plots/io_rm.js"></script>
 <script type="text/javascript" src="plots/io_postmark.js"></script>
 <script type="text/javascript" src="plots/io_andrew.js"></script>
 <script type="text/javascript" src="plots/io_imap.js"></script>
+<script type="text/javascript" src="plots/io_svn.js"></script>
 
 <script type="text/javascript"> <!--
 // number of system parameters
@@ -50,6 +53,8 @@ function sysName(testData)
 {
 	if(testData[0] == "linux" && testData[1] == "safe")
 		return testData[0] + ' ' + testData[1] + ' ' + testData[2] + ' ' + testData[3];
+	if(testData[0] == "kudos" && testData[4] != "opgroup")
+		return testData[0] + ' ' + testData[2] + ' ' + testData[3] + ' ' + testData[4];
 	return testData[0] + ' ' + testData[2] + ' ' + testData[3];
 }
 
@@ -91,13 +96,18 @@ function loadTimes()
 		addTimeTest('timeAndrewTable', time_andrew_data[sys]);
 	for (sys in time_imap_data)
 		addTimeTest('timeImapTable', time_imap_data[sys]);
+	for (sys in time_svn_data)
+		addTimeTest('timeSvnTable', time_svn_data[sys]);
 }
 
 function addSpaceTest(tblId, testName, testData)
 {
 	var row = document.getElementById(tblId).insertRow(-1);
 	var rollbackIndex = 25; // don't write #items for this index
-	appendRowHeader(row, testName + ': ' + testData[2]);
+	var sysName = testName + ': ' + testData[3];
+	if (testData[4] != "opgroup")
+		sysName += ' ' + testData[4];
+	appendRowHeader(row, sysName);
 	appendRowHeader(row, testData[5]);
 	for (var i = 0; i <= rollbackIndex; i += 5)
 	{
@@ -122,6 +132,8 @@ function loadSpace()
 		addSpaceTest('spaceTable', 'andrew', space_andrew_data[sys]);
 	for (sys in space_imap_data)
 		addSpaceTest('spaceTable', 'imap', space_imap_data[sys]);
+	for (sys in space_svn_data)
+		addSpaceTest('spaceTable', 'svn', space_svn_data[sys]);
 }
 
 function addIoTest(tblId, testData)
@@ -149,6 +161,8 @@ function loadIo()
 		addIoTest('ioAndrewTable', io_andrew_data[sys]);
 	for (sys in io_imap_data)
 		addIoTest('ioImapTable', io_imap_data[sys]);
+	for (sys in io_svn_data)
+		addIoTest('ioSvnTable', io_svn_data[sys]);
 }
 
 function loadData()
@@ -210,6 +224,12 @@ I/O (<a href="#io_pit">Current</a>, <a href="#su_io_history">History</a>)
 	<tr class="header"><th class="test">imap</th> <th class="test">rev</th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
 </table>
 </div>
+
+<div class="flow">
+<table id="timeSvnTable">
+	<tr class="header"><th class="test">svn</th> <th class="test">rev</th> <th class="col">real</th> <th class="col">sys</th> <th class="col">io</th> <th class="col">user</th></tr>
+</table>
+</div>
 <div class="space"></div>
 
 <a name="space_pit"></a>
@@ -253,6 +273,13 @@ I/O (<a href="#io_pit">Current</a>, <a href="#su_io_history">History</a>)
 <div class="flow">
 <table id="ioImapTable">
 	<tr class="header"><th class="test">imap</th> <th class="test">rev</th> <th class="col" colspan="2">writes</th> <th class="col" colspan="2">reads</th> <th class="col" colspan="2">multi-write sectors</th></tr>
+	<tr class="header"><th></th> <th></th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">sectors</th> <th class="col">sector writes</th></tr>
+</table>
+</div>
+
+<div class="flow">
+<table id="ioSvnTable">
+	<tr class="header"><th class="test">svn</th> <th class="test">rev</th> <th class="col" colspan="2">writes</th> <th class="col" colspan="2">reads</th> <th class="col" colspan="2">multi-write sectors</th></tr>
 	<tr class="header"><th></th> <th></th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">requests</th> <th class="col">kBs</th> <th class="col">sectors</th> <th class="col">sector writes</th></tr>
 </table>
 </div>
