@@ -51,11 +51,15 @@ var sysLen = 6;
 
 function sysName(testData)
 {
+	var name = testData[0];
 	if(testData[0] == "linux" && testData[1] == "safe")
-		return testData[0] + ' ' + testData[1] + ' ' + testData[2] + ' ' + testData[3];
+		name += ' ' + testData[1];
+	name += ' ' + testData[2] + ' ' + testData[3];
 	if(testData[0] == "kudos" && testData[4] != "opgroup")
-		return testData[0] + ' ' + testData[2] + ' ' + testData[3] + ' ' + testData[4];
-	return testData[0] + ' ' + testData[2] + ' ' + testData[3];
+		name += ' ' + testData[4];
+	else if(testData[0] == "linux" && testData[4] != "fsync")
+		name += ' ' + testData[4];
+	return name;
 }
 
 function appendRowHeader(row, text)
