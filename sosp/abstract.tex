@@ -1,3 +1,5 @@
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
 \begin{abstract}
 
 %% The reliability of a file system to correctly store and later provide
@@ -11,43 +13,43 @@
 %%  checks like \emph{fsck} when recovering from failures, file systems use
 %%  a variety of techniques.
 %
-Reliable file systems fundamentally rely on a ``write before'' relationship
- among buffered changes to the data in stable storage.
+The basic building block of storage system reliability is the ``write before''
+ relationship, where one change to stable storage is delayed until
+ another change commits.
 %
-For example, a journal commit record must be written before any changes are
- written to the main body of the file system; soft
- updates~\cite{ganger00soft} and other consistency enforcement mechanisms
- have similar constraints.
+A journaled file system, for example, must write and commit a
+ journal transaction before applying that transaction's changes.
+ Soft updates~\cite{ganger00soft} and other consistency enforcement
+ mechanisms have similar constraints, implemented in each case in
+ system-dependent ways.
 %
-These relationships are implemented in system-dependent ways.
+%% These relationships are implemented in system-dependent ways.
 %
 We present a general \emph{\patch} abstraction that makes this relationship
- explicit, and represents it in a file system agnostic manner.
+ explicit and file system agnostic.
 %
 A \patch-based file system implementation expresses dependencies among
  writes to stable storage, but does not enforce specific block write orders
- that satisfy those dependencies.
+ to satisfy those dependencies.
 %
 Storage system \modules\ can examine, preserve, and modify the dependency
- structure.
+ structure; the buffer cache writes blocks as allowed by that structure.
 %
 These generalized file system dependencies are naturally exportable to
  user level, allowing applications to specify their own consistency
  protocols for the storage system to follow.
 
-We present the \patch\ abstraction, describe a number of important
- optimizations for \patch-based storage systems, and present a Linux kernel
- implementation of a storage subsystem that uses \patches\ to enforce
- consistency.
+We describe a number of important
+ optimizations for \patch-based storage systems and present \emph{\Kudos},
+ a Linux kernel file system layer based on \patches.
 %
-Our ext2 prototype is competitive with Linux ext2 and ext3 and allows
+The \Kudos\ ext2 prototype is competitive with Linux ext2 and ext3 and allows
  several novel configurations, such as ext2 with soft updates or correct
  dependency enforcement within a loopback file system.
 %
-Finally, we demonstrate three applications which we have modified to
- take advantage of our user level \patch\ interface, called \patchgroups,
- to provide strong consistency guarantees without micromanaging writes to
- the disk.
+Finally, we demonstrate three applications that use
+ \patches\ to provide strong consistency guarantees without
+ micromanaging writes to the disk.
 
 
 \begin{comment}
