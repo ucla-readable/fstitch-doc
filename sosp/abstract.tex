@@ -33,10 +33,10 @@ A \patch-based file system implementation expresses dependencies among
  to satisfy those dependencies.
 %
 Storage system \modules\ can examine, preserve, and modify the dependency
- structure; the buffer cache writes blocks as allowed by that structure.
+ structure; the buffer cache writes blocks as constrained by that structure.
 %
 These generalized file system dependencies are naturally exportable to
- user level, allowing applications to specify their own consistency
+ user level, allowing applications to specify consistency
  protocols for the storage system to follow.
 
 We describe a number of important
