@@ -5,15 +5,15 @@
 
 \makeatletter
 \let\emptyset\varnothing
-\newcommand{\PState}[1]{\ensuremath{#1.\textit{state}}}
+%\newcommand{\PState}[1]{\ensuremath{#1.\textit{state}}}
 \newcommand{\PBlock}[1]{\ensuremath{#1.\textit{block}}}
-\newcommand{\PMemst}{\ensuremath{\textit{mem}}}
-\newcommand{\PInfst}{\ensuremath{\textit{flight}}}
-\newcommand{\PDiskst}{\ensuremath{\textit{disk}}}
+%\newcommand{\PMemst}{\ensuremath{\textit{mem}}}
+%\newcommand{\PInfst}{\ensuremath{\textit{flight}}}
+%\newcommand{\PDiskst}{\ensuremath{\textit{disk}}}
 \newcommand{\PSetlim}[1]{\def\@next{#1}\ifx\@next\@empty\else[\@next]\fi}
-\newcommand{\PMem}[1][]{\ensuremath{\textit{Mem}\PSetlim{#1}}}
-\newcommand{\PInf}[1][]{\ensuremath{\textit{Flight}\PSetlim{#1}}}
-\newcommand{\PDisk}[1][]{\ensuremath{\textit{Disk}\PSetlim{#1}}}
+\newcommand{\PMem}[1][]{\ensuremath{\mathcal{U}\PSetlim{#1}}}
+\newcommand{\PInf}[1][]{\ensuremath{\mathcal{F}\PSetlim{#1}}}
+\newcommand{\PDisk}[1][]{\ensuremath{\mathcal{C}\PSetlim{#1}}}
 \newcommand{\PHard}[1][]{\ensuremath{\textit{\Nrb}\PSetlim{#1}}}
 \newcommand{\PSoft}[1][]{\ensuremath{\textit{\Rb}\PSetlim{#1}}}
 \newcommand{\PEmpty}[1][]{\ensuremath{\textit{\Noop}\PSetlim{#1}}}
@@ -45,22 +45,33 @@ Each \patch\ $p$ encapsulates four important pieces of information: its
  change that affects $n$ blocks must be represented using at least $n$
  \patches, since a \patch\ by definition can touch only one block.
 
-Each \patch\ is in one of three \textbf{states}: \emph{in memory}; \emph{in
- flight} to the disk controller, but not yet committed to disk; or
- \emph{on disk}.  The intermediate in-flight state is necessary because
+Each \patch\ is in one of three \textbf{states}:
+ \emph{committed}, meaning written to disk;
+ \emph{uncommitted}, meaning not written to disk;
+ and \emph{in flight}, meaning committed by upper layers, but not
+ necessarily by lower layers.
+%
+The intermediate in-flight state is necessary because
  operating system software loses control of a \patch\ upon writing its block
- to disk.  $p$'s state is written $\PState{p} \in \{\PMemst, \PInfst,
- \PDiskst\}$.  The operating system changes a \patch's state from
- \PMemst\ to \PInfst\ by writing its block to the disk controller.  Some
+ to disk; the disk controller may commit in-flight \patches\ in any order.
+%
+The operating system changes an uncommitted \patch's state to in-flight
+ by writing its block to the disk controller.  Some
  time later---after possible controller-level disk scheduling, transit over
  the system bus, and a period in the disk's cache---the disk writes the block
  to stable storage and reports success.  When the processor receives this
- notification, it changes the \patch's state to \PDiskst.
+ notification, it changes the \patch's state to committed.
 %
-The sets \PMem, \PInf, and \PDisk\ are defined to contain all \patches\ with
- the given state, and the sets $\PMem[b]$, $\PInf[b]$, and $\PDisk[b]$ are
- defined to contain all \patches\ with the given state \emph{on the given
- block} $b$.
+The sets $\PDisk$, $\PMem$, and $\PInf$ represent all committed,
+ uncommitted, and in-flight patches, respectively.
+%
+%% $p$'s state is written $\PState{p} \in \{\PMemst, \PInfst,
+%% \PDiskst\}$.  
+%
+%% The sets \PMem, \PInf, and \PDisk\ are defined to contain all \patches\ with
+%%  the given state, and 
+Notation such as $\PDisk[b]$ restricts these sets to patches
+ on a given block $b$.
 
 \Patch\ $p$'s \textbf{direct dependencies}, written $\PDDepset{p}$, is a set of
  other \patches\ on which $p$ ``depends''.
@@ -128,17 +139,17 @@ Undo information adds greatly to memory and CPU utilization, but it can
 often be optimized away, as we show in Section~\ref{sec:patch:optimizations}.
 
 \begin{figure}[t]
+\centering
 \begin{small}
 \begin{tabular}{@{}ll@{}}
 $\PBlock{p} = b$ & $p$'s block \\
-$\PState{p}$ & $p$'s state, $\in \{\PMemst, \PInfst, \PDiskst\}$ \\
-$\PDDepset{p}$ & $p$'s direct dependencies: \patches\ that must go to disk \\
-	& before $p$ \\
+% $\PState{p}$ & $p$'s state, $\in \{\PMemst, \PInfst, \PDiskst\}$ \\
+$\PDDepset{p}$ & $p$'s direct dependencies: \patches\ that must be \\
+	& committed before $p$ \\
 \noalign{\vskip3pt}
-$\PMem$ & all in-memory \patches: $\{p \mid \PState{p} = \PMemst\}$ \\
-$\PMem[b]$ & $\{p \mid \PState{p} = \PMemst \text{ and } \PBlock{p} = b
- \}$ \\
-$\PInf, \PDisk$ & similarly for in-flight and on-disk \patches\ \\
+$\PMem$ & the set of all uncommitted \patches \\
+$\PMem[b]$ & $\{p \in \PMem \mid \PBlock{p} = b \}$ \\
+$\PDisk, \PInf$ & similarly for committed and in-flight \patches\ \\
 \noalign{\vskip3pt}
 $p \PDDepend q$ & $p$ directly depends on $q$: $q \in \PDDepset{p}$ \\
 $p \PDepend q$ & $p$ depends on $q$: either $p \PDDepend q$ or there exists \\
@@ -305,7 +316,7 @@ Disk controller behavior is encapsulated in the following atomic action:
 \begin{tabbing}
 \textit{Commit block:} \\
 \quad Pick some block $b$ with $\PInf[b] \neq \emptyset$. \\
-\quad For each $p \in \PInf[b]$, set $\PState{p} \gets \PDiskst$.
+\quad Move each $p \in \PInf[b]$ to $\PDisk$ (committed).
 \end{tabbing}
 
 \noindent
@@ -332,7 +343,7 @@ The buffer cache must thus behave according to the following atomic action:
 \emptyset$. \\
 \quad Pick some $P \subseteq \PMem[b]$ with $\PDepset{P} \subseteq P \cup
 \PDisk$. \\
-\quad For each $p \in P$, set $\PState{p} \gets \PInfst$.
+\quad Move each $p \in P$ to $\PInf$ (in-flight).
 \end{tabbing}
 
 \noindent
@@ -352,17 +363,17 @@ $b_\textrm{J}\} \subseteq \PDisk$, i.e., the journal entries have already been
 written to disk.
 %
 The buffer cache cannot write block $\PBlock{b}$, $\PBlock{i}$, or $\PBlock{d}$,
-since $\{b$, $i$, $i'$, $d\} \PDDepend cmt$ and $\PState{cmt} \neq \PDiskst$.
+since $\{b$, $i$, $i'$, $d\} \PDDepend cmt$ and $\textit{cmt} \not\in \PDisk$.
 %
 Its only option is to write $\PBlock{cmt}$ since $\PDepset{cmt} =
 \{d_\textrm{J}$, $i_\textrm{J}$, $b_\textrm{J}\} \subseteq \PDisk$.
 %
-So, via the action above, it picks $P = \{cmt\}$ and sets $\PState{cmt} \gets
-\PInfst$. (Note that $cmp \not \in P$ since it has unmet dependencies, so it
+So, via the action above, it picks $P = \{cmt\}$ and moves $\textit{cmt}$
+to $\PInf$, the in-flight state). (Note that $cmp \not \in P$ since it has unmet dependencies, so it
 will be reverted before sending the block data to the disk controller.)
 %
 Later, when notification is received that $\PBlock{c}$ has been written to disk,
-$\PState{c}$ is set to $\PDiskst$ and the buffer cache then has the option to
+$c$ is committed and the buffer cache then has the option to
 write any of $\PBlock{b}$, $\PBlock{i}$, or $\PBlock{d}$.
 
 This model does not completely define the disk's behavior on system crash,

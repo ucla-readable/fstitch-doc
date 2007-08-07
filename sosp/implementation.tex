@@ -46,8 +46,7 @@ Writes are considered in flight as soon as they are enqueued on the disk
 scheduler.
 %
 A callback notifies \Kudos\ when the disk controller reports request
-completion; for writes, this sets the corresponding \patch\ states to
-\PDiskst.
+completion; for writes, this commits the corresponding \patches.
 %
 The disk safety property requires that the disk controller wait to report
 completion until a write has reached stable storage.

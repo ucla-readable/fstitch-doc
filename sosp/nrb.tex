@@ -127,7 +127,7 @@ to block $B$\todo{Introduce \PSoft\ and \PSoft[B].}:
 \quad Pick some block $b$ with $\PMem[b] \neq \emptyset$. \\
 \quad Pick some $P \subseteq \PMem[b]$ with $\PDepset{P} \subseteq P \cup
 \PDisk$ and $\PHard[B] \subseteq P$. \\
-\quad For each $p \in P$, set $\PState{p} \gets \PInfst$. \\
+\quad Move each $p \in P$ to $\PInf$ (in-flight). \\
 \quad For each $p \in \PMem[b]-P$, set $\PDDepset{p} \gets \PDDepset{p}
 \cup P$.
 \end{tabbing}
