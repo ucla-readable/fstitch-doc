@@ -17,7 +17,7 @@ The basic building block of storage system reliability is the ``write before''
  relationship, where one change to stable storage is delayed until
  another change commits.
 %
-A journaled file system, for example, must write and commit a
+A journaled file system, for example, must write and commit each
  journal transaction before applying that transaction's changes.
  Soft updates~\cite{ganger00soft} and other consistency enforcement
  mechanisms have similar constraints, implemented in each case in
