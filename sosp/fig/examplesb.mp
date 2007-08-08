@@ -180,7 +180,7 @@ beginfig(2);
   drawelement(jd1,ji1,jb1);
 
   z.a = (jd1.nw+(-e,d')+(-e,d')); z.b = (jx1.se+(e,-d)+(e,-2.8d));
-  draw z.a -- (x.a,y.b) -- z.b -- (x.b,y.a) -- cycle withpen connectionpen scaled .5;
+  draw z.a -- (x.a,y.b) -- z.b -- (x.b,y.a) -- cycle withpen connectionpen scaled .75;
   
   label.top(btex \textsc{Journal} etex, .5[jd1.nw+(0,d'),ji1.ne+(0,d')]+(0,5));
   label.top(btex \mlabel{journaled\\data block} etex scaled 0.65, jd1.n-(0,2));
@@ -271,7 +271,7 @@ beginfig(4);
   save d,e,height,width,jx; pair jx[].nw,jx[].ne,jx[].sw,jx[].se,jx[].c,jx[].w;
   save addblockcolor; color addblockcolor; addblockcolor = black;
   save addblockfillcolor; color addblockfillcolor; addblockfillcolor = white;
-  save addblocklabcolor; color addblocklabcolor; addblocklabcolor = .5white;
+  save addblocklabcolor; color addblocklabcolor; addblocklabcolor = black;
   save delblockfillcolor; color delblockfillcolor; delblockfillcolor = white;
     
   boxjoin(a.width = b.width = a.height);

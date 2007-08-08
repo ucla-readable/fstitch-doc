@@ -535,7 +535,7 @@ Since the disk controller can write blocks in any order, a \Kudos\ file
 that in-flight blocks are independent.  This is precisely stated
 by the \textbf{in-flight safety property:}
 %
-\[ \text{For all blocks $B$,~~} \PDepset{\PInf[B]} \subseteq \PDisk \cup \PInf[B] . \]
+\[ \text{For any block $B$,~~} \PDepset{\PInf[B]} \subseteq \PDisk \cup \PInf[B] . \]
 %
 \begin{comment}
 %% Do we need this comment?
