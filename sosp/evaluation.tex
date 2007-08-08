@@ -51,11 +51,11 @@ All timing results are the mean over three runs.
 To evaluate \patch\ optimizations and \Kudos\ as a whole we ran four
 benchmarks.
 %
-The \emph{tar benchmark} untars and syncs the Linux 2.6.15 source code
+The \emph{untar benchmark} untars and syncs the Linux 2.6.15 source code
 from the cached file \texttt{linux-2.6.15.tar} (218~MB).
 %
 The \emph{delete benchmark}, after unmounting and remounting the file
-system following the tar benchmark, deletes the result of the tar
+system following the untar benchmark, deletes the result of the untar
 benchmark and syncs.
 %
 The \emph{PostMark benchmark} emulates the small file workloads seen
@@ -177,22 +177,25 @@ smaller account for about 51\% of all \rb\ \patches.}
 \small
 \begin{tabular}{@{}lrrrr@{}}
 \textbf{System} & \multicolumn{1}{c}{\textbf{Untar}} & \multicolumn{1}{c}{\textbf{Delete}} & \multicolumn{1}{c}{\textbf{PostMark}} & \multicolumn{1}{c}{\textbf{Andrew}} \\ \hline
-% Results are from r3919
+% Results are from r3966
+% Kudos results are mean over 10
 \multicolumn{3}{@{}l}{\emph{\Kudos\ ext2}\raise2pt\hbox{\strut}} & & \\
-\safe{async} & \safe{4.3 [1.5]} & \safe{0.8 [0.2]} & \safe{1.4 [0.5]} & \safe{37.3 [5.4]} \\
-\safe{soft updates} & \safe{6.2 [1.9]} & \safe{0.9 [0.2]} & \safe{2.4 [0.5]} & \safe{37.9 [5.4]} \\
-\safe{meta journal} & \safe{7.1 [2.7]} & \safe{3.0 [1.0]} & \safe{3.0 [1.0]} & \safe{37.7 [5.4]} \\
-\safe{full journal} & \safe{12.4 [3.3]} & \safe{1.4 [0.6]} & \safe{5.2 [1.3]} & \safe{37.8 [5.4]} \\
-\unsafe{full journal} & \unsafe{10.0 [3.7]} & \unsafe{1.2 [0.5]} & \unsafe{4.3 [1.5]} & \unsafe{37.6 [5.5]} \\ \hline
+\safe{soft updates} & \safe{6.2 [2.5]} & \safe{0.9 [0.2]} & \safe{2.5 [0.5]} & \safe{37.8 [5.3]} \\
+\safe{meta journal} & \safe{8.5 [2.8]} & \safe{1.5 [0.5]} & \safe{3.8 [1.1]} & \safe{37.6 [5.5]} \\
+\safe{full journal} & \safe{12.9 [3.4]} & \safe{1.4 [0.5]} & \safe{5.2 [1.3]} & \safe{37.8 [5.5]} \\
+\unsafe{async} & \unsafe{4.2 [1.5]} & \unsafe{0.7 [0.2]} & \unsafe{1.3 [0.5]} & \unsafe{37.3 [5.3]} \\
+\unsafe{full journal} & \unsafe{10.3 [3.8]} & \unsafe{1.2 [0.5]} & \unsafe{4.5 [1.6]} & \unsafe{37.6 [5.5]} \\ \hline
 
-%FreeBSD (soft updates) & 23.22 & 15.95 \\ 
-%FreeBSD (async) & 10.09 & 3.25 \\ \hline
-
+% Linux results are mean over 3
 \multicolumn{3}{@{}l}{\emph{Linux}\raise2pt\hbox{\strut}} & & \\
-\unsafe{ext2} & \unsafe{4.5 [0.7]} & \unsafe{4.6 [0.2]} & \unsafe{0.2 [0.1]} & \unsafe{37.3 [4.9]} \\
-\unsafe{ext3 ordered} & \unsafe{13.9 [1.0]} & \unsafe{4.3 [0.2]} & \unsafe{0.3 [0.2]} & \unsafe{37.1 [4.9]} \\
-\unsafe{ext3 journal} & \unsafe{10.9 [1.1]} & \unsafe{4.3 [0.3]} & \unsafe{2.7 [0.3]} & \unsafe{37.8 [5.0]} \\
+% safe ordered: r3959
+\safe{ext3 ordered} & \safe{16.1 [1.0]} & \safe{4.4 [0.3]} & \safe{0.4 [0.2]} & \safe{37.7 [5.3]} \\
 \safe{ext3 journal} & \safe{12.7 [1.2]} & \safe{4.5 [0.2]} & \safe{3.4 [0.3]} & \safe{38.8 [5.0]} \\
+\unsafe{ext2} & \unsafe{4.5 [0.7]} & \unsafe{4.6 [0.2]} & \unsafe{0.2 [0.1]} & \unsafe{37.3 [4.9]} \\
+\unsafe{ext3 journal} & \unsafe{10.9 [1.1]} & \unsafe{4.3 [0.3]} & \unsafe{2.7 [0.3]} & \unsafe{37.8 [5.0]} \\
+
+%FreeBSD (soft updates) & 23.22 & 15.95 & & \\ 
+%FreeBSD (async) & 10.09 & 3.25 & & \\
 \end{tabular}
 \caption{\label{fig:bench_time} Benchmark times (seconds). System CPU
   times are in square brackets. Safe configurations are \safe{bold},
@@ -200,81 +203,52 @@ smaller account for about 51\% of all \rb\ \patches.}
 \end{figure}
 }
 
-We compare \Kudos\ and Linux ext2 and ext3 for the tar, delete,
-PostMark, and Andrew benchmarks. Times for these benchmarks are listed
-in Figure~\ref{fig:bench_time}.
+We benchmark \Kudos\ and Linux ext2/ext3 for the untar, delete,
+PostMark, and Andrew benchmarks. Results are listed in
+Figure~\ref{fig:bench_time}.
+%
+The general result is that \Kudos\ and Linux ext2/ext3 perform
+similarly when providing similar durability guarantees. Linux
+ext2/ext3 also outperforms \Kudos, and vice versa, in some scenarios.
+We explain these differences in the following two paragraphs.
 
 \benchtable{}
 
-\paragraph{Untar}
-%
-At the untar benchmark, the \Kudos\ asynchronous mode is faster than
-Linux ext2; both provide a similar consistency guarantee.
-%
-\Kudos\ soft updates mode is 50\% slower than asynchronous mode, but
-provides a much stronger consistency guarantee; it provides comparable
-consistency guarantees to the widely used Linux ext3 in ordered data
-mode but is 50\% faster.
-%
-The \Kudos\ metadata journal mode is most similar to Linux ext3 in
-ordered data mode and is 30\% faster.
-%
-The \Kudos\ full journal mode is 10\% slower than Linux ext3 in full
-journal mode.
-%
-However, when run with the same durability assumptions, \Kudos\ and
-Linux ext3 in full journal modes are similar.
-
-While \Kudos\ compares favorably for total time, during each test
-\Kudos\ uses significantly more CPU time than Linux ext2 or ext3
-do---up to three times the CPU time.
+While \Kudos\ performs similarly for total time for the untar, delete,
+and Andrew benchmarks, during each test \Kudos\ uses significantly
+more CPU time than Linux ext2 or ext3 do---up to three times the CPU
+time.
 %
 Higher CPU requirements are an important concern and, though they were
 the focus of many of our optimization efforts, remain a weakness
 for \Kudos.
+\todo{Characterize the additional cpu time. memcpy? patches?}
 %
-Additionally, while \Kudos\ I/O times are lower than Linux ext2/3 I/O
-times, we have found that small block allocation strategy changes can
-significantly affect I/O time for many of these benchmarks. This further
-emphasizes the importance of the system CPU time difference.
+Additionally, while \Kudos\ I/O times are lower than Linux ext2/ext3 I/O
+times for the untar and delete benchmarks, we have found that small
+block allocation strategy changes can significantly affect I/O time
+for many of these benchmarks. This further emphasizes the importance
+of the system CPU time difference.
 
-%This demonstrates that the overhead of using \patches\ in \Kudos\ is not
-%entirely unreasonable, but has room for significant improvement.
-
-\paragraph{Remove}
-%
-The delete benchmark results are similar to the tar benchmark's,
-except that \Kudos\ total time is less than Linux ext2/3 total time
-for all configurations. \Kudos\ I/O times are substantially lower
-than Linux ext2/3 I/O times because of the block layout differences in
-the tar benchmark.
-
-\paragraph{PostMark}
-%
-We next evaluate overall performance using the PostMark benchmark.
-Unlike the tar and delete benchmarks, \Kudos\ is slower than Linux
-ext2 and ext3 in all configurations.
+Unlike the untar, delete, and Andrew benchmarks, Linux ext2/ext3
+outperforms \Kudos\ at PostMark.
 %
 We believe the primary contributor to this difference is a difference
 in the amount of data written to disk. Linux ext2 and Linux ext3 in
 ordered journal mode detect that most dirty blocks are no longer
 referenced at the end of the test, and so do not write them to disk
 (writing only 0.1--0.2~MB). In contrast, \Kudos\ and Linux ext3 in
-full journal mode do not do this and therefore write these blocks
+full journal mode do not do this detection and thus write these blocks
 (writing 90--180~MB and 120~MB, respectively).
 %
-While we believe that \Kudos\ probably can be improved to make this
-optimization, we have not implemented it.
+While we believe that \Kudos\ and its ext2 module probably can be
+improved to make this optimization, we have not implemented it.
 %
 \todo{Use larger PostMark benchmark. Or note that a larger benchmark would
 show less of an I/O difference.}
 
-\paragraph{Andrew}
-%
-Finally, we evaluate performance using a modified Andrew benchmark.
-\Kudos\ and Linux ext2/3 perform similarly in total time. This benchmark
-differs from the others in that there is a significant amount of time spent
-in userspace running the compiler: about 31.9 seconds.
+%This demonstrates that the overhead of using \patches\ in \Kudos\ is not
+%entirely unreasonable, but has room for significant improvement.
 
 \subsection {Correctness}
 \label{sec:eval:correctness}
@@ -349,7 +323,7 @@ number of copies atomically, using only a small constant number of
 requests.
 %
 \Kudos\ with the unmodified server makes significantly many more
-requests than Linux ext2/3; we believe this is due to \Kudos\ also
+requests than Linux ext2/ext3; we believe this is due to \Kudos\ also
 committing file system summary information that Linux does not commit
 for the \texttt{fsync} system call.
 %
