@@ -20,11 +20,11 @@
 \newcommand{\PSoft}[1][]{\ensuremath{\textit{\Rb}\PSetlim{#1}}}
 \newcommand{\PEmpty}[1][]{\ensuremath{\textit{\Noop}\PSetlim{#1}}}
 %\newcommand{\PDDepset}[1]{\ensuremath{\def\@next{#1}\ifx\@next\@empty\else\@next.\fi\textit{ddeps}}}
-\newcommand{\PDDepset}[1]{\ensuremath{\textit{Dep}_1[#1]}}
+\newcommand{\PDDepset}[1]{\ensuremath{\textit{dep}_1[#1]}}
 \newcommand{\PDepend}{\ensuremath{\leadsto}}
 \newcommand{\PDDepend}{\ensuremath{\rightarrow}}
-%\newcommand{\PDepset}[1]{\ensuremath{\textit{Dep}[#1]}}
-\newcommand{\PDepset}[1]{\ensuremath{\textit{Dep}[#1]}}
+%\newcommand{\PDepset}[1]{\ensuremath{\textit{dep}[#1]}}
+\newcommand{\PDepset}[1]{\ensuremath{\textit{dep}[#1]}}
 \newcommand{\PRDepset}[1]{\ensuremath{\textit{RDep}[#1]}}
 \makeatother
 
@@ -225,8 +225,8 @@ Every \patch\ in $\PDDepset{p}$ must be committed to disk either before
  $p$, or at the same time as $p$ (this is only possible if $p$ and $q$ are
  on the same block).
 %
-The file system arranges dependencies based on the consistency
- semantics it wants to ensure.
+The file system arranges dependencies corresponding to its desired consistency
+ semantics.
 %
 For example, a file system with asynchronous writes (and no durability
  guarantees) might write all \patches\ with $\PDDepset{p} = \emptyset$;
@@ -258,7 +258,7 @@ Circular dependencies among patches cannot be resolved and are therefore
  other if $p \PDepend q \PDepend p$.
 %
 (Although a circular dependency chain entirely within a single block avoids
- this problem, in practice \Kudos\ treats all circular chains as errors.)
+ this problem, \Kudos\ treats all circular chains as errors.)
 %
 Given a \emph{set} of \patches\ $P$, we write $\PDepset{P}$ to mean the set's
  combined dependencies $\bigcup_{p\in P} \PDepset{p}$. 
@@ -546,7 +546,7 @@ by the \textbf{in-flight safety property:}
 \end{comment}
 %
 Thus, $\PDepset{\PInf[B]} \cap \PDepset{\PInf[B']} \subseteq \PDisk$ for
- any $B' \neq B$, and the disk controller can safely write in-flight blocks
+ any $B' \neq B$, and the disk controller can write in-flight blocks
  in any order and still preserve disk safety.
 
 
@@ -563,9 +563,8 @@ Consequently, the buffer cache must write blocks as follows:
 
 \noindent
 %
-We require that $\PInf[b] = \emptyset$ since the disk controller can write
-in-flight blocks in any order, and thus at most one version of a block can
-be in flight at any time.
+We require that $\PInf[b] = \emptyset$ to ensure that at most one version of
+a block is in flight at any time.
 %
 The buffer cache is also expected to write all blocks eventually, a
  liveness property.
