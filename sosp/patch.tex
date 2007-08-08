@@ -369,9 +369,9 @@ marked as in use but unreferenced. The file system can be used immediately
  on reboot; a background scan can locate and recover the leaked resources
  while the system is in use.
 
-These rules map directly to \patch\ dependencies.
+These rules map directly to \Featherstitch.
 %
-Figure~\ref{f:ex}a shows possible soft updates-like dependencies for
+Figure~\ref{f:ex}a shows a set of soft updates-like patches and dependencies for
  our block-append operation.
 %
 %% Each circle represents a single \patch. The shaded boxes indicate disk blocks.
@@ -385,21 +385,23 @@ Figure~\ref{f:ex}a shows possible soft updates-like dependencies for
 %
 Rule~\ref{rule:pointer} requires that $i \PDDepend b$.
 %
-Rule~\ref{rule:reuse} requires that $d$ depend on any
-previous deallocation of the same block;
+Rule~\ref{rule:reuse} requires that $d$ depend on previous pointers to the
+ block being nullified;
 %
 a simple, though more restrictive, way to accomplish this is to let $d
- \PDDepend b$.
+ \PDDepend b$, where $b$ depends on any such nullifications
+ (there are none here).
 %
-The other two dependencies $i \PDDepend d$ and $i' \PDDepend d$ provide an
+The dependencies $i \PDDepend d$ and $i' \PDDepend d$ provide an
  additional guarantee above and beyond metadata consistency, namely
  that no file ever contains accessible uninitialized data.
 %
-Patches would represent additional guarantees naturally as well.
+A similar dependency would make inode updates depend on actual data
+ writes.
 %
-In contrast, the BSD UFS implementation of soft updates represents each UFS
- operation in memory by a different specialized structure encapsulating
- disk changes and dependencies.
+In contrast, the BSD UFS soft updates implementation represents each UFS
+ operation by a different specialized structure encapsulating
+ all that operation's disk changes and dependencies.
 %% As a result, many specialized data structures
 %% represent the different possible file system operations. 
 These structures, their
@@ -420,22 +422,22 @@ Figure~\ref{f:ex}b shows how an additional file system operation can induce
 %
 Before the changes in Figure~\ref{f:ex}a are written, the user deletes a
  one-block file whose data block and inode happen to lie on the same bitmap
- and inode blocks, respectively.
+ and inode blocks used by the previous operation.
 %
 Rule~\ref{rule:reuse} requires the dependency $b_2 \PDDepend i_2$; but
  given this dependency and the previous $i \PDDepend b$, neither the bitmap
  block nor the inode block can be written first!
 %
-A solution is to roll back patch $b_2$ by undoing its effects, which
- requires its undo data.  The resulting bitmap block, which contains only
+A solution is to roll back patch $b_2$ by undoing its effects.
+ The resulting bitmap block, which contains only
  $b$, is safe to write.  Once this write commits, all of $i$, $i'$, and
- $i_2$ are safe to write.  When this in turn commits, the system can write
+ $i_2$ are safe to write.  When these in turn commit, the system can write
  the bitmap block again, this time including $b_2$.
 
 
 \paragraph{Journal transactions}
 %
-A journaling file system, in contrast, ensures post-crash consistency using
+A journaling file system ensures post-crash consistency using
  a write-ahead log.
 %
 %Each transaction leaves the disk in a consistent state, thus avoiding the need
@@ -443,13 +445,13 @@ A journaling file system, in contrast, ensures post-crash consistency using
 %
 All changes in a transaction are first copied into an on-disk journal.
 %
-After these journal copies commit, a small \emph{commit record} is written
- to the journal; this signals that the transaction is complete and that all
- its changes should be considered valid.
+Once these copies commit, a \emph{commit record} is written
+ to the journal, signaling that the transaction is complete and all
+ its changes are valid.
 %
 Once the commit record is written, the original changes can be written to the
 file system in any order, since after a crash the system can replay the
- journal transaction.
+ journal transaction to recover.
 %% the journal later and recopy the data back out into the file system.
 %
 Finally, once all the changes have been written to the file system, the commit
@@ -466,24 +468,24 @@ record can be erased, allowing that portion of the journal to be reused.
 \def\PXcmt{\textit{cmt}}
 \def\PXcmp{\textit{cmp}}
 
-These ordering rules also map directly to patch dependencies, as shown in
+This process also maps directly to patch dependencies, as shown in
  Figure~\ref{f:ex}c.
 %
 Copies of the affected blocks are written into the journal area using
  \patches\ $d_\textrm{J}$, $i_\textrm{J}$, and $b_\textrm{J}$, each on its
  own block.
 %
-The commit record is created on a fourth block in the journal area with
-\patch\ $\PXcmt$, which depends on $d_\textrm{J}$,
+Patch $\PXcmt$ creates the commit record on a fourth block in the journal
+ area; it depends on $d_\textrm{J}$,
 $i_\textrm{J}$, and $b_\textrm{J}$.
 %
 The changes to the main file system all depend on $\PXcmt$.
 %
-Finally, we overwrite the commit record with a completion record with a
-\patch\ $\PXcmp$, which depends on the main file system changes.
+Finally, \patch\ $\PXcmp$, which depends on the main file system changes,
+ overwrites the commit record with a completion record.
 %
-Here, too, a circular block dependency requires the system to roll back a
- patch, namely $\PXcmp$, and write the commit/completion record twice.
+Again, a circular block dependency requires the system to roll back a
+ patch, namely $\PXcmp$, and write the commit/completion block twice.
 
 \begin{comment}
 This arrangement of dependencies ensures that the commit record is not written
