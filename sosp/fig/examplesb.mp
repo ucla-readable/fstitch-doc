@@ -123,10 +123,11 @@ beginfig(2);
   ji1.w - jd1.e = jx1.w - jb1.e = (21,0); jd1.s - jb1.n = (0,35);
   jcp1.c = jx1.c + (3,-4); jc1.c = jx1.c - (3,-17);
 
-  bk1.s - sz1.n = (-10,2);
-  bi1.c - .5[bk1.c,sz1.c] = (0,75);
-  d1.w - .5[bi1.c,.5[bk1.c,sz1.c]] = (50,0);
-  .5[bi1.c,.5[bk1.c,sz1.c]] - .5[jd1.c,jx1.c] = (110,5);
+  bk1.s - sz1.n = (-18,2);
+  jx2.c = .5[bk1.c,sz1.c] + (-2,5);
+  bi1.c - jx2.c = (0,75);
+  d1.w - .5[bi1.c,jx2.c] = (50,0);
+  .5[bi1.c,jx2.c] - .5[jd1.c,jx1.c] = (110,5);
   
   fixelement(d1,bk1,sz1,bi1,jd1,ji1,jb1,jc1,jcp1);
 
@@ -153,7 +154,7 @@ beginfig(2);
   width = jd1.width + 2e;
   z1 = bi1.c + (-width,height)/2;  z2 = bi1.c - (-width,height)/2;
   blockbox((x1,y1) -- (x2,y1) -- (x2,y2) -- (x1,y2) -- cycle);
-  z3 = .5[bk1.c,sz1.c] + (-width,height)/2;  z4 = .5[bk1.c,sz1.c] - (-width,height)/2;
+  z3 = jx2.c + (-width,height)/2;  z4 = jx2.c - (-width,height)/2;
   blockbox((x3,y3) -- (x4,y3) -- (x4,y4) -- (x3,y4) -- cycle);
   z5 = d1.c + (-width,height)/2;  z6 = d1.c - (-width,height)/2;
   blockbox((x5,y5) -- (x6,y5) -- (x6,y6) -- (x5,y6) -- cycle);
@@ -193,19 +194,24 @@ beginfig(2);
   label.top(btex \mlabel{data block}\strut etex scaled 0.9, (.5[x5,x6],y5-1));
 
   drawconnpatch(jc1,jd1)(..);
-  drawconnpatch(jc1,ji1)({dir 45}..);
+  drawconnpatch(jc1,ji1)(..);
   drawconnpatch(jc1,jb1)(..);
   drawconnpatch(sz1,jc1)(..) scaled 0.8;
   drawconnpatch(bk1,jc1)(..) scaled 0.8;
-  drawconnpatch(bi1,jc1)(..) scaled 0.8;
+  drawconnpatch(bi1,jc1)(--bi1.c+(0,.7)..) scaled 0.8;
   
-  drawconnpatchx(jcp1,bi1)(..) scaled 1.5;
+  drawconnpatchx(jcp1,bi1)(..bi1.c-(0,.7)--) scaled 1.5;
   drawconnpatchx(jcp1,sz1)(..) scaled 1.5;
   drawconnpatchx(jcp1,bk1)(..) scaled 1.5;
   drawconnpatchx(jcp1,d1)({dir -45}..sz1.w-(0,25)..{dir 80}) scaled 1.5;
   drawconnpatch(jcp1,jc1)({dir -170} .. .5[jcp1.w,jc1.w]-(5,3) .. {dir 80});
 
   drawelement(jcp1,bi1,bk1,sz1,d1);
+
+  label.top(btex \mlabel{alloc block} etex scaled 0.65, bi1.n-(0,2));
+  label.top(btex \mlabel{clear data} etex scaled 0.65, d1.n-(0,2));
+  label.top(btex \mlabel{attach} etex scaled 0.65, bk1.n-(0,2));
+  label.top(btex \mlabel{size} etex scaled 0.65, sz1.n-(0,2));
 endfig;
 
 beginfig(3);
@@ -259,6 +265,75 @@ beginfig(3);
   drawconnpatch(bk1,d1)(..);
   drawconnpatch(d1,bi1)(..);
   drawconnpatch(sz1,d1)(..);
+endfig;
+
+beginfig(4);
+  save d,e,height,width,jx; pair jx[].nw,jx[].ne,jx[].sw,jx[].se,jx[].c,jx[].w;
+  save addblockcolor; color addblockcolor; addblockcolor = black;
+  save addblockfillcolor; color addblockfillcolor; addblockfillcolor = white;
+  save addblocklabcolor; color addblocklabcolor; addblocklabcolor = .5white;
+  save delblockfillcolor; color delblockfillcolor; delblockfillcolor = white;
+    
+  boxjoin(a.width = b.width = a.height);
+  patchit.d1(image(draw btex $d\S$\strut etex withcolor addblockcolor), 0);
+  d1.dx=10;
+
+  boxjoin(a.width = b.width = a.height);
+  patchit.bk1(image(draw btex $i\S$\strut etex withcolor addblockcolor), 0);
+  patchit.sz1(image(draw btex $i\S'$\strut etex withcolor addblockcolor), 0);
+  patchit.de1(btex $i_2$\strut etex, 0);
+  bk1.dx=6;
+
+  boxjoin(a.width = b.width = a.height);
+  patchit.bi1(image(draw btex $b\S$\strut etex withcolor addblockcolor), 0);
+  patchit.bi2(btex $b_2$\strut etex, 0);
+  bi2.dx=2;
+
+  bi2.height=bi2.width; d1.height=d1.width; de1.height=de1.width;
+  bk1.s - sz1.n = (0,12);
+  jx2.c = .37[.5[bk1.c,sz1.c],de1.c];
+  jx1.c - jx2.c = (-3,75);
+  d1.w - .5[jx1.c,jx2.c] = (50,0);
+  bi1.w - bi2.e = (4,15);
+  .5[bi1.c,bi2.c] = jx1.c - (0,5);
+  .5[bk1.w,sz1.w] - de1.e = (8,0);
+
+  fixelement(d1,bk1,sz1,bi1,de1,bi2);
+  fillelement(d1,bk1,sz1,bi1)(addblockfillcolor);
+  fillelement(bi2,de1)(delblockfillcolor);
+
+  % Block boxes
+  d = e = 8; d'=22;
+  height = .85(d1.height + d' + d);
+  width = d1.width + 2e;
+  z1 = jx1.c + (-width,height)/2;  z2 = jx1.c - (-width,height)/2;
+  blockbox((x1,y1) -- (x2,y1) -- (x2,y2) -- (x1,y2) -- cycle);
+  z3 = jx2.c + (-1.3width,1.2height)/2;  z4 = jx2.c - (-width,1.4height)/2;
+  blockbox((x3,y3) -- (x4,y3) -- (x4,y4) -- (x3,y4) -- cycle);
+  z5 = d1.c + (-width,1.1height)/2;  z6 = d1.c - (-width,1height)/2;
+  blockbox((x5,y5) -- (x6,y5) -- (x6,y6) -- (x5,y6) -- cycle);
+
+  drawelement(d1,bk1,sz1,bi1) withcolor addblockcolor;
+  drawelement(de1,bi2);
+
+  linecap := butt;
+
+  label.top(btex \mlabel{bitmap block}\strut etex scaled 0.9, (.5[x1,x2],y1-1));
+  label.bot(btex \mlabel{inode block}\strut etex scaled 0.9, (.5[x3,x4],y4-1));
+  label.top(btex \mlabel{data block}\strut etex scaled 0.9, (.5[x5,x6],y5-1));
+
+  label.top(image(draw btex \mlabel{alloc} etex withcolor addblocklabcolor) scaled 0.65, bi1.n-(0,2));
+  label.top(btex \mlabel{free\\block} etex scaled 0.65, bi2.n-(0,2));
+  label.top(image(draw btex \mlabel{clear data} etex withcolor addblocklabcolor) scaled 0.65, d1.n-(0,2));
+  label.bot(image(draw btex \mlabel{attach} etex withcolor addblocklabcolor) scaled 0.65, bk1.s-(0,-1.5));
+  label.bot(image(draw btex \mlabel{size} etex withcolor addblocklabcolor) scaled 0.65, sz1.s-(0,-1.5));
+  label.bot(btex \mlabel{erase\\inode} etex scaled 0.65, de1.s-(0,-1.5));
+  
+  drawconnpatch(bk1,bi1)(..);
+  drawconnpatch(bk1,d1)(..);
+  drawconnpatch(d1,bi1)(..);
+  drawconnpatch(sz1,d1)(..);
+  drawconnpatch(bi2,de1)(..);
 endfig;
 
 end

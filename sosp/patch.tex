@@ -11,6 +11,7 @@
 %\newcommand{\PMemst}{\ensuremath{\textit{mem}}}
 %\newcommand{\PInfst}{\ensuremath{\textit{flight}}}
 %\newcommand{\PDiskst}{\ensuremath{\textit{disk}}}
+%\newcommand{\PSetlim}[1]{\def\@next{#1}\ifx\@next\@empty\else_{\@next}\fi}
 \newcommand{\PSetlim}[1]{\def\@next{#1}\ifx\@next\@empty\else\cap\@next\fi}
 \newcommand{\PMem}[1][]{\ensuremath{\mathcal{U}\PSetlim{#1}}}
 \newcommand{\PInf}[1][]{\ensuremath{\mathcal{F}\PSetlim{#1}}}
@@ -19,11 +20,11 @@
 \newcommand{\PSoft}[1][]{\ensuremath{\textit{\Rb}\PSetlim{#1}}}
 \newcommand{\PEmpty}[1][]{\ensuremath{\textit{\Noop}\PSetlim{#1}}}
 %\newcommand{\PDDepset}[1]{\ensuremath{\def\@next{#1}\ifx\@next\@empty\else\@next.\fi\textit{ddeps}}}
-\newcommand{\PDDepset}[1]{\ensuremath{\textit{DD}_{#1}}}
+\newcommand{\PDDepset}[1]{\ensuremath{\textit{DD}[#1]}}
 \newcommand{\PDepend}{\ensuremath{\leadsto}}
 \newcommand{\PDDepend}{\ensuremath{\rightarrow}}
 %\newcommand{\PDepset}[1]{\ensuremath{\textit{Dep}[#1]}}
-\newcommand{\PDepset}[1]{\ensuremath{D_{#1}}}
+\newcommand{\PDepset}[1]{\ensuremath{\textit{Dep}[#1]}}
 \newcommand{\PRDepset}[1]{\ensuremath{\textit{RDep}[#1]}}
 \makeatother
 
@@ -278,6 +279,25 @@ Undo information adds greatly to memory and CPU utilization, but it can
 
 Our \patch\ notation is summarized in Figure~\ref{fig:patchnot}.
 
+\begin{figure*}[t]
+\centering
+\begin{tabular}{@{}cc@{\qquad\qquad}c@{}}
+\includegraphics[scale=0.78]{fig/examplesb_3}
+& \includegraphics[scale=0.78]{fig/examplesb_4}
+& \includegraphics[scale=0.78]{fig/examplesb_2} \\
+\textbf{a)} Adding a block (soft updates)
+& \textbf{b)} \dots plus removing a file
+& \textbf{c)} Adding a block (journal) \\
+\end{tabular}
+\caption{Example patch arrangements for an ext2-like file system.
+ \textbf{a)} Example soft updates order for appending a zeroed-out block to
+ a file.  \textbf{b)} A file on the same inode block is removed before the
+ previous changes commit, inducing a circular block dependency.
+ \textbf{c)} Example journal order for appending a zeroed-out block to a
+ file.}
+\label{f:ex}
+\end{figure*}
+
 
 \subsection{Examples}
 \label{sec:patch:examples}
@@ -309,11 +329,13 @@ the journal later and copy the data back out into the file system.
 Finally, once all the changes have been written to the file system, the commit
 record can be erased, and that portion of the journal may be reused.
 
+\begin{comment}
 \begin{figure}[htb]
   \centering
   \includegraphics[width=.8\hsize]{fig/examplesb_2}
   \caption{\label{fig:journal} An example journal transaction using \patches.}
 \end{figure}
+\end{comment}
 
 Patches implementing a journal transaction could be arranged as follows:
 %
@@ -334,7 +356,7 @@ Finally, we overwrite the commit record with a completion record with a
 \patch\ $cmp$, and we let $cmp \PDDepend \{b$, $i$, $i'$,
 $d\}$.
 %
-These \patches\ are depicted in Figure~\ref{fig:journal}.
+These \patches\ are depicted in Figure~\ref{f:ex}c.
 %
 Each circle represents a single \patch. The shaded boxes indicate disk blocks.
 %
@@ -393,14 +415,16 @@ A simple way to accomplish this is to let $d \PDDepend b$.
 Finally, we can let $i' \PDDepend d$ so that no file ever contains
 accessible uninitialized data.
 %
-Figure~\ref{fig:softupdate} depicts this arrangement.
+Figure~\ref{f:ex}a depicts this arrangement.
 
+\begin{comment}
 \begin{figure}[htb]
   \centering
   \includegraphics[width=92pt]{fig/examplesb_3}
   \caption{\label{fig:softupdate} Soft updates \patches\
   for appending one block to an empty file in an FFS-like file system.}
 \end{figure}
+\end{comment}
 
 In contrast, in the BSD UFS implementation of soft updates, each UFS operation
 is represented in memory by a structure encapsulating the disk changes necessary

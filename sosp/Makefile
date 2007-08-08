@@ -24,6 +24,7 @@ TMP_PDF_IMAGES = fig/figures_1.pdf fig/figures_2.pdf fig/figures_3.pdf \
 	fig/softhard_1.pdf fig/softhard_2.pdf fig/softhard_3.pdf \
 	fig/examples_1.pdf fig/examples_2.pdf \
 	fig/examplesb_1.pdf fig/examplesb_2.pdf fig/examplesb_3.pdf \
+	fig/examplesb_4.pdf \
 	rb_chdesc_size.pdf nrb_merge.pdf opgroup_transitions.pdf svn_opgroups.pdf \
 	imap_fsync.pdf imap_pg.pdf
 TMP_DVI_IMAGES = $(TMP_PDF_IMAGES:.pdf=.eps)
