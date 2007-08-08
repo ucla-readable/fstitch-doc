@@ -1,3 +1,25 @@
+* Must Do
+- Complete big postmark update
+- Update correctness tests
+- Increase number of benchmark runs to 5 or 10
+- Check that we adequately address reviews
+
+* Really Want To Do
+- Improve big postmark perf (lots of reads)
+- Add 8.6 summary
+- Improve understandability of patchgroup eval section
+- Improve patchgroup casestudies (including eliminate/improve the two diagrams)
+
+* Want To Do
+- Check that we did not forget any todos sent to kudos@
+- Decide how to cite email threads (esp reference's title)
+- More fully explain allocator differences and the effects
+- Update kudos to not commit file system summary data on fsync
+- Speed up ima/svn SU
+
+
+
+
 * Paper
 
 review_todos file
@@ -12,9 +34,6 @@ Related work:
 	http://web.mit.edu/tytso/www/linux/ext2intro.html
 	http://www.nongnu.org/ext2-doc/ext2.html
 - recent stackable: https://ols2006.108.redhat.com/2007/Reprints/sipek-Reprint.pdf ?
-
-Optimizations:
-- Update overlap merge algorithm description
 
 Patchgroups:
 - Remove svn figure?
@@ -70,3 +89,13 @@ Misc:
 - Increase number of runs from 3 to maybe 10
 - Check that NOFUA==WB and FUA==WT
 	- Benchmark ext3 with barriers?
+
+
+Chris up next:
+- Big postmark (why do we read so much?)
+- Speed up imap/svn SU?
+	- why are they slow?
+- Update to not commit file system summary data on fsync?
+- Improve understandability of patchgroup eval section
+- Add 8.6 summary
+- Try ext3 data=writeback
