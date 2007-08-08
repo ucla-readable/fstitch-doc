@@ -45,6 +45,32 @@ one independent field at a time; \Kudos\ will merge these \patches\ when
 appropriate, but if they cannot be merged, minimal \patches\ will lead to
 fewer \patch\ revert operations and more flexibility in write ordering.
 
+A file system implementation may also be able to detect at runtime
+that a particular state cannot appear on disk, because of its \patch\
+arrangement, and avoid imposing dependencies that are therefore
+unnecessary.
+%
+For example, a soft updates ordering requires that an inode not be
+cleared until there are no are more referencing directory entries.
+%
+A dependency from the inode clear onto the directory entry clear is
+sufficient to ensure this property. However, when a directory entry
+will never exist on disk because it is created and removed before the
+creation is committed, the inode clear need not depend on the
+directory entry clear.
+%
+The \Kudos\ ext2 module implements this optimization; the module
+detects that a directory entry will never exist on disk when the
+entry's creation and clear \patches\ are merged together.
+%
+The ext2 module implements a related inode deletion optimization: when
+no directory entry will ever reference the inode then the inode bitmap
+and block bitmap clears need not depend on the inode clear.
+%
+These two file system-level dependency optimizations significantly
+reduce the number of disk writes, number of patches created, and
+amount of undo data allocated to create and delete many files.
+\todo{Provide figure for either of the opts? Figure~\ref{f:ex}b is close\ldots}
 
 %% the changes to update a field in an inode structure
 %% on disk, a \patch\ spanning the entire inode could be created even though
