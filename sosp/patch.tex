@@ -11,8 +11,8 @@
 %\newcommand{\PMemst}{\ensuremath{\textit{mem}}}
 %\newcommand{\PInfst}{\ensuremath{\textit{flight}}}
 %\newcommand{\PDiskst}{\ensuremath{\textit{disk}}}
-%\newcommand{\PSetlim}[1]{\def\@next{#1}\ifx\@next\@empty\else_{\@next}\fi}
-\newcommand{\PSetlim}[1]{\def\@next{#1}\ifx\@next\@empty\else\cap\@next\fi}
+\newcommand{\PSetlim}[1]{\def\@next{#1}\ifx\@next\@empty\else_{\@next}\fi}
+%\newcommand{\PSetlim}[1]{\def\@next{#1}\ifx\@next\@empty\else\cap\@next\fi}
 \newcommand{\PMem}[1][]{\ensuremath{\mathcal{U}\PSetlim{#1}}}
 \newcommand{\PInf}[1][]{\ensuremath{\mathcal{F}\PSetlim{#1}}}
 \newcommand{\PDisk}[1][]{\ensuremath{\mathcal{C}\PSetlim{#1}}}
@@ -20,7 +20,7 @@
 \newcommand{\PSoft}[1][]{\ensuremath{\textit{\Rb}\PSetlim{#1}}}
 \newcommand{\PEmpty}[1][]{\ensuremath{\textit{\Noop}\PSetlim{#1}}}
 %\newcommand{\PDDepset}[1]{\ensuremath{\def\@next{#1}\ifx\@next\@empty\else\@next.\fi\textit{ddeps}}}
-\newcommand{\PDDepset}[1]{\ensuremath{\textit{DD}[#1]}}
+\newcommand{\PDDepset}[1]{\ensuremath{\textit{Dep}_1[#1]}}
 \newcommand{\PDepend}{\ensuremath{\leadsto}}
 \newcommand{\PDDepend}{\ensuremath{\rightarrow}}
 %\newcommand{\PDepset}[1]{\ensuremath{\textit{Dep}[#1]}}
@@ -99,20 +99,27 @@ Each committed patch stays committed permanently, although its effects can
 %% The notation $\PMem[b]$ represents the subset of $\PMem$ with the given
 %%  block $b$.
 
-Patch $p$'s block, written $\PBlock{p}$, is represented as a set containing
- all patches that affect that block, including $p$ itself.
+Patch $p$'s block is written $\PBlock{p}$.
 %
-Thus, $\PBlock{p} \cap \PDisk$ is the set of committed patches on
- $p$'s block, and the block is dirty if and only if $\PBlock{p} \cap \PDisk
- \neq \PBlock{p}$.
+Given a block $B$, we write $\PDisk[B]$ for the set of committed
+ patches with block $B$, or in notation $\{p\in\PDisk\mid\PBlock{p}=B\}$.
+%
+$\PInf[B]$ and $\PMem[B]$ are defined similarly.
+
+%%  is represented as a set containing
+%%  all patches that affect that block, including $p$ itself.
+%% %
+%% Thus, $\PBlock{p} \cap \PDisk$ is the set of committed patches on
+%%  $p$'s block, and the block is dirty if and only if $\PBlock{p} \cap \PDisk
+%%  \neq \PBlock{p}$.
 
 Disk controllers act by writing in-flight patches one block at a time; or,
  in notation:
 
 \begin{tabbing}
 \qquad \textit{Commit block:} \\
-\qquad \quad Pick some block $B$ with $\PInf \cap B \neq \emptyset$. \\
-\qquad \quad Commit and acknowledge each patch in $\PInf \cap B$.
+\qquad \quad Pick some block $B$ with $\PInf[B] \neq \emptyset$. \\
+\qquad \quad Commit and acknowledge each patch in $\PInf[B]$.
 \end{tabbing}
 
 \noindent
@@ -180,20 +187,19 @@ The \Kudos\ core makes no assumptions about block atomicity, instead relying
 \begin{figure}[t]
 \centering
 \begin{small}
-\begin{tabular}{@{}ll@{}}
+\begin{tabular}{@{}l@{~~~}l@{}}
 $p$     & a patch \\
 $\PBlock{p}$ & $p$'s block \\
 % $\PState{p}$ & $p$'s state, $\in \{\PMemst, \PInfst, \PDiskst\}$ \\
-$\PDDepset{p}$ & $p$'s direct dependencies: other \patches\ that must be \\
-	& committed before $p$ \\
 \noalign{\vskip3pt}
 $\PDisk, \PMem, \PInf$ & the sets of all committed, uncommitted, and in-flight \\
         & \patches, respectively \\
-% $\PMem[b]$ & $\{p \in \PMem \mid \PBlock{p} = b \}$ \\
+$\PDisk[B], \PMem[B], \PInf[B]$ & committed/uncommitted/in-flight patches on block $B$ \\
 \noalign{\vskip3pt}
-$p \PDDepend q$ & $p$ directly depends on $q$: $q \in \PDDepset{p}$ \\
+$p \PDDepend q$ & $p$ directly depends on $q$ ($p$ must be written before $q$) \\
 $p \PDepend q$ & $p$ depends on $q$: either $p \PDDepend q$ or there exists a patch \\
        & $x$ so that $p \PDepend x \PDDepend q$ \\
+$\PDDepset{p}$ & $p$'s direct dependencies: $\{ q \mid p \PDDepend q \}$ \\
 $\PDepset{p}$ & $p$'s dependencies: $\{ q \mid p \PDepend q \}$ \\
 \end{tabular}
 \end{small}
@@ -208,15 +214,15 @@ $\PDepset{p}$ & $p$'s dependencies: $\{ q \mid p \PDepend q \}$ \\
 Two additional \patch\ properties are required to model write-before
  relationships, \emph{dependencies} and \emph{undo data}.
 %
-Dependencies specify any ordering requirements among patches, and undo data
- allows a patch to be reverted in case its block must be written without
+Dependencies define ordering requirements among patches, and undo data
+ allows a patch to be reverted if its block must be written without
  it.
 
 Each \patch\ $p$ has a set of \textbf{direct dependencies}
  $\PDDepset{p}$.
 %
 Every \patch\ in $\PDDepset{p}$ must be committed to disk either before
- $p$, or at the same time as $p$ (which is only possible if $p$ and $q$ are
+ $p$, or at the same time as $p$ (this is only possible if $p$ and $q$ are
  on the same block).
 %
 The file system arranges dependencies based on the consistency
@@ -228,10 +234,10 @@ For example, a file system with asynchronous writes (and no durability
 a file system wishing to impose strictly ordered writes might set
  $\PDDepset{p_n} = \{p_{n-1}\}$.
 %
-In practice, an upper file system layer defines an initial set of
+In practice, an upper \Kudos\ layer defines an initial set of
  dependencies;
 %
-the rest of \Kudos\ generally preserves this initial set, but can modify
+intermediate layers mostly preserve this initial set, but can modify
  it as necessary to change dependency semantics;
 %
 and finally, the buffer cache obeys the constraints thus defined.
@@ -246,6 +252,11 @@ We say $p$ \emph{depends on} $q$, and write $p \PDepend q$, when there
 %
 \Patch\ $p$'s set of \emph{dependencies} is written $\PDepset{p} = \{ q \mid
  p \PDepend q \}$; this is of course a superset of its direct dependencies.
+%
+Circular dependencies among patches, where $p \PDepend q \PDepend p$, are
+ errors, since they would prevent the system from ever writing either $p$
+ or $q$; however, the system must handle circular dependencies among
+ \emph{blocks}.
 %
 Given a \emph{set} of \patches\ $P$, we write $\PDepset{P}$ to mean the set's
  combined dependencies $\bigcup_{p\in P} \PDepset{p}$. 
@@ -290,10 +301,12 @@ Our \patch\ notation is summarized in Figure~\ref{fig:patchnot}.
 & \textbf{c)} Adding a block (journal) \\
 \end{tabular}
 \caption{Example patch arrangements for an ext2-like file system.
- \textbf{a)} Example soft updates order for appending a zeroed-out block to
- a file.  \textbf{b)} A file on the same inode block is removed before the
- previous changes commit, inducing a circular block dependency.
- \textbf{c)} Example journal order for appending a zeroed-out block to a
+ Circles represent patches, shaded boxes represent disk blocks, and arrows
+ represent dependencies.
+ \textbf{a)} A soft updates order for appending a zeroed-out block to
+ a file.  \textbf{b)} A different file on the same inode block is removed
+ before the previous changes commit, inducing a circular block dependency.
+ \textbf{c)} A journal order for appending a zeroed-out block to a
  file.}
 \label{f:ex}
 \end{figure*}
@@ -302,32 +315,143 @@ Our \patch\ notation is summarized in Figure~\ref{fig:patchnot}.
 \subsection{Examples}
 \label{sec:patch:examples}
 
-To help illustrate how \patches\ can be used to implement existing consistency
-models, we will outline in this section how two widely-used protocols, soft
-updates and journaling, can be translated into \patches.
+This section illustrates how \patches\ can implement two widely-used
+ file system consistency models, soft updates and journaling.
+%
+Our basic example extends an existing file by a single block---perhaps an
+ application has used \texttt{ftruncate} to append 1024 zero bytes to an
+ empty file.
+%
+The file system is based on ext2, an FFS-like file system with inodes and
+ a free block bitmap.
+%
+In such a file system, this operation requires (1) allocating a block by
+ marking the corresponding bit as ``allocated'' in the free block bitmap,
+ (2) attaching the block to the file's inode, (3) setting the inode's size,
+ and (4) clearing the allocated data block.
+%
+These operations affect three blocks---a free block bitmap block, an inode
+ block, and a data block---and correspond to four patches: $b$ (allocate),
+ $i$ (attach), $i'$ (size), and $d$ (clear).
+
+
+\paragraph{Soft updates}
+%
+Early file systems aimed to avoid post-crash disk inconsistencies by
+ writing some, or all, blocks synchronously.
+%
+For example, the write system call might block until all metadata writes
+ had completed---clearly bad for performance.
+%
+Soft updates, in contrast, provides post-crash consistency without
+ synchronous writes by tracking and obeying necessary dependencies among
+ writes~\cite{ganger00soft}.
+%
+A soft updates file system orders its writes to enforce three simple rules
+ for metadata consistency~\cite{ganger00soft}:
+
+\begin{compactenumerate}
+\item \label{rule:pointer} ``Never write a pointer to a structure until it
+ has been initialized (e.g., an inode must be initialized before a
+ directory entry references it).''
+\item \label{rule:reuse} ``Never reuse a resource before nullifying all
+ previous pointers to it''.
+\item \label{rule:overwrite} ``Never reset the last pointer to a live
+ resource before a new pointer has been set''.
+\end{compactenumerate}
+
+\noindent
+By following these rules, a file system limits the possible inconsistencies
+present on the disk at any time to leaked resources only, such as blocks or inodes
+marked as in use but unreferenced. The file system can be used immediately
+ on reboot; a background scan can locate and recover the leaked resources
+ while the system is in use.
+
+These rules map directly to \patch\ dependencies.
+%
+Figure~\ref{f:ex}a shows possible soft updates-like dependencies for
+ our block-append operation.
+%
+%% Each circle represents a single \patch. The shaded boxes indicate disk blocks.
+%
+%% The arrows between \patches\ represent the dependency relationship \PDDepend.
+%
+%% For example, appending a block to an empty file in an FFS-like file system
+%% requires allocating a block by writing a bit to the block bitmap ($b$),
+%% initializing the block by writing zeroes to it ($d$), writing the block number
+%% to the inode for the file ($i$), and updating the file's size ($i'$).
+%
+Rule~\ref{rule:pointer} requires that $i \PDDepend b$.
+%
+Rule~\ref{rule:reuse} requires that $d$ depend on any
+previous deallocation of the same block;
+%
+a simple, though more restrictive, way to accomplish this is to let $d
+ \PDDepend b$.
+%
+The other two dependencies $i \PDDepend d$ and $i' \PDDepend d$ provide an
+ additional guarantee above and beyond metadata consistency, namely
+ that no file ever contains accessible uninitialized data.
+%
+Patches would represent additional guarantees naturally as well.
+%
+In contrast, the BSD UFS implementation of soft updates represents each UFS
+ operation in memory by a different specialized structure encapsulating
+ disk changes and dependencies.
+%% As a result, many specialized data structures
+%% represent the different possible file system operations. 
+These structures, their
+relationships, and their uses for tracking and enforcing
+dependencies are quite complex~\cite{mckusick99soft}.
+
+\begin{comment}
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=92pt]{fig/examplesb_3}
+  \caption{\label{fig:softupdate} Soft updates \patches\
+  for appending one block to an empty file in an FFS-like file system.}
+\end{figure}
+\end{comment}
+
+Figure~\ref{f:ex}b shows how an additional file system operation can induce
+ a circular dependency among blocks.
+%
+Before the changes in Figure~\ref{f:ex}a are written, the user deletes a
+ one-block file whose data block and inode happen to lie on the same bitmap
+ and inode blocks, respectively.
+%
+Rule~\ref{rule:reuse} requires the dependency $b_2 \PDDepend i_2$; but
+ given this dependency and the previous $i \PDDepend b$, neither the bitmap
+ block nor the inode block can be written first!
+%
+The solution is to roll back patch $b_2$ by undoing its effects, which
+ requires its undo data.  The resulting bitmap block, which contains only
+ $b$, is safe to write.  Once this write commits, all of $i$, $i'$, and
+ $i_2$ are safe to write.  When this in turn commits, the system can write
+ the bitmap block again, this time including $b_2$.
+
 
 \paragraph{Journal transactions}
 %
-In a journaling file system, changes to the file system are grouped into
-\emph{transactions} that commit atomically.
+A journaling file system, in contrast, ensures post-crash consistency using
+ a write-ahead log.
 %
 %Each transaction leaves the disk in a consistent state, thus avoiding the need
 %to check the file system when recovering from a failure.
 %
-All changes in a transaction are first copied into an on-disk log (called the
-\emph{journal}) before any of them are allowed to be written to the file
-system itself.
+All changes in a transaction are first copied into an on-disk journal.
 %
-After writing the journal, a small \emph{commit record} is written atomically,
-which signals that the transaction is complete and that all its changes should
-be considered valid.
+After these journal copies commit, a small \emph{commit record} is written
+ to the journal; this signals that the transaction is complete and that all
+ its changes should be considered valid.
 %
 Once the commit record is written, the original changes can be written to the
-file system in any order, since if the system is interrupted it can consult
-the journal later and copy the data back out into the file system.
+file system in any order, since after a crash the system can replay the
+ journal transaction.
+%% the journal later and recopy the data back out into the file system.
 %
 Finally, once all the changes have been written to the file system, the commit
-record can be erased, and that portion of the journal may be reused.
+record can be erased, allowing that portion of the journal to be reused.
 
 \begin{comment}
 \begin{figure}[htb]
@@ -337,31 +461,29 @@ record can be erased, and that portion of the journal may be reused.
 \end{figure}
 \end{comment}
 
-Patches implementing a journal transaction could be arranged as follows:
+\def\PXcmt{\textit{cmt}}
+\def\PXcmp{\textit{cmp}}
+
+These ordering rules also map directly to patch dependencies, as shown in
+ Figure~\ref{f:ex}c.
 %
-suppose we have \patch\ $b$ modifying a bitmap block, $i$ and $i'$
-modifying an inode block, and $d$ modifying a data block.
-%
-Copies of these blocks are written into the journal area using \patches\
-$d_\textrm{J}$, $i_\textrm{J}$, and $b_\textrm{J}$, each on its
-own block.
+Copies of the affected blocks are written into the journal area using
+ \patches\ $d_\textrm{J}$, $i_\textrm{J}$, and $b_\textrm{J}$, each on its
+ own block.
 %
 The commit record is created on a fourth block in the journal area with
-\patch\ $cmt$, and we let $cmt \PDDepend \{d_\textrm{J}$,
-$i_\textrm{J}$, $b_\textrm{J}\}$.
+\patch\ $\PXcmt$, which depends on $d_\textrm{J}$,
+$i_\textrm{J}$, and $b_\textrm{J}$.
 %
-Then we let $\{b$, $i$, $i'$, $d\} \PDDepend cmt$.
+The changes to the main file system all depend on $\PXcmt$.
 %
 Finally, we overwrite the commit record with a completion record with a
-\patch\ $cmp$, and we let $cmp \PDDepend \{b$, $i$, $i'$,
-$d\}$.
+\patch\ $\PXcmp$, which depends on the main file system changes.
 %
-These \patches\ are depicted in Figure~\ref{f:ex}c.
-%
-Each circle represents a single \patch. The shaded boxes indicate disk blocks.
-%
-The arrows between \patches\ represent the dependency relationship \PDDepend.
+Here, too, a circular block dependency requires the system to roll back a
+ patch, namely $\PXcmp$, and write the commit/completion record twice.
 
+\begin{comment}
 This arrangement of dependencies ensures that the commit record is not written
 to disk until all the journal data is present there, that the updates to the
 file system itself are not written until the commit record is present on disk,
@@ -376,62 +498,7 @@ $cmp \PDDepend \{b$, $i$, $i'$, $d\} \PDDepend cmt$.
 So, we must revert $cmp$ and write $\PBlock{cmp}$ with only $cmt$ applied,
 then write $b$, $i$, $i'$, and $d$, and finally write $\PBlock{cmp}$
 again in order to write $cmp$.
-
-\paragraph{Soft updates}
-%
-A file system using soft updates aims to prevent most kinds of inconsistencies
-from ever being present on the disk at all, by carefully ordering its writes
-according to three simple rules~\cite{ganger00soft}:
-
-\begin{enumerate}
-\item \label{rule:pointer} Never write a pointer to a structure until it has been initialized
-\item \label{rule:reuse} Never reuse such structures until all previous pointers to them have been overwritten
-\item \label{rule:overwrite} Never overwrite the last pointer to a live structure before a new pointer to it has been written
-\end{enumerate}
-
-\noindent
-By following these rules, a file system limits the possible inconsistencies
-present on the disk at any time to only leaked resources (e.g. blocks or inodes
-marked as in use but unreferenced). The file system can be used immediately,
-and a background scan can locate and recover the leaked resources while the
-system is in use.
-
-The soft updates rules map directly to \patch\ dependencies.
-%
-For example, appending a block to an empty file in an FFS-like file system
-requires allocating a block by writing a bit to the block bitmap ($b$),
-initializing the block by writing zeroes to it ($d$), writing the block number
-to the inode for the file ($i$), and updating the file's size ($i'$).
-%
-By rule \ref{rule:pointer}, we need $i \PDDepend b$ and $i \PDDepend d$,
-since $b$ and $d$ together initialize the new block.
-%
-By rule \ref{rule:reuse} we also need to make sure that $d$ depends on any
-previous deallocation of the same block, so that it is not overwritten while
-it is still in use.
-%
-A simple way to accomplish this is to let $d \PDDepend b$.
-%
-Finally, we can let $i' \PDDepend d$ so that no file ever contains
-accessible uninitialized data.
-%
-Figure~\ref{f:ex}a depicts this arrangement.
-
-\begin{comment}
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=92pt]{fig/examplesb_3}
-  \caption{\label{fig:softupdate} Soft updates \patches\
-  for appending one block to an empty file in an FFS-like file system.}
-\end{figure}
 \end{comment}
-
-In contrast, in the BSD UFS implementation of soft updates, each UFS operation
-is represented in memory by a structure encapsulating the disk changes necessary
-to implement that operation. As a result, many specialized data structures
-represent the different possible file system operations. These structures, their
-relationships to one another, and their uses for tracking and enforcing
-dependencies are quite complex~\cite{mckusick99soft}.
 
 
 \subsection{Obeying Dependencies}
