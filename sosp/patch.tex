@@ -426,7 +426,7 @@ Rule~\ref{rule:reuse} requires the dependency $b_2 \PDDepend i_2$; but
  given this dependency and the previous $i \PDDepend b$, neither the bitmap
  block nor the inode block can be written first!
 %
-The solution is to roll back patch $b_2$ by undoing its effects, which
+A solution is to roll back patch $b_2$ by undoing its effects, which
  requires its undo data.  The resulting bitmap block, which contains only
  $b$, is safe to write.  Once this write commits, all of $i$, $i'$, and
  $i_2$ are safe to write.  When this in turn commits, the system can write
