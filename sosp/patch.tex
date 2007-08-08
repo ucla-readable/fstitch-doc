@@ -401,12 +401,12 @@ A similar dependency would make inode updates depend on actual data
 %
 In contrast, the BSD UFS soft updates implementation represents each UFS
  operation by a different specialized structure encapsulating
- all that operation's disk changes and dependencies.
+ all of that operation's disk changes and dependencies.
 %% As a result, many specialized data structures
 %% represent the different possible file system operations. 
 These structures, their
-relationships, and their uses for tracking and enforcing
-dependencies are quite complex~\cite{mckusick99soft}.
+relationships, and their uses %% for tracking and enforcing dependencies 
+are quite complex~\cite{mckusick99soft}.
 
 \begin{comment}
 \begin{figure}[htb]
