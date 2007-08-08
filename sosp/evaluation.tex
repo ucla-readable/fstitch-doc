@@ -246,7 +246,8 @@ ordered journal mode detect that most dirty blocks are no longer
 referenced at the end of the test, and so do not write them to disk
 (writing only 0.1--0.2~MB). In contrast, \Kudos\ and Linux ext3 in
 full journal mode do not do this detection and thus write these blocks
-(writing 90--180~MB and 120~MB, respectively).
+(writing 90--180~MB and 120~MB, respectively). \todo{Update
+  not-referenced effectiveness for large postmark.}
 %
 While we believe that \Kudos\ and its ext2 module probably can be
 improved to make this optimization, we have not implemented it.
