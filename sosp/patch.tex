@@ -13,9 +13,9 @@
 %\newcommand{\PDiskst}{\ensuremath{\textit{disk}}}
 \newcommand{\PSetlim}[1]{\def\@next{#1}\ifx\@next\@empty\else_{\@next}\fi}
 %\newcommand{\PSetlim}[1]{\def\@next{#1}\ifx\@next\@empty\else\cap\@next\fi}
-\newcommand{\PMem}[1][]{\ensuremath{\mathcal{U}\PSetlim{#1}}}
-\newcommand{\PInf}[1][]{\ensuremath{\mathcal{F}\PSetlim{#1}}}
-\newcommand{\PDisk}[1][]{\ensuremath{\mathcal{C}\PSetlim{#1}}}
+\newcommand{\PMem}[1][]{\ensuremath{\mathpatchset{U}\PSetlim{#1}}}
+\newcommand{\PInf}[1][]{\ensuremath{\mathpatchset{F}\PSetlim{#1}}}
+\newcommand{\PDisk}[1][]{\ensuremath{\mathpatchset{C}\PSetlim{#1}}}
 \newcommand{\PHard}[1][]{\ensuremath{\textit{\Nrb}\PSetlim{#1}}}
 \newcommand{\PSoft}[1][]{\ensuremath{\textit{\Rb}\PSetlim{#1}}}
 \newcommand{\PEmpty}[1][]{\ensuremath{\textit{\Noop}\PSetlim{#1}}}
@@ -31,9 +31,8 @@
 Every change to stable storage in a \Kudos\ system is represented by a
 \emph{\patch}.
 %
-This section describes the basic \patch\ abstraction using a semi-formal
- notation, and presents our kernel implementation's version of the
- abstraction.
+This section describes the basic \patch\ abstraction
+ and describes our implementation of that abstraction.
 
 \begin{comment}
 %
@@ -48,48 +47,48 @@ Each \patch\ $p$ encapsulates four important pieces of information: its
 
 \subsection{Disk Behavior}
 
-A \Kudos\ system's storage layer commits data in units called
+We first fill in enough of our model to describe how disks behave, and
+ especially how disks commit patches to stable storage.
+%
+Although our terminology originates in conventional disk-based file systems
+ with uniformly-sized blocks, the model would apply with small changes to
+ file systems with non-uniform blocks and to other media, including RAID
+ and network storage.
+
+Our model's storage layer commits data to stable storage in units called
  \textbf{blocks}.
 %
 All writes affect one or more blocks, and it is impossible to selectively
  write part of a block.
-%
-This models a conventional disk file system with uniformly-sized blocks,
- but also models non-uniform blocks and other media, such as RAID or
- network storage.
-%
-(Nevertheless, we frequently use terms like ``the disk'' and ``the disk
- controller'' to simplify our terminology.)
 
-\Kudos\ represents each change to stable storage as a \textbf{patch}.
+Every change to a block's data is represented by a \textbf{patch}.
 %
-Each patch applies to exactly one block; thus, a file system change that
+A patch applies to exactly one block, so a file system change that
  affects $n$ blocks requires at least $n$ patches to represent.
 %
 Each \patch\ is either
  \textbf{committed}, meaning written to disk;
  \textbf{uncommitted}, meaning not written to disk;
- or \textbf{in flight}, meaning committed by upper layers, but not
- necessarily by lower layers.
+ or \textbf{in flight}, meaning in the process of being written to disk.
 %
-The intermediate in-flight state is necessary because
- operating system software loses control of a block upon writing it
- to disk: the disk controller may commit in-flight \patches\ in any order.
-%
-The sets $\PDisk$, $\PMem$, and $\PInf$ represent all committed,
- uncommitted, and in-flight patches, respectively.
+The intermediate in-flight state models caching, reordering, and delay in
+ the storage layer: blocks written by an operating system may be
+ committed by the disk controller in any order, possibly
+ after disk scheduling and a period in the on-disk cache.
 %
 Patches begin their lives as uncommitted.
 %
 The operating system sends uncommitted \patches\ in flight
  by writing their blocks to the disk controller.  Some
- time later---after possible controller-level disk scheduling, transit over
- the system bus, and a period in the disk's cache---the disk writes these blocks
+ time later, the disk writes these blocks
  to stable storage and reports success.  When the processor receives this
- acknowledgement, it commits the relevant patches, moving them into $\PDisk$.
+ acknowledgement, it commits the relevant patches.
 %
 Each committed patch stays committed permanently, although its effects can
  be undone by subsequent patches on the same block.
+%
+The sets $\PDisk$, $\PMem$, and $\PInf$ represent all committed,
+ uncommitted, and in-flight patches, respectively.
 %
 %% $p$'s state is written $\PState{p} \in \{\PMemst, \PInfst,
 %% \PDiskst\}$.  
@@ -113,37 +112,43 @@ $\PInf[B]$ and $\PMem[B]$ are defined similarly.
 %%  $p$'s block, and the block is dirty if and only if $\PBlock{p} \cap \PDisk
 %%  \neq \PBlock{p}$.
 
-Disk controllers act by writing in-flight patches one block at a time; or,
- in notation:
-
+Disk controllers act by writing in-flight patches one block at a
+ time, which we model as follows:
+%
 \begin{tabbing}
-\qquad \textit{Commit block:} \\
-\qquad \quad Pick some block $B$ with $\PInf[B] \neq \emptyset$. \\
-\qquad \quad Commit and acknowledge each patch in $\PInf[B]$.
+\qquad \quad 1. Pick some block $B$ with $\PInf[B] \neq \emptyset$. \\
+\qquad \quad 2. Commit and acknowledge each patch in $\PInf[B]$.
 \end{tabbing}
-
+%
 \noindent
 %
 Disks perform better when allowed to reorder requests, so operating systems
- try to keep many blocks in flight, as constrained by write-before
- relationships.  (For instance, in-flight blocks cannot depend on each
- other.)
+ try to keep many blocks in flight.
+%
+%% , as constrained by write-before
+%% relationships.  (For instance, in-flight blocks cannot depend on each
+%% other.)
 %
 Although file systems will generally write all of a block's uncommitted
  patches when they write the block, they may, if they choose, write a
  \emph{subset} of those patches---and, as we will see, this is sometimes
  required to preserve write-before relationships.
 %
-During such a write, the effects of any unwritten patches must be
- temporarily undone.
+The effects of any unwritten patches must be
+ temporarily undone during a block write.
 
 
-Careful control over write-before relationships is \emph{necessary} to
- ensure consistency, but for some file system designs, such as soft
- updates, it \emph{suffices} only if the underlying storage system
- writes blocks atomically.
+Our model does not specify whether the storage system writes blocks
+ atomically.
 %
-That is, soft updates requires that if the disk fails while a block $B$ is
+However, some file system designs, such as soft updates, rely on block
+ write atomicity:
+%% Careful control over write-before relationships is \emph{necessary} to
+%%  ensure consistency, but for some file system designs, such as soft
+%%  updates, it \emph{suffices} only if the underlying storage system
+%%  writes blocks atomically.
+%
+soft updates expects that if the disk fails while a block $B$ is
  in flight, then $B$'s value on recovery must equal either the old value or
  the new value.
 %
@@ -312,6 +317,92 @@ Our \patch\ notation is summarized in Figure~\ref{fig:patchnot}.
  file.}
 \label{f:ex}
 \end{figure*}
+
+
+\subsection{Obeying Dependencies}
+\label{sec:patch:dependencies}
+
+The \textbf{disk safety property} states that
+ the dependencies of all committed \patches\ must also be committed:
+%
+\[ \PDepset{\PDisk} \subseteq \PDisk. \]
+%
+Thus, no matter when the system crashes, the disk is consistent in terms of
+dependencies.
+%
+The file system's job is to set up dependencies so that the disk safety
+property implies file system correctness.
+
+\begin{comment}
+ However, \Kudos\ can only control when \patches\ are handed to the disk
+ controller, not when they are written to disk.
+ %
+ Disk controller behavior is encapsulated in the following atomic action:
+
+ \begin{tabbing}
+ \textit{Commit block:} \\
+ \quad Pick some block $b$ with $\PInf[b] \neq \emptyset$. \\
+ \quad Move each $p \in \PInf[b]$ to $\PDisk$ (committed).
+ \end{tabbing}
+\end{comment}
+
+Since the disk controller can write blocks in any order, a \Kudos\ file
+ system must also ensure
+that in-flight blocks are independent.  This is precisely stated
+by the \textbf{in-flight safety property:}
+%
+\[ \text{For any block $B$,~~} \PDepset{\PInf[B]} \subseteq \PDisk \cup \PInf[B] . \]
+%
+\begin{comment}
+%% Do we need this comment?
+(The union with $\PInf[B]$ is necessary for the case of multiple in-flight
+\patches\ on the same block.)
+\end{comment}
+%
+Thus, $\PDepset{\PInf[B]} \cap \PDepset{\PInf[B']} \subseteq \PDisk$ for
+ any $B' \neq B$, and the disk controller can write in-flight blocks
+ in any order and still preserve disk safety.
+
+
+Consequently, the buffer cache must write blocks as follows:
+
+\begin{tabbing}
+\quad \textit{Write block:} \\
+\quad \quad Pick some block $B$ with $\PMem[B] \neq \emptyset$ and $\PInf[B] =
+\emptyset$. \\
+\quad \quad Pick some $P \subseteq \PMem[B]$ with $\PDepset{P} \subseteq P \cup
+\PDisk$. \\
+\quad \quad Move each $p \in P$ to $\PInf$ (in-flight).
+\end{tabbing}
+
+\noindent
+%
+We require that $\PInf[b] = \emptyset$ to ensure that at most one version of
+a block is in flight at any time.
+%
+The buffer cache is also expected to write all blocks eventually, a
+ liveness property.
+
+\begin{comment}
+\paragraph{Example}
+%
+Suppose a \Kudos\ system contains the \patches\ in Figure~\ref{f:ex}c,
+where the journal entry patches $d_\textrm{J}$, $i_\textrm{J}$, and
+ $b_\textrm{J}$ have committed and all other patches have not.
+%
+The buffer cache cannot write blocks $\PBlock{b}$, $\PBlock{i}$, or $\PBlock{d}$,
+since $\{b$, $i$, $i'$, $d\} \PDDepend \PXcmt$ and $\PXcmt \not\in \PDisk$.
+%
+Its only option is to write $\PBlock{\PXcmt}$ with $P = \{\PXcmt\}$, since
+ $\PDepset{\PXcmt} = \{d_\textrm{J}$, $i_\textrm{J}$, $b_\textrm{J}\}
+ \subseteq \PDisk$.
+%
+Since $\PXcmp$ has unmet dependencies on other blocks, it must be undone
+ before the write and is excluded from $P$.
+%
+Later, when $\PXcmt$ commits, the buffer cache has the option to
+write any of $\PBlock{b}$, $\PBlock{i}$, or $\PBlock{d}$.
+\end{comment}
 
 
 \subsection{Examples}
@@ -503,90 +594,6 @@ So, we must revert $cmp$ and write $\PBlock{cmp}$ with only $cmt$ applied,
 then write $b$, $i$, $i'$, and $d$, and finally write $\PBlock{cmp}$
 again in order to write $cmp$.
 \end{comment}
-
-
-\subsection{Obeying Dependencies}
-\label{sec:patch:dependencies}
-
-The \textbf{disk safety property} states that
- the dependencies of all committed \patches\ must also be committed:
-%
-\[ \PDepset{\PDisk} \subseteq \PDisk. \]
-%
-Thus, no matter when the system crashes, the disk is consistent in terms of
-dependencies.
-%
-The file system's job is to set up dependencies so that the disk safety
-property implies file system correctness.
-
-\begin{comment}
- However, \Kudos\ can only control when \patches\ are handed to the disk
- controller, not when they are written to disk.
- %
- Disk controller behavior is encapsulated in the following atomic action:
-
- \begin{tabbing}
- \textit{Commit block:} \\
- \quad Pick some block $b$ with $\PInf[b] \neq \emptyset$. \\
- \quad Move each $p \in \PInf[b]$ to $\PDisk$ (committed).
- \end{tabbing}
-\end{comment}
-
-Since the disk controller can write blocks in any order, a \Kudos\ file
- system must also ensure
-that in-flight blocks are independent.  This is precisely stated
-by the \textbf{in-flight safety property:}
-%
-\[ \text{For any block $B$,~~} \PDepset{\PInf[B]} \subseteq \PDisk \cup \PInf[B] . \]
-%
-\begin{comment}
-%% Do we need this comment?
-(The union with $\PInf[B]$ is necessary for the case of multiple in-flight
-\patches\ on the same block.)
-\end{comment}
-%
-Thus, $\PDepset{\PInf[B]} \cap \PDepset{\PInf[B']} \subseteq \PDisk$ for
- any $B' \neq B$, and the disk controller can write in-flight blocks
- in any order and still preserve disk safety.
-
-
-Consequently, the buffer cache must write blocks as follows:
-
-\begin{tabbing}
-\quad \textit{Write block:} \\
-\quad \quad Pick some block $B$ with $\PMem[B] \neq \emptyset$ and $\PInf[B] =
-\emptyset$. \\
-\quad \quad Pick some $P \subseteq \PMem[B]$ with $\PDepset{P} \subseteq P \cup
-\PDisk$. \\
-\quad \quad Move each $p \in P$ to $\PInf$ (in-flight).
-\end{tabbing}
-
-\noindent
-%
-We require that $\PInf[b] = \emptyset$ to ensure that at most one version of
-a block is in flight at any time.
-%
-The buffer cache is also expected to write all blocks eventually, a
- liveness property.
-
-\paragraph{Example}
-%
-Suppose a \Kudos\ system contains the \patches\ in Figure~\ref{f:ex}c,
-where the journal entry patches $d_\textrm{J}$, $i_\textrm{J}$, and
- $b_\textrm{J}$ have committed and all other patches have not.
-%
-The buffer cache cannot write blocks $\PBlock{b}$, $\PBlock{i}$, or $\PBlock{d}$,
-since $\{b$, $i$, $i'$, $d\} \PDDepend \PXcmt$ and $\PXcmt \not\in \PDisk$.
-%
-Its only option is to write $\PBlock{\PXcmt}$ with $P = \{\PXcmt\}$, since
- $\PDepset{\PXcmt} = \{d_\textrm{J}$, $i_\textrm{J}$, $b_\textrm{J}\}
- \subseteq \PDisk$.
-%
-Since $\PXcmp$ has unmet dependencies on other blocks, it must be undone
- before the write and is excluded from $P$.
-%
-Later, when $\PXcmt$ commits, the buffer cache has the option to
-write any of $\PBlock{b}$, $\PBlock{i}$, or $\PBlock{d}$.
 
 
 

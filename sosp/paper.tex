@@ -8,9 +8,14 @@
 \usepackage{fancyhdr}
 \frenchspacing
 
+\iffalse
 \DeclareMathAlphabet{\mathcal}{U}{MathePiTwoCal}{m}{n}
 \DeclareFontFamily{U}{MathePiTwoCal}{}
 \DeclareFontShape{U}{MathePiTwoCal}{m}{n}{ <-> MathePiTwo--mpi2c }{}
+\let\mathpatchset\mathcal
+\else
+\let\mathpatchset\mathbf
+\fi
 
 % The names of commonly referenced things in our work which
 % we might want to give different names for the paper.
