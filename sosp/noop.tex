@@ -1,28 +1,30 @@
 % -*- mode: latex; tex-main-file: "paper.tex" -*-
 
-\subsection{\Kudos\ Interface and \Noop\ \Patches}
+\subsection{Implementation and \Noop\ \Patches}
 \label{sec:patch:noop}
 
 \def\_{{\ttfamily\char`\_}}
 
-\Kudos\ \modules\ create \patches\ with functions like \texttt{patch\_\-create\_\-byte}.
+The \Kudos\ file system implementation creates patch structures
+corresponding directly to our abstraction.
 %
-Arguments to these functions include the relevant block ($\PBlock{p}$), any
-direct dependencies ($\PDDepset{p}$), and the new data represented by the
-\patch.
+Creation functions have names like \texttt{patch\_\-create\_\-byte};
 %
-Most \patches\ specify the new data as a contiguous byte range, including an
+their arguments include the relevant block, any
+direct dependencies, and the new data.
+%
+Most \patches\ specify this data as a contiguous byte range, including an
 offset into the block and the \patch\ length in bytes.
 %
 The undo data for very small \patches\ (4 bytes or less) is stored in the
 \patch\ structure itself; for larger \patches, undo data is stored in
 separately allocated memory.
 %
-As a useful special case, \patches\ that flip one or more bits in a word (for
-instance, in a free block bitmap) are represented specially.
+In bitmap blocks, changes to individual bits in a word can have independent
+dependencies, which we handle with a special bit-flip patch type.
 
 
-The \Kudos\ core automatically detects one special type of dependency.
+The implementation automatically detects one special type of dependency.
 %
 If two \patches\ $p$ and $q$ affect the same block and have overlapping data
 ranges, and $p$ was created before $q$, then \Kudos\ adds an \emph{overlap
@@ -32,21 +34,21 @@ There's no need for file system modules to detect and enforce such
 dependencies themselves.
 
 
-For each block $b$, \Kudos\ maintains a list of all \patches\ with
-$\PBlock{p} = b$.
+For each block $B$, \Kudos\ maintains a list of all \patches\ with
+$\PBlock{p} = B$.
 %
-However, the implementation does not keep track of on-disk \patches; when
+However, the implementation does not keep track of committed \patches; when
 \patch\ $p$ commits, \Kudos\ destroys $p$'s data structure and removes all
 dependencies $q \PDDepend p$.
 %
 The resulting behavior follows our model.
 %
-For each \patch\ $p$, \Kudos\ maintains lists of its direct dependencies (all
-$q$ where $p \PDDepend q$) and its direct ``reverse dependencies'' (that
-is, all $q$ where $q \PDDepend p$).
+For each \patch\ $p$, \Kudos\ maintains lists of its direct dependencies
+and its direct ``reverse dependencies'' (that is, all $q$ where $q
+\PDDepend p$).
 
 
-\Kudos\ also supports \emph{\noop} \patches, which have
+The implementation also supports \emph{\noop} \patches, which have
  no associated data or block.
 %
 \Noop\ \patches\ are useful for representing sets of dependencies and for
@@ -56,7 +58,7 @@ For example, while a journal transaction is being populated in a journaling
  file system, many changes to the main body of the disk should depend on a
  journal commit record that has not yet been created.
 %
-\Kudos\ therefore makes these \patches\ depend on a ``managed'' \noop\ \patch\
+\Kudos\ therefore makes these \patches\ depend on an \noop\ \patch\
  that is explicitly held in memory.
 %
 Once the commit record is created, the \noop\ \patch\ is updated to depend on
@@ -64,28 +66,24 @@ Once the commit record is created, the \noop\ \patch\ is updated to depend on
 %
 Once the commit record is written, the \noop\ \patch\ is automatically
  ``written'' as well, which allows the main file system changes to follow.
-%
-Some aspects of our model would have to change to handle \noop\
- \patches; for example, the in-flight safety property would change to:
-%
-\[ \PDepset{\PInf[b]} \subseteq \PInf[b] \cup \PDisk \cup \PEmpty. \]
-%
-We call a \patch\ \emph{true} if it is not \noop.
 
 
-\Noop\ \patches\ both aid and hurt performance.
-%
-On the one hand, \noop\ \patches\ can represent quadratic sets of dependencies
- with a linear number of edges: if all $m$ \patches\ in $P$ must depend on
- all $n$ \patches\ in $Q$, one could 
+\Noop\ \patches\ can shrink memory usage by representing quadratic sets of
+ dependencies with a linear number of edges: if all $m$ \patches\ in $P$
+ must depend on all $n$ \patches\ in $Q$, one could
  %% add $mn$ direct dependencies $p_i \PDDepend q_j$ or
  add an \noop\ \patch\ $x$ and $m+n$ direct dependencies
  $p_i \PDDepend x \PDDepend q_j$.
 %
-(This is useful for \patchgroups, described in \S\ref{sec:patchgroup}.)
+This is useful for \patchgroups\ as described in \S\ref{sec:patchgroup}.
 %
-On the other hand, some functions may have to traverse \noop\
- \patches\ to determine true dependencies.
+However, too-extensive use of \noop\ \patches\ adds to system time by
+ requiring that functions traverse \noop\ \patch\ layers to find true
+ dependencies.
+%
+Our implementation therefore uses \noop\ \patches\ infrequently, and in the
+ rest of this paper, patches are nonempty by definition unless explicitly
+ stated.
 
 
 \begin{comment}

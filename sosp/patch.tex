@@ -253,10 +253,12 @@ We say $p$ \emph{depends on} $q$, and write $p \PDepend q$, when there
 \Patch\ $p$'s set of \emph{dependencies} is written $\PDepset{p} = \{ q \mid
  p \PDepend q \}$; this is of course a superset of its direct dependencies.
 %
-Circular dependencies among patches, where $p \PDepend q \PDepend p$, are
- errors, since they would prevent the system from ever writing either $p$
- or $q$; however, the system must handle circular dependencies among
- \emph{blocks}.
+Circular dependencies among patches cannot be resolved and are therefore
+ errors.  For example, neither $p$ nor $q$ could be written before the
+ other if $p \PDepend q \PDepend p$.
+%
+(Although a circular dependency chain entirely within a single block avoids
+ this problem, in practice \Kudos\ treats all circular chains as errors.)
 %
 Given a \emph{set} of \patches\ $P$, we write $\PDepset{P}$ to mean the set's
  combined dependencies $\bigcup_{p\in P} \PDepset{p}$. 
@@ -504,8 +506,8 @@ again in order to write $cmp$.
 \subsection{Obeying Dependencies}
 \label{sec:patch:dependencies}
 
-\Kudos\ must ensure the \textbf{disk safety property}, which states that
- the dependencies of all \patches\ on disk are also on disk:
+The \textbf{disk safety property} states that
+ the dependencies of all committed \patches\ must also be committed:
 %
 \[ \PDepset{\PDisk} \subseteq \PDisk. \]
 %
@@ -528,21 +530,25 @@ property implies file system correctness.
  \end{tabbing}
 \end{comment}
 
-Since the disk controller can write blocks in any order, \Kudos\ must ensure
-that in-flight blocks are mutually independent.  This is precisely stated
+Since the disk controller can write blocks in any order, a \Kudos\ file
+ system must also ensure
+that in-flight blocks are independent.  This is precisely stated
 by the \textbf{in-flight safety property:}
 %
-\[ \text{For all blocks $B$,~~} \PDepset{\PInf[B]} \subseteq \PDisk \cup (\PInf[B]) . \]
+\[ \text{For all blocks $B$,~~} \PDepset{\PInf[B]} \subseteq \PDisk \cup \PInf[B] . \]
 %
-This ensures that for any $B' \neq B$, $\PDepset{\PInf[B]} \cap
- \PDepset{\PInf[B']} \subseteq \PDisk$; the disk controller can safely
- write in-flight blocks in any order and still preserve disk safety.
-%
+\begin{comment}
+%% Do we need this comment?
 (The union with $\PInf[B]$ is necessary for the case of multiple in-flight
 \patches\ on the same block.)
+\end{comment}
+%
+Thus, $\PDepset{\PInf[B]} \cap \PDepset{\PInf[B']} \subseteq \PDisk$ for
+ any $B' \neq B$, and the disk controller can safely write in-flight blocks
+ in any order and still preserve disk safety.
 
 
-The buffer cache must thus behave according to the following atomic action:
+Consequently, the buffer cache must write blocks as follows:
 
 \begin{tabbing}
 \quad \textit{Write block:} \\
@@ -564,45 +570,53 @@ The buffer cache is also expected to write all blocks eventually, a
 
 \paragraph{Example}
 %
-Suppose the buffer cache has \patches\ arranged as in the journal example from
-Section~\ref{sec:patch:examples}, and that $\{d_\textrm{J}$, $i_\textrm{J}$,
-$b_\textrm{J}\} \subseteq \PDisk$, i.e., the journal entries have already been
-written to disk.
+Suppose a \Kudos\ system contains the \patches\ in Figure~\ref{f:ex}c,
+where the journal entry patches $d_\textrm{J}$, $i_\textrm{J}$, and
+ $b_\textrm{J}$ have committed and all other patches have not.
 %
-The buffer cache cannot write block $\PBlock{b}$, $\PBlock{i}$, or $\PBlock{d}$,
-since $\{b$, $i$, $i'$, $d\} \PDDepend cmt$ and $\textit{cmt} \not\in \PDisk$.
+The buffer cache cannot write blocks $\PBlock{b}$, $\PBlock{i}$, or $\PBlock{d}$,
+since $\{b$, $i$, $i'$, $d\} \PDDepend \PXcmt$ and $\PXcmt \not\in \PDisk$.
 %
-Its only option is to write $\PBlock{cmt}$ since $\PDepset{cmt} =
-\{d_\textrm{J}$, $i_\textrm{J}$, $b_\textrm{J}\} \subseteq \PDisk$.
+Its only option is to write $\PBlock{\PXcmt}$ with $P = \{\PXcmt\}$, since
+ $\PDepset{\PXcmt} = \{d_\textrm{J}$, $i_\textrm{J}$, $b_\textrm{J}\}
+ \subseteq \PDisk$.
 %
-So, via the action above, it picks $P = \{cmt\}$ and moves $\textit{cmt}$
-to $\PInf$, the in-flight state). (Note that $cmp \not \in P$ since it has unmet dependencies, so it
-will be reverted before sending the block data to the disk controller.)
+Since $\PXcmp$ has unmet dependencies on other blocks, it must be undone
+ before the write and is excluded from $P$.
 %
-Later, when notification is received that $\PBlock{c}$ has been written to disk,
-$c$ is committed and the buffer cache then has the option to
+Later, when $\PXcmt$ commits, the buffer cache has the option to
 write any of $\PBlock{b}$, $\PBlock{i}$, or $\PBlock{d}$.
 
 
-The buffer cache can't handle cross-block \patch\ dependency cycles since
-it must write data in units of blocks.
-%
-Thus, if $p \PDepend q \PDepend p$, then $p$ and $q$ must be on the same
-block; otherwise, neither $p$ nor $q$ could ever get written.
-%
-Whenever upper layers might generate cross-block dependency cycles,
-intervening layers must break those cycles somehow before they reach the
-cache.
-%
-For instance, a journal layer might detect dependency cycles and put the
-corresponding \patches\ into a single transaction, but the
-\emph{implementation} of that transaction could not contain cross-block
-cycles.
-%
-In practice, the \Kudos\ implementation currently disallows any dependency
-cycles, including cycles within a single block; this simplifies many graph
-traversals used to determine when optimizations may be applied, and has not
-yet caused any difficulty in implementing different consistency policies.
-
 
 \input{noop}
+
+
+\subsection{Discussion}
+
+The patch abstraction seems general enough to suit many forms of
+ dependency tracking.
+%
+Only one property of the model seems specific to conventional file systems,
+ namely that circular dependency chains are errors.
+%
+This restriction is required because \Kudos\ assumes a lower layer that
+ commits one patch at a time (or one block at a time).
+%
+Disks certainly behave this way, but a dependency tracker built above a
+ more advanced lower layer---such as a journal---could resolve many
+ circular dependency chains by forcing the relevant blocks into a single
+ transaction or transaction equivalent.
+%
+\Featherstitch's journal module could potentially implement this, allowing
+ upper layers to create (size-limited) circular dependency chains, but we
+ leave this for future work.
+
+Patches model write-before relationships, but one might instead build a
+ generalized file system dependency system that modeled abstract
+ transactions.
+%
+We chose write-before relationships as our foundation since they minimally
+ constrain file system disk layout; nevertheless, it would be interesting
+ to consider whether a transaction abstraction could model, say, soft
+ updates-like dependencies.
