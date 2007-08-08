@@ -4,3 +4,9 @@ opt_*.pdf
 figures_*.pdf
 *.log
 *.mpx
+softhard_*.eps
+softhard_*.pdf
+examples_*.pdf
+examples_*.eps
+examplesb_*.eps
+examplesb_*.pfb

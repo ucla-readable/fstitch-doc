@@ -58,7 +58,8 @@ bib: $(MAINFILE:.tex=.aux) $(BIBS)
 	$(MAKE) bib
 
 %.ps: %.dvi
-	$(DVIPS) $< -o $@
+	TEXCONFIG=.:`kpsewhich --show-path 'dvips config'` \
+		$(DVIPS) -Pmathpical $< -o $@
 
 %.pdf: %.ps
 	$(EPS2PDF) $< -o $@
