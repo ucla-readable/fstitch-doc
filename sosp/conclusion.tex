@@ -1,16 +1,36 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-\Kudos\ provides a new way for file system implementations to formalize the
-``write before'' relationship among buffered changes to stable storage, allowing
-file system software to be divided into \modules\ that cooperate loosely to
-implement strong consistency guarantees. We also explored several optimizations
-to the \patch\ abstraction that significantly improve performance. \Patches\
-simplify the design of consistency protocols like journaling and soft updates by
-separating the specification and enforcement of write ordering requirements.
-Additionally, \patches\ can be extended outside the file system implementation
-into userspace, allowing applications to specify in a limited way what their
-specific consistency requirements are, providing the file system implementation
-more freedom to reorder writes without violating the application's needs.
-Extending the \patch\ abstraction into user space may be able to improve the
-efficiency of applications with specific write ordering requirements.
+\Kudos\ \patches\ provide a new way for file system implementations to formalize
+the ``write before'' relationship among buffered changes to stable storage.
+%
+We present several optimizations which significantly decrease the overhead
+required to use \patches, both in terms of the amount of memory required and the
+CPU time spent.
+%
+We evaluate a prototype file system implementation using \patches\ to determine
+whether these ideas can be used in production file systems.
+%
+The answer is that they can: with the optimizations we described, the
+performance of our prototype is usually at least as fast as Linux when
+configured to provide similar consistency guarantees, although in some cases it
+still requires improvement.
+
+
+\Patches\ simplify the implementation of consistency protocols like journaling
+and soft updates by separating the specification from the enforcement of write
+before relationships.
+%
+Using \patches\ also allows our prototype to be divided into \modules\ that
+cooperate loosely to implement strong consistency guarantees.
+%
+Additionally, \patches\ can be extended into userspace, allowing applications to
+specify more precisely what their specific consistency requirements are.
+%
+This provides the buffer cache more freedom to reorder writes without violating
+the application's needs, while simultaneously freeing the application from
+having to micromanage writes to disk.
+%
+We present results for an IMAP server modified to take advantage of this
+feature, and show that it can significantly reduce both the total time and the
+number of writes required for our benchmark.
