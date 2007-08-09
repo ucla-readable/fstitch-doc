@@ -47,10 +47,32 @@ Specifically, \Kudos\ configurations have 662~MB of RAM total and
 and Linux configurations have 350~MB of RAM total and 312~MB of RAM
 for the block cache.
 
-We examine Linux ext2 and ext3 (in ordered and journal modes) and
-\Kudos\ ext2 (in asynchronous, soft updates, metadata journal, and
-full journal modes), all created with default configurations.
+We examine Linux ext2 (in asynchronous mode) and ext3 (in writeback,
+ordered, and full journal modes) and \Kudos\ ext2 (in asynchronous,
+soft updates, metadata journal, and full journal modes), all created
+with default configurations.
+
+The three journal modes provide different consistency guarantees.
+The strength of these guarantees is strictly ordered:
+\vspace{-0.5\baselineskip}
+\begin{center}
+asynchronous $<$ writeback $<$ ordered $<$ full
+\end{center}
+\vspace{-0.5\baselineskip}
+Writeback journaling commits metadata atomically and commits data only
+after the corresponding metadata. \Kudos\ metadata journaling is
+equivalent to ext3 writeback journaling.
 %
+Ordered journaling commits data associated with a given transaction
+prior to the proceeding transacation's metadata. It is the most
+commonly used ext3 journaling mode.
+%
+In all tests ext3 writeback and ordered journaling modes performed
+similarly, and \Kudos\ does not implement ordered mode, so we report
+only writeback results.
+%
+Full journaling commits data atomically.
+
 There is a notable write durability difference between the default
 \Kudos\ and Linux ext2/ext3 configurations: \Kudos\ presumes a write is
 durable after is is on the disk platter (safe) and Linux ext2 and ext3
@@ -187,7 +209,7 @@ smaller account for about 51\% of all \rb\ \patches.}
 \unsafe{full journal} & \unsafe{11.1 [3.9]} & \unsafe{1.2 [0.5]} & \unsafe{86.6 [25.7]} & \unsafe{37.1 [4.4]} \\ \hline
 
 \multicolumn{3}{@{}l}{\emph{Linux}\raise2pt\hbox{\strut}} & & \\
-\safe{ext3 ordered} & \safe{16.9 [1.0]} & \safe{4.6 [0.3]} & \safe{54.1 [~~4.0]} & \safe{37.7 [4.0]} \\
+\safe{ext3 writeback} & \safe{19.5 [1.0]} & \safe{4.5 [0.3]} & \safe{55.7 [~~3.7]} & \safe{37.8 [4.0]} \\
 \safe{ext3 journal} & \safe{20.3 [1.2]} & \safe{4.6 [0.2]} & \safe{82.5 [~~5.0]} & \safe{38.2 [4.0]} \\
 \unsafe{ext2} & \unsafe{9.5 [0.7]} & \unsafe{4.7 [0.2]} & \unsafe{45.8 [~~2.0]} & \unsafe{37.0 [4.0]} \\
 \unsafe{ext3 journal} & \unsafe{15.3 [1.2]} & \unsafe{4.3 [0.3]} & \unsafe{80.2 [~~4.9]} & \unsafe{37.3 [4.0]} \\
@@ -231,7 +253,7 @@ block allocation strategy changes can significantly affect I/O time
 for many of these benchmarks. This further emphasizes the importance
 of the system CPU time difference.
 
-Unlike the untar, delete, and Andrew benchmarks, Linux ext3 ordered
+Unlike the untar, delete, and Andrew benchmarks, Linux ext3 writeback
 and journal modes outperform \Kudos\ meta journal and full journal
 modes, respectively, at PostMark.\todo{Note that we do not know why
   and/or note cpu time difference?}
@@ -358,8 +380,8 @@ journal & linear & 1.2 [0.3] & 26 \\
 
 \end{tabular}
 \caption{\label{fig:imap-compare} IMAP benchmark: move 1,000 messages.
-  Times are in seconds, writes in number of requests. System CPU
-  times are in square brackets.}
+  Times are in seconds (system CPU times in square brackets) and
+  writes in number of requests.}
 \end{figure}
 
 \subsection{Summary}

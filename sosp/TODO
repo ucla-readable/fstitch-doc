@@ -102,4 +102,3 @@ Chris up next:
 - Update to not commit file system summary data on fsync?
 - Improve understandability of patchgroup eval section
 - Add 8.6 summary
-- Try ext3 data=writeback
