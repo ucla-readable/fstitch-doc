@@ -15,6 +15,9 @@
 \let\mathpatchset\mathcal
 \else
 \def\mathpatchset#1{\text{\bfseries\itshape#1}}
+% I prefer commas in math mode to be Times commas.
+\DeclareSymbolFont{MathTextrm}{OT1}{\rmdefault}{m}{n}
+\DeclareMathSymbol{,}{\mathpunct}{MathTextrm}{`,}
 \fi
 
 % The names of commonly referenced things in our work which
