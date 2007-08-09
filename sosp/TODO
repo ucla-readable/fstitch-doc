@@ -9,6 +9,7 @@
 - Add 8.6 summary
 - Improve understandability of patchgroup eval section
 - Improve patchgroup casestudies (including eliminate/improve the two diagrams)
+- Deal with long/tiny urls
 
 * Want To Do
 - Check that we did not forget any todos sent to kudos@
