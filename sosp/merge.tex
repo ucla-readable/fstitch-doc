@@ -5,50 +5,43 @@
 
 File operations such as block allocations, inode updates, and directory updates
 create many distinct \patches. Keeping track of these
-\patches\ and their dependencies requires a significant amount of memory and
+\patches\ and their dependencies requires memory and
 CPU time.
 %
 \Kudos\ therefore \emph{merges} \patches\ when possible, drastically reducing
-the \patch\ counts and memory usage, by conservatively identifying when a
+\patch\ counts and memory usage, by conservatively identifying when a
 new \patch\ could always be written at the same time as an existing \patch.
 %
 Rather than creating a new \patch\ in this case, \Kudos\ updates the data
 and dependencies so as to merge the new \patch\ into the existing one.
 
 
-The first two types of merging involve hard patches.
+Two types of patch merging involve hard patches, and the first is trivial
+to explain:
 %
-The first type is trivial to explain:
+since all of a block's \nrb\ \patches\ \emph{must} be written at the same
+time, they can always safely be merged.
 %
-since all of a block's \nrb\ \patches\ must be written at the same time, there
-is no need to maintain more than one \nrb\ \patch\ per block.
+\Kudos\ thus ensures that each block contains at most one \nrb\ \patch.
 %
-All other \nrb\ \patches\ can safely be merged into the first,
+If \Kudos\ detects that a new patch $p$ could be created as \nrb\ and $p$'s
+block already contains a \nrb\ \patch\ $h$, then
 %
-and in fact \Kudos\ ensures that each block contains at most one \nrb\
-\patch.
-
-
-Assume some module attempts to create a \patch\ $p$ on a block that already
-has a \nrb\ \patch\ $h$, and \Kudos\ determines that $p$ may be \nrb.
-%
-Then the implementation merges $p$ into $h$ at creation time by applying
-$p$'s data to the block and setting $\PDDepset{h} \gets \PDDepset{h} \cup
-\PDDepset{p}$.
-%
-Although this changes $h$'s direct dependency set, that change cannot
-introduce any new block-level cycles or $p$ could not have been \nrb\ in the
-first place.
+the implementation merges $p$ into $h$ by applying $p$'s data to the block
+and setting $\PDDepset{h} \gets \PDDepset{h} \cup \PDDepset{p}$.
 %
 The existing \nrb\ \patch\ $h$ is returned to the caller.
-
-
+%
+This changes $h$'s direct dependency set after $h$'s creation time, but
+since $p$ could have been created \nrb, the change cannot introduce any new
+block-level cycles.
+%
 Unfortunately, the merge can create \emph{intra}-block cycles.
 %
-If some \noop\ \patch\ $x$ exists with $p \PDepend x \PDepend h$, then after
-the merge $h \PDepend x \PDepend h$.
+If some \noop\ \patch\ $e$ has $p \PDepend e \PDepend h$, then after
+the merge $h \PDepend e \PDepend h$.
 %
-A graph traversal prunes these cyclic
+\Kudos\ detects and prunes these cyclic
 dependencies as $p$'s dependencies are merged into $h$.
 
 
@@ -56,60 +49,56 @@ dependencies as $p$'s dependencies are merged into $h$.
 example, as shown in Figure~\ref{fig:opt}c.
 
 
-A new \nrb\ \patch\ might also be created on a block
-that has existing \emph{\rb} \patches\ in memory.
+Second, \Featherstitch\ detects when a new \nrb\ patch can be merged with
+ a block's existing \emph{\rb} \patches.
 %
-For example, Figure~\ref{f:soft2hard}a shows a block with both \nrb\ and
-\rb\ \patches: $p_1$ must be \rb\ since it initiates a block-level cycle
-$p_1 \PDepend q_h \PDepend p_h$, and similarly for $p_2$ and $p_3$.
+Block-level cycles may force a patch $p$ to be created as soft.
 %
-To write these blocks, the buffer cache must revert $p_1$, $p_2$, and
-$p_3$ and write $p_h$ on its own.
+Once those cycles are broken (because the relevant patches commit), $p$
+ could be converted to hard; but to avoid unnecessary work,
 %
-Once $p_h$ commits, the \patches\ in memory reach the state in
-Figure~\ref{f:soft2hard}b.
+\Kudos\ delays the conversion, performing it only when it detects that a
+ new patch on $p$'s block could be created \nrb.
 %
-$p_h$ is now irrelevant for cycle detection,
-and in fact there are no block-level dependency cycles in the diagram: it
-would be safe to transform $p_1$, $p_2$, and $p_3$ into \nrb\ \patches.
-%
-However, \Kudos\ delays this and performs the conversion only later when
-adding a new \nrb\ \patch\ to the $p$ block. 
+Figure~\ref{f:soft2hard} demonstrates this scenario using soft updates-like
+ dependencies.
 
 
-Consider a new \nrb\ \patch\ $p_h$ added to a block that contains some
-\rb\ \patch\ $p$.
+Specifically, consider a new \nrb\ \patch\ $h$ added to a block that
+contains some \rb\ \patch\ $p$.
 %
-Since $p_h$ is considered to overlap $p$, \Kudos\ adds a direct dependency
-$p_h \PDDepend p$.
+Since $h$ is considered to overlap $p$, \Kudos\ adds a direct dependency
+$h \PDDepend p$.
 %
-Since $p_h$ could be \nrb, we know there are no block-level dependency cycles
-with head $p_h$.
+Since $h$ could be \nrb\ even including this overlap dependency, we know
+there are no block-level cycles with head $h$.
 %
 But as a result, we know that there are no block-level dependency cycles
-with head $p$, since such a cycle would imply
-a $p_h$-headed cycle $p_h \PDDepend p \PDepend q \PDepend p'$.
+with head $p$, since any such cycle $p \PDepend \cdots \PDepend p_1$ would
+imply an $h$-headed cycle $h \PDDepend p \PDepend \cdots \PDepend p_1$.
 %
-Thus, $p$ is transformed into a \nrb\ \patch\ and then merged into $p_h$
-using \nrb\ \patch\ merging.
-%
-Figure~\ref{f:soft2hard}c shows the resulting configuration when a new \nrb\
-\patch\ $p_h'$ is added.
+Thus, $p$ can be transformed into a \nrb\ \patch.  \Kudos\ performs this
+transformation and merges $p$ and $h$ via \nrb\ \patch\ merging.
 
 
 \begin{figure}
 \centering
 \begin{small}
 \begin{tabular}{@{}p{.32\hsize}@{~~}p{.32\hsize}@{~~}p{.32\hsize}@{}}
-\includegraphics[width=\hsize]{fig/softhard_1} &
-\includegraphics[width=\hsize]{fig/softhard_2} &
-\includegraphics[width=\hsize]{fig/softhard_3} \\
-\centering \textbf{a)} Initial state &
-\centering \textbf{b)} After $p_h$ reaches~disk &
-\centering \textbf{c)} \Rb-to-\nrb\ conversion
+\centering \includegraphics[width=.93\hsize]{fig/softhard_1} &
+\centering \includegraphics[width=.93\hsize]{fig/softhard_2} &
+\centering \includegraphics[width=.93\hsize]{fig/softhard_3} \cr
+\centering \textbf{a)} Block-level cycle &
+\centering \textbf{b)} $d_1$ commits &
+\centering \textbf{c)} After merge
 \end{tabular}
 \end{small}
-\caption{\Rb-to-\nrb\ patch merging.}
+\caption{\Rb-to-\nrb\ patch merging.  \textbf{a)} Soft updates-like
+dependencies among directory data and an inode block.  $i \PDDepend d_1$
+because $d_1$ deletes a file whose inode is on $i$; $d_2 \PDDepend i$
+because $d_2$ allocates a file whose inode is on $i$. \textbf{b)} Writing
+$d_1$ removes the cycle. \textbf{c)} $d_3$, which adds a hard link,
+initiates soft-to-hard merging.}
 \label{f:soft2hard}
 \end{figure}
 
