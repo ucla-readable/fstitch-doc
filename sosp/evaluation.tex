@@ -74,10 +74,13 @@ only writeback results.
 Full journaling commits data atomically.
 
 There is a notable write durability difference between the default
-\Kudos\ and Linux ext2/ext3 configurations: \Kudos\ presumes a write is
-durable after is is on the disk platter (safe) and Linux ext2 and ext3
-after it is in the disk cache (unsafe). However, both systems can run
-with either durability assumption---we report both results for each.
+\Kudos\ and Linux ext2/ext3 configurations: \Kudos\ presumes a write
+is durable after it is on the disk platter (safe) and Linux ext2 and
+ext3 after it is in the disk cache (unsafe). However, Linux can write
+safely (by restricting the disk to providing only a write through
+cache) and \Kudos\ can write unsafely (by disabling FUA).
+%
+We report both results for each when comparing the systems.
 %
 All timing results are the mean over three runs.
 
