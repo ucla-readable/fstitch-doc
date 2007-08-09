@@ -3,6 +3,7 @@
 - Update correctness tests
 - Increase number of benchmark runs to 5 or 10
 - Check that we adequately address reviews
+- Total memory requirements, not just rollback
 
 * Really Want To Do
 - Improve big postmark perf (lots of reads)

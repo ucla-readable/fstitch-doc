@@ -3,16 +3,20 @@
 \subsection{\Nrb\ \Patches}
 \label{sec:patch:nrb}
 
-The first optimization reduces the space overhead of undo data by
-detecting when it will never be necessary.
+The first optimization reduces space overhead by
+eliminating undo data.
 %
 When a \patch\ $p$ is created, \Kudos\ conservatively detects whether $p$
-will ever need to be reverted.
+ might ever need to be reverted.
 %
-If not, $p$ is a \emph{\nrb\ \patch}: its data can be applied
-%directly
-to the in-memory copy of the block without saving undo data
-for the previous version.
+That is, \Kudos\ detects whether future patches and dependencies could ever
+ create a state where the only way the buffer cache could make progress is
+ by undoing $p$.
+%
+If this is impossible---if no future patches and dependencies could force
+ $p$'s reversion---then $p$ does not need undo data, and we call $p$ a
+ \emph{\nrb\ \patch}: its data can be applied to the in-memory copy of the
+ block without saving the previous version.
 
 
 Only \patches\ in a block-level dependency cycle might need to be reverted.

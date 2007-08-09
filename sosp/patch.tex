@@ -389,13 +389,13 @@ different block before being able to write the remaining \patches.
 
 
 
-Another implementation choice is required to allow the buffer cache to
- write a selected subset of a block's patches.
+Another implementation choice allows the buffer cache to
+ write a subset of a block's patches.
 %
 Our system maintains each block in its dirty state, including the
  effects of all uncommitted patches, but
 %
-each patch carries its own \textbf{undo data} consisting of the 
+each patch carries \textbf{undo data}: the 
  previous version of the block data altered by the \patch.
 %
 If a \patch\ $p$ is not written with its containing block, the buffer cache
@@ -438,7 +438,7 @@ write any of $\PBlock{b}$, $\PBlock{i}$, or $\PBlock{d}$.
 \label{sec:patch:examples}
 
 This section illustrates how \patches\ can implement two widely-used
- file system consistency models, soft updates and journaling.
+ file system consistency mechanisms, soft updates and journaling.
 %
 Our basic example extends an existing file by a single block---perhaps an
  application calls \texttt{ftruncate} to append 1024 zero bytes to an
@@ -463,7 +463,7 @@ Early file systems aimed to avoid post-crash disk inconsistencies by
  writing some, or all, blocks synchronously.
 %
 For example, the write system call might block until all metadata writes
- had completed---clearly bad for performance.
+ have completed---clearly bad for performance.
 %
 Soft updates, in contrast, provides post-crash consistency without
  synchronous writes by tracking and obeying necessary dependencies among
