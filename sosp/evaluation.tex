@@ -88,51 +88,38 @@ the Ion window manager, version 2-20040729.
 \begin{figure}[t]
 \centering
 \small
-\begin{tabular}{@{}lrrr@{}}
+\begin{tabular}{@{}lrrrr@{}}
 \textbf{Optimization}
-        & \textbf{\# \patches} & \textbf{Undo data} & \textbf{System time} \\
-% Results are from r3931
+        & \textbf{\Patches} & \textbf{Undo data} & \textbf{Malloc} & \textbf{CPU} \\
+% Results are from r4020, but only for 2 runs
 % NOTE: also update numbers in \patchoptundo and \patchoptcount
 \hline
 \multicolumn{4}{@{}c@{}}{\textbf{Untar test}\raise2pt\hbox{\strut}} \\
-None
-        & 619,740               & 470.43~MB             & 3.44~sec \\
-\Nrb\ \patches\
-        & 445,927               & 210.88~MB             & 3.09~sec \\
-Overlap merging
-        & 109,152               & 260.00~MB             & 2.18~sec \\
-Both optimizations
-        &  67,363               & 0.33~MB               & 2.33~sec \\
+None            &   619,740 &   459.41MB &   773MB & 3.44s \\
+\Nrb\ \patches\ &   445,927 &   210.88MB &   515MB & 3.09s \\
+Overlap merge   &   109,152 &   260.00MB &   544MB & 2.18s \\
+Both            &    67,363 &     0.33MB &   293MB & 2.33s \\
 \hline
+
 \multicolumn{4}{@{}c@{}}{\textbf{Delete test}\raise2pt\hbox{\strut}} \\
-None
-        & 299,089               & 1.46~MB               & 0.85~sec \\
-\Nrb\ \patches\
-        & 41,113                & 0.93~MB               & 0.29~sec \\
-Overlap merging
-        & 54,665                & 0.96~MB               & 0.33~sec \\
-Both optimizations
-        &  1,800                & 0.00~MB               & 0.19~sec \\
+None            &   299,089 &     1.43MB &    48MB & 0.85s \\
+\Nrb\ \patches\ &    41,113 &     0.90MB &    20MB & 0.29s \\
+Overlap merge   &    54,665 &     0.94MB &    21MB & 0.33s \\
+Both            &     1,800 &     0.00MB &    13MB & 0.19s \\
 \hline
+
 \multicolumn{4}{@{}c@{}}{\textbf{PostMark test}\raise2pt\hbox{\strut}} \\
-None
-        & 4,590,772             & 3,175.28~MB           & 26.44~sec \\
-\Nrb\ \patches\
-        & 2,550,689             & 1,582.93~MB           & 21.48~sec \\
-Overlap merging
-        &   542,620             & 1,587.80~MB           & 14.56~sec \\
-Both optimizations
-        &   617,669             &     0.09~MB           & 14.57~sec \\
+None            & 4,591,533 & 3,175.28MB & 5,347MB & 26.06s \\
+\Nrb\ \patches\ & 2,561,815 & 1,583.16MB & 3,672MB & 20.44s \\
+Overlap merge   &   542,665 & 1,587.81MB & 3,649MB & 13.50s \\
+Both            &   633,382 &     0.10MB & 2,073MB & 13.62s \\
 \hline
+
 \multicolumn{4}{@{}c@{}}{\textbf{Andrew test}\raise2pt\hbox{\strut}} \\
-None
-        &  70,922               & 65.63~MB              & 5.38~sec \\
-\Nrb\ \patches\
-        &  50,381               & 37.05~MB              & 5.43~sec \\
-Overlap merging
-        &  12,438               & 28.57~MB              & 5.34~sec \\
-Both optimizations
-        &  11,180               & 0.03~MB               & 5.35~sec \\
+None            &    70,922 &    64.09MB &    97MB & 4.30s \\
+\Nrb\ \patches\ &    50,680 &    36.18MB &    69MB & 4.32s \\
+Overlap merge   &    12,479 &    27.91MB &    60MB & 4.21s \\
+Both            &    10,118 &     0.03MB &    31MB & 4.18s \\
 \end{tabular}
 \caption{Effectiveness of \Kudos\ optimizations.}
 \label{f:optdata}
@@ -145,7 +132,7 @@ We evaluate the effectiveness of the \patch\ optimizations discussed in
 Section~\ref{sec:patch:optimizations}, in terms of
 %
 the total number of \patches\ created, amount of undo data allocated,
-and system CPU time used.
+total amount of memory allocated for \Kudos, and system CPU time used.
 %
 Figure~\ref{f:optdata} shows these results for the untar, delete,
 PostMark, and Andrew benchmarks for \Kudos\ ext2 in soft updates mode,
@@ -159,8 +146,10 @@ Undo data memory usage is reduced by \patchoptundo,
 %
 the number of \patches\ created is reduced by \patchoptcount,
 %
+the total amount of memory allocated by \Kudos\ by 61--73\%,
+%
 and system CPU time is reduced by up to 77\%.
-\todo{Discuss why both can increase \#patches.}
+\todo{Discuss why both can increase \#patches and CPU.}
 
 \begin{comment}
 \begin{figure}[t]
