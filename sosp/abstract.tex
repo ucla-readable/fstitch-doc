@@ -36,21 +36,19 @@ Storage system \modules\ can examine, preserve, and modify the dependency
  structure; the buffer cache writes blocks as constrained by that structure.
 %
 These generalized file system dependencies are naturally exportable to
- user level, allowing applications to specify consistency
- protocols for the storage system to follow.
+ user level.
 %
-Our patch-based storage system, 
-We describe a number of important
- optimizations for \patch-based storage systems and present \emph{\Kudos},
- a Linux kernel file system layer based on \patches.
+Our patch-based storage system, \emph{\Featherstitch}, includes a number of
+ important optimizations.
 %
-The \Kudos\ ext2 prototype is competitive with Linux ext2 and ext3 and allows
- several novel configurations, such as ext2 with soft updates or correct
- dependency enforcement within a loopback file system.
+A \Kudos\ ext2 prototype running in the Linux kernel supports asynchronous
+ writes, soft updates-like dependencies, and journaling.
 %
-Finally, we demonstrate three applications that use
- \patches\ to provide strong consistency guarantees without
- micromanaging writes to the disk.
+It performs competitively with ext2 and ext3 on many benchmarks;
+ supports unusual configurations, such as correct dependency
+ enforcement within a loopback file system; and allows applications
+ to specify consistency requirements without micromanaging how those
+ requirements are satisfied.
 
 
 \begin{comment}
