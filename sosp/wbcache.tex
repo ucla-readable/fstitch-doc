@@ -1,21 +1,23 @@
 % -*- mode: latex; tex-main-file: "paper.tex" -*-
 
-\subsection{Write-Back Cache}
+\subsection{Buffer Cache}
 \label{sec:modules:wbcache}
 
-The \Kudos\ buffer cache module is called the \emph{write-back cache}.
+The \Kudos\ buffer cache both
 %
-Its job is twofold: first, it caches blocks in memory, and second, it
-ensures that modifications are written to stable storage in an order that
-preserves the in-flight safety property.
+caches blocks in memory and
+ensures that modifications are written to stable storage in a safe order.
 %
-Modules ``below'' the write-back cache---that is, between its output
-interface and the disk---can reorder block writes at will without violating
-dependency orderings.
+Modules ``below'' the buffer cache---that is, between its output interface
+and the disk---can reorder block writes at will without violating
+dependencies, since block writes below the buffer cache contain only
+in-flight patches.
 %
-There can be many write-back caches in a configuration at once (for
-instance, one for each block device). To a write-back cache, the complex
-consistency protocols that other \modules\ want to enforce are nothing more
+%% There can be many write-back caches in a configuration at once (for
+%% instance, one for each block device). 
+%
+The buffer cache sees the complex
+consistency protocols that other \modules\ want to enforce as nothing more
 than sets of dependencies among \patches; it has no idea what consistency
 protocols it is implementing, if any.
 % Yet it is the \module\ that ends up doing most of the work to make sure that
@@ -23,7 +25,7 @@ protocols it is implementing, if any.
 
 % Despite this, write-back caches are relatively simple; they are only slightly
 % more complex than the naive implementation already suggested.
-Our prototype write-back cache \module\ 
+Our prototype buffer cache \module\ 
 %% is little more than a front end to
 %% the automatically-maintained ready \patch\ lists described in
 %% Section~\ref{sec:patch:readylist}.
@@ -36,17 +38,22 @@ The FIFO policy used to write blocks is modified only to preserve the
 in-flight safety property: a block will not be written if none of its
 \patches\ are ready to write.
 %
-Once the write-back cache finds a block with ready \patches, all other
-\patches\ on that block are reverted, the resulting block data is copied
-and sent to the disk driver, the ready \patches\ are marked in-flight, and
-the reverted \patches\ are re-applied.
+Once the cache finds a block with ready \patches, it extracts all ready
+patches $P$ from the block, reverts any remaining \patches\ on that block,
+and sends the resulting data to the disk driver.  The ready \patches\ are
+marked in-flight and will be committed when the disk driver acknowledges
+the write.
+%% \patches\ on that block are reverted, the resulting block data is copied
+%% and sent to the disk driver, the ready \patches\ are marked in-flight, and
+%% the reverted \patches\ are re-applied.
 %
-The block itself is also marked in-flight, ensuring that the cache will not
-try to write it again until the current version commits.
+The block itself is also marked in flight until the current version
+commits, ensuring that the cache will wait until then to write the block
+again.
 
 
-As a special case to aid disk performance, when the write-back cache finds
-it can write block $n$, it then checks to see if block $n+1$ can be written as
+As a performance heuristic, when the cache finds a writable block $n$, it
+then checks to see if block $n+1$ can be written as
 well.
 %
 It continues writing increasing block numbers until some block is either
