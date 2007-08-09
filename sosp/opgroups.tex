@@ -9,32 +9,32 @@
 \newcommand{\pgSync}{\texttt{pg\_sync}}
 \newcommand{\pgClose}{\texttt{pg\_close}}
 
-Robust applications
+
+This section describes \emph{\patchgroups}, a simple API that extends \patches\ to user
+space and lets applications express dependencies among file system
+operations.
+%
+Currently,
+robust applications
 %% often manipulate valuable data, e.g. a mail server's mail
 %% or a version control system's local checkout.
 %
-ensure their on-disk data remains in a sane state even after a
-system crash by requiring their changes be committed in
-a specified order.
+can ensure their on-disk data remains in a sane state even after a
+system crash by enforcing write-before relationships in one of two ways:
+%% requiring their changes be committed in
+%% a specified order.
+%% %
+%% Existing systems can ensure such orders in two ways:
 %
-Existing systems can ensure such orders in two ways:
-%
-applications can tell the file system \emph{how} to implement the
-ordering by requiring immediate syncs
+either forcing an ordering by requiring immediate syncs
 (e.g. \texttt{sync}, \texttt{fsync}, or \texttt{sync\_file\_range}),
 %
-or applications can require particular file system implementation
+or assuming an ordering by depending on particular file system implementation
 semantics (e.g. journaling).
-%
 %
 The \patch\ abstraction, in contrast, can let a process specify
 \emph{what} ordering is required and leave the storage system to implement
 that ordering in the most appropriate way.
-
-
-This section describes \emph{\patchgroups}, which extend \patches\ to user
-space and let applications express dependencies among file system
-operations.
 %
 Compared to forcing block writes in the application, this lets the file
 system buffer, combine, and reorder block writes, but is still relatively
@@ -42,6 +42,7 @@ independent of the underlying file system.
 %
 For example, \patchgroups\ even allow an application to specify
 dependencies among raw block device writes.
+
 
 In this section we describe the \patchgroup\ abstraction
 %
@@ -69,7 +70,8 @@ The \patchgroup\ interface is as follows:
 \end{alltt}
 \end{scriptsize}
 
-Each process has its own set of \patchgroups.
+Each process has its own set of \patchgroups, which are currently shared
+among all threads..
 %
 The call \texttt{\pgDepend(q, p)} makes \patchgroup\ \texttt{q} depend on
 \patchgroup\ \texttt{p}: all \patches\ associated with \texttt{p} will
@@ -163,8 +165,8 @@ When using a journal, writing the commit record atomically commits a
 transaction; additional \patchgroup-specified dependencies for the data in each
 transaction must be shifted to the commit record itself.
 %
-These dependencies then collapse into dependencies of the commit record on
-itself, or to previous commit records---both dependencies which already exist.
+These dependencies then collapse into harmless dependencies from the commit
+record to itself or to previous commit records.
 %
 Finally, for a metadata journal, blocks which are modified as part of a
 \patchgroup\ must also be included in the transaction, making the metadata

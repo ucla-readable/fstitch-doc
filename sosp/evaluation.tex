@@ -24,7 +24,7 @@ that a \Kudos\ \patch-based storage system has overall performance
 that is within reason, even though it is slower than Linux in some
 benchmarks;
 %
-that \Kudos\ file systems are consistent after system crashs;
+that \Kudos\ file systems are consistent after system crashes;
 %
 and that a \patchgroup-enabled IMAP server performs as well as or
 better than the unmodified server.
@@ -42,11 +42,16 @@ because \Kudos\ uses its own block cache in addition to the kernel's,
 we limit \Kudos\ and Linux configurations to an effective 312~MB of
 RAM available for the block cache.
 %
-Specifically, \Kudos\ configurations have 662~MB of RAM total and
-312~MB of RAM for the \Kudos\ block cache
+(\Kudos\ is given more RAM total, roughly compensating for extra memory
+pressure due to its extra block copies and Linux integration; see \S7.)
 %
-and Linux configurations have 350~MB of RAM total and 312~MB of RAM
-for the block cache.
+Only our PostMark benchmark is sensitive to cache size.
+
+%% Specifically, \Kudos\ configurations have 662~MB of RAM total and
+%% 312~MB of RAM for the \Kudos\ block cache
+%% %
+%% and Linux configurations have 350~MB of RAM total and 312~MB of RAM
+%% for the block cache.
 
 We examine Linux ext2 (in asynchronous mode) and ext3 (in writeback,
 ordered, and full journal modes) and \Kudos\ ext2 (in asynchronous,
