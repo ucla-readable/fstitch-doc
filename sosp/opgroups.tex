@@ -107,9 +107,6 @@ For example, \texttt{\pgDepend(q, p)} returns an error if
 \texttt{\pgEngage(p)} will return an error.\footnote{These rules are really
 just a strictly enforced version of the requirement from \S\ref{sec:patch:nrb}
 that all dependencies must be specified up-front.}
-%
-\todo{Explicitly mention that patchgroups allow specification of precisely
-happens-before? They cannot be used to ``hold patches'' in ram.}
 
 \Patchgroups\ and file descriptors are managed similarly---they are copied
 across \texttt{fork}, preserved across \texttt{exec}, and closed on
