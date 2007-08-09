@@ -37,7 +37,7 @@ dependencies themselves.
 For each block $B$, \Kudos\ maintains a list of all \patches\ with
 $\PBlock{p} = B$.
 %
-However, the implementation does not keep track of committed \patches; when
+However, it does not track committed \patches; when
 \patch\ $p$ commits, \Kudos\ destroys $p$'s data structure and removes all
 dependencies $q \PDDepend p$.
 %
@@ -51,23 +51,23 @@ and its direct ``reverse dependencies'' (that is, all $q$ where $q
 The implementation also supports \emph{\noop} \patches, which have
  no associated data or block.
 %
-\Noop\ \patches\ are useful for representing sets of dependencies and for
- preventing other \patches\ from being written.
+%% \Noop\ \patches\ are useful for representing sets of dependencies and for
+%%  preventing other \patches\ from being written.
 %
-For example, while a journal transaction is being populated in a journaling
- file system, many changes to the main body of the disk should depend on a
+For example, during a journal transaction,
+ changes to the main body of the disk should depend on a
  journal commit record that has not yet been created.
 %
-\Kudos\ therefore makes these \patches\ depend on an \noop\ \patch\
+\Kudos\ makes these \patches\ depend on an \noop\ \patch\
  that is explicitly held in memory.
 %
 Once the commit record is created, the \noop\ \patch\ is updated to depend on
  the actual commit record and then released.
 %
-Once the commit record is written, the \noop\ \patch\ is automatically
- ``written'' as well, which allows the main file system changes to follow.
-
-
+The \noop\ \patch\ automatically commits at the same time as the commit
+ record, allowing the main file system changes to follow.
+%
+%
 \Noop\ \patches\ can shrink memory usage by representing quadratic sets of
  dependencies with a linear number of edges: if all $m$ \patches\ in $P$
  must depend on all $n$ \patches\ in $Q$, one could

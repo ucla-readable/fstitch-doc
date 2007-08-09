@@ -47,7 +47,7 @@ Each \patch\ $p$ encapsulates four important pieces of information: its
 
 \subsection{Disk Behavior}
 
-We first fill in enough of our model to describe how disks behave, and
+We first describe how disks behave in our model, and
  especially how disks commit patches to stable storage.
 %
 Although our terminology originates in conventional disk-based file systems
@@ -55,15 +55,15 @@ Although our terminology originates in conventional disk-based file systems
  file systems with non-uniform blocks and to other media, including RAID
  and network storage.
 
-Our model's storage layer commits data to stable storage in units called
+We assume data is committed to stable storage in units called
  \textbf{blocks}.
 %
 All writes affect one or more blocks, and it is impossible to selectively
  write part of a block.
 
-Every change to a block's data is represented by a \textbf{patch}.
+A \textbf{patch} models any change to block data.
 %
-A patch applies to exactly one block, so a file system change that
+Each patch applies to exactly one block, so a file system change that
  affects $n$ blocks requires at least $n$ patches to represent.
 %
 Each \patch\ is either
@@ -73,19 +73,19 @@ Each \patch\ is either
 %
 The intermediate in-flight state models caching, reordering, and delay in
  the storage layer: blocks written by an operating system may be
- committed by the disk controller in any order, possibly
+ committed in any order, possibly
  after disk scheduling and a period in the on-disk cache.
 %
-Patches begin their lives as uncommitted.
+Patches are created as uncommitted.
 %
-The operating system sends uncommitted \patches\ in flight
+The operating system moves uncommitted \patches\ to the in-flight state
  by writing their blocks to the disk controller.  Some
  time later, the disk writes these blocks
- to stable storage and reports success.  When the processor receives this
+ to stable storage and reports success; when the processor receives this
  acknowledgement, it commits the relevant patches.
 %
-Each committed patch stays committed permanently, although its effects can
- be undone by subsequent patches on the same block.
+Committed patches stay committed permanently, although their effects can
+ be undone by subsequent patches.
 %
 The sets $\PDisk$, $\PMem$, and $\PInf$ represent all committed,
  uncommitted, and in-flight patches, respectively.
@@ -112,8 +112,8 @@ $\PInf[B]$ and $\PMem[B]$ are defined similarly.
 %%  $p$'s block, and the block is dirty if and only if $\PBlock{p} \cap \PDisk
 %%  \neq \PBlock{p}$.
 
-Disk controllers act by writing in-flight patches one block at a
- time, which we model as follows:
+We can now model disk controllers' behavior: they write in-flight patches one
+ block at a time, as follows.
 %
 \begin{tabbing}
 \qquad \quad 1. Pick some block $B$ with $\PInf[B] \neq \emptyset$. \\
@@ -133,16 +133,16 @@ Although file systems will generally write all of a block's uncommitted
  patches when they write the block, they may, if they choose, write a
  \emph{subset} of those patches---and, as we will see, this is sometimes
  required to preserve write-before relationships.
-%
-The effects of any unwritten patches must be
- temporarily undone during a block write.
+%% %
+%% The effects of any unwritten patches must be
+%%  temporarily undone during a block write.
 
 
 Our model does not specify whether the storage system writes blocks
  atomically.
 %
-However, some file system designs, such as soft updates, rely on block
- write atomicity:
+Some file system designs, such as soft updates, rely on block write
+ atomicity:
 %% Careful control over write-before relationships is \emph{necessary} to
 %%  ensure consistency, but for some file system designs, such as soft
 %%  updates, it \emph{suffices} only if the underlying storage system
@@ -152,21 +152,20 @@ soft updates expects that if the disk fails while a block $B$ is
  in flight, then $B$'s value on recovery must equal either the old value or
  the new value.
 %
-Most journal designs do not require this, and can recover even if
- in-flight blocks are corrupted---for instance, because the memory holding
- the new value of the block lost coherence before the disk stopped
+Most journal designs do not require this, and include recovery procedures
+ that handle in-flight block corruption---for instance, because the memory
+ holding the new value of the block lost coherence before the disk stopped
  writing.
 %
-For systems that provide an atomicity guarantee at upper or lower layers,
- however, an additional journal might introduce overhead.
- %% , for instance by buffering blocks in non-volatile memory before writing them to disk.
+Since we intended \Kudos\ to model the write-before relationships that
+ implement these journal designs, \Kudos\ does not provide block atomicity
+ itself.
+%% , for instance by buffering blocks in non-volatile memory before writing them to disk.
 %
-\Kudos\ patches can capture all possible write ordering requirements,
- including those necessary to implement a journal, but \Kudos\ itself does
- not provide block atomicity.
-%
-Instead, layers using \Kudos\ should choose a file system design suitable
- for a given disk.
+As a result, a \Kudos\ file system with soft updates-like dependencies
+ should only be used in conjunction with a storage layer providing block
+ atomicity.  (This is no different from other soft updates
+ implementations.)
 
 
 \begin{comment}
@@ -201,11 +200,13 @@ $\PDisk, \PMem, \PInf$ & the sets of all committed, uncommitted, and in-flight \
         & \patches, respectively \\
 $\PDisk[B], \PMem[B], \PInf[B]$ & committed/uncommitted/in-flight patches on block $B$ \\
 \noalign{\vskip3pt}
-$p \PDDepend q$ & $p$ directly depends on $q$ ($p$ must be written before $q$) \\
-$p \PDepend q$ & $p$ depends on $q$: either $p \PDDepend q$ or there exists a patch \\
-       & $x$ so that $p \PDepend x \PDDepend q$ \\
-$\PDDepset{p}$ & $p$'s direct dependencies: $\{ q \mid p \PDDepend q \}$ \\
+$p \PDepend q$ & $p$ depends on $q$ ($p$ must be written before $q$) \\
 $\PDepset{p}$ & $p$'s dependencies: $\{ q \mid p \PDepend q \}$ \\
+\noalign{\vskip3pt}
+$p \PDDepend q$ & $p$ directly depends on $q$: the one-step version of
+ $\PDepend$. \\
+	& $p\PDepend q$ means either $p\PDDepend q$ or $\exists x : p \PDepend x \PDDepend q$ \\
+$\PDDepset{p}$ & $p$'s direct dependencies: $\{ q \mid p \PDDepend q \}$ \\
 \end{tabular}
 \end{small}
 
@@ -216,86 +217,122 @@ $\PDepset{p}$ & $p$'s dependencies: $\{ q \mid p \PDepend q \}$ \\
 
 \subsection{Dependencies}
 
-Two additional \patch\ properties are required to model write-before
- relationships, \emph{dependencies} and \emph{undo data}.
+A \Featherstitch\ file system implementation represents write-before
+ relationships using an explicit \textbf{dependency} relation.
 %
-Dependencies define ordering requirements among patches, and undo data
- allows a patch to be reverted if its block must be written without
- it.
-
-Each \patch\ $p$ has a set of \textbf{direct dependencies}
- $\PDDepset{p}$.
+The storage layer doesn't understand dependencies; instead, the file system
+ maintains dependencies and passes blocks to the storage layer in an
+ order that preserves dependency semantics.
 %
-Every \patch\ in $\PDDepset{p}$ must be committed to disk either before
- $p$, or at the same time as $p$ (this is only possible if $p$ and $q$ are
- on the same block).
+Patch $p$ is made to \emph{depend on} patch $q$, written $p \PDepend q$,
+ when the file system requires that $q$ be committed before $p$.
 %
-The file system arranges dependencies corresponding to its desired consistency
+(As a special case, if $p$ and $q$ are on the same block, they may be
+ committed at the same time.)
+%
+The file system uses dependencies to set up its desired consistency
  semantics.
 %
 For example, a file system with asynchronous writes (and no durability
- guarantees) might write all \patches\ with $\PDDepset{p} = \emptyset$;
+ guarantees) might create \patches\ with no dependencies at all;
 %
-a file system wishing to impose strictly ordered writes might set
- $\PDDepset{p_n} = \{p_{n-1}\}$.
+a file system wishing to strictly order writes might set
+ $p_n \PDepend p_{n-1} \PDepend \cdots \PDepend p_1$.
 %
-In practice, an upper \Kudos\ layer defines an initial set of
- dependencies;
+%% In practice, an upper \Kudos\ layer defines an initial set of
+%%  dependencies;
+%% %
+%% intermediate layers mostly preserve this initial set, but can modify
+%%  it as necessary to change dependency semantics;
 %
-intermediate layers mostly preserve this initial set, but can modify
- it as necessary to change dependency semantics;
-%
-and finally, the buffer cache obeys the constraints thus defined.
-
-
-We say $p$ \emph{directly depends on} $q$, and write $p \PDDepend q$, when
- $q \in \PDDepset{p}$.
-%
-We say $p$ \emph{depends on} $q$, and write $p \PDepend q$, when there
- exists a dependency chain from $p$ to $q$: that is, either $p \PDDepend q$
- or, for some \patch\ $x$, $p \PDepend x \PDDepend q$.
-%
-\Patch\ $p$'s set of \emph{dependencies} is written $\PDepset{p} = \{ q \mid
- p \PDepend q \}$; this is of course a superset of its direct dependencies.
+%% and finally, the buffer cache obeys the constraints thus defined.
 %
 Circular dependencies among patches cannot be resolved and are therefore
- errors.  For example, neither $p$ nor $q$ could be written before the
+ errors;  for example, neither $p$ nor $q$ could be written before the
  other if $p \PDepend q \PDepend p$.
 %
 (Although a circular dependency chain entirely within a single block avoids
  this problem, \Kudos\ treats all circular chains as errors.)
 %
-Given a \emph{set} of \patches\ $P$, we write $\PDepset{P}$ to mean the set's
- combined dependencies $\bigcup_{p\in P} \PDepset{p}$. 
+\Patch\ $p$'s \emph{set} of dependencies, written $\PDepset{p}$, consists
+ of all patches on which $p$ depends;
+%
+\( \PDepset{p} = \{ q \mid p \PDepend q \}. \)
+%
+Given a set of \patches\ $P$, we write $\PDepset{P}$ to mean the
+ combined dependency set $\bigcup_{p\in P} \PDepset{p}$. 
 
+
+The \textbf{disk safety property} formalizes dependency requirements by
+ stating that the dependencies of all committed \patches\ must also be
+ committed:
+%
+\[ \PDepset{\PDisk} \subseteq \PDisk. \]
+%
+Thus, no matter when the system crashes, the disk is consistent in terms of
+dependencies.
+%
+%% The file system's job is to set up dependencies so that the disk safety
+%% property implies file system correctness.
+%
 \begin{comment}
-\paragraph{Undo data}
-%
-When a \patch\ is created, the buffer cache's copy of the block data
-is modified in-place to reflect the change. However,
-%
-some arrangements of \patches\ may require that the buffer cache
-%\emph{not} write one or more \patches\ on some block.
-first write a block with only some \patches\ applied, and then write a
-different block before being able to write the remaining \patches.
-%
-(An example of this is given in Section~\ref{sec:patch:examples}.)
+ However, \Kudos\ can only control when \patches\ are handed to the disk
+ controller, not when they are written to disk.
+ %
+ Disk controller behavior is encapsulated in the following atomic action:
+
+ \begin{tabbing}
+ \textit{Commit block:} \\
+ \quad Pick some block $b$ with $\PInf[b] \neq \emptyset$. \\
+ \quad Move each $p \in \PInf[b]$ to $\PDisk$ (committed).
+ \end{tabbing}
 \end{comment}
+%
+Since, as described above, the disk controller can write blocks in any
+ order, a \Kudos\ file system must also ensure
+that in-flight blocks are independent.  This is precisely stated
+by the \textbf{in-flight safety property:}
+%
+\[ \text{For any block $B$,~~} \PDepset{\PInf[B]} \subseteq \PDisk \cup \PInf[B] . \]
+%
+\begin{comment}
+%% Do we need this comment?
+(The union with $\PInf[B]$ is necessary for the case of multiple in-flight
+\patches\ on the same block.)
+\end{comment}
+%
+Given this, $\PDepset{\PInf[B]} \cap \PDepset{\PInf[B']} \subseteq \PDisk$ for
+ any $B' \neq B$, and the disk controller can write in-flight blocks
+ in any order and still preserve disk safety.
+%
+Finally, to uphold the in-flight safety property, the buffer cache must
+ write blocks as follows:
+%
+\begin{tabbing}
+\quad \quad Pick some block $B$ with $\PMem[B] \neq \emptyset$ and $\PInf[B] =
+\emptyset$. \\
+\quad \quad Pick some $P \subseteq \PMem[B]$ with $\PDepset{P} \subseteq P \cup
+\PDisk$. \\
+\quad \quad Move each $p \in P$ to $\PInf$ (in-flight).
+\end{tabbing}
+%
+\noindent
+%
+We require that $\PInf[B] = \emptyset$ to ensure that at most one version of
+ a block is in flight at any time.
 
-Each patch also carries \textbf{undo data} consisting of the 
- previous version of the block data altered by the \patch.
+In summary, the main \Featherstitch\ implementation challenge is to design
+ data structures that make it easy to create patches, quick to manipulate
+ patches, and that help the buffer cache write blocks and patches in line
+ with the above procedure.
 %
-If a \patch\ $p$ is not written with its containing block, the system
- \emph{reverts} the \patch, which swaps the new data and the previous
- version on the (single) copy of the block in the buffer cache.
-%
-Once the block is written, the system will re-apply the \patch\ and, when
- allowed, write the block again, this time including the \patch.
-%
-Undo information adds greatly to memory and CPU utilization, but it can
- often be optimized away, as we show in Section~\ref{sec:patch:optimizations}.
+(The buffer cache is also expected to write all blocks eventually, a
+ liveness property.)
 
-Our \patch\ notation is summarized in Figure~\ref{fig:patchnot}.
+
+\subsection{Dependency Implementation}
+
+
 
 \begin{figure*}[t]
 \centering
@@ -319,69 +356,61 @@ Our \patch\ notation is summarized in Figure~\ref{fig:patchnot}.
 \end{figure*}
 
 
-\subsection{Obeying Dependencies}
+The write-before relationship is transitive, so if $p \PDepend q$ and $q
+ \PDepend r$, there is no need to explicitly store a $p \PDepend r$
+ dependency.
+%
+To reduce storage requirements, a \Kudos\ implementation maintains only a
+ subset of dependencies called the \emph{direct dependencies}.
+%
+Each patch $p$ has a corresponding set of direct dependencies
+ $\PDDepset{p}$; 
+%
+we say $p$ \emph{directly depends on} $q$, and write $p \PDDepend q$, when
+ $q \in \PDDepset{p}$.
+%
+The dependency relation $p \PDepend q$ simply means that either $p
+ \PDDepend q$, or $p \PDepend x \PDDepend q$ for some patch $x$.
+
+
+\begin{comment}
+\paragraph{Undo data}
+%
+When a \patch\ is created, the buffer cache's copy of the block data
+is modified in-place to reflect the change. However,
+%
+some arrangements of \patches\ may require that the buffer cache
+%\emph{not} write one or more \patches\ on some block.
+first write a block with only some \patches\ applied, and then write a
+different block before being able to write the remaining \patches.
+%
+(An example of this is given in Section~\ref{sec:patch:examples}.)
+\end{comment}
+
+
+
+Another implementation choice is required to allow the buffer cache to
+ write a selected subset of a block's patches.
+%
+Our buffer cache maintains each block in its dirty state, including the
+ effects of all uncommitted patches.
+%
+However, each patch also carries \textbf{undo data} consisting of the 
+ previous version of the block data altered by the \patch.
+%
+If a \patch\ $p$ is not written with its containing block, the buffer cache
+ \emph{reverts} the \patch, which swaps the new data on the buffered block
+ and the previous version in the undo data.
+%
+Once the block is written, the system will re-apply the \patch\ and, when
+ allowed, write the block again, this time including the \patch.
+%
+Undo information adds greatly to memory and CPU utilization, but it can
+ often be optimized away, as we show in Section~\ref{sec:patch:optimizations}.
+
+Figure~\ref{fig:patchnot} summarizes the patch notation.
+
 \label{sec:patch:dependencies}
-
-The \textbf{disk safety property} states that
- the dependencies of all committed \patches\ must also be committed:
-%
-\[ \PDepset{\PDisk} \subseteq \PDisk. \]
-%
-Thus, no matter when the system crashes, the disk is consistent in terms of
-dependencies.
-%
-The file system's job is to set up dependencies so that the disk safety
-property implies file system correctness.
-
-\begin{comment}
- However, \Kudos\ can only control when \patches\ are handed to the disk
- controller, not when they are written to disk.
- %
- Disk controller behavior is encapsulated in the following atomic action:
-
- \begin{tabbing}
- \textit{Commit block:} \\
- \quad Pick some block $b$ with $\PInf[b] \neq \emptyset$. \\
- \quad Move each $p \in \PInf[b]$ to $\PDisk$ (committed).
- \end{tabbing}
-\end{comment}
-
-Since the disk controller can write blocks in any order, a \Kudos\ file
- system must also ensure
-that in-flight blocks are independent.  This is precisely stated
-by the \textbf{in-flight safety property:}
-%
-\[ \text{For any block $B$,~~} \PDepset{\PInf[B]} \subseteq \PDisk \cup \PInf[B] . \]
-%
-\begin{comment}
-%% Do we need this comment?
-(The union with $\PInf[B]$ is necessary for the case of multiple in-flight
-\patches\ on the same block.)
-\end{comment}
-%
-Thus, $\PDepset{\PInf[B]} \cap \PDepset{\PInf[B']} \subseteq \PDisk$ for
- any $B' \neq B$, and the disk controller can write in-flight blocks
- in any order and still preserve disk safety.
-
-
-Consequently, the buffer cache must write blocks as follows:
-
-\begin{tabbing}
-\quad \textit{Write block:} \\
-\quad \quad Pick some block $B$ with $\PMem[B] \neq \emptyset$ and $\PInf[B] =
-\emptyset$. \\
-\quad \quad Pick some $P \subseteq \PMem[B]$ with $\PDepset{P} \subseteq P \cup
-\PDisk$. \\
-\quad \quad Move each $p \in P$ to $\PInf$ (in-flight).
-\end{tabbing}
-
-\noindent
-%
-We require that $\PInf[b] = \emptyset$ to ensure that at most one version of
-a block is in flight at any time.
-%
-The buffer cache is also expected to write all blocks eventually, a
- liveness property.
 
 \begin{comment}
 \paragraph{Example}
