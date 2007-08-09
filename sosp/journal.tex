@@ -6,7 +6,7 @@
 The \Kudos\ journal module sits below a regular file system and transforms
 incoming \patches\ into journal transactions.
 %
-Data \patches\ are copied into the journal; a commit record depends on the
+File system blocks are copied into the journal; a commit record depends on the
 journal \patches; and the original file system \patches\ depend in turn on the
 commit record.
 %
@@ -53,4 +53,5 @@ above.
 Our journal module prototype can run in full data journal mode, where every
 updated block is written to the journal, or in metadata-only mode, where only
 blocks containing file system metadata are written to the journal. It can
-tell which blocks are which by looking for a special flag on each \patch.
+tell which blocks are which by looking for a special flag on each \patch\ set
+by the UHFS module.
