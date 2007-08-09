@@ -139,7 +139,7 @@ Although file systems will generally write all of a block's uncommitted
 %%  temporarily undone during a block write.
 
 
-Our model does not specify whether the storage system writes blocks
+We intentionally do not specify whether the storage system writes blocks
  atomically.
 %
 Some file system designs, such as soft updates, rely on block write
@@ -158,12 +158,11 @@ Most journal designs do not require this, and include recovery procedures
  holding the new value of the block lost coherence before the disk stopped
  writing.
 %
-Since we intended \Kudos\ to model the write-before relationships that
- implement these journal designs, \Kudos\ does not provide block atomicity
- itself.
+Since patches model the write-before relationships used to build these
+ journal designs, patches do not provide block atomicity themselves, and
 %% , for instance by buffering blocks in non-volatile memory before writing them to disk.
 %
-As a result, a \Kudos\ file system with soft updates-like dependencies
+a patch-based file system with soft updates-like dependencies
  should only be used in conjunction with a storage layer providing block
  atomicity.  (This is no different from other soft updates
  implementations.)
@@ -217,7 +216,7 @@ $\PDDepset{p}$ & $p$'s direct dependencies: $\{ x \mid p \PDDepend x \}$ \\
 
 \subsection{Dependencies}
 
-A \Featherstitch\ file system implementation represents write-before
+A patch-based file system implementation represents write-before
  relationships using an explicit \textbf{dependency} relation.
 %
 The storage layer doesn't understand dependencies; instead, the file system
