@@ -251,14 +251,16 @@ order.
 %% The combination of these properties ensures the creation of file $i$
 %% precedes the creation of file $(i+1)$.
 %
-In addition to being obtuse, file renaming does not behave as required
-on many systems; for example, neither NTFS nor BSD UFS with soft
-updates provide this property.
+In addition to being obtuse, file renaming does not behave as required on
+many systems; for example, neither NTFS with journaling nor BSD UFS with
+soft updates provide the required properties.  The Subversion developers
+essentially specialized their consistency mechanism for one file system,
+ext3 in either ``ordered'' or full journaling mode.
 %
-Additionally, non-journaled systems such as BSD UFS with soft updates
-do not provide the metadata ordering property.  On such systems the
-journal file's installation may precede earlier file installations,
-leaving the working copy in an inconsistent state.
+%% Additionally, non-journaled systems such as BSD UFS with soft updates
+%% do not provide the metadata ordering property.  On such systems the
+%% journal file's installation may precede earlier file installations,
+%% leaving the working copy in an inconsistent state.
 
 We updated the Subversion working copy library to use \patchgroups\ to
 express commit ordering requirements
