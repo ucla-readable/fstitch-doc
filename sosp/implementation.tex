@@ -23,7 +23,7 @@ required to update per-process \patchgroup\ state.
 
 
 During initialization, the \Kudos\ kernel module registers a VFS file system
-type with Linux (like ``nfs'' or ``ext2'').
+type with Linux.  %% (like ``nfs'' or ``ext2'').
 %
 Each file system \Kudos\ detects on a specified disk device can then be mounted
 from Linux using a command like \mbox{\texttt{mount -t kfs kfs:\textit{name}
@@ -139,13 +139,21 @@ designed for a different situation: writes complete quickly (to the disk's
 cache) and only reads take a long time.
 \end{comment}
 
-Future work will require hardening several aspects of our Linux
-integration.
+Our prototype's Linux integration has several performance problems.
+%% Future work will require hardening several aspects of our Linux
+%% integration.
 %
-Integrating \patch\ and dependency support into Linux's native buffer cache
-would allow applications to use memory-mapped I/O on \Kudos\ files and
-reduce \Kudos's memory usage.
+For example, data blocks are often stored in Linux's buffer cache as well
+as our own, increasing memory pressure.
 %
+Writing a block requires copying that block's data whether or not any
+patches were undone.
+%
+Our buffer cache's size is more limited than Linux's, since it currently
+requires that all blocks are stored in permanently-mapped kernel memory.
+
+
+\begin{comment}
 We also observe that read delay increases notably when there are many
 writes.
 %
@@ -153,3 +161,4 @@ We suspect that write requests, which for \Kudos\ take far longer than
 Linux expects because the drive must delay completion notification, are
 using all available command slots; one or more slots should probably be
 reserved for reads.
+\end{comment}
