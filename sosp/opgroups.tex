@@ -183,9 +183,9 @@ journal act like a full journal for those data blocks.
 %% Subversion case study (about same speed, additional safety on non-ext3
 %% ordered, client).
 
-We tested the \patchgroup\ interface by adding \patchgroup\ support to three
+We studied the \patchgroup\ interface by adding \patchgroup\ support to three
 applications: the gzip compression utility, the Subversion version control
-system, and the UW IMAP mail server daemon.
+client, and the UW IMAP mail server daemon.
 
 % discussion potential gains (in addition to actual gains)?
 
@@ -209,7 +209,7 @@ Ordered and full journaling: safe with no changes.}
 % describe why pgs are easier/better than journaling
 
 The Subversion version control system's client~\cite{svn} manipulates a
-local working copy of a source repository.
+local working copy of a repository.
 %% In this case study we take an interest in how the Subversion version
 %% control system client~\cite{svn} manipulates a local checkout (a
 %% Subversion ``working copy'').
@@ -228,9 +228,9 @@ system or hardware crash.
 For example, the journal file is marked as complete by moving it from
 its temporary to live location.
 %
-Should the file system completely commit (1) the file rename before
-(2) the file data, and crash inbetween (1) and (2), then a subsequent
-journal replay could corrupt the working copy.
+Should the file system completely commit the file rename before
+the file data, and crash before completing the file data commit, then
+a subsequent journal replay could corrupt the working copy.
 
 The working copy library could ensure a safe commit ordering by
 syncing files as necessary; the Subversion server (repository) library
@@ -253,24 +253,20 @@ order.
 %% The combination of these properties ensures the creation of file $i$
 %% precedes the creation of file $(i+1)$.
 %
-In addition to being obtuse, file renaming does not behave
-as required on many systems other than ext3 in ordered or full data
-mode; for example, neither NTFS nor BSD UFS with soft updates provide
-this property.
+In addition to being obtuse, file renaming does not behave as required
+on many systems; for example, neither NTFS nor BSD UFS with soft
+updates provide this property.
 %
-And non-journaled systems, such as BSD UFS with soft updates, do not
-provide the metadata ordering property. On these systems, the journal
-file's installation may precede earlier file installations, leaving the
-working copy in an inconsistent state.
+Additionally, non-journaled systems such as BSD UFS with soft updates
+do not provide the metadata ordering property; on such systems the
+journal file's installation may precede earlier file installations,
+leaving the working copy in an inconsistent state.
 
 We updated the Subversion working copy library to use \patchgroups\ to
 express commit ordering requirements
 %% \todo{Use consistency protocol phrase here and throughout?} 
 without relying on properties of the
 underlying file system implementation.
-%
-For example, Figure~\ref{fig:svn-order} shows the \patchgroups\ created to update a
-file with conflicts.
 %
 The use of the file rename property is replaced in two ways.
 %
@@ -300,17 +296,10 @@ Once we understood Subversion v1.4.3's requirements, it took a day to add
 the 220 lines of code that enforce safety for conflicted updates (out of
 25,000 in the working copy library).
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=.8\columnwidth]{svn_opgroups}
-  \caption{\Patchgroups\ to update a file in a Subversion working copy.}
-  \label{fig:svn-order}
-\end{figure}
-
 \paragraph{UW IMAP}
 \label{sec:patchgroup:uwimap}
 
-Finally, we updated the University of Washington's IMAP mail server
+We updated the University of Washington's IMAP mail server
 (v2004g)~\cite{uwimap} to ensure mail updates are committed to disk
 in safe and more efficient orderings.
 %
@@ -323,7 +312,7 @@ mailbox (COPY), and delete messages marked for deletion (EXPUNGE).
 
 We updated the imapd and mbox mail storage drivers to use
 \patchgroups, ensuring that all disk writes occur in a safe ordering
-without enforcing a specific order.
+without enforcing a specific block write order.
 %
 The original server conservatively preserved command ordering by
 syncing the mailbox file after each CHECK on it or COPY into it.
@@ -362,15 +351,15 @@ messages from mailbox.src to mailbox.dst.}
 \label{fig:imap}
 \end{figure}
 
-These changes to UW IMAP simplify it in two ways:
+These changes improve UW IMAP by
 %
-they ensure disk write ordering correctness
+ensuring ensure disk write ordering correctness
 %
-and they make more efficient usage of disk writes.
+and by performing disk writes more efficiently.
 %
 As each command's changes now depend on the preceding command's
 changes, it is no longer required that all code
-ensure its changes are committed before any later, dependent
+specifically ensure its changes are committed before any later, dependent
 command's changes. Without \patchgroups, modules like the mbox driver
 forced a conservative disk sync protocol because ensuring safety more
 efficiently required additional state information, adding further

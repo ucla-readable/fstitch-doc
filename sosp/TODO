@@ -1,18 +1,17 @@
 * Must Do
 - Update correctness tests
-- Increase number of benchmark runs to 5 or 10
+/ Increase number of benchmark runs to 5 or 10
+/ Update opt and imap tables for r4000
 - Check that we adequately address reviews
-- Total memory requirements, not just rollback
-- Update opt and imap tables for r4000
+/ Total memory requirements, not just rollback
 
 * Really Want To Do
 - Add 8.6 summary
 - Improve understandability of patchgroup eval section
-- Improve patchgroup casestudies (including eliminate/improve the two diagrams)
+- Improve imap diagram
 - Deal with long/tiny urls
 
 * Want To Do
-- Add file system consistency ordering?
 - Metapost patchgroup figures?
 - Check that we did not forget any todos sent to kudos@
 - Decide how to cite email threads (esp reference's title)
