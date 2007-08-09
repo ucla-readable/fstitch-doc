@@ -340,7 +340,7 @@ for the \texttt{fsync} system call.
 \begin{figure}[t]
 \centering
 \begin{tabular}{@{}llrr@{}}
-\textbf{File System} & \textbf{Consistency protocol} & \textbf{Time} & \textbf{Writes} \\ \hline
+\textbf{File System} & \textbf{Consistency method} & \textbf{Time} & \textbf{Writes} \\ \hline
 
 % Results are from r3933
 % Single commented out reuslts are from r3933
@@ -380,7 +380,7 @@ full journal & \patchgroups & 1.5 [0.5] & 32 \\ \hline
 %%Linux ext3 ordered (fsync) & 23.9 [0.3] & 3,025 \\
 journal & fsync & 20.4 [0.3] & 2,531 \\
 
-journal & linear & 1.2 [0.3] & 26 \\
+journal & assume linear & 1.2 [0.3] & 26 \\
 
 \end{tabular}
 \caption{\label{fig:imap-compare} IMAP benchmark: move 1,000 messages.
