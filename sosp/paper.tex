@@ -104,6 +104,7 @@
 %\renewcommand{\topfraction}{1.00}
 %\renewcommand{\textfraction}{0.10}
 
+\iffalse
 \pagestyle{fancyplain}
 \input{svnversion}
 \lhead{}
@@ -113,6 +114,9 @@
 \cfoot{\thepage}
 \rfoot{\svnversion{}}
 \renewcommand{\headrulewidth}{0pt}
+\else
+\pagestyle{empty}
+\fi
 
 %\renewcommand{\topfraction}{.8}
 %\renewcommand{\bottomfraction}{.8}
