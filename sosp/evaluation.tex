@@ -267,7 +267,8 @@ modes, respectively, at PostMark.
 \subsection {Correctness}
 \label{sec:eval:correctness}
 
-In order to check that we had implemented the soft updates rules correctly,
+In order to check that we had implemented the journaling and soft updates
+rules correctly,
 we implemented a \Kudos\ module which crashes the operating system, without
 giving it a chance to synchronize its buffers, at a random time during each
 run.
@@ -276,9 +277,12 @@ In \Kudos\ asynchronous mode, after crashing, fsck nearly always reported
 that the file system contained many references to inodes that had been
 deleted, among other errors: the file system was corrupt.
 %
-With our soft updates dependencies, the file system was always mostly
+With our soft updates dependencies, the file system was always soft update
 consistent: fsck reported that inode reference counts were higher than the
 correct values (an expected discrepancy after a soft updates crash).
+%
+With journaling, fsck always reported that the file system was
+consistent after the journal replay.
 
 \subsection {\Patchgroups}
 \label{sec:evaluation:uwimap}
