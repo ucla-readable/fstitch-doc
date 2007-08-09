@@ -389,10 +389,10 @@ different block before being able to write the remaining \patches.
 
 
 
-Another implementation choice allows the buffer cache to
+Another implementation choice defines how the buffer cache can
  write a subset of a block's patches.
 %
-Our system maintains each block in its dirty state, including the
+We maintain each block in its dirty state, including the
  effects of all uncommitted patches, but
 %
 each patch carries \textbf{undo data}: the 
