@@ -2,24 +2,26 @@
 \label{sec:conclusion}
 
 \Kudos\ \patches\ provide a new way for file system implementations to formalize
-the ``write before'' relationship among buffered changes to stable storage.
+the ``write-before'' relationship among buffered changes to stable storage.
 %
-We present several optimizations which significantly decrease the overhead
+Thanks to several optimizations,
+\begin{comment}
+which significantly decrease the overhead
 required to use \patches, both in terms of the amount of memory required and the
 CPU time spent.
 %
 We evaluate a prototype file system implementation using \patches\ to determine
 whether these ideas can be used in production file systems.
 %
-The answer is that they can: with the optimizations we described, the
+\end{comment}
+the
 performance of our prototype is usually at least as fast as Linux when
 configured to provide similar consistency guarantees, although in some cases it
 still requires improvement.
-
-
-\Patches\ simplify the implementation of consistency protocols like journaling
-and soft updates by separating the specification from the enforcement of write
-before relationships.
+%
+\Patches\ simplify the implementation of consistency mechanisms like journaling
+and soft updates by separating the specification of write-before
+relationships from their enforcement.
 %
 Using \patches\ also allows our prototype to be divided into \modules\ that
 cooperate loosely to implement strong consistency guarantees.
@@ -42,9 +44,9 @@ first area we would like to work on is the performance of our \Kudos\ prototype.
 We have already improved the performance by at least five orders of magnitude
 over the original implementation, but it is still not as fast as it could be.
 %
-We would also like to explore a variety of extensions to \Kudos. For instance,
+We would also like to explore a variety of extensions to \Kudos, such as
 sending \patches\ over network file systems and implementing other consistency
-mechanisms are both avenues for future work.
+mechanisms like shadow paging.
 %
 Finally, we would like to try using \patchgroups\ for several more complicated
 applications, like databases, to see how well they fit the needed semantics and
