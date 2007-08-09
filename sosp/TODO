@@ -1,6 +1,6 @@
 * Must Do
 - Update correctness tests
-/ Increase number of benchmark runs to 5 or 10
+/ Increase number of benchmark runs to 5
 / Update opt and imap tables for r4000
 - Check that we adequately address reviews
 / Total memory requirements, not just rollback
@@ -16,6 +16,8 @@
 - Check that we did not forget any todos sent to kudos@
 - Decide how to cite email threads (esp reference's title)
 - More fully explain allocator differences and the effects
+
+* Probably Won't Do
 - Update kudos to not commit file system summary data on fsync
 - Speed up imap/svn SU
 - Improve postmark perf
