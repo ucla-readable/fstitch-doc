@@ -62,9 +62,9 @@ This lets file system implementations specify a
 % (or worrying about)
  a write order that honors that relationship.
 %
-It lets other storage system components examine and
+It lets storage system components examine and
  modify dependency structures independent of the file system's layout,
- possibly even changing one consistency mechanism into another.
+ possibly even changing one type of consistency into another.
 %
 It also lets applications modify dependency structures: a
  user-level interface called \emph{\patchgroups} shows that applications
@@ -72,13 +72,13 @@ It also lets applications modify dependency structures: a
  storage system to follow.
 
 
-The simplicity and uniformity of the \patch\ abstraction may simplify
+The \patch\ abstraction's uniformity may simplify
  implementation of, extension of, and experimentation with mechanisms for
  ensuring file system consistency and reliability.
 %
-File system implementers currently find it difficult to provide
+File system implementers find it difficult to provide
  consistency guarantees~\cite{tweedie98journaling,mckusick99soft},
- a situation is further complicated by file system extensions and
+ a situation further complicated by file system extensions and
  special disk interfaces~\cite{soules03metadata,fast04versionfs,quinlan02venti,cornell04wayback,wright03ncryptfs,sivathanu03semantically-smart,sivathanu05database-aware}.
 %
 File system extension techniques such as stackable file
@@ -95,14 +95,14 @@ other proposed systems for improving file system integrity
  metadata consistency to full data journaling and full ACID
  transactions~\cite{gal05transactional,liskov04transactional}.
 %
-Some users, however, provide reliability for some data end-to-end
- and prefer to avoid \emph{any} consistency
+Some users, however, provide end-to-end reliability for some data
+ and prefer to avoid \emph{any} associated consistency
  slowdowns in the file system layer~\cite{googleext2}.
 %
 \Patches\ can represent all these choices, and since they provide a common
- language for file systems, extensions, and users to discuss consistency
+ language for file systems and extensions to discuss consistency
  requirements, they can even allow combinations of consistency protocols to
- comfortably coexist on the same file system.
+ comfortably coexist.
 
 
 \begin{comment}
@@ -121,10 +121,10 @@ But different extensions within a file system, or different
 \end{comment}
 
 
-Current applications have even fewer mechanisms available
- for controlling buffer cache behavior.
+Applications likewise have few mechanisms
+ for controlling buffer cache behavior in today's systems, and
 %
-Robust applications, including databases, mail servers, and source code
+robust applications, including databases, mail servers, and source code
  management tools, must choose between several mediocre options.
 %
 They can accept the performance penalty of expensive system calls like
