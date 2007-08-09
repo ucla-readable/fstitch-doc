@@ -98,8 +98,8 @@ dependencies among directory data and an inode block. $d_1$ deletes a file
 whose inode is on $i$, so Rule~\ref{rule:reuse} requires $i \PDDepend d_1$;
 $d_2$ allocates a file whose inode is on $i$, so Rule~\ref{rule:pointer}
 requires $d_2 \PDDepend i$. \textbf{b)} Writing $d_1$ removes the
-cycle. \textbf{c)} $d_3$, which adds a hard link, initiates soft-to-hard
-merging.}
+cycle. \textbf{c)} $d_3$, which adds a hard link to $d_2$'s file, initiates
+soft-to-hard merging.}
 \label{f:soft2hard}
 \end{figure}
 
