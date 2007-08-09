@@ -5,11 +5,11 @@ digraph pgtransitions
 	"b" [label="engaged"]
 	"c" [label=""]
 	"d" [label=""]
-	"start" -> "start" [label="gain before"]
+	"start" -> "start" [label="gain dependency"]
 	"start" -> "d"
 	"start" -> "b" [label="engage"]
 	"b" -> "c" [label="disengage"]
 	"c" -> "b" [label="engage"]
 	"c" -> "d"
-	"d" -> "d" [label="gain after"]
+	"d" -> "d" [label="become dependency"]
 }

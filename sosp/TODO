@@ -4,7 +4,6 @@
 / Update opt and imap tables for r4000
 - Check that we adequately address reviews
 / Total memory requirements, not just rollback
-- Remove before/after from figure 5
 
 * Really Want To Do
 - Add 8.6 summary
