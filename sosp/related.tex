@@ -1,7 +1,7 @@
 \section{Related Work}
 \label{sec:related}
 
-\paragraph{Consistency}
+%% \paragraph{Consistency}
 
 Most modern file systems protect file system integrity in the face of
 possible power failure or crashes via journaling, which groups
@@ -91,10 +91,10 @@ simulations.
 %% than the theoretical seek time or the number of blocks accessed, can be a
 %% bottleneck.
 
-Dependency-like ideas have been used in
+Dependencies have been used in
 BlueFS~\cite{nightingale05speculative} and
 xsyncfs~\cite{nightingale06rethink} to reduce the aggregate performance
-impact of providing strong consistency guarantees.
+impact of strong consistency guarantees.
 %
 In particular, xsyncfs provides \emph{external synchrony}, which
 has the same consistency guarantees as synchronous file system ordering for
@@ -104,18 +104,18 @@ Writes are committed in groups using a journaling design, but
 %
 xsyncfs enforces additional write-before relationships on
 \emph{non-file system} communication: a journal transaction must commit
-before any external output by a process involved in that transaction, such
-as terminal data or network traffic, is allowed to escape the kernel.
+before output from any process involved in that transaction can
+escape the kernel, for example via the terminal or a network connection.
 %
-These dependencies are tracked across IPC as well.
+These dependency relationships are tracked across IPC as well.
 %
-\Featherstitch\ dependencies might be useful for representing xsyncfs
-dependencies, or the cross-network dependencies send in BlueFS, more
-generally; for instance, \Kudos\ patches apply at least conceptually to any
-file system, whereas the xsyncfs implementation assumes a file system like
-ext3.
+\Featherstitch\ patches could generalize the link between the file system
+implementation and xsyncfs dependencies, or the cross-network dependencies
+sent in BlueFS; for instance, \Kudos\ patches apply at least conceptually
+to any file system, whereas the xsyncfs implementation assumes a file
+system like ext3.
 %
-Conversely, \Featherstitch\ applications could benefit from the the
+Conversely, \Featherstitch\ applications could benefit from the
 combination of strict ordering and nonblocking writes provided by xsyncfs.
 
 \begin{comment}
@@ -167,10 +167,10 @@ performance in BlueFS~\cite{nightingale05speculative}.
 Stackable \module\ software for file systems continues to attract active
 research~\cite{rosenthal90evolving, heidemann91layered, skinner93stacking,
 heidemann94filesystem,zadok99extending,
-zadok00fist,wright03ncryptfs,wright06versatility}, as does other extensions
+zadok00fist,wright03ncryptfs,wright06versatility}, as do other extensions
 to file system and disk interfaces~\cite{huang05fs2,sivathanu06typesafe};
-these designs could potentially
-benefit from a patchlike mechanism for representing write-before
+these systems could potentially
+benefit from a patch-like mechanism that represented write-before
 relationships and consistency requirements in an agnostic manner.
 
 \begin{comment}
@@ -204,11 +204,13 @@ of these ideas.
 \end{comment}
 
 
-\paragraph{} \Kudos\ adds to this body of work by generalizing and making
-explicit the write-before relationship that is already present in many
-storage systems, and making it a pervasive primitive throughout the storage
+%% \paragraph{} 
+\Kudos\ adds to this body of work by generalizing and making
+explicit the write-before relationship already present in many
+storage systems, making it a pervasive primitive throughout the storage
 system. This allows many different consistency models to be created and
-combined in file system independent ways, and it provides a means for file
-system extensions to deal directly with consistency. It also allows the
-extension of this concept into userspace, so that even user applications
-can easily use this functionality.
+combined in file system independent ways, and provides a means for file
+system extensions to deal directly with consistency. 
+%% It also allows the
+%% extension of this concept into userspace, so that even user applications
+%% can easily use this functionality.
