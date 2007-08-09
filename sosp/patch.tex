@@ -441,7 +441,7 @@ This section illustrates how \patches\ can implement two widely-used
  file system consistency models, soft updates and journaling.
 %
 Our basic example extends an existing file by a single block---perhaps an
- application has used \texttt{ftruncate} to append 1024 zero bytes to an
+ application calls \texttt{ftruncate} to append 1024 zero bytes to an
  empty file.
 %
 The file system is based on ext2, an FFS-like file system with inodes and
@@ -484,7 +484,7 @@ A soft updates file system orders its writes to enforce three simple rules
 
 \noindent
 By following these rules, a file system limits the possible inconsistencies
-present on the disk at any time to leaked resources only, such as blocks or inodes
+present on the disk at any time to leaked resources, such as blocks or inodes
 marked as in use but unreferenced. The file system can be used immediately
  on reboot; a background scan can locate and recover the leaked resources
  while the system is in use.
