@@ -27,7 +27,11 @@ Both journaling and soft updates are naturally represented in terms of
 patches, as Section~\ref{sec:patch:examples} demonstrates, and we use both
 journaling and soft updates as running examples throughout the paper.
 %
-Soft updates forms in some ways a more challenging test of the patch
+In both cases, the patch implementation extracts ad hoc orderings and
+optimizations into general dependency graphs, making the orderings
+potentially easier to understand and modify.
+%
+Soft updates is in some ways a more challenging test of the patch
 abstraction: its dependencies are more variable and harder to predict,
 it are widely considered difficult to implement, and the existing FreeBSD
 implementation is quite optimized~\cite{mckusick99soft}.
@@ -41,7 +45,7 @@ provide, and which often requires more seeks than journaling
 despite writing less data.
 
 CAPFS~\cite{vilayannur05providing} and Echo~\cite{mann94coherent}
-have considered
+considered
 customizable application-level consistency protocols
 in the context of distributed, parallel file systems.
 %
@@ -66,8 +70,8 @@ unnecessary consistency protocols can be extremely expensive.
 %% applications currently use expensive interfaces like \texttt{fsync()} when
 %% they require specific consistency guarantees.
 %
-\Kudos\ \patchgroups\ bring this sort of customizable consistency to all
-applications, not just those using specialized distributed file systems.
+\Kudos\ \patchgroups\ generalize this sort of customizable consistency
+and brings it to disk-based file systems.
 
 A similar application interface to \patchgroups\ is explored in
 Section~4 of Burnett's thesis~\cite{burnett06information}. However, the methods
@@ -87,13 +91,49 @@ simulations.
 %% than the theoretical seek time or the number of blocks accessed, can be a
 %% bottleneck.
 
-Dependency-like ideas have also been explored in
+Dependency-like ideas have been used in
 BlueFS~\cite{nightingale05speculative} and
 xsyncfs~\cite{nightingale06rethink} to reduce the aggregate performance
 impact of providing strong consistency guarantees.
 %
-In particular, xsyncfs gives users the illusion that the file system
-synchronizes after every write, without actually blocking applications .
+In particular, xsyncfs provides users with the appearance of synchronous
+file system ordering without actually blocking applications on each write.
+%
+Writes are committed in groups using a journaling design, but
+%
+xsyncfs enforces additional write-before relationships on
+\emph{non-file system} communication: a journal transaction must commit
+before any external output by a process involved in that transaction, such
+as terminal data or network traffic, is allowed to escape the kernel.
+%
+These dependencies are tracked across IPC as well.
+%
+\Featherstitch\ dependencies might be useful for representing xsyncfs
+dependencies, or the cross-network dependencies send in BlueFS, more
+generally; for instance, \Kudos\ patches apply at least conceptually to any
+file system, whereas the xsyncfs implementation assumes a file system like
+ext3.
+%
+Conversely, \Featherstitch\ applications could benefit from the
+apparently-fast strict ordering provided by xsyncfs.
+
+\begin{comment}
+written by that transaction, \emph{or} any
+data written by processes involved in that transaction's writes after that
+trasactions data that might have been computed by a process that wrote
+anything in that process.
+%
+depending on any write in
+the assuming that commit
+
+but the system
+tracks any process output that followed---and, thus, might depend
+on---these writes.
+%
+Any user-visible operation
+
+the b operations are combined and com a journal, but a dependency subsystem
+tracks
 
 External synchrony~\cite{nightingale06rethink} builds on journaling to
 automatically provide strict file system operation ordering for applications,
@@ -114,6 +154,7 @@ dependencies, allowing them to apply to any file system.
 %
 Similar \patch-like dependencies are used to improve network file system
 performance in BlueFS~\cite{nightingale05speculative}.
+\end{comment}
 
 % "allow the kernel to safely and efficiently handle any metadata layout without understanding the layout itself"
 % \cite{kaashoek97application}
@@ -154,7 +195,7 @@ of these ideas.
 %% extension to be written in a portable way, giving it the same benefit.
 
 \paragraph{} \Kudos\ adds to this body of work by generalizing and making
-explicit the ``write before'' relationship that is already present in many
+explicit the write-before relationship that is already present in many
 storage systems, and making it a pervasive primitive throughout the storage
 system. This allows many different consistency models to be created and
 combined in file system independent ways, and it provides a means for file

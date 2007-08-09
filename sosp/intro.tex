@@ -17,10 +17,10 @@ The answer is a qualified yes.
 This paper builds a complete and relatively efficient file system layer,
  called \emph{\Featherstitch}, that uses
  a simple, uniform, and file system agnostic data type to explicitly
- represent all ``write before'' relationships among changes to stable
+ represent all write-before relationships among changes to stable
  storage.
 %
-``Write before'' relationships, which require some changes to be committed
+Write-before relationships, which require some changes to be committed
  before others, are part of the abstract basis of every mechanism for ensuring file system
  consistency and reliability, from journaling to synchronous writes.
 %
@@ -40,7 +40,7 @@ File systems today deal with many challenges that make implementing this
 To meet this challenge, file systems use a variety of techniques, like
  journaling and soft updates.
 %
-These mechanisms are each based on imposing some ``write before''
+These mechanisms are each based on imposing some write-before
  relationship among buffered changes to the data in stable storage.
 %
 The answer is a qualified yes.
