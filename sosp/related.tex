@@ -4,7 +4,7 @@
 \paragraph{Consistency}
 
 Most modern file systems protect file system integrity in the face of
-possible power failure or crashes via \emph{journaling}, which groups
+possible power failure or crashes via journaling, which groups
 operations into transactions that commit
 atomically~\cite{seltzer00journaling}.
 The content and the layout of the
@@ -27,17 +27,73 @@ Both journaling and soft updates are naturally represented in terms of
 patches, as Section~\ref{sec:patch:examples} demonstrates, and we use both
 journaling and soft updates as running examples throughout the paper.
 %
-Soft updates form in some ways a more challenging test of the patch
-abstraction: their dependencies are more variable and harder to predict,
-they are widely considered difficult to implement, and the existing FreeBSD
+Soft updates forms in some ways a more challenging test of the patch
+abstraction: its dependencies are more variable and harder to predict,
+it are widely considered difficult to implement, and the existing FreeBSD
 implementation is quite optimized~\cite{mckusick99soft}.
 %
-We therefore spend a fair amount of space discussing soft updates-like
-dependency orders.
+We therefore frequently discuss soft updates-like
+dependencies.
 %
 This should not be construed as a wholesale endorsement of soft updates,
-which rely on a property (atomic block writes) that many disks do not
-provide and which often require more seeks than journaling designs.
+which relies on a property (atomic block writes) that many disks do not
+provide, and which often requires more seeks than journaling
+despite writing less data.
+
+CAPFS~\cite{vilayannur05providing} and Echo~\cite{mann94coherent}
+have considered
+customizable application-level consistency protocols
+in the context of distributed, parallel file systems.
+%
+CAPFS allows application writers to design plug-ins for a parallel file store
+that define what actions to take before and after each client-side system
+call.
+%
+These plug-ins can enforce additional consistency policies.
+%
+Echo maintains a partial order on the locally cached updates to the remote file
+system, and guarantees that the server will store the updates accordingly;
+applications can extend the partial order.
+%% , thus
+%% reducing the server's flexibility to choose how to write the data or make it
+%% available to other clients.
+%
+Both systems are based on the principle that not providing the right
+consistency protocol can cause unpredictable failures, yet enforcing
+unnecessary consistency protocols can be extremely expensive.
+%
+%% However, this is also true with a local file system, and as a result
+%% applications currently use expensive interfaces like \texttt{fsync()} when
+%% they require specific consistency guarantees.
+%
+\Kudos\ \patchgroups\ bring this sort of customizable consistency to all
+applications, not just those using specialized distributed file systems.
+
+A similar application interface to \patchgroups\ is explored in
+Section~4 of Burnett's thesis~\cite{burnett06information}. However, the methods
+used to implement the interfaces are very different: Burnett's system tracks
+dependencies at the level of entire system calls, associates dirty blocks with
+unique IDs returned by those calls, and duplicates dirty blocks when necessary
+to preserve ordering. \Kudos\ tracks individual changes to blocks internally,
+allowing kernel modules a finer level of control, and only chooses to expose a
+userspace interface similar to Burnett's as a means to simplify the sanity
+checking required of arbitrary user-submitted requests.
+%
+Additionally, our evaluation uses a real disk rather than trace-driven
+simulations.
+%% rather than an implementation. We have found that some aspects of real disks
+%% have significant impacts which his simulator may not have taken into account;
+%% for instance, we have found that the number of I/O requests to the disk, rather
+%% than the theoretical seek time or the number of blocks accessed, can be a
+%% bottleneck.
+
+Dependency-like ideas have also been explored in
+BlueFS~\cite{nightingale05speculative} and
+xsyncfs~\cite{nightingale06rethink} to reduce the aggregate performance
+impact of providing strong consistency guarantees.
+%
+In particular, xsyncfs gives users the illusion that the file system
+synchronizes after every write, without actually blocking applications .
 
 External synchrony~\cite{nightingale06rethink} builds on journaling to
 automatically provide strict file system operation ordering for applications,
@@ -58,50 +114,6 @@ dependencies, allowing them to apply to any file system.
 %
 Similar \patch-like dependencies are used to improve network file system
 performance in BlueFS~\cite{nightingale05speculative}.
-
-Customizable application-level consistency protocols have previously been
-considered in the context of distributed, parallel file systems by
-CAPFS~\cite{vilayannur05providing} and Echo~\cite{mann94coherent}.
-%
-CAPFS allows application writers to design plug-ins for a parallel file store
-that define what actions to take before and after each client-side system
-call.
-%
-These plug-ins can enforce additional consistency policies.
-%
-Echo maintains a partial order on the locally cached updates to the remote file
-system, and guarantees that the server will store the updates accordingly. It
-also provides a mechanism for applications to extend the partial order, thus
-reducing the server's flexibility to choose how to write the data or make it
-available to other clients.
-%
-Both systems are based on the principle that not providing the right
-consistency protocol can cause unpredictable failures, yet enforcing
-unnecessary consistency protocols can be extremely expensive.
-%
-However, this is also true with a local file system, and as a result
-applications currently use expensive interfaces like \texttt{fsync()} when
-they require specific consistency guarantees.
-%
-\Kudos\ \patchgroups\ bring this sort of customizable consistency to all
-applications, not just those using specialized distributed file systems.
-
-A similar application interface to \patchgroups\ is explored in
-Section~4 of Burnett's thesis~\cite{burnett06information}. However, the methods
-used to implement the interfaces are very different: Burnett's system tracks
-dependencies at the level of entire system calls, associates dirty blocks with
-unique IDs returned by those calls, and duplicates dirty blocks when necessary
-to preserve ordering. \Kudos\ tracks individual changes to blocks internally,
-allowing kernel modules a finer level of control, and only chooses to expose a
-userspace interface similar to Burnett's as a means to simplify the sanity
-checking which is required of arbitrary user-submitted requests.
-
-Additionally, Burnett's system is evaluated using trace-driven simulations
-rather than an implementation. We have found that some aspects of real disks
-have significant impacts which his simulator may not have taken into account;
-for instance, we have found that the number of I/O requests to the disk, rather
-than the theoretical seek time or the number of blocks accessed, can be a
-bottleneck.
 
 % "allow the kernel to safely and efficiently handle any metadata layout without understanding the layout itself"
 % \cite{kaashoek97application}

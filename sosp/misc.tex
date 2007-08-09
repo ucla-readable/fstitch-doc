@@ -101,7 +101,7 @@ taking $O(n)$ time to process $n$ patches rather than $O(n^2)$.
 
 Finally, block allocation policies can have a dramatic effect on the number of
 I/O requests required to write changes to the disk. For instance, soft
-updates requires that  -like dependencies require that data blocks be initialized before
+updates-like dependencies require that data blocks be initialized before
 an indirect block references them.   
 dependencies implementing soft updates, indirect block data cannot be written
 until the referenced blocks have been at least initialized. By allocating an
