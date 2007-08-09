@@ -197,11 +197,6 @@ add.  We updated gzip to use \patchgroups\ that ensure the input file's
 removal is not committed before the output file's data is written, so that
 a crash does not lose both files. The update adds 10 lines of code to gzip
 v1.3.9.
-%
-\todo{Contrast with SU and journaling?
-SU: must sync prior to unlink; slower completion and later changes to
-output require additional writes.
-Ordered and full journaling: safe with no changes.}
 
 \paragraph{Subversion}
 \label{sec:patchgroup:svn}
@@ -335,8 +330,6 @@ changes are committed to disk, and the \patchgroup\ dependencies ensure
 changes are committed in a safe ordering.
 %
 Figure~\ref{fig:imap}b illustrates using patches to move messages.
-%
-\todo{Does this figure convey what we want it to?}
 
 \begin{figure}[tb]
 \centering
