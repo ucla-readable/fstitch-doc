@@ -61,6 +61,7 @@ which dependencies can be applied.
 %
 The \patchgroup\ interface is as follows:
 
+\vspace{-0.5\baselineskip}
 \begin{scriptsize}
 \begin{alltt}
   typedef int pg_t;          pg_t \textbf{pg_create}(void);
@@ -69,6 +70,7 @@ The \patchgroup\ interface is as follows:
   int \textbf{pg_depend}(pg_t after, pg_t before);
 \end{alltt}
 \end{scriptsize}
+\vspace{-0.5\baselineskip}
 
 Each process has its own set of \patchgroups, which are currently shared
 among all threads..
