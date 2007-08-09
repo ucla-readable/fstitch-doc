@@ -88,7 +88,7 @@ cache) and \Kudos\ can write unsafely (by disabling FUA).
 %
 We report both results for each when comparing the systems.
 %
-All timing results are the mean over three runs.
+All timing results are the mean over five runs.
 
 To evaluate \patch\ optimizations and \Kudos\ as a whole we ran four
 benchmarks.
@@ -364,7 +364,7 @@ also currently has this limitation.
 \begin{tabular}{@{}llrr@{}}
 \textbf{File System} & \textbf{Consistency method} & \textbf{Time} & \textbf{Writes} \\ \hline
 
-% Results are from r3933
+% Results are from r4037, mean of 5 runs
 % Single commented out reuslts are from r3933
 %% Double commented out results are from r3862
 
@@ -400,9 +400,9 @@ full journal & \patchgroups & 1.4 [0.4] & 32 \\ \hline
 
 %fsync & Linux & ext2 & 16.7 [0.3] & 2,503 \\
 %%Linux ext3 ordered (fsync) & 23.9 [0.3] & 3,025 \\
-journal & fsync & 20.4 [0.3] & 2,531 \\
+journal & fsync & 19.9 [0.3] & 2,531 \\
 
-journal & assume linear & 1.2 [0.3] & 26 \\
+journal & assume linear & 1.3 [0.3] & 26 \\
 
 \end{tabular}
 \caption{\label{fig:imap-compare} IMAP benchmark: move 1,000 messages.
