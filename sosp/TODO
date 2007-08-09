@@ -6,6 +6,7 @@
 / Total memory requirements, not just rollback
 
 * Really Want To Do
+- Fig 11: report meta or full journaling for fsync/patchgroups?
 - Add 8.6 summary
 - Improve understandability of patchgroup eval section
 - Improve imap diagram
