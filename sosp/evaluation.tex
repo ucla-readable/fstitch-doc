@@ -268,14 +268,14 @@ modes, respectively, at PostMark.\todo{Note that we do not know why
 \subsection {Correctness}
 \label{sec:eval:correctness}
 
-In order to check that we had implemented the soft updates rules correctly, we
-implemented a \Kudos\ module which crashes the operating system, without
-giving it a chance to synchronize its buffers, at a random time during the
-untar test.
+In order to check that we had implemented the soft updates rules correctly,
+we implemented a \Kudos\ module which crashes the operating system, without
+giving it a chance to synchronize its buffers, at a random time during each
+run.
 %
-In \Kudos\ asynchronous mode, after crashing, fsck nearly always reported that
-the file system contained many references to inodes that had been deleted: the
-file system was corrupt.
+In \Kudos\ asynchronous mode, after crashing, fsck nearly always reported
+that the file system contained many references to inodes that had been
+deleted, among other errors: the file system was corrupt.
 %
 With our soft updates dependencies, the file system was always mostly
 consistent: fsck reported that inode reference counts were higher than the
