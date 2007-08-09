@@ -1,5 +1,4 @@
 * Must Do
-- Complete big postmark update
 - Update correctness tests
 - Increase number of benchmark runs to 5 or 10
 - Check that we adequately address reviews
@@ -7,7 +6,6 @@
 - Update opt and imap tables for r4000
 
 * Really Want To Do
-- Improve big postmark perf (lots of reads)
 - Add 8.6 summary
 - Improve understandability of patchgroup eval section
 - Improve patchgroup casestudies (including eliminate/improve the two diagrams)
@@ -19,7 +17,8 @@
 - Decide how to cite email threads (esp reference's title)
 - More fully explain allocator differences and the effects
 - Update kudos to not commit file system summary data on fsync
-- Speed up ima/svn SU
+- Speed up imap/svn SU
+- Improve postmark perf
 
 
 
