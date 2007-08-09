@@ -26,8 +26,8 @@ During initialization, the \Kudos\ kernel module registers a VFS file system
 type with Linux.  %% (like ``nfs'' or ``ext2'').
 %
 Each file system \Kudos\ detects on a specified disk device can then be mounted
-from Linux using a command like \mbox{\texttt{mount -t kfs kfs:\textit{name}
-/mnt/point}}.
+from Linux using a command like \texttt{mount -t kfs kfs:\textit{name}
+/mnt/point}.
 %
 Since \Kudos\ provides its own \patch-aware buffer cache, it sets
 \texttt{O\_SYNC} on all opened files as the simplest way to bypass the normal
