@@ -36,12 +36,23 @@ CPU, 2~GB of RAM, and a Seagate ST3320620AS 320~GB 7200~RPM SATA2 disk.
 All tests use a 10~GB file system and the Linux 2.6.20.1 kernel
 with the Ubuntu v6.06.1 distribution.
 %
+Because the \Kudos-kernel integration does not use high memory and
+because \Kudos\ uses its own block cache in addition to the kernel's,
+we limit \Kudos\ and Linux configurations to an effective 312~MB of
+RAM available for the block cache.
+%
+Specifically, \Kudos\ configurations have 662~MB of RAM total and
+312~MB of RAM for the \Kudos\ block cache
+%
+and Linux configurations have 350~MB of RAM total and 312~MB of RAM
+for the block cache.
+
 We examine Linux ext2 and ext3 (in ordered and journal modes) and
 \Kudos\ ext2 (in asynchronous, soft updates, metadata journal, and
 full journal modes), all created with default configurations.
 %
 There is a notable write durability difference between the default
-\Kudos\ and Linux ext2/3 configurations: \Kudos\ presumes a write is
+\Kudos\ and Linux ext2/ext3 configurations: \Kudos\ presumes a write is
 durable after is is on the disk platter (safe) and Linux ext2 and ext3
 after it is in the disk cache (unsafe). However, both systems can run
 with either durability assumption---we report both results for each.
@@ -178,22 +189,19 @@ smaller account for about 51\% of all \rb\ \patches.}
 \small
 \begin{tabular}{@{}lrrrr@{}}
 \textbf{System} & \multicolumn{1}{c}{\textbf{Untar}} & \multicolumn{1}{c}{\textbf{Delete}} & \multicolumn{1}{c}{\textbf{PostMark}} & \multicolumn{1}{c}{\textbf{Andrew}} \\ \hline
-% Results are from r3966, except for postmark (r3972)
-% Kudos results are mean over 10
+% Results are from r3998, mean of 3 runs
 \multicolumn{3}{@{}l}{\emph{\Kudos\ ext2}\raise2pt\hbox{\strut}} & & \\
-\safe{soft updates} & \safe{6.2 [2.5]} & \safe{0.9 [0.2]} & \safe{48.2 [14.7]} & \safe{37.8 [5.3]} \\
-\safe{meta journal} & \safe{8.5 [2.8]} & \safe{1.5 [0.5]} & \safe{75.6 [16.8]} & \safe{37.6 [5.5]} \\
-\safe{full journal} & \safe{12.9 [3.4]} & \safe{1.4 [0.5]} & \safe{99.1 [22.2]} & \safe{37.8 [5.5]} \\
-\unsafe{async} & \unsafe{4.2 [1.5]} & \unsafe{0.7 [0.2]} & \unsafe{46.6~~~[8.6]} & \unsafe{37.3 [5.3]} \\
-\unsafe{full journal} & \unsafe{10.3 [3.8]} & \unsafe{1.2 [0.5]} & \unsafe{86.3 [25.2]} & \unsafe{37.6 [5.5]} \\ \hline
+\safe{soft updates} & \safe{5.8 [1.7]} & \safe{0.9 [0.2]} & \safe{47.4 [13.2]} & \safe{37.8 [4.2]} \\
+\safe{meta journal} & \safe{9.0 [2.8]} & \safe{1.4 [0.5]} & \safe{73.2 [16.7]} & \safe{37.1 [4.1]} \\
+\safe{full journal} & \safe{12.7 [3.3]} & \safe{1.4 [0.5]} & \safe{95.2 [22.3]} & \safe{37.5 [4.4]} \\
+\unsafe{async} & \unsafe{4.3 [1.5]} & \unsafe{0.7 [0.2]} & \unsafe{45.2 [~~8.3]} & \unsafe{36.8 [4.1]} \\
+\unsafe{full journal} & \unsafe{11.1 [3.9]} & \unsafe{1.2 [0.5]} & \unsafe{86.6 [25.7]} & \unsafe{37.1 [4.4]} \\ \hline
 
-% Linux results are mean over 3
 \multicolumn{3}{@{}l}{\emph{Linux}\raise2pt\hbox{\strut}} & & \\
-% safe ordered: r3959
-\safe{ext3 ordered} & \safe{16.1 [1.0]} & \safe{4.4 [0.3]} & \safe{33.4 [3.9]} & \safe{37.7 [5.3]} \\
-\safe{ext3 journal} & \safe{12.7 [1.2]} & \safe{4.5 [0.2]} & \safe{65.7 [5.0]} & \safe{38.8 [5.0]} \\
-\unsafe{ext2} & \unsafe{4.5 [0.7]} & \unsafe{4.6 [0.2]} & \unsafe{30.4 [2.0]} & \unsafe{37.3 [4.9]} \\
-\unsafe{ext3 journal} & \unsafe{10.9 [1.1]} & \unsafe{4.3 [0.3]} & \unsafe{57.9 [4.9]} & \unsafe{37.8 [5.0]} \\
+\safe{ext3 ordered} & \safe{16.9 [1.0]} & \safe{4.6 [0.3]} & \safe{54.1 [~~4.0]} & \safe{37.7 [4.0]} \\
+\safe{ext3 journal} & \safe{20.3 [1.2]} & \safe{4.6 [0.2]} & \safe{82.5 [~~5.0]} & \safe{38.2 [4.0]} \\
+\unsafe{ext2} & \unsafe{9.5 [0.7]} & \unsafe{4.7 [0.2]} & \unsafe{45.8 [~~2.0]} & \unsafe{37.0 [4.0]} \\
+\unsafe{ext3 journal} & \unsafe{15.3 [1.2]} & \unsafe{4.3 [0.3]} & \unsafe{80.2 [~~4.9]} & \unsafe{37.3 [4.0]} \\
 
 %FreeBSD (soft updates) & 23.22 & 15.95 & & \\ 
 %FreeBSD (async) & 10.09 & 3.25 & & \\
@@ -211,7 +219,6 @@ Figure~\ref{fig:bench_time}.
 The general result is that \Kudos\ and Linux ext2/ext3 perform
 similarly when providing similar durability guarantees. Linux
 ext2/ext3 also outperforms \Kudos, and vice versa, in some scenarios.
-We explain these differences in the following two paragraphs.
 
 \benchtable{}
 
@@ -223,34 +230,22 @@ time.
 Higher CPU requirements are an important concern and, though they were
 the focus of many of our optimization efforts, remain a weakness
 for \Kudos.
-\todo{Characterize the additional cpu time. memcpy? patches?}
 %
-Additionally, while \Kudos\ I/O times are lower than Linux ext2/ext3 I/O
+Some of the contributors to \Kudos\ CPU usage are inherent, e.g.
+\patch\ creation, while others are artifacts of the current
+implementation, e.g.  creating a second copy of a block to write it to
+disk. We have not separated these two categories.
+%
+Further, while \Kudos\ I/O times are lower than Linux ext2/ext3 I/O
 times for the untar and delete benchmarks, we have found that small
 block allocation strategy changes can significantly affect I/O time
 for many of these benchmarks. This further emphasizes the importance
 of the system CPU time difference.
 
-Unlike the untar, delete, and Andrew benchmarks, Linux ext2/ext3
-outperforms \Kudos\ at PostMark.
-%
-We believe the primary contributor to this difference is a difference
-in the amount of data read from disk, because of \Kudos's smaller
-default cache (64~MB cache vs the 2~GB of ram).  Whereas
-Linux ext2/ext3 reads on the order of 100~kB, \Kudos\ reads
-480--540~MB. \todo{Use larger cache?}
-%
-We believe a secondary contributor to this difference is a difference
-in the amount of data written to disk. Linux ext2 and Linux ext3 in
-ordered journal mode detect that most dirty blocks are no longer
-referenced at the end of the test, and so do not write them to disk
-(writing only 0.1--0.2~MB). In contrast, \Kudos\ and Linux ext3 in
-full journal mode do not do this detection and thus write these blocks
-(writing 90--180~MB and 120~MB, respectively). \todo{Update
-  not-referenced effectiveness for large postmark.}
-%
-While we believe that \Kudos\ and its ext2 module probably can be
-improved to make this optimization, we have not implemented it.
+Unlike the untar, delete, and Andrew benchmarks, Linux ext3 ordered
+and journal modes outperform \Kudos\ meta journal and full journal
+modes, respectively, at PostMark.\todo{Note that we do not know why
+  and/or note cpu time difference?}
 
 %This demonstrates that the overhead of using \patches\ in \Kudos\ is not
 %entirely unreasonable, but has room for significant improvement.
@@ -278,9 +273,11 @@ correct values (an expected discrepancy after a soft updates crash).
 % #reviewers who want measurements of at least svn and imap studies: 2
 
 To evaluate the performance of the \patchgroup-enabled UW IMAP mail
-server (\S\ref{sec:patchgroup:uwimap}) we benchmark a client moving
-1,000 messages. The client selects the source mailbox (containing
-1,000 2~kB messages), creates the new mailbox, copies each message to
+server (\S\ref{sec:patchgroup:uwimap}) we benchmark moving 1,000
+messages.
+%
+To move the messages the client selects the source mailbox (containing
+1,000 2~kB messages), creates a new mailbox, copies each message to
 the new mailbox and marks each source message for deletion, expunges
 the marked messages, commits the mailboxes, and logs out.
 
@@ -336,47 +333,48 @@ for the \texttt{fsync} system call.
 
 \begin{figure}[t]
 \centering
-\begin{tabular}{@{}lrr@{}}
-\textbf{System} & \textbf{Time} & \textbf{Writes} \\ \hline
+\begin{tabular}{@{}lllrr@{}}
+\textbf{Proto} & \textbf{System} & \textbf{File System} & \textbf{Time} & \textbf{Writes} \\ \hline
 
 % Results are from r3933
 % Commented out results are from r3862
 
-\multicolumn{3}{@{}c@{}}{\textbf{Unsafe}\raise2pt\hbox{\strut}} \\
-
-% NOFUA
-\Kudos\ async (pg) & 1.2 [0.3] & 18 \\
-%\Kudos\ soft updates (pg) & 11.4 [0.4] & 3,015 \\
-%\Kudos\ meta journal (pg) & 1.4 [0.4] & 33 \\
-\Kudos\ full journal (pg) & 1.3 [0.5] & 33 \\
+\multicolumn{5}{@{}c@{}}{\textbf{Unsafe}\raise2pt\hbox{\strut}} \\
 
 % WB
-Linux ext2 (fsync) & 1.5 [0.3] & 2,503 \\
+fsync & Linux & ext2 & 1.5 [0.3] & 2,503 \\
 %Linux ext3 ordered (fsync) & 2.0 [0.3] & 3,025 \\
-Linux ext3 journal (fsync) & 1.8 [0.3] & 2,531 \\ \hline
+fsync & Linux & ext3 journal & 1.8 [0.3] & 2,531 \\
 
-\multicolumn{3}{@{}c@{}}{\textbf{Safe}\raise2pt\hbox{\strut}} \\
+% NOFUA
+\patchgroups & \Kudos & async & 1.2 [0.3] & 18 \\
+%\Kudos\ soft updates (pg) & 11.4 [0.4] & 3,015 \\
+%\Kudos\ meta journal (pg) & 1.4 [0.4] & 33 \\
+\patchgroups & \Kudos & full journal & 1.3 [0.5] & 33 \\ \hline
 
-% FUA
-%\Kudos\ async (pg) & 1.6 [0.3] & 2,503 \\
-\Kudos\ soft updates (pg) & 27.2 [1.2] & 3,015 \\
-%\Kudos\ meta journal (pg) & 1.5 [0.4] & 32 \\
-\Kudos\ full journal (pg) & 1.5 [0.5] & 32 \\
-\Kudos\ full journal (linear) & 1.4 [0.4] & 31 \\
+\multicolumn{5}{@{}c@{}}{\textbf{Safe}\raise2pt\hbox{\strut}} \\
 
-% WT, fsyncs to CHECK/CLOSE
-Linux ext3 journal (linear) & 1.2 [0.3] & 26 \\
+% WT
+fsync & Linux & ext2 & 16.7 [0.3] & 2,503 \\
+%Linux ext3 ordered (fsync) & 23.9 [0.3] & 3,025 \\
+fsync & Linux & ext3 journal & 20.4 [0.3] & 2,531 \\
 
 % FUA, without patchgroups
 %\Kudos\ async (pg) & 1.6 [0.3] & 2,503 \\
-\Kudos\ soft updates (fsync) & 65.0 [0.3] & 8,083 \\
+fsync & \Kudos & soft updates & 65.0 [0.3] & 8,083 \\
 %\Kudos\ meta journal (pg) & 51.3 [0.4] & 7,111 \\
-\Kudos\ full journal (fsync) & 51.0 [0.5] & 7,114 \\
+fsync & \Kudos & full journal & 51.0 [0.5] & 7,114 \\
 
-% WT
-Linux ext2 (fsync) & 16.7 [0.3] & 2,503 \\
-%Linux ext3 ordered (fsync) & 23.9 [0.3] & 3,025 \\
-Linux ext3 journal (fsync) & 20.4 [0.3] & 2,531 \\
+% FUA
+%\Kudos\ async (pg) & 1.6 [0.3] & 2,503 \\
+\patchgroups & \Kudos & soft updates & 27.2 [1.2] & 3,015 \\
+%\Kudos\ meta journal (pg) & 1.5 [0.4] & 32 \\
+\patchgroups & \Kudos & full journal & 1.5 [0.5] & 32 \\
+
+% WT, fsyncs to CHECK/CLOSE
+linear & Linux & ext3 journal & 1.2 [0.3] & 26 \\
+
+linear & \Kudos & full journal & 1.4 [0.4] & 31 \\
 
 \end{tabular}
 \caption{\label{fig:imap-compare} IMAP benchmark: move 1,000 messages.
