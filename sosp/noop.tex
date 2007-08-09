@@ -69,11 +69,11 @@ The \noop\ \patch\ automatically commits at the same time as the commit
 %
 %
 \Noop\ \patches\ can shrink memory usage by representing quadratic sets of
- dependencies with a linear number of edges: if all $m$ \patches\ in $P$
- must depend on all $n$ \patches\ in $Q$, one could
+ dependencies with a linear number of edges: if all $m$ \patches\ in $Q$
+ must depend on all $n$ \patches\ in $P$, one could
  %% add $mn$ direct dependencies $p_i \PDDepend q_j$ or
- add an \noop\ \patch\ $x$ and $m+n$ direct dependencies
- $p_i \PDDepend x \PDDepend q_j$.
+ add an \noop\ \patch\ $e$ and $m+n$ direct dependencies
+ $q_i \PDDepend e$ and $e \PDDepend p_j$.
 %
 This is useful for \patchgroups\ as described in \S\ref{sec:patchgroup}.
 %

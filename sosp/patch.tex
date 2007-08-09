@@ -201,13 +201,12 @@ $\PDisk, \PMem, \PInf$ & the sets of all committed, uncommitted, and in-flight \
         & \patches, respectively \\
 $\PDisk[B], \PMem[B], \PInf[B]$ & committed/uncommitted/in-flight patches on block $B$ \\
 \noalign{\vskip3pt}
-$p \PDepend q$ & $p$ depends on $q$ ($p$ must be written before $q$) \\
-$\PDepset{p}$ & $p$'s dependencies: $\{ q \mid p \PDepend q \}$ \\
+$q \PDepend p$ & $q$ depends on $p$ ($p$ must be written before $q$) \\
+$\PDepset{p}$ & $p$'s dependencies: $\{ x \mid p \PDepend x \}$ \\
 \noalign{\vskip3pt}
-$p \PDDepend q$ & $p$ directly depends on $q$: the one-step version of
- $\PDepend$. \\
-	& $p\PDepend q$ means either $p\PDDepend q$ or $\exists x : p \PDepend x \PDDepend q$ \\
-$\PDDepset{p}$ & $p$'s direct dependencies: $\{ q \mid p \PDDepend q \}$ \\
+$q \PDDepend p$ & $q$ directly depends on $p$ \\
+	& ($q\PDepend p$ means either $q\PDDepend p$ or $\exists x : q \PDepend x \PDDepend p$.) \\
+$\PDDepset{p}$ & $p$'s direct dependencies: $\{ x \mid p \PDDepend x \}$ \\
 \end{tabular}
 \end{small}
 
@@ -225,13 +224,13 @@ The storage layer doesn't understand dependencies; instead, the file system
  maintains dependencies and passes blocks to the storage layer in an
  order that preserves dependency semantics.
 %
-Patch $p$ is made to \emph{depend on} patch $q$, written $p \PDepend q$,
- when the file system requires that $q$ be committed before $p$.
+Patch $q$ \emph{depends on} patch $p$, written $q \PDepend p$,
+ when the file system requires that $p$ be committed before $q$.
 %
 (As a special case, if $p$ and $q$ are on the same block, they may be
  committed at the same time.)
 %
-The file system uses dependencies to set up its desired consistency
+The file system creates dependencies that express its desired consistency
  semantics.
 %
 For example, a file system with asynchronous writes (and no durability
@@ -258,7 +257,7 @@ Circular dependencies among patches cannot be resolved and are therefore
 \Patch\ $p$'s \emph{set} of dependencies, written $\PDepset{p}$, consists
  of all patches on which $p$ depends;
 %
-\( \PDepset{p} = \{ q \mid p \PDepend q \}. \)
+\( \PDepset{p} = \{ x \mid p \PDepend x \}. \)
 %
 Given a set of \patches\ $P$, we write $\PDepset{P}$ to mean the
  combined dependency set $\bigcup_{p\in P} \PDepset{p}$. 
@@ -357,8 +356,8 @@ In summary, the main \Featherstitch\ implementation challenge is to design
 \end{figure*}
 
 
-The write-before relationship is transitive, so if $p \PDepend q$ and $q
- \PDepend r$, there is no need to explicitly store a $p \PDepend r$
+The write-before relationship is transitive, so if $r \PDepend q$ and $q
+ \PDepend p$, there is no need to explicitly store an $r \PDepend p$
  dependency.
 %
 To reduce storage requirements, a \Kudos\ implementation maintains only a
@@ -367,11 +366,11 @@ To reduce storage requirements, a \Kudos\ implementation maintains only a
 Each patch $p$ has a corresponding set of direct dependencies
  $\PDDepset{p}$; 
 %
-we say $p$ \emph{directly depends on} $q$, and write $p \PDDepend q$, when
- $q \in \PDDepset{p}$.
+we say $q$ \emph{directly depends on} $p$, and write $q \PDDepend p$, when
+ $p \in \PDDepset{q}$.
 %
-The dependency relation $p \PDepend q$ simply means that either $p
- \PDDepend q$ or $p \PDepend x \PDDepend q$ for some patch $x$.
+The dependency relation $q \PDepend p$ simply means that either $q
+ \PDDepend p$ or $q \PDepend x \PDDepend p$ for some patch $x$.
 
 
 \begin{comment}
@@ -639,7 +638,7 @@ Only one property of the model depends on the conventional file system context,
  namely that circular dependency chains are errors.
 %
 This restriction is required because \Kudos\ assumes a lower layer that
- commits one patch at a time (or one block at a time).
+ commits one block at a time.
 %
 Disks certainly behave this way, but a dependency tracker built above a
  more advanced lower layer---such as a journal---could resolve many

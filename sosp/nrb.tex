@@ -39,11 +39,11 @@ The system aims to reduce memory usage by making most patches hard.
 But which patches can be made hard?
 %
 Define a \emph{block-level cycle} as a dependency chain of uncommitted
- patches $p_1 \PDepend \cdots \PDepend p_n$ where the ends have the same
- block $\PBlock{p_1} = \PBlock{p_n}$, and at least one patch in the middle
+ patches $p_n \PDepend \cdots \PDepend p_1$ where the ends have the same
+ block $\PBlock{p_n} = \PBlock{p_1}$, and at least one patch in the middle
  has a different block $\PBlock{p_i} \neq \PBlock{p_1}$.
 %
-The patch $p_1$ is called the \emph{head} of the block-level cycle.
+The patch $p_n$ is called the \emph{head} of the block-level cycle.
 %
 Now assume that a patch $p \in \PMem$ is not the head of any block-level
  cycle.
@@ -60,7 +60,7 @@ However, we know that $q$'s uncommitted dependencies, if any, are all on
 %
 Since \Featherstitch\ disallows circular dependencies, every
  chain of dependencies starting at $q$ has finite length, and therefore
- contains an uncommitted patch $x$ where all of $x$'s dependencies have
+ contains an uncommitted patch $x$ all of whose dependencies have
  been committed.
 %
 (If $x$ has in-flight dependencies, simply wait
@@ -89,19 +89,18 @@ After $p$ is created, the system can add new dependencies $q \PDDepend p$,
 %
 Since every \patch\ follows this rule, all possible block-level cycles with
  head $p$ are present in the dependency graph when $p$ is created.
-
-
-This simplifies the problem, but \Featherstitch\ must still check the
- dependency graph for block-level cycles.
 %
-Actual graph traversals proved quite expensive, so
+\Featherstitch\ must still check for these cycles, of course, and
 %
-we implement a conservative approximation: \patch\ $p$ is
+actual graph traversals proved expensive.
+%
+We thus implemented a conservative approximation: \patch\ $p$ is
 created as \nrb\ if \emph{no} patches on other blocks depend on uncommitted
  patches on $\PBlock{p}$.
 %
-That is, for all dependencies $q \PDepend r$ between uncommitted patches,
- either $\PBlock{r} \neq \PBlock{p}$ or $\PBlock{q} = \PBlock{r} = \PBlock{p}$.
+That is, given any dependency between uncommitted patches $y \PDepend x$,
+ either $\PBlock{x}$ isn't on $p$'s block or \emph{both} $x$ and $y$ are on
+ $p$'s block.
 %
 If this holds, then $p$ cannot head a block-level cycle no matter its
  dependencies.
