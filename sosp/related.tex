@@ -24,13 +24,20 @@ can avoid \emph{fsck} after a crash, although a background \emph{fsck} is
 required to recover leaked storage.
 
 Both journaling and soft updates are naturally represented in terms of
-patches, as Section~\ref{sec:patch:examples} demonstrates.
+patches, as Section~\ref{sec:patch:examples} demonstrates, and we use both
+journaling and soft updates as running examples throughout the paper.
 %
-
-demonstrates how
-
-Sections~\ref{sec:patch:examples} and
-\ref{sec:modules:journal} explain journaling with \patches.
+Soft updates form in some ways a more challenging test of the patch
+abstraction: their dependencies are more variable and harder to predict,
+they are widely considered difficult to implement, and the existing FreeBSD
+implementation is quite optimized~\cite{mckusick99soft}.
+%
+We therefore spend a fair amount of space discussing soft updates-like
+dependency orders.
+%
+This should not be construed as a wholesale endorsement of soft updates,
+which rely on a property (atomic block writes) that many disks do not
+provide and which often require more seeks than journaling designs.
 
 External synchrony~\cite{nightingale06rethink} builds on journaling to
 automatically provide strict file system operation ordering for applications,
