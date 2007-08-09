@@ -3,8 +3,8 @@
 \section{\Modules}
 \label{sec:modules}
 
-A complete \Kudos\ configuration is composed of many \modules, somewhat like 
- a finely-grained variant of a stackable file system.
+A \Kudos\ configuration is composed of many \modules\ that cooperate to
+ implement file system functionality.
 %
 There are three major types of \modules.
 %
@@ -27,88 +27,51 @@ allocate file names, and other file system micro-operations.
 %% doesn't have to know how to combine the micro-operations into larger, more
 %% familiar file system operations. 
 A generic CFS-to-\LFS\ \module\ called UHFS
-(``universal high-level file system'') decomposes the larger file write, read,
-append, and other standard operations into \LFS\ micro-operations. 
+(``universal high-level file system'') decomposes familiar VFS operations
+like write, read, and append into \LFS\ micro-operations. 
 %
-File system extensions like those often implemented by stackable file
-systems would generally use the CFS interface; for example, we wrote a
-simple CFS module that provides case-insensitive access to a case-sensitive
-file system.
+%% File system extensions like those often implemented by stackable file
+%% systems would generally use the CFS interface; for example, we wrote a
+%% simple CFS module that provides case-insensitive access to a case-sensitive
+%% file system.
 %
-File system implementations, such as our ext2 and UFS implementations, use
-the \LFS\ interface.
+File system implementations, such as our ext2 and UFS implementations,
+generally use the \LFS\ interface.
 
 
-\Patches\ are explicitly part of the \LFS\ interface.
+Module interfaces include patches explicitly, allowing modules to examine
+and modify dependencies.
 %
-Every \LFS\ function that might modify the file system takes a
+For instance, every \LFS\ function that might modify the file system takes a
 \texttt{\textit{patch\char`\_t **p}} argument.
 %
 Before the function is called, \texttt{*p} should be set to the \patch,
 if any, on which the modification should depend;
 %
-when the function returns, \texttt{*p} will be set to some \patch\
+when the function returns, \texttt{*p} is set to some \patch\
 corresponding to the modification itself.
 %
+\begin{comment}
 (\Noop\ \patches\ allow this interface to generalize to multiple
 dependencies.)
+\end{comment}
 %
 For example, this function is called to append a block to an \LFS\ inode
-(which is called ``\verb+fdesc_t+''):
+\verb+f+:
 
 \begin{small}
 \begin{alltt}
 int (*append_file_block)(LFS_t *module, 
-   fdesc_t *file, uint32_t block, patch_t **p);
+   fdesc_t *f, uint32_t block, patch_t **p);
 \end{alltt}
 \end{small}
 
+\begin{comment}
 \noindent
 This design lets \LFS\ modules examine and modify the dependency structure.
+\end{comment}
 
-\input{journal}
 
-\input{wbcache}
-
-\subsection{Loopback Device}
-\label{sec:modules:loop}
-
-The loopback device is a BD module that uses a file in an \LFS\ module as
-its underlying data store. It is very similar to the device of the same
-name in Linux, but with one critical difference: it is aware of \patches.
-%
-The loopback module preserves its file system's dependencies and forwards
-them to its underlying data store.
-%
-As a result, the data store will honor those dependencies and preserve the
-loopback file system's consistency, even if the data store would normally
-provide no guarantees for consistency of file system data (e.g., it used
-metadata-only journaling).
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[height=2.5in]{fig/figures_1}
-  \caption{A running \Kudos\ configuration. {\it/} is a soft updated
-    file system on an IDE drive; {\it/loop} is an externally journaled
-    file system on loop devices.}
-  \label{fig:kfs-graph}
-\end{figure}
-
-Figure~\ref{fig:kfs-graph} shows an example configuration using the
-loopback module.
-%
-A file system image is mounted with an external journal, both of
-which are loopback block devices stored on the root file system (which uses
-soft updates). The journaled file system's ordering requirements are sent
-through the loopback module as \patches, allowing dependency information to be
-maintained across boundaries that might otherwise lose that information. In
-contrast, without \patches\ and the ability to forward \patches\ through
-loopback devices, BSD cannot express soft updates' consistency requirements
-through loopback devices. The \modules\ in Figure~\ref{fig:kfs-graph} are a
-complete and working \Kudos\ configuration, and although the use of a loopback
-device is somewhat contrived in the example, they are increasingly being used in
-conventional operating systems. For instance, Mac OS X uses them in order to
-allow users to encrypt their home directories.
 
 \subsection{ext2 and UFS}
 
@@ -144,6 +107,64 @@ desired dependencies for the \patches\ they create, they no longer need to
 concern themselves with those \patches---the block device subsystem will track
 and enforce the dependencies.
 
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[height=2.5in]{fig/figures_1}
+  \caption{A running \Kudos\ configuration. {\it/} is a soft updated
+    file system on an IDE drive; {\it/loop} is an externally journaled
+    file system on loop devices.}
+  \label{fig:kfs-graph}
+\end{figure}
+
+
+\input{journal}
+
+\input{wbcache}
+
+\subsection{Loopback}
+\label{sec:modules:loop}
+
+The \Featherstitch\ loopback module demonstrates how pervasive
+support for patches can implement previously unfamiliar dependency
+semantics.
+%
+Like Linux's loopback device, it provides a block device interface that
+uses a file in some other file system as its data store; unlike Linux's
+block device, consistency requirements on this block device are obeyed by
+the underlying file system.
+%% interface provides consistency  for a block device.
+%% demonstrates how is a BD module that uses a file in an \LFS\ module as
+%% its underlying data store. It is very similar to the device of the same
+%% name in Linux, but with one critical difference: it is aware of \patches.
+%
+The loopback module preserves incoming dependencies and forwards
+them to the underlying data store.
+%
+As a result, the data store will honor those dependencies and preserve the
+loopback file system's consistency, even if the data store would normally
+provide no guarantees for consistency of file system data (e.g., it used
+metadata-only journaling).
+
+Figure~\ref{fig:kfs-graph} shows an albeit contrived example
+configuration using the loopback module.
+%
+A file system image is mounted with an external journal, both of
+which are loopback block devices stored on the root file system (which uses
+soft updates). The journaled file system's ordering requirements are sent
+through the loopback module as \patches, allowing dependency information to be
+maintained across boundaries that might otherwise lose that information. In
+contrast, without \patches\ and the ability to forward \patches\ through
+loopback devices, BSD cannot express soft updates' consistency requirements
+through loopback devices. The \modules\ in Figure~\ref{fig:kfs-graph} are a
+complete \Kudos\ configuration.
+
+%%  and although the use of a loopback
+%% device is somewhat contrived in the example, they are increasingly being used in
+%% conventional operating systems. For instance, Mac OS X uses them in order to
+%% allow users to encrypt their home directories.
+
+\begin{comment}
 \subsection{Asynchronous writes}
 \label{sec:modules:unlink}
 
@@ -152,3 +173,4 @@ incoming \patches, allowing the buffer cache to write blocks in any order.
 %
 This implements similar semantics to existing file systems like ext2 in
 asynchronous write mode.
+\end{comment}
