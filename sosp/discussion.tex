@@ -2,48 +2,44 @@
 \label{sec:discussion}
 
 There are several areas in which we would like to improve our work. The obvious
-first area we would like to work on is the performance of \Kudos. We have
-already improved the performance by literally several orders of magnitude over
-the original implementation, but \Kudos\ is still not as fast as it could be --
-and not quite as fast as it needs to be to be a viable option for most computer
-systems.
+first area we would like to work on is the performance of our \Kudos\ prototype.
+%
+We have already improved the performance by at least five orders of magnitude
+over the original implementation, but it is still not as fast as it could be.
+%
+We would also like to explore a variety of extensions to \Kudos. For instance,
+sending \patches\ over network file systems and implementing other consistency
+mechanisms are both avenues for future work.
+%
+Finally, we would like to try using \patchgroups\ for several more complicated
+applications, like databases, to see how well they fit the needed semantics and
+how well they perform.
 
-We would also like to identify places where \Kudos\ can be made more flexible,
-by adding more features to the system and changing the existing parts that make
-these features difficult to add. For instance, we would like to find more
-applications which can take advantage of \patchgroups, and see what changes might
-need to be made to the \patchgroup\ interface in order to facilitate adapting those
-applications.
 
-There are several ways in which the performance can be improved. For instance,
-we create a very large number of \patches, and the sheer number of them can
-cause problems for any algorithm which needs to traverse parts of the \patch\
-dependency graph. We already attack this problem by merging \patches\ using
-several different heuristics to determine when it is safe to do so. However, the
-heuristics are fairly conservative, and further improvements will likely uncover
-additional merging opportunities.
+While the original inspiration for \patches\ came from soft updates, we came to
+like journals more and more compared to soft updates while we developed \Kudos.
+%
+Disks have several properties which contribute to this unexpected reversal.
+First, they are very much not random access devices: seeking is expensive, and
+even when I/O requests are consecutive, the very number of I/O requests turns
+out to be a bottleneck.
+%
+Additionally, few disks actually guarantee to write blocks atomically: it is
+entirely possible for the value of a block to be neither the original nor the
+new value if a crash occurs while it is being written.
 
-The merging \Kudos\ currently performs preserves the data exactly, and only
-alters the graph structure. When files are deleted, it is often the case that
-during the delete operation many blocks are updated but then later freed. It is
-not actually necessary to write the updated versions of the blocks at all in
-this case; they can merely be discarded. A new type of \patch, one which merges
-with those already on the block and indicates that the block need not be written
-(effectively cancelling them out), could help \Kudos\ take advantage of this
-situation.
 
-Another strategy for dealing with the large number of \patches\ is to avoid
-costly traversals altogether by incrementally calculating and propagating
-information about the \patch\ graph. We already do this as well, but there are
-still some places where we must iterate over potentially large lists of
-\patches. For instance, when creating a new \patch, \Kudos\ needs to identify
-other \patches\ on the same block which overlap with the new \patch. This is
-currently one of the larger uses of CPU time in \Kudos. Some optimization has
-already been done to improve the performance of this operation, but the problem
-has not yet been completely solved.
-
-Finally, there are a few additional features that we would like to add to
-\Kudos. For instance, the \LFS\ interface does not currently support sparse
-files, nor does the UHFS \module. We'd also like to improve the journal module,
-to support the stronger data ordering provided by Linux ext3, and to use the
-same format for the journal as ext3.
+Soft updates requires this second guarantee, and it performs much better when
+the seeking and additional I/O requests it does to write metadata are
+comparatively inexpensive.
+%
+Journaling, on the other hand, allows adjacent I/O requrests to be batched
+easily, and it does not require the atomic block write guarantee.
+%
+Even though it can write up to twice as much data, due to the different I/O
+behavior it may even take less time to write it than soft updates would take for
+half as much data.
+%
+As disks get larger and sustained I/O speeds increase faster than seek times or
+I/O bus round trip times, the surprising result is that journaling is looking
+better and better compared to soft updates.
