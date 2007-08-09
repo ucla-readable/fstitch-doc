@@ -184,10 +184,10 @@ endfig;
 
 beginfig(4);
   boxjoin(a.width = b.width; a.height = b.height);
-  patchit.a(btex $p$\strut etex, 0);
-  patchit.b(btex $q$\strut etex, 0);
-  patchit.c(btex $r$\strut etex, 0);
-  patchit.d(btex $s$\strut etex, 0);
+  patchit.a(btex $s$\strut etex, 0);
+  patchit.b(btex $r$\strut etex, 0);
+  patchit.c(btex $q$\strut etex, 0);
+  patchit.d(btex $p$\strut etex, 0);
   a.width=a.height;
 
   d.w-c.e=c.w-b.e=(10,0);
@@ -201,10 +201,10 @@ endfig;
 
 beginfig(6);
   boxjoin(a.width = b.width; a.height = b.height);
-  patchit.a(btex $p$\strut etex, 0);
-  patchit.b(btex $q$\strut etex, 0);
-  patchit.c(btex $r$\strut etex, 0);
-  patchit.d(btex $s$\strut etex, 0);
+  patchit.a(btex $s$\strut etex, 0);
+  patchit.b(btex $r$\strut etex, 0);
+  patchit.c(btex $q$\strut etex, 0);
+  patchit.d(btex $p$\strut etex, 0);
   a.width=a.height;
 
   d.w-c.e=c.w-b.e=(10,0);

@@ -7,13 +7,12 @@ The first optimization reduces space overhead by
 eliminating undo data.
 %
 When a \patch\ $p$ is created, \Kudos\ conservatively detects whether $p$
- might ever need to be reverted:
+ might require reversion:
 %
-that is, whether future patches and dependencies could ever create a state
- where the only way the buffer cache could make progress would be to undo
- $p$.
+that is, whether any possible future patches and dependencies could force
+ the buffer cache to undo $p$ before making further progress.
 %
-If future patches and dependencies could not force
+If no future patches and dependencies could force
  $p$'s reversion, then $p$ does not need undo data.
 %
 The challenge is to detect this condition without predicting the future.

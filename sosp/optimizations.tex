@@ -56,13 +56,18 @@ since here, data blocks will \emph{never} need to be reverted;
 and in larger examples, the effects are even worse.
 
 
-This section shows how \Kudos\ uses generic \patch\
-properties and dependency analysis to reduce the 23 \patches\ and 33,000 bytes
+This section shows how generic \patch\
+properties and dependency analysis can reduce the 23 \patches\ and 33,000 bytes
 of undo data in Figure~\ref{fig:opt}a to the 8 \patches\ and 0 bytes of
 undo data in Figure~\ref{fig:opt}d.
 %
-These optimizations apply transparently to any \Kudos\ file system.
-
+Additional optimizations simplify \Kudos's other main overhead, the CPU
+time required for the buffer cache to find a suitable set of patches to
+write.
+%
+These optimizations apply transparently to any \Kudos\ file system, and as
+we demonstrate in our evaluation, have dramatic effects on real benchmarks
+as well.
 
 \begin{comment}
 

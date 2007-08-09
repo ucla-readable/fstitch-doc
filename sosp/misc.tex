@@ -3,15 +3,15 @@
 \subsection{Other Optimizations}
 \label{sec:patch:misc}
 
-Even with these optimizations, there is only so much
-that can be done with bad sets of dependencies.
+Optimizations can only do so much
+with bad sets of dependencies.
 %
 Just as having too few dependencies can compromise system correctness,
 having too many dependencies, or the wrong dependencies, can non-trivially
-degrade the system performance.
+degrade system performance.
 %
-For example, in both the following \patch\ arrangements, $p$ depends on all
-of $q$, $r$, and $s$, but the left-hand arrangement gives the system more
+For example, in both the following \patch\ arrangements, $s$ depends on all
+of $r$, $q$, and $p$, but the left-hand arrangement gives the system more
 freedom to reorder block writes:
 
 \begin{figure}[htb]
@@ -24,7 +24,7 @@ freedom to reorder block writes:
 \end{figure}
 
 \noindent%
-For example, if $q$, $r$, and $s$ are adjacent on disk, the left-hand
+If $q$, $r$, and $s$ are adjacent on disk, the left-hand
 arrangement can be satisfied with two disk requests while the right-hand
 one will require four.
 %
@@ -32,7 +32,7 @@ Although the arrangements have similar coding difficulty, in several cases
 we discovered that one of our file system implementations was performing
 slowly because it created an arrangement like the one on the right.
 
-Care must also be taken to avoid unnecessary \emph{implicit} dependencies,
+Care must be taken to avoid unnecessary \emph{implicit} dependencies,
 and in particular overlap dependencies.
 %
 For instance, inode blocks contain multiple inodes, and changes to two
@@ -41,36 +41,42 @@ directories and even sometimes for different fields in a summary block like
 the superblock.
 %
 The best results can be obtained from \emph{minimal} \patches\ that change
-one independent field at a time; \Kudos\ will merge these \patches\ when
-appropriate, but if they cannot be merged, minimal \patches\ will lead to
+one independent field at a time.  \Kudos\ will merge these \patches\ when
+appropriate, but if they cannot be merged, minimal \patches\ cause
 fewer \patch\ revert operations and more flexibility in write ordering.
 
-A file system implementation may also be able to detect at runtime
-that a particular state cannot appear on disk, because of its \patch\
-arrangement, and avoid imposing dependencies that are therefore
-unnecessary.
+File system implementations can generate better dependency arrangements
+when they can detect that certain states will never appear on disk.
 %
-For example, a soft updates ordering requires that an inode not be
-cleared until there are no are more referencing directory entries.
+For example, soft updates requires that clearing an inode
+depend on nullifications of all the corresponding directory entries, which
+normally induces dependencies from the inode onto the directory
+entries.
 %
+However, if a directory entry will never exist on disk---for example,
+because a patch to remove the entry merged with the patch that created
+it---then there is no need to require the corresponding dependency.
+%
+Leaving out these dependencies can speed up the system by avoiding circular
+block dependencies, such as those in Figure~\ref{f:soft2hard}, and thus
+avoiding the attendant rollbacks and double writes.
+%
+\begin{comment}
 A dependency from the inode clear onto the directory entry clear is
 sufficient to ensure this property. However, when a directory entry
 will never exist on disk because it is created and removed before the
 creation is committed, the inode clear need not depend on the
 directory entry clear.
+\end{comment}
 %
-The \Kudos\ ext2 module implements this optimization; the module
-detects that a directory entry will never exist on disk when the
-entry's creation and clear \patches\ are merged together.
+The \Kudos\ ext2 module implements this optimization and another, related
+one: if a directory entry will never reference an inode, then the patches
+that clear the corresponding inode bitmap and block bitmap entries need not
+depend on the patch that deleted that directory entry.
 %
-The ext2 module implements a related inode deletion optimization: when
-no directory entry will ever reference the inode then the inode bitmap
-and block bitmap clears need not depend on the inode clear.
-%
-These two file system-level dependency optimizations significantly
-reduce the number of disk writes, number of patches created, and
-amount of undo data allocated to create and delete many files.
-\todo{Provide figure for either of the opts? Figure~\ref{f:ex}b is close\ldots}
+These optimizations significantly reduce the number of disk writes, number
+of patches created, and amount of undo data allocated when files are
+created and deleted within a short time.
 
 %% the changes to update a field in an inode structure
 %% on disk, a \patch\ spanning the entire inode could be created even though
@@ -83,22 +89,27 @@ amount of undo data allocated to create and delete many files.
 
 %% \subsubsection{\Patch\ List Ordering}
 
+\begin{comment}
+%% Declared uninteresting.
 The buffer cache and a few other \modules\ perform better in the
-common case that the \patches\ on a block are listed in order of creation
-time.
+common case that each block's \patches\ are listed in order of creation
+time,
 %
-This improves their performance from $O(n^2)$ to $O(n)$ in the number of
-\patches.
+taking $O(n)$ time to process $n$ patches rather than $O(n^2)$.
 %% in the common case that this order is preserved.
+\end{comment}
 
 Finally, block allocation policies can have a dramatic effect on the number of
-I/O requests required to write changes to the disk. For instance, with
+I/O requests required to write changes to the disk. For instance, soft
+updates requires that  -like dependencies require that data blocks be initialized before
+an indirect block references them.   
 dependencies implementing soft updates, indirect block data cannot be written
 until the referenced blocks have been at least initialized. By allocating an
 indirect block in the middle of a range of data blocks for a file, the data
 blocks must be written as two smaller I/O requests since the indirect block
 cannot be written at the same time. Allocating the indirect block somewhere
-else allows the data blocks to be written in one larger I/O request.
+else allows the data blocks to be written in one larger I/O request, at the
+cost of (depending on readahead policies) a potential slowdown in read performance.
 
 
 \begin{comment}

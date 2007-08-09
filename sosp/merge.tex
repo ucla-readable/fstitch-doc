@@ -303,22 +303,43 @@ further reducing the number of \patches\ and the amount of undo data
 required.
 
 
-Two overlapping \patches\ $p_1$ and $p_2$, with $p_1 \PDepend p_2$, may be
-merged iff it would always be possible to write them at the same time.
+Overlapping \patches\ $p_1$ and $p_2$, with $p_2 \PDepend p_1$, may be
+merged \emph{unless} some possible future patches and dependencies could
+force the buffer cache to undo $p_2$, but not $p_1$.
 %
-Here we may reuse the reasoning developed for \nrb\ \patches\ above: it is
-always possible to write these \patches\ simultaneously if, assuming that
-$p_2$ were \nrb, $p_1$ could also be made \nrb---that is, if $p_1$ will
-never be the head of a block-level cycle terminating at $p_2$.
+Here we may reuse the reasoning developed for \nrb\ \patches\ above,
+arriving at a simpler property.
 %
-The same properties that simplified the creation of \nrb\ \patches\ also help
-us check this property: that is, if no block-level cycle $p_1 \PDepend x
-\PDepend p_2$ exists when $p_1$ is created, then no such block-level cycle
-will ever exist.
-
+If $p_2$ will never be the head of a block-level cycle containing $p_1$,
+then $p_2$ and $p_1$ can always be committed together; and any such
+block-level cycle will exist when $p_2$ is created.
 
 As with \nrb\ \patch\ creation, the \Kudos\ implementation checks a simpler
-property that requires less graph traversal.
+property that limits required graph traversals.
+%
+We experimented with various heuristics to balance CPU expense and missed
+merge opportunities.
+%
+The final heuristic examines all dependency chains of uncommitted patches
+starting at $p_2$.  It succeeds if $p_1$ is not in any of the chains,
+failing conservatively if any of the chains grows too long (more than 10
+links) or there are too many chains.  
+%
+However, some chains cannot induce block-level cycles and are allowed
+regardless of length:
+%
+If $p_1 \PDepend x$ for some $x$, then
+%
+since there are no circular dependencies, any chain from $p_2$ that
+encounters $x$ will never encounter $p_1$ later.  Our heuristic detects
+several easy-to-check instances of this principle, including $h$, a
+hard patch on $p_1$'s block ($p_2 \PDepend h$ by definition).
+%
+We tuned the heuristic to cope with
+long dependency chains created by the Andrew benchmark on soft updates-like
+dependencies.
+%
+\begin{comment}
 %
 It checks that every path starting at $p_1$ fits at least one of the
 following cases:
@@ -370,19 +391,23 @@ following cases:
 \end{xcompactitemize}
 
 \noindent
+\end{comment}
 %
-If all paths fit, then there are no block-level cycles from $p_1$
-to $p_2$, $p_1$ and $p_2$ can have the same lifetime, and $p_1$ can be
-merged into $p_2$ where they overlap.
+If all chains fit, then there are no block-level cycles from $p_2$
+to $p_1$, $p_2$ and $p_1$ can have the same lifetime, and $p_2$ can be
+merged into $p_1$ where they overlap
 %
-(This may require growing $p_2$ to cover $p_1$'s data range.)
+(which may require growing $p_1$'s data range).
 %
-It also simplifies the implementation somewhat to limit overlap
-merging to the case when $p_1$ does not overlap with any other
-\patches, and to limit $p \PDDepend q$ existence checks to just $p$'s
+It also simplifies the implementation to avoid overlap merging when $p_2$
+overlaps with two or more soft patches that do not themselves overlap.
+
+\begin{comment}
+, and to limit $p \PDDepend q$ existence checks to just $p$'s
 and $q$'s two oldest and newest dependencies.
 %
 The rules to overlap merge two bit \patches\ are similar.
+\end{comment}
 
 
 
