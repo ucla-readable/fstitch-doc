@@ -33,7 +33,7 @@ potentially easier to understand and modify.
 %
 Soft updates is in some ways a more challenging test of the patch
 abstraction: its dependencies are more variable and harder to predict,
-it are widely considered difficult to implement, and the existing FreeBSD
+it is widely considered difficult to implement, and the existing FreeBSD
 implementation is quite optimized~\cite{mckusick99soft}.
 %
 We therefore frequently discuss soft updates-like
@@ -96,8 +96,9 @@ BlueFS~\cite{nightingale05speculative} and
 xsyncfs~\cite{nightingale06rethink} to reduce the aggregate performance
 impact of providing strong consistency guarantees.
 %
-In particular, xsyncfs provides users with the appearance of synchronous
-file system ordering without actually blocking applications on each write.
+In particular, xsyncfs provides users with \emph{external synchrony}, which
+has the same consistency guarantees as synchronous file system ordering for
+users, but does not actually block applications on each write.
 %
 Writes are committed in groups using a journaling design, but
 %
@@ -114,8 +115,8 @@ generally; for instance, \Kudos\ patches apply at least conceptually to any
 file system, whereas the xsyncfs implementation assumes a file system like
 ext3.
 %
-Conversely, \Featherstitch\ applications could benefit from the
-apparently-fast strict ordering provided by xsyncfs.
+Conversely, \Featherstitch\ applications could benefit from the the
+combination of strict ordering and nonblocking writes provided by xsyncfs.
 
 \begin{comment}
 written by that transaction, \emph{or} any
@@ -159,14 +160,21 @@ performance in BlueFS~\cite{nightingale05speculative}.
 % "allow the kernel to safely and efficiently handle any metadata layout without understanding the layout itself"
 % \cite{kaashoek97application}
 
-\paragraph{Stackable File Systems}
+%% \paragraph{Stackable File Systems}
 
 % \cite{webber93portable}
 
 Stackable \module\ software for file systems continues to attract active
 research~\cite{rosenthal90evolving, heidemann91layered, skinner93stacking,
 heidemann94filesystem,zadok99extending,
-zadok00fist,wright03ncryptfs,wright06versatility}. Previous
+zadok00fist,wright03ncryptfs,wright06versatility}, as does other extensions
+to file system and disk interfaces~\cite{huang05fs2,sivathanu06typesafe};
+these designs could potentially
+benefit from a patchlike mechanism for representing write-before
+relationships and consistency requirements in an agnostic manner.
+
+\begin{comment}
+Previous
 systems like FiST~\cite{zadok00fist} or GEOM~\cite{geom} generally focus on
 an individual portion of the system and thus restrict both what a \module\
 can do and how \modules\ can be arranged. FiST, for instance, does not
@@ -193,6 +201,8 @@ of these ideas.
 %% systems -- but FS2 is currently specific to ext2, since it deals directly with
 %% low-level disk structures. The \Kudos\ \module\ interface should allow such an
 %% extension to be written in a portable way, giving it the same benefit.
+\end{comment}
+
 
 \paragraph{} \Kudos\ adds to this body of work by generalizing and making
 explicit the write-before relationship that is already present in many
