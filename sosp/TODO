@@ -4,6 +4,7 @@
 - Increase number of benchmark runs to 5 or 10
 - Check that we adequately address reviews
 - Total memory requirements, not just rollback
+- Update opt and imap tables for r4000
 
 * Really Want To Do
 - Improve big postmark perf (lots of reads)
@@ -13,6 +14,7 @@
 - Deal with long/tiny urls
 
 * Want To Do
+- Add file system consistency ordering?
 - Check that we did not forget any todos sent to kudos@
 - Decide how to cite email threads (esp reference's title)
 - More fully explain allocator differences and the effects
