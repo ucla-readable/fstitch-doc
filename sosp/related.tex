@@ -3,21 +3,26 @@
 
 \paragraph{Consistency}
 
+Most modern file systems protect file system integrity in the face of
+possible power failure or crashes via \emph{journaling}, which groups
+operations into transactions that commit
+atomically~\cite{seltzer00journaling}.
+The content and the layout of the
+journal vary in each implementation, but in all cases, the system can use the
+journal to replay (or roll back) any operations that did not complete due to
+the shutdown. A correct recovery procedure, though 
+difficult to write~\cite{yang04using}, avoids time-consuming
+\emph{fsck}-like file system
+checks on reboot after a crash.  Sections~\ref{sec:patch:examples} and
+\ref{sec:modules:journal} explain journaling with \patches.
+
 Soft updates~\cite{ganger00soft} significantly lowers the overhead required to
 provide file system consistency. By carefully ordering writes to disk, soft
 updates avoids the need for synchronous writes to disk or duplicate writes to
 a journal. Soft updates also guarantees a strong level of consistency after a
 crash, enough so that the system can avoid time-consuming file system
 consistency checks using a utility like \emph{fsck}. 
-%
-A comparable approach to protecting the integrity of the file
-system~\cite{seltzer00journaling} is to write
-upcoming operations to a journal first. The content and the layout of the
-journal vary in each implementation, but in all cases, the system can use the
-journal to play out (or roll back) the operations that did not complete as a
-result of a crash. Thus, \emph{fsck} can be avoided by consulting the journal
-when recovering from a crash.  Sections~\ref{sec:patch:examples} and
-\ref{sec:modules:journal} explain journaling with \patches.
+
 
 External synchrony~\cite{nightingale06rethink} builds on journaling to
 automatically provide strict file system operation ordering for applications,
