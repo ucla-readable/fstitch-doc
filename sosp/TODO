@@ -17,6 +17,7 @@
 - Metapost imap patchgroup figure?
 - Check that we did not forget any todos sent to kudos@
 - Decide how to cite email threads (esp reference's title)
+- Note that we do not know why kudos is slowish at postmark?
 - More fully explain allocator differences and the effects
 - Patchgroup interface: mention threads?
 
