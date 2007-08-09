@@ -346,7 +346,8 @@ constant number of requests.
 \Kudos\ with the unmodified server makes significantly many more
 requests than Linux ext3; we believe this is due to \Kudos\ also
 committing file system summary information that Linux does not commit
-for the \texttt{fsync} system call.
+for the \texttt{fsync} system call. \Kudos\ with \patchgroups\
+also currently has this limitation.
 
 \begin{figure}[t]
 \centering
