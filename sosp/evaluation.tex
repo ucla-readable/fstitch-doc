@@ -203,14 +203,15 @@ smaller account for about 51\% of all \rb\ \patches.}
 \small
 \begin{tabular}{@{}lrrrr@{}}
 \textbf{System} & \multicolumn{1}{c}{\textbf{Untar}} & \multicolumn{1}{c}{\textbf{Delete}} & \multicolumn{1}{c}{\textbf{PostMark}} & \multicolumn{1}{c}{\textbf{Andrew}} \\ \hline
-% Results are from r4000, mean of 3 runs
+% Results are from r4037, mean of 5 runs
 \multicolumn{3}{@{}l}{\emph{\Kudos\ ext2}\raise2pt\hbox{\strut}} & & \\
-\safe{soft updates} & \safe{5.8 [1.7]} & \safe{0.9 [0.2]} & \safe{47.4 [13.2]} & \safe{37.8 [4.2]} \\
-\safe{meta journal} & \safe{9.0 [2.8]} & \safe{1.4 [0.5]} & \safe{73.2 [16.7]} & \safe{37.1 [4.1]} \\
-\safe{full journal} & \safe{12.7 [3.3]} & \safe{1.4 [0.5]} & \safe{95.2 [22.3]} & \safe{37.5 [4.4]} \\
-\unsafe{async} & \unsafe{4.3 [1.5]} & \unsafe{0.7 [0.2]} & \unsafe{45.2 [~~8.3]} & \unsafe{36.8 [4.1]} \\
-\unsafe{full journal} & \unsafe{11.1 [3.9]} & \unsafe{1.2 [0.5]} & \unsafe{86.6 [25.7]} & \unsafe{37.1 [4.4]} \\ \hline
+\safe{soft updates} & \safe{6.4 [1.9]} & \safe{0.8 [0.2]} & \safe{47.0 [13.5]} & \safe{36.9 [4.1]} \\
+\safe{meta journal} & \safe{8.5 [2.6]} & \safe{1.4 [0.5]} & \safe{70.8 [15.6]} & \safe{36.7 [4.2]} \\
+\safe{full journal} & \safe{12.8 [3.2]} & \safe{1.3 [0.5]} & \safe{93.8 [19.7]} & \safe{36.9 [4.4]} \\
+\unsafe{async} & \unsafe{4.3 [1.4]} & \unsafe{0.7 [0.2]} & \unsafe{45.4 [~~7.3]} & \unsafe{36.4 [4.1]} \\
+\unsafe{full journal} & \unsafe{11.1 [3.8]} & \unsafe{1.1 [0.5]} & \unsafe{83.9 [23.7]} & \unsafe{36.7 [4.3]} \\ \hline
 
+% Results mean of 3 runs
 \multicolumn{3}{@{}l}{\emph{Linux}\raise2pt\hbox{\strut}} & & \\
 \safe{ext3 writeback} & \safe{19.5 [1.0]} & \safe{4.5 [0.3]} & \safe{55.7 [~~3.7]} & \safe{37.8 [4.0]} \\
 \safe{ext3 journal} & \safe{20.3 [1.2]} & \safe{4.6 [0.2]} & \safe{82.5 [~~5.0]} & \safe{38.2 [4.0]} \\
