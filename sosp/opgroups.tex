@@ -63,9 +63,9 @@ The \patchgroup\ interface is as follows:
 \begin{scriptsize}
 \begin{alltt}
   typedef int pg_t;          pg_t \textbf{pg_create}(void);
-  int \textbf{pg_depend}(pg_t after, pg_t before);
   int \textbf{pg_engage}(pg_t pg);    int  \textbf{pg_disengage}(pg_t pg);
   int \textbf{pg_sync}(pg_t pg);      int  \textbf{pg_close}(pg_t pg);
+  int \textbf{pg_depend}(pg_t after, pg_t before);
 \end{alltt}
 \end{scriptsize}
 
@@ -182,17 +182,27 @@ journal act like a full journal for those data blocks.
 We studied the \patchgroup\ interface by adding \patchgroup\ support to three
 applications: the gzip compression utility, the Subversion version control
 client, and the UW IMAP mail server daemon.
+%
+These applications were chosen for their relatively simple and explicit
+consistency requirements; we intended to test how well patchgroups
+implement existing application requirements, not to create new mechanisms.
+One effect of this choice is that, after some modification, versions of
+these applications could attain similar consistency guarantees if run on a
+fully-journaled file system with a conventional API.  Patchgroups, however,
+make the required guarantees explicit, can be implemented on other types of
+file system, and introduce no additional cost on fully-journaled systems.
 
 % discussion potential gains (in addition to actual gains)?
 
 \paragraph{Gzip}
 \label{sec:patchgroup:gzip}
 
-Our first test showed that simple consistency requirements were simple to
-add.  We updated gzip to use \patchgroups\ that ensure the input file's
-removal is not committed before the output file's data is written, so that
-a crash does not lose both files. The update adds 10 lines of code to gzip
-v1.3.9.
+%% Our first test showed that simple consistency requirements were simple to
+%% add.  
+Our modified gzip uses \patchgroups\ to make the input file's
+removal depend on the output file's data being written; thus,
+a crash cannot lose both files. The update adds 10 lines of code to gzip
+v1.3.9: simple consistency requirements are simple to add.
 
 \paragraph{Subversion}
 \label{sec:patchgroup:svn}
@@ -213,8 +223,7 @@ where each entry in Subversion's journal is either idempotent or
 atomic.
 %
 Depending on the file system, however, even with this precaution a
-working copy operation may not be protected against an operating
-system or hardware crash.
+working copy operation may not be protected against a crash.
 %
 For example, the journal file is marked as complete by moving it from
 its temporary to live location.
@@ -224,19 +233,17 @@ the file data, and crash before completing the file data commit, then
 a subsequent journal replay could corrupt the working copy.
 
 The working copy library could ensure a safe commit ordering by
-syncing files as necessary; the Subversion server (repository) library
-takes this approach.
+syncing files as necessary. The Subversion server (repository) library
+takes this approach, but
 %
-However, as is common for non-server applications, the Subversion
+the Subversion
 developers deemed this approach too slow to be worthwhile at the
 client~\cite{svntradeoff}.
 %
-Instead, the working copy library takes advantage of two file system
-ordering properties ensured by ordered data and full data journaling, such
-as is implemented by ext3.
+Instead, the working copy library assumes that
 %
-First, all preceding writes to a file's data are committed before the file
-is renamed,
+first, all preceding writes to a file's data are committed before the file
+is renamed;
 %
 and second, metadata updates are effectively committed in their system call
 order.
@@ -249,7 +256,7 @@ on many systems; for example, neither NTFS nor BSD UFS with soft
 updates provide this property.
 %
 Additionally, non-journaled systems such as BSD UFS with soft updates
-do not provide the metadata ordering property; on such systems the
+do not provide the metadata ordering property.  On such systems the
 journal file's installation may precede earlier file installations,
 leaving the working copy in an inconsistent state.
 

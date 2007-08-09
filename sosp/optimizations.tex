@@ -51,9 +51,11 @@ The \patches\ slow down the buffer cache system by making graph traversals
 more expensive;
 %
 storing undo data for \patches\ on data blocks is particularly painful
-since here, data blocks will \emph{never} need to be reverted;
+here, as data blocks will \emph{never} need to be reverted;
 %
-and in larger examples, the effects are even worse.
+and in larger examples, the effects are even worse: when running the
+benchmarks described in \S\ref{eval}, unoptimized \Kudos\ allocates twice
+as much memory for undo data as for cached block data, or even more.
 
 
 This section shows how generic \patch\
