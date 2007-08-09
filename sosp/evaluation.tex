@@ -289,7 +289,7 @@ We evaluate the performance of the \patchgroup-enabled UW IMAP mail
 server (\S\ref{sec:patchgroup:uwimap}) by benchmarking moving 1,000
 messages from one folder to another.
 %
-To move the messages the client selects the source mailbox (containing
+To move the messages, the client selects the source mailbox (containing
 1,000 2~kB messages), creates a new mailbox, copies each message to
 the new mailbox and marks each source message for deletion, expunges
 the marked messages, commits the mailboxes, and logs out.
@@ -308,9 +308,9 @@ copy),
 %
 \Kudos\ with the \patchgroup-enabled server (sync only at the end),
 %
-and Linux and \Kudos\ with the server modified to take advantage of
-fully journaled file systems (changes are effectively committed
-linearly, so sync only at the end).
+and Linux and \Kudos\ with the server modified to assume and take
+advantage of fully journaled file systems (changes are effectively
+committed linearly, so sync only at the end).
 
 Unsafe \Kudos\ and Linux configurations complete in about 1.5~seconds;
 we do not include their results among the safe configurations in
