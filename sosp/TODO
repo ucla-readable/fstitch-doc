@@ -13,6 +13,7 @@
 
 * Want To Do
 - Add file system consistency ordering?
+- Metapost patchgroup figures?
 - Check that we did not forget any todos sent to kudos@
 - Decide how to cite email threads (esp reference's title)
 - More fully explain allocator differences and the effects
