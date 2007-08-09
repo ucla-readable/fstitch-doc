@@ -3,8 +3,8 @@
 \section{\Modules}
 \label{sec:modules}
 
-A complete \Kudos\ configuration is composed of many \modules, making it
-in some sense a finer-grained variant of a stackable file system.
+A complete \Kudos\ configuration is composed of many \modules, somewhat like 
+ a finely-grained variant of a stackable file system.
 %
 There are three major types of \modules.
 %
@@ -15,17 +15,18 @@ conventional block device interface with interfaces such as ``read block'' and
 Closest to the system call interface are \emph{common file system} (CFS)
 \modules, which have an interface similar to VFS~\cite{kleiman86vnodes}. 
 %
-\Kudos\ also supports an intermediate interface between BD and CFS.
-%
-This \emph{low-level file system} (\LFS) interface helps divide file system
-implementations into code common across block-structured file systems and
-code specific to a given file system layout.
+In between these interfaces are modules implementing a  \emph{low-level file
+system} (\LFS) interface, which helps divide file system implementations
+into code common across block-structured file systems and code specific to
+a given file system layout.
 %
 The \LFS\ interface has functions to allocate blocks, add blocks to files,
-allocate file names, and other file system micro-operations. A \module\
-implementing the \LFS\ interface defines how bits are laid out on the disk, but
-doesn't have to know how to combine the micro-operations into larger, more
-familiar file system operations. A generic CFS-to-\LFS\ \module\ called UHFS
+allocate file names, and other file system micro-operations. 
+%% A \module\
+%% implementing the \LFS\ interface defines how bits are laid out on the disk, but
+%% doesn't have to know how to combine the micro-operations into larger, more
+%% familiar file system operations. 
+A generic CFS-to-\LFS\ \module\ called UHFS
 (``universal high-level file system'') decomposes the larger file write, read,
 append, and other standard operations into \LFS\ micro-operations. 
 %
