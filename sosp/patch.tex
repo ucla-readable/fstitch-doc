@@ -10,6 +10,7 @@
 %\newcommand{\PBlock}[1]{\ensuremath{B_{#1}}}
 %\newcommand{\PBlock}[1]{\ensuremath{B[{#1}]}}
 \newcommand{\PBlock}[1]{\ensuremath{\textit{blk}[{#1}]}}
+\newcommand{\PB}{\ensuremath{B}}
 %\newcommand{\PMemst}{\ensuremath{\textit{mem}}}
 %\newcommand{\PInfst}{\ensuremath{\textit{flight}}}
 %\newcommand{\PDiskst}{\ensuremath{\textit{disk}}}
@@ -102,10 +103,10 @@ The sets $\PDisk$, $\PMem$, and $\PInf$ represent all committed,
 
 Patch $p$'s block is written $\PBlock{p}$.
 %
-Given a block $B$, we write $\PDisk[B]$ for the set of committed
- patches with block $B$, or in notation $\PDisk[B] = \{p\in\PDisk\mid\PBlock{p}=B\}$.
+Given a block $\PB$, we write $\PDisk[\PB]$ for the set of committed
+ patches with block $\PB$, or in notation $\PDisk[\PB] = \{p\in\PDisk\mid\PBlock{p}=\PB\}$.
 %
-$\PInf[B]$ and $\PMem[B]$ are defined similarly.
+$\PInf[\PB]$ and $\PMem[\PB]$ are defined similarly.
 
 %%  is represented as a set containing
 %%  all patches that affect that block, including $p$ itself.
@@ -118,8 +119,8 @@ We can now model disk controllers' behavior: they write in-flight patches one
  block at a time, as follows.
 %
 \begin{tabbing}
-\qquad \quad 1. Pick some block $B$ with $\PInf[B] \neq \emptyset$. \\
-\qquad \quad 2. Commit and acknowledge each patch in $\PInf[B]$.
+\qquad \quad 1. Pick some block $\PB$ with $\PInf[\PB] \neq \emptyset$. \\
+\qquad \quad 2. Commit and acknowledge each patch in $\PInf[\PB]$.
 \end{tabbing}
 %
 \noindent
@@ -150,8 +151,8 @@ Some file system designs, such as soft updates, rely on block write
 %%  updates, it \emph{suffices} only if the underlying storage system
 %%  writes blocks atomically.
 %
-soft updates expects that if the disk fails while a block $B$ is
- in flight, then $B$'s value on recovery must equal either the old value or
+soft updates expects that if the disk fails while a block $\PB$ is
+ in flight, then $\PB$'s value on recovery must equal either the old value or
  the new value.
 %
 Most journal designs do not require this, and include recovery procedures
@@ -199,7 +200,7 @@ $\PBlock{p}$ & patch $p$'s block \\
 \noalign{\vskip3pt}
 $\PDisk, \PMem, \PInf$ & the sets of all committed, uncommitted, and in-flight \\
         & \patches, respectively \\
-$\PDisk[B], \PMem[B], \PInf[B]$ & committed/uncommitted/in-flight patches on block $B$ \\
+$\PDisk[\PB], \PMem[\PB], \PInf[\PB]$ & committed/uncommitted/in-flight patches on block $\PB$ \\
 \noalign{\vskip3pt}
 $q \PDepend p$ & $q$ depends on $p$ ($p$ must be written before $q$) \\
 $\PDepset{p}$ & $p$'s dependencies: $\{ x \mid p \PDepend x \}$ \\
@@ -294,32 +295,32 @@ Since, as described above, the disk controller can write blocks in any
 that in-flight blocks are independent.  This is precisely stated
 by the \textbf{in-flight safety property:}
 %
-\[ \text{For any block $B$,~~} \PDepset{\PInf[B]} \subseteq \PDisk \cup \PInf[B] . \]
+\[ \text{For any block $\PB$,~~} \PDepset{\PInf[\PB]} \subseteq \PDisk \cup \PInf[\PB] . \]
 %
 \begin{comment}
 %% Do we need this comment?
-(The union with $\PInf[B]$ is necessary for the case of multiple in-flight
+(The union with $\PInf[\PB]$ is necessary for the case of multiple in-flight
 \patches\ on the same block.)
 \end{comment}
 %
-Given this, $\PDepset{\PInf[B]} \cap \PDepset{\PInf[B']} \subseteq \PDisk$ for
- any $B' \neq B$, and the disk controller can write in-flight blocks
+Given this, $\PDepset{\PInf[\PB]} \cap \PDepset{\PInf[\PB']} \subseteq \PDisk$ for
+ any $\PB' \neq \PB$, and the disk controller can write in-flight blocks
  in any order and still preserve disk safety.
 %
 Finally, to uphold the in-flight safety property, the buffer cache must
  write blocks as follows:
 %
 \begin{tabbing}
-\quad \quad Pick some block $B$ with $\PMem[B] \neq \emptyset$ and $\PInf[B] =
+\quad \quad Pick some block $\PB$ with $\PMem[\PB] \neq \emptyset$ and $\PInf[\PB] =
 \emptyset$. \\
-\quad \quad Pick some $P \subseteq \PMem[B]$ with $\PDepset{P} \subseteq P \cup
+\quad \quad Pick some $P \subseteq \PMem[\PB]$ with $\PDepset{P} \subseteq P \cup
 \PDisk$. \\
 \quad \quad Move each $p \in P$ to $\PInf$ (in-flight).
 \end{tabbing}
 %
 \noindent
 %
-We require that $\PInf[B] = \emptyset$ to ensure that at most one version of
+We require that $\PInf[\PB] = \emptyset$ to ensure that at most one version of
  a block is in flight at any time.
 
 In summary, the main \Featherstitch\ implementation challenge is to design

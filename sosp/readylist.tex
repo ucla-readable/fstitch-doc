@@ -42,11 +42,11 @@ into a \emph{ready list} on its containing block.
 The buffer cache, then, can immediately tell whether any of a block's
 patches are writable by examining its ready list.
 
-To write a block $B$, the buffer cache initially populates the set $P$ with the
+To write a block $\PB$, the buffer cache initially populates the set $P$ with the
 contents of the ready list.
 %
 While moving a patch $p$ into $P$, \Kudos\ checks whether there exist
-dependencies $q \PDDepend p$ where $q$ is also on block $B$.
+dependencies $q \PDDepend p$ where $q$ is also on block $\PB$.
 %
 The system can potentially write $q$ at the same time as $p$, so $q$'s
 counts are updated as if $p$ has already committed.
@@ -54,7 +54,7 @@ counts are updated as if $p$ has already committed.
 This may make $q$ ready, after which it in turn is added to $P$.
 %
 (This premature accounting is safe because the system won't try to write
-$B$ again until $p$ actually commits.)
+$\PB$ again until $p$ actually commits.)
 
 
 On-line maintenance of the ready counts adds some cost to several \patch\

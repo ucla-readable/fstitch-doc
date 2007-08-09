@@ -148,18 +148,18 @@ need to be reverted and omits their undo data. We call these \emph{\nrb}
 necessary to differentiate them.)
 %
 Since a \nrb\ \patch\ cannot be reverted, a write of any \patches\
-on block $B$ must include all \nrb\ \patches\ on $B$. To accordingly
+on block $\PB$ must include all \nrb\ \patches\ on $\PB$. To accordingly
 update our formal model we define a new set of \patches, \PHard, which
-contains all \nrb\ \patches. We write \PHard[B] to restrict the set
-to block $B$\todo{Introduce \PSoft\ and \PSoft[B].}:
+contains all \nrb\ \patches. We write \PHard[\PB] to restrict the set
+to block $\PB$\todo{Introduce \PSoft\ and \PSoft[\PB].}:
 
 \begin{tabbing}
 \textbf{Write block.} \\
 \quad Pick some block $b$ with $\PMem[b] \neq \emptyset$. \\
 \quad Pick some $P \subseteq \PMem[b]$ with $\PDepset{P} \subseteq P \cup
-\PDisk$ and $\PHard[B] \subseteq P$. \\
+\PDisk$ and $\PHard[\PB] \subseteq P$. \\
 \quad Move each $p \in P$ to $\PInf$ (in-flight). \\
-\quad For each $p \in \PMem[b]-P$, set $\PDDepset{p} \gets \PDDepset{p}
+\quad For each $p \in \PMem[\PB]-P$, set $\PDDepset{p} \gets \PDDepset{p}
 \cup P$.
 \end{tabbing}
 
@@ -170,8 +170,8 @@ To avoid (expensive) dependency traversals to determine whether a new
 \Kudos\ conservatively identifies \nrb\ \patches\ using only local
 dependency information.
 %
-\Kudos\ detects that a new \patch\ on block $b$ may need to be reverted if:
-\todo{Which form is easier to read? Can we write \(\PMem - \PMem[b] - \PEmpty\) more concisely?}
+\Kudos\ detects that a new \patch\ on block $\PB$ may need to be reverted if:
+\todo{Which form is easier to read? Can we write \(\PMem - \PMem[\PB] - \PEmpty\) more concisely?}
 %
 \todo{Actually, our implementation also uses in flight \patches. Can we make
 it not?}

@@ -34,8 +34,8 @@ There's no need for file system modules to detect and enforce such
 dependencies themselves.
 
 
-For each block $B$, \Kudos\ maintains a list of all \patches\ with
-$\PBlock{p} = B$.
+For each block $\PB$, \Kudos\ maintains a list of all \patches\ with
+$\PBlock{p} = \PB$.
 %
 However, it does not track committed \patches; when
 \patch\ $p$ commits, \Kudos\ destroys $p$'s data structure and removes all
