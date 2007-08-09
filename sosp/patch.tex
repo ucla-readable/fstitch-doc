@@ -216,15 +216,16 @@ $\PDDepset{p}$ & $p$'s direct dependencies: $\{ x \mid p \PDDepend x \}$ \\
 
 \subsection{Dependencies}
 
-A patch-based file system implementation represents write-before
+A patch-based storage system implementation represents write-before
  relationships using an explicit \textbf{dependency} relation.
 %
-The storage layer doesn't understand dependencies; instead, the file system
- maintains dependencies and passes blocks to the storage layer in an
+The disk controller and lower layers don't understand dependencies; instead,
+ the system
+ maintains dependencies and passes blocks to the controller in an
  order that preserves dependency semantics.
 %
 Patch $q$ \emph{depends on} patch $p$, written $q \PDepend p$,
- when the file system requires that $p$ be committed before $q$.
+ when the storage system must commit $p$ before $q$.
 %
 (As a special case, if $p$ and $q$ are on the same block, they may be
  committed at the same time.)
@@ -288,7 +289,7 @@ dependencies.
 \end{comment}
 %
 Since, as described above, the disk controller can write blocks in any
- order, a \Kudos\ file system must also ensure
+ order, a \Kudos\ storage system must also ensure
 that in-flight blocks are independent.  This is precisely stated
 by the \textbf{in-flight safety property:}
 %

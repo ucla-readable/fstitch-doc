@@ -9,20 +9,28 @@ operations into transactions that commit
 atomically~\cite{seltzer00journaling}.
 The content and the layout of the
 journal vary in each implementation, but in all cases, the system can use the
-journal to replay (or roll back) any operations that did not complete due to
-the shutdown. A correct recovery procedure, though 
-difficult to write~\cite{yang04using}, avoids time-consuming
+journal to replay (or roll back) any transactions that did not complete due to
+the shutdown. A recovery procedure, if correct~\cite{yang04using}, 
+avoids time-consuming
 \emph{fsck}-like file system
-checks on reboot after a crash.  Sections~\ref{sec:patch:examples} and
+checks on reboot after a crash in favor of simple journal operations.
+
+Soft updates~\cite{ganger00soft} is another important mechanism for
+ensuring post-crash consistency. Carefully managed write orderings
+avoid the need for synchronous writes to disk or duplicate writes to
+a journal; only relatively harmless inconsistencies, such as leaked blocks,
+are allowed to appear on the file system. As in journaling, soft updates
+can avoid \emph{fsck} after a crash, although a background \emph{fsck} is
+required to recover leaked storage.
+
+Both journaling and soft updates are naturally represented in terms of
+patches, as Section~\ref{sec:patch:examples} demonstrates.
+%
+
+demonstrates how
+
+Sections~\ref{sec:patch:examples} and
 \ref{sec:modules:journal} explain journaling with \patches.
-
-Soft updates~\cite{ganger00soft} significantly lowers the overhead required to
-provide file system consistency. By carefully ordering writes to disk, soft
-updates avoids the need for synchronous writes to disk or duplicate writes to
-a journal. Soft updates also guarantees a strong level of consistency after a
-crash, enough so that the system can avoid time-consuming file system
-consistency checks using a utility like \emph{fsck}. 
-
 
 External synchrony~\cite{nightingale06rethink} builds on journaling to
 automatically provide strict file system operation ordering for applications,

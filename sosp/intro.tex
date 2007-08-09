@@ -72,7 +72,7 @@ It also lets applications modify dependency structures: a
  storage system to follow.
 
 
-The \patch\ abstraction's uniformity may simplify
+A uniform and pervasive \patch\ abstraction may simplify the
  implementation of, extension of, and experimentation with mechanisms for
  ensuring file system consistency and reliability.
 %
@@ -169,11 +169,11 @@ As a result, the loosely-coupled \modules\ that implement a file system
 \end{comment}
 
 
-Production file system implementations achieve consistency and write before
- relationships without sacrificing performance via a variety of file
- system specific optimizations.
+Though production file systems use system-specific optimizations to achieve
+ consistency without sacrificing performance, we tried to achieve good
+ performance in a general way.
 %
-We found that a naive \patch-based implementation scaled terribly,
+A naive \patch-based implementation scaled terribly,
  spending far more space and time on dependency manipulation than
  conventional systems.
 %
