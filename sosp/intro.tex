@@ -63,11 +63,12 @@ This lets file system implementations specify a
  a write order that honors that relationship.
 %
 It lets other storage system components examine and
- modify dependency structures independent of the file system's layout.
+ modify dependency structures independent of the file system's layout,
+ possibly even changing one consistency mechanism into another.
 %
-It even allows applications to modify dependency structures: an example
- user-level interface called \emph{\patchgroups} lets applications access
- \patches\ and thereby define consistency policies for the underlying
+It also lets applications modify dependency structures: a
+ user-level interface called \emph{\patchgroups} shows that applications
+ can access \patches\ and define consistency policies for the underlying
  storage system to follow.
 
 
