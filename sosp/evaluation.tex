@@ -90,36 +90,36 @@ the Ion window manager, version 2-20040729.
 \small
 \begin{tabular}{@{}lrrrr@{}}
 \textbf{Optimization}
-        & \textbf{\Patches} & \textbf{Undo data} & \textbf{Malloc} & \textbf{CPU} \\
+        & \textbf{\# \Patches} & \textbf{Undo data} & \textbf{System time} \\ % Malloc
 % Results are from r4020, but only for 2 runs
 % NOTE: also update numbers in \patchoptundo and \patchoptcount
 \hline
 \multicolumn{4}{@{}c@{}}{\textbf{Untar test}\raise2pt\hbox{\strut}} \\
-None            &   619,740 &   459.41MB &   773MB & 3.44s \\
-\Nrb\ \patches\ &   445,927 &   210.88MB &   515MB & 3.09s \\
-Overlap merge   &   109,152 &   260.00MB &   544MB & 2.18s \\
-Both            &    67,363 &     0.33MB &   293MB & 2.33s \\
+None              &   619,740 &   459.41~MB &  3.44~sec \\ % 773~MB
+\Nrb\ \patches\   &   445,927 &   210.88~MB &  3.09~sec \\ % 515~MB
+Overlap merging   &   109,152 &   260.00~MB &  2.18~sec \\ % 544~MB
+Both              &    67,363 &     0.33~MB &  2.33~sec \\ % 293~MB
 \hline
 
 \multicolumn{4}{@{}c@{}}{\textbf{Delete test}\raise2pt\hbox{\strut}} \\
-None            &   299,089 &     1.43MB &    48MB & 0.85s \\
-\Nrb\ \patches\ &    41,113 &     0.90MB &    20MB & 0.29s \\
-Overlap merge   &    54,665 &     0.94MB &    21MB & 0.33s \\
-Both            &     1,800 &     0.00MB &    13MB & 0.19s \\
+None              &   299,089 &     1.43~MB &  0.85~sec \\ % 48~MB
+\Nrb\ \patches\   &    41,113 &     0.90~MB &  0.29~sec \\ % 20~MB
+Overlap merging   &    54,665 &     0.94~MB &  0.33~sec \\ % 21~MB
+Both              &     1,800 &     0.00~MB &  0.19~sec \\ % 13~MB
 \hline
 
 \multicolumn{4}{@{}c@{}}{\textbf{PostMark test}\raise2pt\hbox{\strut}} \\
-None            & 4,591,533 & 3,175.28MB & 5,347MB & 26.06s \\
-\Nrb\ \patches\ & 2,561,815 & 1,583.16MB & 3,672MB & 20.44s \\
-Overlap merge   &   542,665 & 1,587.81MB & 3,649MB & 13.50s \\
-Both            &   633,382 &     0.10MB & 2,073MB & 13.62s \\
+None              & 4,591,533 & 3,175.28~MB & 26.06~sec \\ % 5,347~MB
+\Nrb\ \patches\   & 2,561,815 & 1,583.16~MB & 20.44~sec \\ % 3,672~MB
+Overlap merging   &   542,665 & 1,587.81~MB & 13.50~sec \\ % 3,649~MB
+Both              &   633,382 &     0.10~MB & 13.62~sec \\ % 2,073~MB
 \hline
 
 \multicolumn{4}{@{}c@{}}{\textbf{Andrew test}\raise2pt\hbox{\strut}} \\
-None            &    70,922 &    64.09MB &    97MB & 4.30s \\
-\Nrb\ \patches\ &    50,680 &    36.18MB &    69MB & 4.32s \\
-Overlap merge   &    12,479 &    27.91MB &    60MB & 4.21s \\
-Both            &    10,118 &     0.03MB &    31MB & 4.18s \\
+None              &    70,922 &    64.09~MB &  4.30~sec \\ % 97~MB
+\Nrb\ \patches\   &    50,680 &    36.18~MB &  4.32~sec \\ % 69~MB
+Overlap merging   &    12,479 &    27.91~MB &  4.21~sec \\ % 60~MB
+Both              &    10,118 &     0.03~MB &  4.18~sec \\ % 31~MB
 \end{tabular}
 \caption{Effectiveness of \Kudos\ optimizations.}
 \label{f:optdata}
@@ -261,49 +261,40 @@ correct values (an expected discrepancy after a soft updates crash).
 % #reviewers who want measurements of all case studies: 1
 % #reviewers who want measurements of at least svn and imap studies: 2
 
-To evaluate the performance of the \patchgroup-enabled UW IMAP mail
-server (\S\ref{sec:patchgroup:uwimap}) we benchmark moving 1,000
-messages.
+We evaluate the performance of the \patchgroup-enabled UW IMAP mail
+server (\S\ref{sec:patchgroup:uwimap}) by moving 1,000 messages.
 %
 To move the messages the client selects the source mailbox (containing
 1,000 2~kB messages), creates a new mailbox, copies each message to
 the new mailbox and marks each source message for deletion, expunges
 the marked messages, commits the mailboxes, and logs out.
 
-Figure~\ref{fig:imap-compare} shows the results.
+Figure~\ref{fig:imap-compare} shows the results for safe file system
+configurations,
 %
-We divide configurations into the two categories unsafe (drive cache
-durability only, a message can be lost if the system loses power) and safe
-(drive platter durability).
-%
-We report total time, system CPU time, and the number of disk write
+reporting total time, system CPU time, and the number of disk write
 requests (an indicator of the number of required seeks in safe
 configurations).
 %
 We benchmark
 %
-\Kudos\ and Linux with the unmodified server (fsync after each message
+\Kudos\ and Linux with the unmodified server (sync after each message
 copy),
 %
 \Kudos\ with the \patchgroup-enabled server (sync only at the end),
 %
-and Linux with a server modified to presume a fully journaled file
-system (fsync only at the end).
+and Linux with a server modified to use fully journaled file systems
+(sync only at the end).
 %
-Figure~\ref{fig:imap-compare} groups similar results, reporting each
-of the following with one entry:
-%
-\Kudos\ meta and full journal modes,
-%
-Linux ordered and journal modes,
-%
-and unsafe/safe \Kudos\ asynchronous mode with/without \patchgroups.
+\Kudos\ meta and full journal modes perform similarly, as do Linux
+ext3 writeback, ordered, and full journal modes;
+Figure~\ref{fig:imap-compare} shows one result for \Kudos\ journal
+modes and one result for Linux journal modes.
 
 Safe journaled \Kudos\ with \patchgroups\ performs at least as well as
-all other \Kudos\ and all Linux configurations, including the unsafe
-configurations. Safe journaled \Kudos\ with \patchgroups\ is 11--13
-times faster than safe Linux ext2 or ext3 with the unmodified server
-and even up to 20\% faster than unsafe Linux ext2 or ext3.
+all other \Kudos\ and all Linux configurations. Safe journaled \Kudos\
+with \patchgroups\ is 11--13 times faster than safe Linux ext3 with
+the unmodified server.
 %
 \Kudos\ soft updates mode with \patchgroups\ is significantly slower
 than \Kudos\ journal modes. As the number of write requests indicate,
@@ -314,7 +305,7 @@ number of copies atomically, using only a small constant number of
 requests.
 %
 \Kudos\ with the unmodified server makes significantly many more
-requests than Linux ext2/ext3; we believe this is due to \Kudos\ also
+requests than Linux ext3; we believe this is due to \Kudos\ also
 committing file system summary information that Linux does not commit
 for the \texttt{fsync} system call.
 %
@@ -322,55 +313,53 @@ for the \texttt{fsync} system call.
 
 \begin{figure}[t]
 \centering
-\begin{tabular}{@{}lllrr@{}}
-\textbf{Proto} & \textbf{System} & \textbf{File System} & \textbf{Time} & \textbf{Writes} \\ \hline
+\begin{tabular}{@{}llrr@{}}
+\textbf{File System} & \textbf{Consistency protocol} & \textbf{Time} & \textbf{Writes} \\ \hline
 
 % Results are from r3933
-% Commented out results are from r3862
+% Single commented out reuslts are from r3933
+%% Double commented out results are from r3862
 
-\multicolumn{5}{@{}c@{}}{\textbf{Unsafe}\raise2pt\hbox{\strut}} \\
+%\multicolumn{5}{@{}c@{}}{\textbf{Unsafe}\raise2pt\hbox{\strut}} \\
 
 % WB
-fsync & Linux & ext2 & 1.5 [0.3] & 2,503 \\
-%Linux ext3 ordered (fsync) & 2.0 [0.3] & 3,025 \\
-fsync & Linux & ext3 journal & 1.8 [0.3] & 2,531 \\
+%fsync & Linux & ext2 & 1.5 [0.3] & 2,503 \\
+%%Linux ext3 ordered (fsync) & 2.0 [0.3] & 3,025 \\
+%fsync & Linux & ext3 journal & 1.8 [0.3] & 2,531 \\
 
 % NOFUA
-\patchgroups & \Kudos & async & 1.2 [0.3] & 18 \\
-%\Kudos\ soft updates (pg) & 11.4 [0.4] & 3,015 \\
-%\Kudos\ meta journal (pg) & 1.4 [0.4] & 33 \\
-\patchgroups & \Kudos & full journal & 1.3 [0.5] & 33 \\ \hline
+%\patchgroups & \Kudos & async & 1.2 [0.3] & 18 \\
+%%\Kudos\ soft updates (pg) & 11.4 [0.4] & 3,015 \\
+%%\Kudos\ meta journal (pg) & 1.4 [0.4] & 33 \\
+%\patchgroups & \Kudos & full journal & 1.3 [0.5] & 33 \\ \hline
 
-\multicolumn{5}{@{}c@{}}{\textbf{Safe}\raise2pt\hbox{\strut}} \\
+%\multicolumn{5}{@{}c@{}}{\textbf{Safe}\raise2pt\hbox{\strut}} \\
 
-% WT
-fsync & Linux & ext2 & 16.7 [0.3] & 2,503 \\
-%Linux ext3 ordered (fsync) & 23.9 [0.3] & 3,025 \\
-fsync & Linux & ext3 journal & 20.4 [0.3] & 2,531 \\
+\multicolumn{4}{@{}l}{\emph{\Kudos\ ext2}\raise2pt\hbox{\strut}} \\
 
-% FUA, without patchgroups
-%\Kudos\ async (pg) & 1.6 [0.3] & 2,503 \\
-fsync & \Kudos & soft updates & 65.0 [0.3] & 8,083 \\
-%\Kudos\ meta journal (pg) & 51.3 [0.4] & 7,111 \\
-fsync & \Kudos & full journal & 51.0 [0.5] & 7,114 \\
+soft updates & fsync & 65.0 [0.3] & 8,083 \\
+%%\Kudos\ meta journal (pg) & 51.3 [0.4] & 7,111 \\
+full journal & fsync & 51.0 [0.5] & 7,114 \\
 
-% FUA
-%\Kudos\ async (pg) & 1.6 [0.3] & 2,503 \\
-\patchgroups & \Kudos & soft updates & 27.2 [1.2] & 3,015 \\
-%\Kudos\ meta journal (pg) & 1.5 [0.4] & 32 \\
-\patchgroups & \Kudos & full journal & 1.5 [0.5] & 32 \\
+%%\Kudos\ async (pg) & 1.6 [0.3] & 2,503 \\
+soft updates & \patchgroups & 27.2 [1.2] & 3,015 \\
+%%\Kudos\ meta journal (pg) & 1.5 [0.4] & 32 \\
+full journal & \patchgroups & 1.5 [0.5] & 32 \\ \hline
 
-% WT, fsyncs to CHECK/CLOSE
-linear & Linux & ext3 journal & 1.2 [0.3] & 26 \\
+%linear & \Kudos & full journal & 1.4 [0.4] & 31 \\
 
-linear & \Kudos & full journal & 1.4 [0.4] & 31 \\
+\multicolumn{4}{@{}l}{\emph{Linux ext3}\raise2pt\hbox{\strut}} \\
+
+%fsync & Linux & ext2 & 16.7 [0.3] & 2,503 \\
+%%Linux ext3 ordered (fsync) & 23.9 [0.3] & 3,025 \\
+journal & fsync & 20.4 [0.3] & 2,531 \\
+
+journal & linear & 1.2 [0.3] & 26 \\
 
 \end{tabular}
 \caption{\label{fig:imap-compare} IMAP benchmark: move 1,000 messages.
-  Times are in seconds, writes in number of requests.  System CPU
-  times are in square brackets. Consistency protocols: ``fsync'' is
-  the unmodified server, ``pg'' uses patchgroups, and ``linear'' presumes
-  a fully journaled file system.}
+  Times are in seconds, writes in number of requests. System CPU
+  times are in square brackets.}
 \end{figure}
 
 \subsection{Summary}
