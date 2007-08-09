@@ -264,7 +264,7 @@ Given a set of \patches\ $P$, we write $\PDepset{P}$ to mean the
 
 
 The \textbf{disk safety property} formalizes dependency requirements by
- stating that the dependencies of all committed \patches\ must also be
+ stating that the dependencies of all committed \patches\ must have been
  committed:
 %
 \[ \PDepset{\PDisk} \subseteq \PDisk. \]
@@ -370,7 +370,7 @@ we say $p$ \emph{directly depends on} $q$, and write $p \PDDepend q$, when
  $q \in \PDDepset{p}$.
 %
 The dependency relation $p \PDepend q$ simply means that either $p
- \PDDepend q$, or $p \PDepend x \PDDepend q$ for some patch $x$.
+ \PDDepend q$ or $p \PDepend x \PDDepend q$ for some patch $x$.
 
 
 \begin{comment}
@@ -392,10 +392,10 @@ different block before being able to write the remaining \patches.
 Another implementation choice is required to allow the buffer cache to
  write a selected subset of a block's patches.
 %
-Our buffer cache maintains each block in its dirty state, including the
- effects of all uncommitted patches.
+Our system maintains each block in its dirty state, including the
+ effects of all uncommitted patches, but
 %
-However, each patch also carries \textbf{undo data} consisting of the 
+each patch carries its own \textbf{undo data} consisting of the 
  previous version of the block data altered by the \patch.
 %
 If a \patch\ $p$ is not written with its containing block, the buffer cache
@@ -408,7 +408,7 @@ Once the block is written, the system will re-apply the \patch\ and, when
 Undo information adds greatly to memory and CPU utilization, but it can
  often be optimized away, as we show in Section~\ref{sec:patch:optimizations}.
 
-Figure~\ref{fig:patchnot} summarizes the patch notation.
+Figure~\ref{fig:patchnot} summarizes our patch notation.
 
 \label{sec:patch:dependencies}
 
