@@ -115,36 +115,36 @@ the Ion window manager, version 2-20040729.
 \small
 \begin{tabular}{@{}lrrrr@{}}
 \textbf{Optimization}
-        & \textbf{\# \Patches} & \textbf{Undo data} & \textbf{System time} \\ % Malloc
-% Results are from r4020, but only for 2 runs
+        & \textbf{\# \Patches} & \textbf{Undo data} & \textbf{System time} \\ % Malloc Malloc-block_data
+% Results are from r4037, mean of 5 runs
 % NOTE: also update numbers in \patchoptundo and \patchoptcount
 \hline
 \multicolumn{4}{@{}c@{}}{\textbf{Untar test}\raise2pt\hbox{\strut}} \\
-None              &   619,740 &   459.41~MB &  3.44~sec \\ % 773~MB
-\Nrb\ \patches\   &   445,927 &   210.88~MB &  3.09~sec \\ % 515~MB
-Overlap merging   &   109,152 &   260.00~MB &  2.18~sec \\ % 544~MB
-Both              &    67,363 &     0.33~MB &  2.33~sec \\ % 293~MB
+None              &   619,740 &   459.41~MB &  3.33~sec \\ % 768~MB 513~MB
+\Nrb\ \patches\   &   446,002 &   205.94~MB &  2.73~sec \\ % 515~MB 259~MB
+Overlap merging   &   111,486 &   254.02~MB &  1.87~sec \\ % 544~MB 289~MB
+Both              &    68,887 &     0.39~MB &  1.83~sec \\ % 293~MB  37~MB
 \hline
 
 \multicolumn{4}{@{}c@{}}{\textbf{Delete test}\raise2pt\hbox{\strut}} \\
-None              &   299,089 &     1.43~MB &  0.85~sec \\ % 48~MB
-\Nrb\ \patches\   &    41,113 &     0.90~MB &  0.29~sec \\ % 20~MB
-Overlap merging   &    54,665 &     0.94~MB &  0.33~sec \\ % 21~MB
-Both              &     1,800 &     0.00~MB &  0.19~sec \\ % 13~MB
+None              &   299,089 &     1.43~MB &  0.81~sec \\ % 48~MB
+\Nrb\ \patches\   &    41,113 &     0.91~MB &  0.24~sec \\ % 20~MB
+Overlap merging   &    54,665 &     0.93~MB &  0.31~sec \\ % 21~MB
+Both              &     1,800 &     0.00~MB &  0.15~sec \\ % 13~MB
 \hline
 
 \multicolumn{4}{@{}c@{}}{\textbf{PostMark test}\raise2pt\hbox{\strut}} \\
-None              & 4,591,533 & 3,175.28~MB & 26.06~sec \\ % 5,347~MB
-\Nrb\ \patches\   & 2,561,815 & 1,583.16~MB & 20.44~sec \\ % 3,672~MB
-Overlap merging   &   542,665 & 1,587.81~MB & 13.50~sec \\ % 3,649~MB
-Both              &   633,382 &     0.10~MB & 13.62~sec \\ % 2,073~MB
+None              & 4,591,628 & 3,175.28~MB & 24.46~sec \\ % 5,347~MB 3316MB
+\Nrb\ \patches\   & 2,544,300 & 1,583.75~MB & 20.00~sec \\ % 3,674~MB 3674MB
+Overlap merging   &   543,738 & 1,587.81~MB & 12.57~sec \\ % 3,649~MB 1618MB
+Both              &   624,776 &     0.10~MB & 13.78~sec \\ % 2,068~MB   41MB
 \hline
 
 \multicolumn{4}{@{}c@{}}{\textbf{Andrew test}\raise2pt\hbox{\strut}} \\
-None              &    70,922 &    64.09~MB &  4.30~sec \\ % 97~MB
-\Nrb\ \patches\   &    50,680 &    36.18~MB &  4.32~sec \\ % 69~MB
-Overlap merging   &    12,479 &    27.91~MB &  4.21~sec \\ % 60~MB
-Both              &    10,118 &     0.03~MB &  4.18~sec \\ % 31~MB
+None              &    70,925 &    64.09~MB &  4.33~sec \\ % 97~MB 69MB
+\Nrb\ \patches\   &    50,803 &    36.18~MB &  4.31~sec \\ % 69~MB 41MB
+Overlap merging   &    12,466 &    27.91~MB &  4.23~sec \\ % 60~MB 31MB
+Both              &    10,398 &     0.04~MB &  4.30~sec \\ % 32~MB  4MB
 \end{tabular}
 \caption{Effectiveness of \Kudos\ optimizations.}
 \label{f:optdata}
@@ -171,10 +171,8 @@ Undo data memory usage is reduced by \patchoptundo,
 %
 the number of \patches\ created is reduced by \patchoptcount,
 %
-the total amount of memory allocated by \Kudos\ by 61--73\%,
-%
-and system CPU time is reduced by up to 77\%.
-\todo{Discuss why both can increase \#patches and CPU.}
+and system CPU time is reduced by up to 81\%.
+\todo{Discuss why both can increase \#patches and CPU?}
 
 \begin{comment}
 \begin{figure}[t]
