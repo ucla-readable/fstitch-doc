@@ -204,7 +204,7 @@ smaller account for about 51\% of all \rb\ \patches.}
 \begin{tabular}{@{}lrrrr@{}}
 \textbf{System} & \multicolumn{1}{c}{\textbf{Untar}} & \multicolumn{1}{c}{\textbf{Delete}} & \multicolumn{1}{c}{\textbf{PostMark}} & \multicolumn{1}{c}{\textbf{Andrew}} \\ \hline
 % Results are from r4037, mean of 5 runs
-\multicolumn{3}{@{}l}{\emph{\Kudos\ ext2}\raise2pt\hbox{\strut}} & & \\
+\multicolumn{5}{@{}l}{\emph{\Kudos\ ext2}\raise2pt\hbox{\strut}} \\
 \safe{soft updates} & \safe{6.4 [1.9]} & \safe{0.8 [0.2]} & \safe{47.0 [13.5]} & \safe{36.9 [4.1]} \\
 \safe{meta journal} & \safe{8.5 [2.6]} & \safe{1.4 [0.5]} & \safe{70.8 [15.6]} & \safe{36.7 [4.2]} \\
 \safe{full journal} & \safe{12.8 [3.2]} & \safe{1.3 [0.5]} & \safe{93.8 [19.7]} & \safe{36.9 [4.4]} \\
@@ -212,7 +212,7 @@ smaller account for about 51\% of all \rb\ \patches.}
 \unsafe{full journal} & \unsafe{11.1 [3.8]} & \unsafe{1.1 [0.5]} & \unsafe{83.9 [23.7]} & \unsafe{36.7 [4.3]} \\ \hline
 
 % Results mean of 3 runs
-\multicolumn{3}{@{}l}{\emph{Linux}\raise2pt\hbox{\strut}} & & \\
+\multicolumn{5}{@{}l}{\emph{Linux}\raise2pt\hbox{\strut}} \\
 \safe{ext3 writeback} & \safe{19.5 [1.0]} & \safe{4.5 [0.3]} & \safe{55.7 [~~3.7]} & \safe{37.8 [4.0]} \\
 \safe{ext3 journal} & \safe{20.3 [1.2]} & \safe{4.6 [0.2]} & \safe{82.5 [~~5.0]} & \safe{38.2 [4.0]} \\
 \unsafe{ext2} & \unsafe{9.5 [0.7]} & \unsafe{4.7 [0.2]} & \unsafe{45.8 [~~2.0]} & \unsafe{37.0 [4.0]} \\
@@ -288,7 +288,8 @@ correct values (an expected discrepancy after a soft updates crash).
 % #reviewers who want measurements of at least svn and imap studies: 2
 
 We evaluate the performance of the \patchgroup-enabled UW IMAP mail
-server (\S\ref{sec:patchgroup:uwimap}) by moving 1,000 messages.
+server (\S\ref{sec:patchgroup:uwimap}) by benchmarking moving 1,000
+messages from one folder to another.
 %
 To move the messages the client selects the source mailbox (containing
 1,000 2~kB messages), creates a new mailbox, copies each message to
@@ -309,33 +310,45 @@ copy),
 %
 \Kudos\ with the \patchgroup-enabled server (sync only at the end),
 %
-and Linux with a server modified to use fully journaled file systems
-(sync only at the end).
-%
-\Kudos\ meta and full journal modes perform similarly, as do Linux
-ext3 writeback, ordered, and full journal modes;
-Figure~\ref{fig:imap-compare} shows one result for \Kudos\ journal
-modes and one result for Linux journal modes.
+and Linux and \Kudos\ with the server modified to take advantage of
+fully journaled file systems (changes are effectively committed
+linearly, so sync only at the end).
 
-Safe journaled \Kudos\ with \patchgroups\ performs at least as well as
-all other \Kudos\ and all Linux configurations. Safe journaled \Kudos\
-with \patchgroups\ is 11--13 times faster than safe Linux ext3 with
-the unmodified server.
+Unsafe \Kudos\ and Linux configurations complete in about 1.5~seconds;
+we do not include their results among the safe configurations in
+Figure~\ref{fig:imap-compare}.
 %
-\Kudos\ soft updates mode with \patchgroups\ is significantly slower
-than \Kudos\ journal modes. As the number of write requests indicate,
-each of its \patchgroups\ requires multiple write requests (e.g. to
-update the destination mailbox and the destination mailbox's
-modification time). In contrast, journaling is able to commit a large
-number of copies atomically, using only a small constant number of
-requests.
+\Kudos\ meta and full journal modes perform similarly so we report
+only for the full journal mode.
+%
+Linux ext3 writeback, ordered, and full journal modes also perform simiarly
+so we report only for the full journal mode.
+%
+Using the linear consistency method with \Kudos\ and Linux full
+journal modes perform similarly so we report only Linux results.
+
+Fully journaled \Kudos\ with \patchgroups\ performs at least as well
+as all other (safe and unsafe) \Kudos\ and all Linux configurations.
+It is 11--13 times faster than safe Linux ext3 with the unmodified
+server.
+%
+Using the linear consistency method with \Kudos\ and Linux, the IMAP
+server performs similarly to the \patchgroup\ consistency method with
+\Kudos. However, the linear consistency method requires the underlying
+file system use full data journaling.
+%
+\Kudos\ in soft updates mode with \patchgroups\ is significantly
+slower than \Kudos\ in journal modes. As the number of write requests
+indicate, each of soft updates mode's \patchgroups\ require multiple
+write requests (e.g. to update the destination mailbox and the
+destination mailbox's modification time). In contrast, journaling is
+able to commit a large number of copies atomically, using only a small
+constant number of requests.
 %
 \Kudos\ with the unmodified server makes significantly many more
 requests than Linux ext3; we believe this is due to \Kudos\ also
 committing file system summary information that Linux does not commit
 for the \texttt{fsync} system call.
-%
-\todo{Discuss full journal optimized server results.}
 
 \begin{figure}[t]
 \centering
