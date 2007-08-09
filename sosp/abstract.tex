@@ -13,19 +13,20 @@
 %%  checks like \emph{fsck} when recovering from failures, file systems use
 %%  a variety of techniques.
 %
-A basic building block of storage system reliability is the ``write before''
+Reliable storage systems depend at least in part on a ``write before''
  relationship, where one change to stable storage is delayed until
  another change commits.
 %
 A journaled file system, for example, must write and commit each
- journal transaction before applying that transaction's changes.
- Soft updates~\cite{ganger00soft} and other consistency enforcement
+ journal transaction before applying that transaction's changes, and
+ soft updates~\cite{ganger00soft} and other consistency enforcement
  mechanisms have similar constraints, implemented in each case in
  system-dependent ways.
 %
 %% These relationships are implemented in system-dependent ways.
 %
-We present a general \emph{\patch} abstraction that makes this relationship
+We present a general \emph{\patch} abstraction that makes the ``write
+ before'' relationship
  explicit and file system agnostic.
 %
 A \patch-based file system implementation expresses dependencies among

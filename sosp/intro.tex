@@ -14,6 +14,21 @@ The answer is a qualified yes.
 \end{comment}
 
 
+This paper builds a complete and relatively efficient file system layer,
+ called \emph{\Featherstitch}, that uses
+ a simple, uniform, and file system agnostic data type to explicitly
+ represent all ``write before'' relationships among changes to stable
+ storage.
+%
+``Write before'' relationships, which require some changes to be committed
+ before others, are part of the abstract basis of every mechanism for ensuring file system
+ consistency and reliability, from journaling to synchronous writes.
+%
+\Kudos\ API design and optimizations make these relationships, in a concrete form
+ called \emph{patches}, a promising implementation strategy as well.
+
+
+\begin{comment}
 As file system functionality increases, maintaining file system
  correctness in the presence of failures is increasingly a focus of
  research~\cite{sivathanuetal05-logic,denehyetal05-journal-guided}.
@@ -28,58 +43,85 @@ To meet this challenge, file systems use a variety of techniques, like
 These mechanisms are each based on imposing some ``write before''
  relationship among buffered changes to the data in stable storage.
 %
-This paper aims to evaluate whether a simple, unified abstraction that
- represents this relationship can be used to efficiently implement a
- complete file system layer, where modifications are common and cache
- sizes are large.
-%
 The answer is a qualified yes.
+\end{comment}
 
 
-We present a new fundamental data type called a \emph{\patch},
- which represents both a change to disk data and any \emph{dependencies}
+A patch represents both a change to disk data and any \emph{dependencies}
  between that change and other changes. 
 %
-\Patches\ were inspired by the dependency abstraction from BSD's soft
- updates~\cite{ganger00soft}, but whereas the soft updates implementation
- involves many structures specific to the UFS file
+\Patches\ were initially inspired by the dependency abstraction from BSD's soft
+ updates~\cite{ganger00soft}, but whereas soft updates dependencies
+ implement a particular type of consistency
+ and involve many structures specific to the UFS file
  system~\cite{mckusick99soft}, \patches\ are fully general,
  specifying only how a range of bytes should be changed.
 %
-This lets file system implementations specify \emph{what} the desired
- write before relationship is between the changes without dictating
+This lets file system implementations specify a
+ write-before relationship between changes without dictating
 % (or worrying about)
- \emph{how} to write blocks to stable storage to implement that policy.
+ a write order that honors that relationship.
 %
-It also lets other storage system components examine and
+It lets other storage system components examine and
  modify dependency structures independent of the file system's layout.
 %
-Additionally, we present a user-level interface called \patchgroups,
- which provides applications with controlled access to \patches---allowing
- them to impose their own limited consistency policies for the storage
- system to follow.
+It even allows applications to modify dependency structures: an example
+ user-level interface called \emph{\patchgroups} lets applications access
+ \patches\ and thereby define consistency policies for the underlying
+ storage system to follow.
 
 
-While it is already difficult for file system implementers to provide
+The simplicity and uniformity of the \patch\ abstraction may simplify
+ implementation of, extension of, and experimentation with mechanisms for
+ ensuring file system consistency and reliability.
+%
+File system implementers currently find it difficult to provide
  consistency guarantees~\cite{tweedie98journaling,mckusick99soft},
- the situation is further complicated by file system extensions and
+ a situation is further complicated by file system extensions and
  special disk interfaces~\cite{soules03metadata,fast04versionfs,quinlan02venti,cornell04wayback,wright03ncryptfs,sivathanu03semantically-smart,sivathanu05database-aware}.
 %
-Stackable file systems~\cite{zadok00fist,zadok99extending,heidemann94filesystem,rosenthal90evolving},
- for instance, may place extensions over an existing file system
- responsible for maintaining consistency.
+File system extension techniques such as stackable file
+ systems~\cite{zadok00fist,zadok99extending,heidemann94filesystem,rosenthal90evolving}
+ leave consistency up to the underlying file system; any extension-specific
+ ordering requirements are difficult to express at the VFS layer.
 %
-However, some extensions, like creating a file containing metadata
- information about a directory, can introduce ordering requirements
- difficult to express at the VFS layer.
+Although maintaining file system
+ correctness in the presence of failures is increasingly a focus of
+ research~\cite{sivathanuetal05-logic,denehyetal05-journal-guided},
 %
+other proposed systems for improving file system integrity
+ differ mainly in the kind of consistency they aim to impose, ranging from
+ metadata consistency to full data journaling and full ACID
+ transactions~\cite{gal05transactional,liskov04transactional}.
+%
+Some users, however, provide reliability for some data end-to-end
+ and prefer to avoid \emph{any} consistency
+ slowdowns in the file system layer~\cite{googleext2}.
+%
+\Patches\ can represent all these choices, and since they provide a common
+ language for file systems, extensions, and users to discuss consistency
+ requirements, they can even allow combinations of consistency protocols to
+ comfortably coexist on the same file system.
+
+
+\begin{comment}
+But different extensions within a file system, or different
+ applications over the file system, may require different types of
+ consistency semantics, and performance suffers when lower layers are
+ unnecessarily denied the opportunity to reorder writes;
+ %
+\Patches\ can implement many consistency mechanisms, including
+ soft updates and journaling, and can allow combinations of different
+ consistency protocols to exist at the same time.
+ %
 \Patches\ provide a simple and effective way for such extensions to
  express their requirements of the storage system, adding to the
  requirements already expressed by the file system itself.
+\end{comment}
 
 
-This problem exists for applications as well, where even fewer mechanisms
- for controlling buffer cache behavior are available.
+Current applications have even fewer mechanisms available
+ for controlling buffer cache behavior.
 %
 Robust applications, including databases, mail servers, and source code
  management tools, must choose between several mediocre options.
@@ -89,32 +131,16 @@ They can accept the performance penalty of expensive system calls like
  of operations that count on particular file system semantics, or
  rely on specialized raw-disk interfaces.
 %
-\Patchgroups\ allow applications the same benefit that \patches\ provide
+\Patchgroups\ give applications some of the same benefits that \patches\ provide
  for kernel-level file system implementations and extensions.
 %
 Modifying an IMAP mail server to use \patchgroups\ required only localized
- changes; the resulting server follows IMAP's consistency requirements,
- is as fast or faster, and makes many fewer disk write requests.
+ changes.  The result meets IMAP's consistency requirements no
+ matter what type of consistency the underlying file system provides, and
+ avoids the performance hit of full synchronization.
 
 
-Other proposed systems for improving file system integrity and consistency
- differ mainly in the kind of consistency they aim to impose, ranging from
- metadata consistency to full data journaling and even full ACID
- transactions~\cite{gal05transactional,liskov04transactional}.
-%
-However, different extensions within a file system, or different
- applications over the file system, may require different types of
- consistency semantics, and performance suffers when lower layers are
- unnecessarily denied the opportunity to reorder writes.
-%
-Some Google applications, for instance, get better locality by avoiding the
- use of a journal, and can tolerate the additional time spent doing (rare)
- consistency checks~\cite{googleext2}.
-%
-\Patches\ can implement many consistency mechanisms, including
- soft updates and journaling, and can allow combinations of different
- consistency protocols to exist at the same time.
-%
+\begin{comment}
 Our file system modules impose soft updates-style \patch\ requirements by
  default, since doing so requires some knowledge of the file system's
  structures; we have also written a journal module that can change
@@ -125,7 +151,6 @@ A file system module not interested in supporting soft updates support
  module to provide a consistency guarantee.
 
 
-\begin{comment}
 The \Kudos\ storage system implementation is decomposed entirely into
  pluggable \modules\ that manipulate \patches, hopefully making the system
  as a whole more configurable, extensible, and easier to understand.
@@ -142,37 +167,45 @@ As a result, the loosely-coupled \modules\ that implement a file system
 \end{comment}
 
 
-This generality comes at a cost, but that cost can be partially mitigated.
-%
 Production file system implementations achieve consistency and write before
- relationships without sacrificing performance by using a variety of file
+ relationships without sacrificing performance via a variety of file
  system specific optimizations.
 %
-We found that a naive implementation using \patches\ scaled terribly,
+We found that a naive \patch-based implementation scaled terribly,
  spending far more space and time on dependency manipulation than
  conventional systems.
 %
-We therefore developed a variety of dynamic optimizations that
- significantly reduce the memory and CPU overhead associated with \patches.
+We therefore developed several optimizations that attack \patch\ memory and
+ CPU overheads, reducing some overheads by at least \patchoptundo\ in our
+ tests. 
+%
+Room for improvement remains, but \Featherstitch\ is
+ competitive with equivalent Linux configurations on many benchmarks.
 
 
-Our contributions include the generalized \patch\ design, the
- optimizations we have developed for making \patches\ more efficient,
- the formal model of \patches, the \patchgroup\ mechanism that exports
- \patches\ to user space, and several of the individual modules we
- have developed, like the journal.
+Our contributions include the \patch\ model and design, our
+ optimizations for making \patches\ more efficient,
+ the \patchgroup\ mechanism that exports
+ \patches\ to applications, and several individual \Kudos\ modules, such as
+ the journal.
 
 
 We describe \patches\ abstractly, state their behavior and safety
  properties, give examples of their use, and reason about the
  correctness of our optimizations.
 %
-Finally, we demonstrate a prototype file system implementation using
- \patches\ called \Kudos.
-%
-\Kudos\ is decomposed entirely into pluggable modules that manipulate
+We then describe the \Kudos\ implementation, which is decomposed
+ entirely into pluggable modules that manipulate
  \patches, hopefully making the system as a whole more configurable,
  extensible, and easier to understand.
+%
+We conclude following an evaluation comparing \Kudos\ and Linux-native file
+ system implementations.
+
+
+
+
+\begin{comment}
 %
 Our benchmarks show that our optimizations can reduce the number of
  \patches\ \Kudos\ creates by \patchoptcount\ and the amount of undo data
@@ -180,3 +213,4 @@ Our benchmarks show that our optimizations can reduce the number of
 %
 Our prototype is not yet as fast as we would like, but it is competitive
  with Linux on many of our benchmarks.
+\end{comment}
