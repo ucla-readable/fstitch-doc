@@ -83,7 +83,7 @@ The operating system moves uncommitted \patches\ to the in-flight state
  by writing their blocks to the disk controller.  Some
  time later, the disk writes these blocks
  to stable storage and reports success; when the processor receives this
- acknowledgement, it commits the relevant patches.
+ acknowledgment, it commits the relevant patches.
 %
 Committed patches stay committed permanently, although their effects can
  be undone by subsequent patches.
