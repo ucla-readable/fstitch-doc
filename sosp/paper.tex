@@ -8,13 +8,13 @@
 \usepackage{fancyhdr}
 \frenchspacing
 
-\iftrue
+\iffalse
 \DeclareMathAlphabet{\mathcal}{U}{MathePiTwoCal}{m}{n}
 \DeclareFontFamily{U}{MathePiTwoCal}{}
 \DeclareFontShape{U}{MathePiTwoCal}{m}{n}{ <-> MathePiTwo--mpi2c }{}
 \let\mathpatchset\mathcal
 \else
-\let\mathpatchset\mathbf
+\def\mathpatchset#1{\text{\bfseries\itshape#1}}
 \fi
 
 % The names of commonly referenced things in our work which
