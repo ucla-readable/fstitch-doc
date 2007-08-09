@@ -83,8 +83,8 @@ After $p$ is created, the system can add new dependencies $q \PDDepend p$,
  but will never add new dependencies $p \PDDepend q$.\footnote{The actual
  rule is somewhat more flexible: modules may add new direct dependencies if
  they guarantee that those dependencies don't produce any new block-level
- cycles.  As one example, if no \patch\ depends on some \noop\ \patch\ $p$,
- then adding a new $p \PDDepend q$ dependency can't produce a cycle.}
+ cycles.  As one example, if no \patch\ depends on some \noop\ \patch\ $e$,
+ then adding a new $e \PDDepend q$ dependency can't produce a cycle.}
 %
 Since every \patch\ follows this rule, all possible block-level cycles with
  head $p$ are present in the dependency graph when $p$ is created.
