@@ -7,7 +7,8 @@
 \let\emptyset\varnothing
 %\newcommand{\PState}[1]{\ensuremath{#1.\textit{state}}}
 %\newcommand{\PBlock}[1]{\ensuremath{#1.\textit{block}}}
-\newcommand{\PBlock}[1]{\ensuremath{B_{#1}}}
+%\newcommand{\PBlock}[1]{\ensuremath{B_{#1}}}
+\newcommand{\PBlock}[1]{\ensuremath{B[{#1}]}}
 %\newcommand{\PMemst}{\ensuremath{\textit{mem}}}
 %\newcommand{\PInfst}{\ensuremath{\textit{flight}}}
 %\newcommand{\PDiskst}{\ensuremath{\textit{disk}}}
@@ -193,7 +194,7 @@ The \Kudos\ core makes no assumptions about block atomicity, instead relying
 \begin{small}
 \begin{tabular}{@{}l@{~~~}l@{}}
 $p$     & a patch \\
-$\PBlock{p}$ & $p$'s block \\
+$\PBlock{p}$ & patch $p$'s block \\
 % $\PState{p}$ & $p$'s state, $\in \{\PMemst, \PInfst, \PDiskst\}$ \\
 \noalign{\vskip3pt}
 $\PDisk, \PMem, \PInf$ & the sets of all committed, uncommitted, and in-flight \\

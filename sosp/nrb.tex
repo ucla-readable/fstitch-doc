@@ -7,82 +7,110 @@ The first optimization reduces space overhead by
 eliminating undo data.
 %
 When a \patch\ $p$ is created, \Kudos\ conservatively detects whether $p$
- might ever need to be reverted.
+ might ever need to be reverted:
 %
-That is, \Kudos\ detects whether future patches and dependencies could ever
- create a state where the only way the buffer cache could make progress is
- by undoing $p$.
+that is, whether future patches and dependencies could ever create a state
+ where the only way the buffer cache could make progress would be to undo
+ $p$.
 %
-If this is impossible---if no future patches and dependencies could force
- $p$'s reversion---then $p$ does not need undo data, and we call $p$ a
- \emph{\nrb\ \patch}: its data can be applied to the in-memory copy of the
- block without saving the previous version.
+If future patches and dependencies could not force
+ $p$'s reversion, then $p$ does not need undo data.
+%
+The challenge is to detect this condition without predicting the future.
+%
+We solve this challenge by restricting dependency creation.
 
 
-Only \patches\ in a block-level dependency cycle might need to be reverted.
+We implemented support for \textbf{hard patches}, which are simply patches
+ that lack undo data.
 %
-However, some of the \patches\ in a cycle may be \nrb; only the crucial
-\patch\ that creates the cycle must be \rb, for that is the \patch\ that
-must be reverted to create a valid write order.
+Since a hard patch $h$ cannot be reverted, any other patch on its block
+ must depend on $h$ (the other patches can't be written without $h$).
 %
-Thus, \patch\ $p$ may be \nrb\ if it will \emph{never} be the head of a
-block-level cycle: that is, if there will never exist true \patches\ $q$
-and $p'$ with $p \PDepend q \PDepend p'$ and $\PBlock{p} = \PBlock{p'}
-\neq \PBlock{q}$.
+We enforce this requirement, for example using overlap
+ dependencies, and
 %
-In other words, if the only cycle between $\PBlock{p}$ and $\PBlock{q}$ is $p
-\PDDepend q \PDDepend p'$, then $q$ and $p'$ may be \nrb, but $p$ may
-not.
+as a result, the buffer cache will write a block's hard patches (if any)
+ whenever it writes the block.
 %
-As a result, the set of all \nrb\ \patches\ in memory will never contain
-a block-level cycle, and the system can always find a valid order to
-write \nrb\ \patches\ to disk.
-%
-This assumes that the dependency structure correctly represents
-dependencies among \patches\ on the same block.
-%
-Specifically, all \nrb\ \patches\ on a block depend on each other (since
-they can't be written independently), and any \rb\ \patch\ on a block
-depends on that block's \nrb\ \patches, if any (since it cannot be written
-without them).
+The system aims to reduce memory usage by making most patches hard.
 
 
-When \patch\ $p$ is created, \Kudos\ must decide whether any future
-\patch\ or dependency could create a block-level cycle with $p$ at the
-head.
+But which patches can be made hard?
 %
-This decision is simplified by an API property: \emph{All of a \patch's
-direct dependencies are specified at creation time};
+Define a \emph{block-level cycle} as a dependency chain of uncommitted
+ patches $p_1 \PDepend \cdots \PDepend p_n$ where the ends have the same
+ block $\PBlock{p_1} = \PBlock{p_n}$, and at least one patch in the middle
+ has a different block $\PBlock{p_i} \neq \PBlock{p_1}$.
 %
-no new dependencies $p \PDDepend q$ may be introduced after $p$ is
-created.\footnote{The actual rule is somewhat more flexible: modules may add
-  new direct dependencies if they guarantee that those dependencies
-  don't introduce any new block-level cycles.  As one example, if no
-  \patch\ depends on some \noop\ \patch\ $p$, then adding a new $p
-  \PDDepend q$ dependency can't introduce a cycle.}
+The patch $p_1$ is called the \emph{head} of the block-level cycle.
 %
-Since every \patch\ follows this rule, all possible block-level cycles $p
-\PDepend q \PDepend p'$ are visible at creation time.
+Now assume that a patch $p \in \PMem$ is not the head of any block-level
+ cycle.
+%
+One can then show that the buffer cache can always write a block without
+ rolling back $p$.
+%
+The hard case is where $\PBlock{p}$ cannot itself be written without
+ rolling back $p$, which occurs when $p$ has an uncommitted dependency $q$
+ on a different block.
+%
+However, we know that $q$'s uncommitted dependencies, if any, are all on
+ blocks other than $p$'s; otherwise there would be a block-level cycle.
+%
+Since \Featherstitch\ disallows circular dependencies, every
+ chain of dependencies starting at $q$ has finite length, and therefore
+ contains an uncommitted patch $x$ where all of $x$'s dependencies have
+ been committed.
+%
+(If $x$ has in-flight dependencies, simply wait
+ for the disk controller to commit them.)
+%
+Since $x$ is not on $p$'s block, the buffer cache can write $x$ without
+ rolling back $p$.
 
 
-Traversing the dependency graph to check for a block-level cycle
-proved to be quite expensive.
+\Featherstitch\ may thus make a patch hard when it can prove that patch
+ will never be the head of a block-level cycle.
 %
-\Kudos\ thus implements a conservative approximation: \patch\ $p$ is
-created as \nrb\ if \emph{no} other block depends on the in-memory
-version of $\PBlock{p}$.
+This requires two tricks.
 %
-That is, for all dependencies $q \PDepend p'$ with $p' \in
-\PMem[\PBlock{p}]$, either $\PBlock{q} = \PBlock{p}$ or $q$ is \anoop\
-\patch.
+First, an API restriction allows us to search for \emph{existing},
+ rather than future, block-level cycles:
 %
-If no other block depends on $p$'s block, then $p$ can never initiate a
-block-level cycle no matter its dependencies.
+\emph{A \patch's direct dependencies are all supplied at creation time}.
 %
-Determining this property is less expensive than a full graph
-traversal, and works well in practice.
+After $p$ is created, the system can add new dependencies $q \PDDepend p$,
+ but will never add new dependencies $p \PDDepend q$.\footnote{The actual
+ rule is somewhat more flexible: modules may add new direct dependencies if
+ they guarantee that those dependencies don't produce any new block-level
+ cycles.  As one example, if no \patch\ depends on some \noop\ \patch\ $p$,
+ then adding a new $p \PDDepend q$ dependency can't produce a cycle.}
+%
+Since every \patch\ follows this rule, all possible block-level cycles with
+ head $p$ are present in the dependency graph when $p$ is created.
 
 
+This simplifies the problem, but \Featherstitch\ must still check the
+ dependency graph for block-level cycles.
+%
+Actual graph traversals proved quite expensive, so
+%
+we implement a conservative approximation: \patch\ $p$ is
+created as \nrb\ if \emph{no} patches on other blocks depend on uncommitted
+ patches on $\PBlock{p}$.
+%
+That is, for all dependencies $q \PDepend r$ between uncommitted patches,
+ either $\PBlock{r} \neq \PBlock{p}$ or $\PBlock{q} = \PBlock{r} = \PBlock{p}$.
+%
+If this holds, then $p$ cannot head a block-level cycle no matter its
+ dependencies.
+%
+This heuristic works well in practice and, given some bookkeeping, 
+ takes $O(1)$ time to check.
+
+
+\begin{comment}
 \Kudos\ further ensures that the dependency structure correctly
 represents dependencies on the same block through overlap
 dependencies: since \nrb\ \patches\ are considered to cover the entire
@@ -105,6 +133,7 @@ Then to write block $b$, the buffer cache must choose some $P \subseteq
 \subseteq P. \]
 %
 If no such $P$ exists, then the cache must write a different block.
+\end{comment}
 
 
 Applying \nrb\ \patch\ rules to our example makes 14 of the 23 \patches\ \nrb\
