@@ -10,7 +10,7 @@ PDFLATEX = pdflatex
 
 MAINFILE = paper.tex
 
-TEXSRCS = abstract.tex conclusion.tex discussion.tex evaluation.tex \
+TEXSRCS = abstract.tex acknowledge.tex conclusion.tex evaluation.tex \
 	implementation.tex optimizations.tex intro.tex journal.tex \
 	modules.tex noop.tex nrb.tex merge.tex misc.tex opgroups.tex \
 	paper.tex readylist.tex related.tex using.tex wbcache.tex \

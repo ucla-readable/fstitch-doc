@@ -34,3 +34,18 @@ having to micromanage writes to disk.
 We present results for an IMAP server modified to take advantage of this
 feature, and show that it can significantly reduce both the total time and the
 number of writes required for our benchmark.
+
+
+There are several areas in which we would like to improve our work. The obvious
+first area we would like to work on is the performance of our \Kudos\ prototype.
+%
+We have already improved the performance by at least five orders of magnitude
+over the original implementation, but it is still not as fast as it could be.
+%
+We would also like to explore a variety of extensions to \Kudos. For instance,
+sending \patches\ over network file systems and implementing other consistency
+mechanisms are both avenues for future work.
+%
+Finally, we would like to try using \patchgroups\ for several more complicated
+applications, like databases, to see how well they fit the needed semantics and
+how well they perform.
