@@ -103,7 +103,7 @@ Finally, block allocation policies can have a dramatic effect on the number of
 I/O requests required to write changes to the disk. For instance, soft
 updates-like dependencies require that data blocks be initialized before
 an indirect block references them.   
-dependencies implementing soft updates, indirect block data cannot be written
+\todo{Make sensical}dependencies implementing soft updates, indirect block data cannot be written
 until the referenced blocks have been at least initialized. By allocating an
 indirect block in the middle of a range of data blocks for a file, the data
 blocks must be written as two smaller I/O requests since the indirect block

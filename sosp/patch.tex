@@ -479,9 +479,9 @@ A soft updates file system orders its writes to enforce three simple rules
  has been initialized (e.g., an inode must be initialized before a
  directory entry references it).''
 \item \label{rule:reuse} ``Never reuse a resource before nullifying all
- previous pointers to it''.
+ previous pointers to it.''
 \item \label{rule:overwrite} ``Never reset the last pointer to a live
- resource before a new pointer has been set''.
+ resource before a new pointer has been set.''
 \end{compactenumerate}
 
 \noindent

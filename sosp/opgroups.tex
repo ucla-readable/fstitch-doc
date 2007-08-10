@@ -73,7 +73,7 @@ The \patchgroup\ interface is as follows:
 \vspace{-0.5\baselineskip}
 
 Each process has its own set of \patchgroups, which are currently shared
-among all threads..
+among all threads.
 %
 The call \texttt{\pgDepend(q, p)} makes \patchgroup\ \texttt{q} depend on
 \patchgroup\ \texttt{p}: all \patches\ associated with \texttt{p} will
@@ -140,8 +140,8 @@ to disk:
 system module like ext2.
 %
 Each \patchgroup\ corresponds to a pair of containing \noop\ \patches,
-and inter-\patchgroup\ dependencies to dependencies between these \noop\
-\patches.
+and each inter-\patchgroup\ dependency corresponds to a dependency between
+the \noop\ \patches.
 %
 The \LFS\ module ensures that all file system changes are inserted
 between engaged \patchgroups' \noop\ \patches.
@@ -191,8 +191,9 @@ These applications were chosen for their relatively simple and explicit
 consistency requirements; we intended to test how well patchgroups
 implement existing application requirements, not to create new mechanisms.
 One effect of this choice is that, after some modification, versions of
-these applications could attain similar consistency guarantees if run on a
-fully-journaled file system with a conventional API.  Patchgroups, however,
+these applications could attain consistency guarantees similar to those
+attained using \patchgroups\ if they are ran on a
+fully-journaled file system with a conventional API.\todo{Not correct. Subversion is already correct and only requires ordered journaling.}  Patchgroups, however,
 make the required guarantees explicit, can be implemented on other types of
 file system, and introduce no additional cost on fully-journaled systems.
 
@@ -355,7 +356,7 @@ messages from mailbox.src to mailbox.dst.}
 
 These changes improve UW IMAP by
 %
-ensuring ensure disk write ordering correctness
+ensuring disk write ordering correctness
 %
 and by performing disk writes more efficiently.
 %
