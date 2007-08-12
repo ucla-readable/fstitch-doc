@@ -11,7 +11,7 @@
 - Deal with long/tiny urls
 
 * Want To Do
-- Metapost imap patchgroup figure?
+- Metapost the imap patchgroup figure?
 - Explicitly mention that patchgroups allow specification of precisely
   happens-before? They cannot be used to ``hold patches'' in ram.
 - Check that we did not forget any todos sent to kudos@
@@ -20,11 +20,17 @@
 - More fully explain allocator differences and the effects
 - Patchgroup interface: mention threads?
 
-* Probably Won't Do
-- Update kudos to not commit file system summary data on fsync
-- Speed up imap/svn SU
+* Might Try To Do?
+- Linux-Kudos double block cacheing
 - Improve postmark perf
-
+- Patchgroups: less consistency flag
+- Give Linux ext2 SU
+- Explain when patch opts do not apply
+- Thank Intel/MS
+- Understand why both opts can increase #patches and cpu time
+- Speed up imap/svn SU
+/ Make allocated data block init depend on prev free, not alloc
+/ Update kudos to not commit file system summary data on fsync
 
 
 
