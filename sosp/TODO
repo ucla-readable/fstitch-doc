@@ -27,6 +27,7 @@
 - Give Linux ext2 SU
 - Explain when patch opts do not apply
 - Thank Intel/MS
+- Mention that, unlike most Linus FSes, we O_SYNC file operations?
 - Understand why both opts can increase #patches and cpu time
 - Speed up imap/svn SU
 / Make allocated data block init depend on prev free, not alloc
