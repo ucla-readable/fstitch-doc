@@ -14,4 +14,24 @@ Our work on \Kudos\ was supported by the National Science
 %
 Additionally, Christopher Frost and Mike Mammarella were awarded SOSP student
 travel scholarships, supported by the National Science Foundation, to present
-this paper at the conference.
+this paper at the
+% seems that PDF and PS need different metrics for this easter egg:
+\ifpdf
+conference\makebox[.1pt][l]{.}\makebox[0.056cm][r]{\scalebox{.035}{\raisebox{.28cm}{\begin{tabular}{c}
+\color{white}We $\heartsuit$ \\
+\color{white}Kudos
+\end{tabular}}}}
+
+\else
+conference\makebox[.1pt][l]{.}\makebox[0.08cm][r]{\scalebox{.035}{\raisebox{.28cm}{\begin{tabular}{c}
+\color{white}We $\heartsuit$ \\
+\color{white}Kudos
+\end{tabular}}}}
+
+\fi
+
+% alternative easter eggs. first one adds a tiny final sentence. the second
+% puts a pdf in place of the period, which caused many pdf rendering issues
+
+%\scalebox{.04}{Finally, we $\heartsuit$ Kudos.}
+%\makebox[2pt][r]{\scalebox{.09}{\includegraphics[clip=true,bb=1cm .6cm 15cm 15cm,scale=.04]{egg.pdf}}}
