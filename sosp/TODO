@@ -4,7 +4,6 @@
 - Check that we adequately address reviews
 
 * Really Want To Do
-- Note journal size
 - Mention debugger
 - Fig 11: report meta or full journaling for fsync/patchgroups?
 - Improve understandability of patchgroup eval section
@@ -20,18 +19,17 @@
 - Decide how to cite email threads (esp reference's title)
 - Note that we do not know why kudos is slowish at postmark?
 - More fully explain allocator differences and the effects
-- Patchgroup interface: mention threads?
 
 * Might Try To Do?
-- Linux-Kudos double block cacheing
 - Improve postmark perf
-- Patchgroups: less consistency flag
-- Give Linux ext2 SU
 - Explain when patch opts do not apply
 - Thank Intel/MS
-- Mention that, unlike most Linus FSes, we O_SYNC file operations?
-- Understand why both opts can increase #patches and cpu time
 - Speed up imap/svn SU
+
+
+* No Time To Do
+- Give Linux ext2 SU
+/ Patchgroups: less consistency flag
 / Make allocated data block init depend on prev free, not alloc
 / Update kudos to not commit file system summary data on fsync
 
