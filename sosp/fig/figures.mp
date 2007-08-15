@@ -180,13 +180,12 @@ beginfig(4);
   patchit.d(btex $p$\strut etex, 0);
   a.width=a.height;
 
-  d.w-c.e=c.w-b.e=(10,0);
-  a.s-c.n=(0,8);
+  d.w-c.e=c.w-b.e=b.w-a.e=(10,0);
 
   drawelement(a,b,c,d);
   drawconnpatch(a,b)(..);
-  drawconnpatch(a,c)(..);
-  drawconnpatch(a,d)(..);
+  drawconnpatch(a,c)({dir 50}..);
+  drawconnpatch(a,d)({dir 52}..{dir -40});
 endfig;
 
 beginfig(6);
@@ -197,8 +196,7 @@ beginfig(6);
   patchit.d(btex $p$\strut etex, 0);
   a.width=a.height;
 
-  d.w-c.e=c.w-b.e=(10,0);
-  a.s-c.n=(0,8);
+  d.w-c.e=c.w-b.e=b.w-a.e=(10,0);
 
   drawelement(a,b,c,d);
   drawconnpatch(a,b)(..);
