@@ -151,12 +151,17 @@ two \patchgroups.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.7\hsize]{fig/figures_5}
-\caption{\label{fig:patchgroup-patches} \Patches\ corresponding to two
-  \patchgroups, $p$ and $q$.  The $h$ and $t$ \patches\ are created by the 
-  \patchgroup\ module; the heavy dependency between $t_p$ and $h_q$ was added
-  by \texttt{pg~depend(p, q)}.  Each of $a_i$, $b$, and $c$ corresponds to
-  a different file system change.}
+%% \includegraphics[width=0.7\hsize]{fig/figures_5}
+%% \caption{\label{fig:patchgroup-patches} \Patches\ corresponding to two
+%%   \patchgroups, $p$ and $q$.  The $h$ and $t$ \patches\ are created by the 
+%%   \patchgroup\ module; the heavy dependency between $t_p$ and $h_q$ was added
+%%   by \texttt{pg~depend(p, q)}.  Each of $a_i$, $b$, and $c$ corresponds to
+%%   a different file system change.}
+\includegraphics[width=\hsize]{fig/figures_7}
+\caption{\label{fig:patchgroup-patches} \Patchgroup\ \patch\ layout.  Empty
+patches $h_\textit{pg}$ and $t_\textit{pg}$ bracket file system patches that occur while
+\patchgroup\ \textit{pg} is engaged.  \Patchgroup\ dependencies connect one
+\patchgroup's $t$ patch to another's $h$.}
 \end{figure}
 
 While these simple dependencies are all that is necessary when using soft

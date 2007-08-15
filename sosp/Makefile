@@ -20,6 +20,7 @@ BIBS = paper.bib kmaster.bib
 
 TMP_PDF_IMAGES = fig/figures_1.pdf fig/figures_2.pdf fig/figures_3.pdf \
         fig/figures_4.pdf fig/figures_5.pdf fig/figures_6.pdf \
+	fig/figures_7.pdf \
 	fig/opt_1.pdf fig/opt_2.pdf fig/opt_3.pdf fig/opt_4.pdf \
 	fig/softhard_1.pdf fig/softhard_2.pdf fig/softhard_3.pdf \
 	fig/examples_1.pdf fig/examples_2.pdf \

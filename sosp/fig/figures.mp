@@ -255,7 +255,38 @@ beginfig(5);
   drawconnpatch(hq,tq)(..);
   drawconnpatch(hq,c)(..);
   drawconnpatch(c,tq)(..);
+endfig;
 
+
+beginfig(7);
+  boxjoin(a.width = b.width; a.height = b.height);
+  patchit.hp(btex $h_\textit{pg}$ etex, 0);
+  patchit.tp(btex $t_\textit{pg}$ etex, 0);
+  patchit.hx(btex $h_\textit{xg}$ etex, 0);
+  patchit.tq(btex $t_\textit{qg}$ etex, 0);
+
+  tq.width = tq.height;
+
+  hp.w - tq.e = hx.w - tp.e = (50,0);
+  tp.w - hp.e = (120,0);
+
+  drawelement(hp,tp,hx,tq);
+
+  label(btex \mlabel{f{}ile system changes\\written during\\\texttt{pg\char`\_engage(}\textit{pg}\texttt{)}} etex scaled 0.8, .5[hp.c,tp.c]);
+  label.top(btex \mlabel{\texttt{pg\char`\_depend}\\\texttt{(}\textit{qg}\texttt{,} \textit{pg}\texttt{)}} etex scaled 0.8, .5[tq.c,hp.c]);
+  label.top(btex \mlabel{\texttt{pg\char`\_depend}\\\texttt{(}\textit{pg}\texttt{,} \textit{xg}\texttt{)}} etex scaled 0.8, .5[tp.c,hx.c]);
+  drawconnpatch(tq,hp)(..);
+  drawconnpatch(tp,hx)(..);
+  drawconnarrow hp.c -- hp.c + (35,10) cutbefore bpath.hp;
+  drawconnarrow hp.c -- hp.c + (42,-2) cutbefore bpath.hp;
+  drawconnarrow hp.c -- hp.c + (30,-10) cutbefore bpath.hp;
+  drawconnarrow tp.c + (-35,10) -- tp.c cutafter bpath.tp;
+  drawconnarrow tp.c + (-42,3) -- tp.c cutafter bpath.tp;
+  drawconnarrow tp.c + (-40,-4) -- tp.c cutafter bpath.tp;
+  drawconnarrow tp.c + (-38,-14) -- tp.c cutafter bpath.tp;
+  drawconnarrow tq.w - (10,5) -- tq.c cutafter bpath.tq;
+  drawconnarrow tq.w - (12,-2) -- tq.c cutafter bpath.tq;
+  drawconnarrow hx.c -- hx.e + (10,0) cutbefore bpath.hx;
 endfig;
 
 end
