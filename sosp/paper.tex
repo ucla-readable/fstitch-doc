@@ -6,6 +6,7 @@
 \usepackage{multirow}
 \usepackage{amsthm}
 \usepackage{fancyhdr}
+\IfFileExists{fonts.sty}{\input{fonts.sty}}{}%
 \frenchspacing
 
 \iffalse
@@ -133,19 +134,17 @@
 % TODO: pick an easter egg
 %\title{\sffamily\textbf{Generalized F\makebox[.1pt][l]{i}\makebox[0.04cm][r]{\raisebox{0cm}{\scalebox{.03}{\rotatebox{90}{We $\heartsuit$ KudOS}}}}\hspace{.13cm}l\makebox[9pt][l]{e}\makebox[0.01cm][r]{\raisebox{0.203cm}{\scalebox{0.02}{We~~~~~~$\heartsuit$~~~~~~Kudos\hspace{5cm}}}} System Dependencies}\todo{Finish title easter egg.}}
 \title{\sffamily\textbf{Generalized File System Dependencies}}
-\author{\sffamily
-	Christopher Frost\assast\asscontact
+\author{Christopher Frost\assast\asscontact
 	\qquad Mike Mammarella\assast\asscontact
 	\qquad Eddie Kohler\assast \\
 	\sffamily Andrew de los Reyes$^\dag$
 	\quad Shant Hovsepian\assast
 	\quad Andrew Matsuoka$^\ddag$
 	\quad Lei Zhang$^\dag$ \\
-	\sffamily \fontsize{10pt}{10pt}\selectfont
-	\assast UCLA
+	\affaddr{\assast UCLA
 	\qquad $^\dag$Google
-	\qquad $^\ddag$UT Austin \\
-	\url{http://featherstitch.cs.ucla.edu/} \\
+	\qquad $^\ddag$UT Austin} \\
+	\affemail{http://featherstitch.cs.ucla.edu/} \\
 }
 \date{}
 
