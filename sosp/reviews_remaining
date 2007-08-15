@@ -1,9 +1,14 @@
-- perhaps add shadow paging as a consistency model
-- best way to compare: implement SU for Linux ext2 and compare
-	- but: we now have journal perf numbers, so maybe this is less of an issue
-- should we be more clear about goals of case studies?
-	- should we state that gzip is safe with ordered ext3? why fsync is an inefficient solution?
-- should we evaluate gzip and subversion modifications?
+Remaining:
 - add more explanation for when hard patches cannot be applied?
 - compare with exokernel (sosp 97)
-- compare perf with freebsd ufs with soft updates in text? (we said we might)
+
+Mostly took care of:
+/ should we be more clear about goals of case studies?
+	- should we state that gzip is safe with ordered ext3? why fsync is an inefficient solution?
+
+Decided to not do:
+/ should we evaluate gzip and subversion modifications?
+/ perhaps add shadow paging as a consistency model
+/ best way to compare: implement SU for Linux ext2 and compare
+	- but: we now have journal perf numbers, so maybe this is less of an issue
+/ compare perf with freebsd ufs with soft updates in text? (we said we might)
