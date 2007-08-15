@@ -77,17 +77,18 @@ Each \patch\ is either
  \textbf{uncommitted}, meaning not written to disk;
  or \textbf{in flight}, meaning in the process of being written to disk.
 %
-The intermediate in-flight state models caching, reordering, and delay in
- the storage layer: blocks written by an operating system may be
- committed in any order, possibly
- after disk scheduling and a period in the on-disk cache.
+The intermediate in-flight state models reordering and delay in
+ lower storage layers; for example, modern disks often cache
+ %% : blocks written by an operating system may be
+ %% committed in any order, possibly
+ writes to add opportunities for disk scheduling.
 %
 Patches are created as uncommitted.
 %
 The operating system moves uncommitted \patches\ to the in-flight state
  by writing their blocks to the disk controller.  Some
  time later, the disk writes these blocks
- to stable storage and reports success; when the processor receives this
+ to stable storage and reports success; when the operating system receives this
  acknowledgment, it commits the relevant patches.
 %
 Committed patches stay committed permanently, although their effects can
@@ -107,7 +108,7 @@ The sets $\PDisk$, $\PMem$, and $\PInf$ represent all committed,
 Patch $p$'s block is written $\PBlock{p}$.
 %
 Given a block $\PB$, we write $\PDisk[\PB]$ for the set of committed
- patches with block $\PB$, or in notation $\PDisk[\PB] = \{p\in\PDisk\mid\PBlock{p}=\PB\}$.
+ patches on block $\PB$, or in notation $\PDisk[\PB] = \{p\in\PDisk\mid\PBlock{p}=\PB\}$.
 %
 $\PInf[\PB]$ and $\PMem[\PB]$ are defined similarly.
 
@@ -118,12 +119,13 @@ $\PInf[\PB]$ and $\PMem[\PB]$ are defined similarly.
 %%  $p$'s block, and the block is dirty if and only if $\PBlock{p} \cap \PDisk
 %%  \neq \PBlock{p}$.
 
-We can now model disk controllers' behavior: they write in-flight patches one
- block at a time, as follows.
+Disk controllers in this model write in-flight patches one block at a time,
+ choosing blocks in an arbitrary order. In notation:
 %
 \begin{tabbing}
 \qquad \quad 1. Pick some block $\PB$ with $\PInf[\PB] \neq \emptyset$. \\
-\qquad \quad 2. Commit and acknowledge each patch in $\PInf[\PB]$.
+\qquad \quad 2. Write block $\PB$ and acknowledge each patch in $\PInf[\PB]$. \\
+\qquad \quad 3. Repeat.
 \end{tabbing}
 %
 \noindent
@@ -135,9 +137,11 @@ Disks perform better when allowed to reorder requests, so operating systems
 %% relationships.  (For instance, in-flight blocks cannot depend on each
 %% other.)
 %
-Although file systems will generally write all of a block's uncommitted
- patches when they write the block, they may, if they choose, write a
- \emph{subset} of those patches---and, as we will see, this is sometimes
+A block write will generally put all of that block's uncommitted
+ patches in flight, but a file system may, instead, write a \emph{subset} of those
+ patches, leaving some of them in the uncommitted state.
+%
+As we will see, this is sometimes
  required to preserve write-before relationships.
 %% %
 %% The effects of any unwritten patches must be
@@ -148,27 +152,26 @@ We intentionally do not specify whether the storage system writes blocks
  atomically.
 %
 Some file system designs, such as soft updates, rely on block write
- atomicity:
+ atomicity, where
 %% Careful control over write-before relationships is \emph{necessary} to
 %%  ensure consistency, but for some file system designs, such as soft
 %%  updates, it \emph{suffices} only if the underlying storage system
 %%  writes blocks atomically.
 %
-soft updates expects that if the disk fails while a block $\PB$ is
- in flight, then $\PB$'s value on recovery must equal either the old value or
- the new value.
+if the disk fails while a block $\PB$ is
+ in flight, $\PB$ contains either the old data or the new data on recovery.
 %
-Most journal designs do not require this, and include recovery procedures
- that handle in-flight block corruption---for instance, because the memory
- holding the new value of the block lost coherence before the disk stopped
- writing.
+Many journal designs do not require this, and include recovery procedures
+ that handle in-flight block corruption---for instance, if the memory
+ holding the new value of the block loses coherence before the disk stops
+ writing~\cite{tso04ext3}.
 %
-Since patches model the write-before relationships used to build these
+Since patches model the write-before relationships underlying these
  journal designs, patches do not provide block atomicity themselves, and
 %% , for instance by buffering blocks in non-volatile memory before writing them to disk.
 %
 a patch-based file system with soft updates-like dependencies
- should only be used in conjunction with a storage layer providing block
+ should be used in conjunction with a storage layer that provides block
  atomicity.  (This is no different from other soft updates
  implementations.)
 
@@ -230,16 +233,16 @@ The disk controller and lower layers don't understand dependencies; instead,
  order that preserves dependency semantics.
 %
 Patch $q$ \emph{depends on} patch $p$, written $q \PDepend p$,
- when the storage system must commit $p$ before $q$.
+ when the storage system must commit $q$ either after $p$ or at the same
+ time as $p$.
 %
-(As a special case, if $p$ and $q$ are on the same block, they may be
- committed at the same time.)
+(Patches can be committed simultaneously only if they are on the same block.)
 %
-The file system creates dependencies that express its desired consistency
+A file system should create dependencies that express its desired consistency
  semantics.
 %
-For example, a file system with asynchronous writes (and no durability
- guarantees) might create \patches\ with no dependencies at all;
+For example, a file system with no durability
+ guarantees might create \patches\ with no dependencies at all;
 %
 a file system wishing to strictly order writes might set
  $p_n \PDepend p_{n-1} \PDepend \cdots \PDepend p_1$.
@@ -253,11 +256,11 @@ a file system wishing to strictly order writes might set
 %% and finally, the buffer cache obeys the constraints thus defined.
 %
 Circular dependencies among patches cannot be resolved and are therefore
- errors;  for example, neither $p$ nor $q$ could be written before the
- other if $p \PDepend q \PDepend p$.
+ errors;  for example, neither $p$ nor $q$ could be written first
+ if $p \PDepend q \PDepend p$.
 %
-(Although a circular dependency chain entirely within a single block avoids
- this problem, \Kudos\ treats all circular chains as errors.)
+(Although a circular dependency chain entirely within a single block would be
+ acceptable, \Kudos\ treats all circular chains as errors.)
 %
 \Patch\ $p$'s \emph{set} of dependencies, written $\PDepset{p}$, consists
  of all patches on which $p$ depends;
@@ -295,7 +298,7 @@ dependencies.
 %
 Since, as described above, the disk controller can write blocks in any
  order, a \Kudos\ storage system must also ensure
-that in-flight blocks are independent.  This is precisely stated
+the independence of in-flight blocks.  This is precisely stated
 by the \textbf{in-flight safety property:}
 %
 \[ \text{For any block $\PB$,~~} \PDepset{\PInf[\PB]} \subseteq \PDisk \cup \PInf[\PB] . \]
@@ -306,33 +309,33 @@ by the \textbf{in-flight safety property:}
 \patches\ on the same block.)
 \end{comment}
 %
-Given this, $\PDepset{\PInf[\PB]} \cap \PDepset{\PInf[\PB']} \subseteq \PDisk$ for
- any $\PB' \neq \PB$, and the disk controller can write in-flight blocks
+This implies that $\PDepset{\PInf[\PB]} \cap \PDepset{\PInf[\PB']} \subseteq \PDisk$ for
+ any $\PB' \neq \PB$, so the disk controller can write in-flight blocks
  in any order and still preserve disk safety.
 %
-Finally, to uphold the in-flight safety property, the buffer cache must
+To uphold the in-flight safety property, the buffer cache must
  write blocks as follows:
 %
 \begin{tabbing}
-\quad \quad Pick some block $\PB$ with $\PMem[\PB] \neq \emptyset$ and $\PInf[\PB] =
+\quad \quad 1. Pick some block $\PB$ with $\PMem[\PB] \neq \emptyset$ and $\PInf[\PB] =
 \emptyset$. \\
-\quad \quad Pick some $P \subseteq \PMem[\PB]$ with $\PDepset{P} \subseteq P \cup
+\quad \quad 2. Pick some $P \subseteq \PMem[\PB]$ with $\PDepset{P} \subseteq P \cup
 \PDisk$. \\
-\quad \quad Move each $p \in P$ to $\PInf$ (in-flight).
+\quad \quad 3. Move each $p \in P$ to $\PInf$ (in-flight).
 \end{tabbing}
 %
 \noindent
 %
-We require that $\PInf[\PB] = \emptyset$ to ensure that at most one version of
+The requirement that $\PInf[\PB] = \emptyset$ ensures that at most one version of
  a block is in flight at any time.
+%
+The buffer cache is also expected to write all blocks eventually, a
+ liveness property.
 
-In summary, the main \Featherstitch\ implementation challenge is to design
- data structures that make it easy to create patches, quick to manipulate
+The main \Featherstitch\ implementation challenge is to design
+ data structures that make it easy to create patches and quick to manipulate
  patches, and that help the buffer cache write blocks and patches in line
  with the above procedure.
-%
-(The buffer cache is also expected to write all blocks eventually, a
- liveness property.)
 
 
 \subsection{Dependency Implementation}
@@ -347,11 +350,11 @@ In summary, the main \Featherstitch\ implementation challenge is to design
 & \includegraphics[scale=0.78]{fig/examplesb_2} \\
 \textbf{a)} Adding a block (soft updates)
 & \textbf{b)} \dots plus removing a file
-& \textbf{c)} Adding a block (journal) \\
+& \textbf{c)} Adding a block (journaling) \\
 \end{tabular}
 \caption{Example patch arrangements for an ext2-like file system.
  Circles represent patches, shaded boxes represent disk blocks, and arrows
- represent dependencies.
+ represent direct dependencies.
  \textbf{a)} A soft updates order for appending a zeroed-out block to
  a file.  \textbf{b)} A different file on the same inode block is removed
  before the previous changes commit, inducing a circular block dependency.
@@ -365,8 +368,8 @@ The write-before relationship is transitive, so if $r \PDepend q$ and $q
  \PDepend p$, there is no need to explicitly store an $r \PDepend p$
  dependency.
 %
-To reduce storage requirements, a \Kudos\ implementation maintains only a
- subset of dependencies called the \emph{direct dependencies}.
+To reduce storage requirements, a \Kudos\ implementation maintains a
+ subset of the dependencies called the \emph{direct dependencies}.
 %
 Each patch $p$ has a corresponding set of direct dependencies
  $\PDDepset{p}$; 
@@ -374,7 +377,7 @@ Each patch $p$ has a corresponding set of direct dependencies
 we say $q$ \emph{directly depends on} $p$, and write $q \PDDepend p$, when
  $p \in \PDDepset{q}$.
 %
-The dependency relation $q \PDepend p$ simply means that either $q
+The dependency relation $q \PDepend p$ means that either $q
  \PDDepend p$ or $q \PDepend x \PDDepend p$ for some patch $x$.
 
 
@@ -394,13 +397,13 @@ different block before being able to write the remaining \patches.
 
 
 
-Another implementation choice defines how the buffer cache can
- write a subset of a block's patches.
+%% Another implementation choice defines how the buffer cache can
+%%  write a subset of a block's patches.
 %
-We maintain each block in its dirty state, including the
- effects of all uncommitted patches, but
+\Featherstitch\ maintains each block in its dirty state, including the
+ effects of all uncommitted patches.
 %
-each patch carries \textbf{undo data}: the 
+However, each patch carries \textbf{undo data}, the 
  previous version of the block data altered by the \patch.
 %
 If a \patch\ $p$ is not written with its containing block, the buffer cache
@@ -410,8 +413,15 @@ If a \patch\ $p$ is not written with its containing block, the buffer cache
 Once the block is written, the system will re-apply the \patch\ and, when
  allowed, write the block again, this time including the \patch.
 %
-Undo information adds greatly to memory and CPU utilization, but it can
- often be optimized away, as we show in Section~\ref{sec:patch:optimizations}.
+Some undo mechanism is required to break block-level dependency cycles, as
+ shown in the next section.
+%
+We considered alternate designs, such as maintaining a single ``old''
+ version of the block, but per-patch undo data gives file systems the
+ maximum flexibility to create \patch\ structures.
+%
+However, many of our optimizations optimize undo data away, greatly
+ reducing memory usage and CPU utilization.
 
 Figure~\ref{fig:patchnot} summarizes our patch notation.
 
@@ -442,17 +452,17 @@ write any of $\PBlock{b}$, $\PBlock{i}$, or $\PBlock{d}$.
 \subsection{Examples}
 \label{sec:patch:examples}
 
-This section illustrates how \patches\ can implement two widely-used
+This section illustrates \patch\ implementations of two widely-used
  file system consistency mechanisms, soft updates and journaling.
 %
 Our basic example extends an existing file by a single block---perhaps an
- application calls \texttt{ftruncate} to append 1024 zero bytes to an
+ application calls \texttt{ftruncate} to append 512 zero bytes to an
  empty file.
 %
-The file system is based on ext2, an FFS-like file system with inodes and
+The file system is based on Linux's ext2, an FFS-like file system with inodes and
  a free block bitmap.
 %
-In such a file system, this operation requires (1) allocating a block by
+In such a file system, extending a file by one block requires (1) allocating a block by
  marking the corresponding bit as ``allocated'' in the free block bitmap,
  (2) attaching the block to the file's inode, (3) setting the inode's size,
  and (4) clearing the allocated data block.
@@ -470,9 +480,9 @@ Early file systems aimed to avoid post-crash disk inconsistencies by
 For example, the write system call might block until all metadata writes
  have completed---clearly bad for performance.
 %
-Soft updates, in contrast, provides post-crash consistency without
+Soft updates provides post-crash consistency without
  synchronous writes by tracking and obeying necessary dependencies among
- writes~\cite{ganger00soft}.
+ writes.
 %
 A soft updates file system orders its writes to enforce three simple rules
  for metadata consistency~\cite{ganger00soft}:
@@ -488,8 +498,8 @@ A soft updates file system orders its writes to enforce three simple rules
 \end{compactenumerate}
 
 \noindent
-By following these rules, a file system limits the possible inconsistencies
-present on the disk at any time to leaked resources, such as blocks or inodes
+By following these rules, a file system limits possible disk inconsistencies
+to leaked resources, such as blocks or inodes
 marked as in use but unreferenced. The file system can be used immediately
  on reboot; a background scan can locate and recover the leaked resources
  while the system is in use.
@@ -508,10 +518,10 @@ Figure~\ref{f:ex}a shows a set of soft updates-like patches and dependencies for
 %% initializing the block by writing zeroes to it ($d$), writing the block number
 %% to the inode for the file ($i$), and updating the file's size ($i'$).
 %
-Rule~\ref{rule:pointer} requires that $i \PDDepend b$.
+Soft updates Rule~\ref{rule:pointer} requires that $i \PDDepend b$.
 %
-Rule~\ref{rule:reuse} requires that $d$ depend on previous pointers to the
- block being nullified;
+Rule~\ref{rule:reuse} requires that $d$ depend on the nullification of previous pointers to the
+ block;
 %
 a simple, though more restrictive, way to accomplish this is to let $d
  \PDDepend b$, where $b$ depends on any such nullifications
@@ -521,10 +531,10 @@ The dependencies $i \PDDepend d$ and $i' \PDDepend d$ provide an
  additional guarantee above and beyond metadata consistency, namely
  that no file ever contains accessible uninitialized data.
 %
-A similar dependency would make inode updates depend on actual data
- writes.
+%% A similar dependency would make inode updates depend on actual data
+%%  writes.
 %
-In contrast, the BSD UFS soft updates implementation represents each UFS
+Unlike \Featherstitch, the BSD UFS soft updates implementation represents each UFS
  operation by a different specialized structure encapsulating
  all of that operation's disk changes and dependencies.
 %% As a result, many specialized data structures
@@ -546,17 +556,20 @@ Figure~\ref{f:ex}b shows how an additional file system operation can induce
  a circular dependency among blocks.
 %
 Before the changes in Figure~\ref{f:ex}a are written, the user deletes a
- one-block file whose data block and inode happen to lie on the same bitmap
+ one-block file whose data block and inode happen to lie on the bitmap
  and inode blocks used by the previous operation.
 %
 Rule~\ref{rule:reuse} requires the dependency $b_2 \PDDepend i_2$; but
  given this dependency and the previous $i \PDDepend b$, neither the bitmap
  block nor the inode block can be written first!
 %
-A solution is to roll back patch $b_2$ by undoing its effects.
- The resulting bitmap block, which contains only
- $b$, is safe to write.  Once this write commits, all of $i$, $i'$, and
- $i_2$ are safe to write.  When these in turn commit, the system can write
+Breaking the cycle requires rolling back one or more patches, which in turn
+ requires undo data.
+%
+For example, the system might roll back $b_2$ and write the resulting
+ bitmap block, which contains only
+ $b$.  Once this write commits, all of $i$, $i'$, and
+ $i_2$ are safe to write; and once \emph{they} commit, the system can write
  the bitmap block again, this time including $b_2$.
 
 
@@ -636,14 +649,11 @@ again in order to write $cmp$.
 
 \subsection{Discussion}
 
-The patch abstraction seems general enough to suit many forms of
- dependency tracking.
+The patch abstraction places only one substantive restriction on its users,
+ namely, that circular dependency chains are errors.
 %
-Only one property of the model depends on the conventional file system context,
- namely that circular dependency chains are errors.
-%
-This restriction is required because \Kudos\ assumes a lower layer that
- commits one block at a time.
+This restriction arises from the file system context: \Kudos\ assumes a
+ lower layer that commits one block at a time.
 %
 Disks certainly behave this way, but a dependency tracker built above a
  more advanced lower layer---such as a journal---could resolve many
@@ -655,10 +665,11 @@ Disks certainly behave this way, but a dependency tracker built above a
  leave the implementation for future work.
 
 Patches model write-before relationships, but one might instead build a
- generalized file system dependency system that modeled abstract
+ generalized dependency system that modeled abstract
  transactions.
 %
 We chose write-before relationships as our foundation since they minimally
- constrain file system disk layout; nevertheless, it would be interesting
- to consider whether a transaction abstraction could model, say, soft
- updates-like dependencies.
+ constrain file system disk layout.
+%% ; nevertheless, it would be interesting
+%%  to consider whether a transaction abstraction could model, say, soft
+%%  updates-like dependencies.

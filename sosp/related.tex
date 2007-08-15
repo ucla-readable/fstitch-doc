@@ -112,7 +112,7 @@ They are committed in groups using a journaling design, but
 additional write-before relationships are enforced on
 \emph{non-file system} communication: a journal transaction must commit
 before output from any process involved in that transaction becomes externally
-visible, for example via the terminal or a network connection.
+visible via, for example, the terminal or a network connection.
 %
 Dependency relationships are tracked across IPC as well.
 %

@@ -133,7 +133,7 @@ beginfig(2);
 
   vardef wogna =
     drawelement(jc1);
-    drawconnpatch(d1,jc1)({dir -110}..sz1.w-(0,20)..{dir 125}) scaled 0.8;
+    drawconnpatch(d1,jc1)(--d1.c-(.3,0){dir -110}..sz1.w-(0,20)..{dir 125}) scaled 0.8;
   enddef;
 
   % Clip cmt\S vs. cmp\S
@@ -196,14 +196,14 @@ beginfig(2);
   drawconnpatch(jc1,jd1)(..);
   drawconnpatch(jc1,ji1)(..);
   drawconnpatch(jc1,jb1)(..);
-  drawconnpatch(sz1,jc1)(..) scaled 0.8;
+  drawconnpatch(sz1,jc1)(--sz1.c+(0,.7)..) scaled 0.8;
   drawconnpatch(bk1,jc1)(..) scaled 0.8;
   drawconnpatch(bi1,jc1)(--bi1.c+(0,.7)..) scaled 0.8;
   
   drawconnpatchx(jcp1,bi1)(..bi1.c-(0,.7)--) scaled 1.5;
-  drawconnpatchx(jcp1,sz1)(..) scaled 1.5;
+  drawconnpatchx(jcp1,sz1)(..sz1.c-(0,.7)--) scaled 1.5;
   drawconnpatchx(jcp1,bk1)(..) scaled 1.5;
-  drawconnpatchx(jcp1,d1)({dir -45}..sz1.w-(0,25)..{dir 80}) scaled 1.5;
+  drawconnpatchx(jcp1,d1)({dir -45}..sz1.w-(0,25)..{dir 80}d1.c+(.7,0)--) scaled 1.5;
   drawconnpatch(jcp1,jc1)({dir -170} .. .5[jcp1.w,jc1.w]-(5,3) .. {dir 80});
 
   drawelement(jcp1,bi1,bk1,sz1,d1);
@@ -325,8 +325,8 @@ beginfig(4);
   label.top(image(draw btex \mlabel{alloc} etex withcolor addblocklabcolor) scaled 0.65, bi1.n-(0,2));
   label.top(btex \mlabel{free\\block} etex scaled 0.65, bi2.n-(0,2));
   label.top(image(draw btex \mlabel{clear data} etex withcolor addblocklabcolor) scaled 0.65, d1.n-(0,2));
-  label.bot(image(draw btex \mlabel{attach} etex withcolor addblocklabcolor) scaled 0.65, bk1.s-(0,-1.5));
-  label.bot(image(draw btex \mlabel{size} etex withcolor addblocklabcolor) scaled 0.65, sz1.s-(0,-1.5));
+  label.bot(image(draw btex \mlabel{attach} etex withcolor addblocklabcolor) scaled 0.65, bk1.s-(0,-1.8));
+  label.bot(image(draw btex \mlabel{size} etex withcolor addblocklabcolor) scaled 0.65, sz1.s-(0,-1.8));
   label.bot(btex \mlabel{erase\\inode} etex scaled 0.65, de1.s-(0,-1.5));
   
   drawconnpatch(bk1,bi1)(..);

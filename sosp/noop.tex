@@ -1,14 +1,14 @@
 % -*- mode: latex; tex-main-file: "paper.tex" -*-
 
-\subsection{Implementation and \Noop\ \Patches}
+\subsection{Patch Implementation}
 \label{sec:patch:noop}
 
 \def\_{{\ttfamily\char`\_}}
 
-The \Kudos\ file system implementation creates patch structures
-corresponding directly to our abstraction.
+Our \Kudos\ file system implementation creates patch structures
+corresponding directly to this abstraction.
 %
-Creation functions have names like \texttt{patch\_\-create\_\-byte};
+Functions like \texttt{patch\_\-create\_\-byte} create patches;
 %
 their arguments include the relevant block, any
 direct dependencies, and the new data.
@@ -24,27 +24,28 @@ In bitmap blocks, changes to individual bits in a word can have independent
 dependencies, which we handle with a special bit-flip patch type.
 
 
-The implementation automatically detects one special type of dependency.
+The implementation automatically detects one type of dependency.
 %
-If two \patches\ $p$ and $q$ affect the same block and have overlapping data
-ranges, and $p$ was created before $q$, then \Kudos\ adds an \emph{overlap
-dependency} $q \PDDepend p$ to ensure that $p$ is written before $q$.
+If two \patches\ $q$ and $p$ affect the same block and have overlapping data
+ranges, and $q$ was created after $p$, then \Kudos\ adds an \emph{overlap
+dependency} $q \PDDepend p$ to ensure that $q$ is written after $p$.
 %
-There's no need for file system modules to detect and enforce such
+File systems need not detect such
 dependencies themselves.
 
 
 For each block $\PB$, \Kudos\ maintains a list of all \patches\ with
 $\PBlock{p} = \PB$.
 %
-However, it does not track committed \patches; when
+However, committed \patches\ are not tracked; when
 \patch\ $p$ commits, \Kudos\ destroys $p$'s data structure and removes all
 dependencies $q \PDDepend p$.
 %
-The resulting behavior follows our model.
+Thus, a patch whose dependencies have all committed appears like a patch
+with no dependencies at all.
 %
-For each \patch\ $p$, \Kudos\ maintains lists of its direct dependencies
-and its direct ``reverse dependencies'' (that is, all $q$ where $q
+Each patch $p$ maintains doubly linked lists of its direct dependencies
+and ``reverse dependencies'' (that is, all $q$ where $q
 \PDDepend p$).
 
 
@@ -75,13 +76,13 @@ The \noop\ \patch\ automatically commits at the same time as the commit
  add an \noop\ \patch\ $e$ and $m+n$ direct dependencies
  $q_i \PDDepend e$ and $e \PDDepend p_j$.
 %
-This is useful for \patchgroups\ as described in \S\ref{sec:patchgroup}.
+This is useful for \patchgroups; see Section~\ref{sec:patchgroup}.
 %
 However, extensive use of \noop\ \patches\ adds to system time by
  requiring that functions traverse \noop\ \patch\ layers to find true
  dependencies.
 %
-Our implementation therefore uses \noop\ \patches\ infrequently, and in the
+Our implementation uses \noop\ \patches\ infrequently, and in the
  rest of this paper, patches are nonempty unless explicitly
  stated.
 
