@@ -3,7 +3,7 @@
 - Check that we adequately address reviews
 
 * Really Want To Do
-- Fix patchgroups for svn (incorrect optimization? does it affect imap speed?)
+- Note journal size
 - Mention debugger
 - Fig 11: report meta or full journaling for fsync/patchgroups?
 - Improve understandability of patchgroup eval section
