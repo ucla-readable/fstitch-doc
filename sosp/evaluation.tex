@@ -114,6 +114,7 @@ the Ion window manager, version 2-20040729.
 \textbf{Optimization}
         & \textbf{\# \Patches} & \textbf{Undo data} & \textbf{System time} \\ % Malloc Malloc-block_data
 % Results are from r4121, mean of 5 runs
+% Postmark none and hard were run with a 20k dblock cache
 % NOTE: also update numbers in \patchoptundo and \patchoptcount
 \hline
 \multicolumn{4}{@{}c@{}}{\textbf{Untar test}\raise2pt\hbox{\strut}} \\
@@ -131,8 +132,8 @@ Both              &     1,800 &     0.00~MB &  0.15~sec \\ %  2~MB
 \hline
 
 \multicolumn{4}{@{}c@{}}{\textbf{PostMark test}\raise2pt\hbox{\strut}} \\
-None              & - & - & - \\
-\Nrb\ \patches\   & - & - & - \\
+None              & 4,590,571 & 3,175.28~MB & 23.64~sec \\ % 3,316~MB
+\Nrb\ \patches\   & 2,544,198 & 1,582.94~MB & 18.62~sec \\ % 1,639~MB
 Overlap merging   &   550,442 & 1,590.27~MB & 12.88~sec \\ % 1,643~MB
 Both              &   675,308 &     0.11~MB & 11.05~sec \\ %    75~MB
 \hline
@@ -154,13 +155,19 @@ We evaluate the effectiveness of the \patch\ optimizations discussed in
 Section~\ref{sec:patch:optimizations}, in terms of
 %
 the total number of \patches\ created, amount of undo data allocated,
-total amount of memory allocated for \Kudos, and system CPU time used.
+and system CPU time used.
 %
 Figure~\ref{f:optdata} shows these results for the untar, delete,
 PostMark, and Andrew benchmarks for \Kudos\ ext2 in soft updates mode,
 with all combinations of using \nrb\ \patches\ and overlap merging.
-The results for metadata and full data journaling are similar.
 %
+The PostMark results for no optimizations and for just the \nrb\
+\patches\ optimization use a smaller maximum \Kudos\ cache size,
+80,000 blocks vs 160,000 blocks, so that the benchmark does not run
+out of memory.
+%
+The results for metadata and full data journaling are similar.
+
 Both optimizations work well alone, but their combination is particularly
 effective at reducing the amount of undo data---which, again, is pure
 overhead relative to conventional file systems.
