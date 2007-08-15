@@ -272,18 +272,18 @@ beginfig(7);
 
   drawelement(hp,tp,hx,tq);
 
-  label(btex \mlabel{f{}ile system changes\\written during\\\texttt{pg\char`\_engage(}\textit{pg}\texttt{)}} etex scaled 0.8, .5[hp.c,tp.c]);
+  label(btex \mlabel{f{}ile system changes\\written between\\\texttt{pg\char`\_engage(}\textit{pg}\texttt{)} and\\\texttt{pg\char`\_disengage(}\textit{pg}\texttt{)}} etex scaled 0.8, .5[hp.c,tp.c]+(0,5));
   label.top(btex \mlabel{\texttt{pg\char`\_depend}\\\texttt{(}\textit{qg}\texttt{,} \textit{pg}\texttt{)}} etex scaled 0.8, .5[tq.c,hp.c]);
   label.top(btex \mlabel{\texttt{pg\char`\_depend}\\\texttt{(}\textit{pg}\texttt{,} \textit{xg}\texttt{)}} etex scaled 0.8, .5[tp.c,hx.c]);
   drawconnpatch(tq,hp)(..);
   drawconnpatch(tp,hx)(..);
-  drawconnarrow hp.c -- hp.c + (35,10) cutbefore bpath.hp;
-  drawconnarrow hp.c -- hp.c + (42,-2) cutbefore bpath.hp;
+  drawconnarrow hp.c -- hp.c + (34,18) cutbefore bpath.hp;
+  drawconnarrow hp.c -- hp.c + (42,10) cutbefore bpath.hp;
   drawconnarrow hp.c -- hp.c + (30,-10) cutbefore bpath.hp;
-  drawconnarrow tp.c + (-35,10) -- tp.c cutafter bpath.tp;
-  drawconnarrow tp.c + (-42,3) -- tp.c cutafter bpath.tp;
-  drawconnarrow tp.c + (-40,-4) -- tp.c cutafter bpath.tp;
-  drawconnarrow tp.c + (-38,-14) -- tp.c cutafter bpath.tp;
+  drawconnarrow tp.c + (-30,18) -- tp.c cutafter bpath.tp;
+  drawconnarrow tp.c + (-40,11) -- tp.c cutafter bpath.tp;
+  drawconnarrow tp.c + (-32,-4) -- tp.c cutafter bpath.tp;
+  drawconnarrow tp.c + (-36,-14) -- tp.c cutafter bpath.tp;
   drawconnarrow tq.w - (10,5) -- tq.c cutafter bpath.tq;
   drawconnarrow tq.w - (12,-2) -- tq.c cutafter bpath.tq;
   drawconnarrow hx.c -- hx.e + (10,0) cutbefore bpath.hx;

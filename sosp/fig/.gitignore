@@ -2,8 +2,11 @@ opt_*.eps
 figures_*.eps
 opt_*.pdf
 figures_*.pdf
+pg_*.pdf
+pg_*.eps
 *.log
 *.mpx
+mpxerr.tex
 softhard_*.eps
 softhard_*.pdf
 examples_*.pdf
