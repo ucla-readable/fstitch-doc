@@ -1,18 +1,16 @@
 * Must Do
-- Add postmark none and hard patch results (they OOM)
 - Finish title easter egg
 - Check that we adequately address reviews
 
 * Really Want To Do
-- Mention debugger
 - Fig 11: report meta or full journaling for fsync/patchgroups?
 - Improve understandability of patchgroup eval section
   Or mention how some journals implement some patchgroup uses for free?
-- Improve imap diagram
 - Deal with long/tiny urls
 
 * Want To Do
-- Metapost the imap patchgroup figure?
+- Improve imap diagram
+	- Metapost it?
 - Explicitly mention that patchgroups allow specification of precisely
   happens-before? They cannot be used to ``hold patches'' in ram.
 - Check that we did not forget any todos sent to kudos@
@@ -21,9 +19,9 @@
 - More fully explain allocator differences and the effects
 
 * Might Try To Do?
-- Improve postmark perf
-- Explain when patch opts do not apply
 - Thank Intel/MS
+- Explain when patch opts do not apply
+- Improve postmark perf
 - Speed up imap/svn SU
 
 
