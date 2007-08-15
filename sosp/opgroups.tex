@@ -1,13 +1,7 @@
 \section{\Patchgroups}
 \label{sec:patchgroup}
 
-\newcommand{\pgCreate}{\texttt{pg\_create}}
-\newcommand{\pgDepend}{\texttt{pg\_depend}}
-\newcommand{\pgEngage}{\texttt{pg\_engage}}
-\newcommand{\pgDisengage}{\texttt{pg\_disengage}}
-\newcommand{\pgRelease}{\texttt{pg\_release}}
-\newcommand{\pgSync}{\texttt{pg\_sync}}
-\newcommand{\pgClose}{\texttt{pg\_close}}
+% notation removed to notation.tex
 
 
 This section describes \emph{\patchgroups}, a simple API that extends \patches\ to user
@@ -65,9 +59,9 @@ The \patchgroup\ interface is as follows:
 \begin{scriptsize}
 \begin{alltt}
   typedef int pg_t;          pg_t \textbf{pg_create}(void);
-  int \textbf{pg_engage}(pg_t pg);    int  \textbf{pg_disengage}(pg_t pg);
-  int \textbf{pg_sync}(pg_t pg);      int  \textbf{pg_close}(pg_t pg);
-  int \textbf{pg_depend}(pg_t after, pg_t before);
+  int \textbf{pg_engage}(pg_t \pgPgNf);     int  \textbf{pg_disengage}(pg_t \pgPgNf);
+  int \textbf{pg_sync}(pg_t \pgPgNf);       int  \textbf{pg_close}(pg_t \pgPgNf);
+  int \textbf{pg_depend}(pg_t \pgQgNf, pg_t \pgPgNf);  /* \textrm{adds \(\pgQgNf\PDepend\pgPgNf\)} */
 \end{alltt}
 \end{scriptsize}
 \vspace{-0.5\baselineskip}
@@ -75,9 +69,9 @@ The \patchgroup\ interface is as follows:
 Each process has its own set of \patchgroups, which are currently shared
 among all threads.
 %
-The call \texttt{\pgDepend(q, p)} makes \patchgroup\ \texttt{q} depend on
-\patchgroup\ \texttt{p}: all \patches\ associated with \texttt{p} will
-be committed prior to those associated with \texttt{q}.
+The call \texttt{\pgDepend(\pgQg, \pgPg)} makes \patchgroup\ \pgQg\ depend on
+\patchgroup\ \pgPg: all \patches\ associated with \pgPg\ will
+commit prior to any of those associated with \pgQg.
 %
 The \patches\ associated with a \patchgroup\ are those created while
 the \patchgroup\ is engaged.
@@ -106,9 +100,9 @@ inconstructible.
 Figure~\ref{fig:patchgroup-transitions} shows when a given
 \patchgroup\ dependency operation is valid.
 %
-For example, \texttt{\pgDepend(q, p)} returns an error if
-\texttt{q} has \emph{ever} been engaged; if it succeeds, a subsequent
-\texttt{\pgEngage(p)} will return an error.\footnote{These rules are really
+For example, \texttt{\pgDepend(\pgQg, \pgPg)} returns an error if
+\pgQg\ has \emph{ever} been engaged; if it succeeds, a subsequent
+\texttt{\pgEngage(\pgPg)} will return an error.\footnote{These rules are really
 just a strictly enforced version of the requirement from \S\ref{sec:patch:nrb}
 that all dependencies must be specified up-front.}
 
@@ -159,8 +153,8 @@ two \patchgroups.
 %%   a different file system change.}
 \includegraphics[width=\hsize]{fig/figures_7}
 \caption{\label{fig:patchgroup-patches} \Patchgroup\ \patch\ layout.  Empty
-patches $h_\textit{pg}$ and $t_\textit{pg}$ bracket file system patches that occur while
-\patchgroup\ \textit{pg} is engaged.  \Patchgroup\ dependencies connect one
+patches $h_{\pgPgNf}$ and $t_{\pgPgNf}$ bracket file system patches that occur while
+\patchgroup\ \pgPg\ is engaged.  \Patchgroup\ dependencies connect one
 \patchgroup's $t$ patch to another's $h$.}
 \end{figure}
 
@@ -349,8 +343,8 @@ Figure~\ref{fig:imap}b illustrates using patches to move messages.
 \begin{figure}[tb]
 \centering
 \begin{tabular}{@{}cc@{}}
-\includegraphics[width=0.45\columnwidth]{fig/pg_2} & 
-\includegraphics[width=0.45\columnwidth]{fig/pg_3}\\
+\includegraphics[scale=0.6]{fig/pg_2} & 
+\includegraphics[scale=0.6]{fig/pg_3}\\
 \textbf{a)} Unmodified, \texttt{fsync} & 
 \textbf{b)} \Patchgroups
 \end{tabular}

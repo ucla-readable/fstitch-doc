@@ -260,10 +260,10 @@ endfig;
 
 beginfig(7);
   boxjoin(a.width = b.width; a.height = b.height);
-  patchit.hp(btex $h_\textit{pg}$ etex, 0);
-  patchit.tp(btex $t_\textit{pg}$ etex, 0);
-  patchit.hx(btex $h_\textit{xg}$ etex, 0);
-  patchit.tq(btex $t_\textit{qg}$ etex, 0);
+  patchit.hp(btex $h_{\pgPgNf}$ etex, 0);
+  patchit.tp(btex $t_{\pgPgNf}$ etex, 0);
+  patchit.hx(btex $h_{\pgOgNf}$ etex, 0);
+  patchit.tq(btex $t_{\pgQgNf}$ etex, 0);
 
   tq.width = tq.height;
 
@@ -272,9 +272,9 @@ beginfig(7);
 
   drawelement(hp,tp,hx,tq);
 
-  label(btex \mlabel{f{}ile system changes\\written between\\\texttt{pg\char`\_engage(}\textit{pg}\texttt{)} and\\\texttt{pg\char`\_disengage(}\textit{pg}\texttt{)}} etex scaled 0.8, .5[hp.c,tp.c]+(0,5));
-  label.top(btex \mlabel{\texttt{pg\char`\_depend}\\\texttt{(}\textit{qg}\texttt{,} \textit{pg}\texttt{)}} etex scaled 0.8, .5[tq.c,hp.c]);
-  label.top(btex \mlabel{\texttt{pg\char`\_depend}\\\texttt{(}\textit{pg}\texttt{,} \textit{xg}\texttt{)}} etex scaled 0.8, .5[tp.c,hx.c]);
+  label(btex \mlabel{f{}ile system changes\\written between\\\texttt{pg\char`\_engage(\pgPg)} and\\\texttt{pg\char`\_disengage(\pgPg)}} etex scaled 0.8, .5[hp.c,tp.c]+(0,5));
+  label.top(btex \mlabel{\texttt{pg\char`\_depend}\\\texttt{(\pgQg, \pgPg)}} etex scaled 0.8, .5[tq.c,hp.c]);
+  label.top(btex \mlabel{\texttt{pg\char`\_depend}\\\texttt{(\pgPg, \pgOg)}} etex scaled 0.8, .5[tp.c,hx.c]);
   drawconnpatch(tq,hp)(..);
   drawconnpatch(tp,hx)(..);
   drawconnarrow hp.c -- hp.c + (34,18) cutbefore bpath.hp;
