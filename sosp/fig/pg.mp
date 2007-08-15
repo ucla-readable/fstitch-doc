@@ -60,7 +60,7 @@ beginfig(1);
 endfig;
 
 beginfig(2);
-  boxjoin(a.width = b.width; a.height = b.height; a.s - b.n = (0,8));
+  boxjoin(a.width = b.width; a.height = b.height; a.s - b.n = (0,14));
   elementit.a(btex \mlabel{write copy\strut} etex, 0, 0, push);
   elementit.b(btex \mlabel{write copy\strut} etex, 0, 0, push);
   elementit.c(btex \mlabel{write copy\strut} etex, 0, 0, push);
@@ -69,10 +69,68 @@ beginfig(2);
   boxjoin();
   elementit.d(btex \mlabel{delete\\originals} etex, 0, 0, push);
   d.width = c.width;
-  c.sw - d.ne = (20,5);
+  c.sw - d.ne = (20,14);
 
   drawelement(a,b,c,d);
+  label.bot(btex \texttt{fsync} etex scaled 0.8, a.s);
+  label.bot(btex \texttt{fsync} etex scaled 0.8, b.s);
+  label.bot(btex \texttt{fsync} etex scaled 0.8, c.s);
+  label.bot(btex \texttt{fsync} etex scaled 0.8, d.s);
+
+  label.lft(btex \texttt{COPY} $\Bigg\{$ etex scaled 0.85, .5[a.nw,b.nw]);
+  label.lft(btex \texttt{COPY} $\Bigg\{$ etex scaled 0.85, .5[b.nw,c.nw]);
+  label.lft(btex \texttt{COPY} $\Bigg\{$ etex scaled 0.85, .5[c.nw,c.nw+(c.nw-b.nw)]);
+
+  label.rt(btex $\left.\vcenter to 46pt{}\right\}$ \texttt{EXPUNGE} etex scaled 0.85, d.e);
+  label.rt(btex \kern2pt$\}$\kern3pt~\texttt{CHECK} etex scaled 0.85, d.se - (0,7));
   
+  label.top(btex \texttt{mailbox.dst} etex, a.n + (0,4));
+  label.top(btex \texttt{mailbox.src} etex, (xpart d.n,ypart a.n) + (0,4));
+
+  z1 = (xpart d.w - 10, ypart a.n);
+  z2 = (x1, ypart d.s - 4);
+  drawconnarrow z1 -- z2;
+  label.lft(btex Time etex rotated 90, .5[z1,z2]);
+endfig;
+
+beginfig(3);
+  boxjoin(a.width = b.width; a.height = b.height; a.s - b.n = (0,14));
+  elementit.a(btex \mlabel{write copy\strut} etex, 0, 0, push);
+  elementit.b(btex \mlabel{write copy\strut} etex, 0, 0, push);
+  elementit.c(btex \mlabel{write copy\strut} etex, 0, 0, push);
+  a.dx = 10; a.dy = 2;
+
+  boxjoin();
+  elementit.d(btex \mlabel{delete\\originals} etex, 0, 0, push);
+  d.width = c.width;
+  c.sw - d.ne = (20,14);
+
+  drawelement(a,b,c,d);
+  label.bot(btex \texttt{pg\char`\_sync(}$\textit{pg}_4$\texttt{)} etex scaled 0.8, d.s);
+
+  label.lft(btex \texttt{COPY} ($\textit{pg}_1$) $\Big\{$ etex scaled 0.85, .5[a.nw,a.sw]);
+  label.lft(btex \texttt{COPY} ($\textit{pg}_2$) $\Big\{$ etex scaled 0.85, .5[b.nw,b.sw]);
+  label.lft(btex \texttt{COPY} ($\textit{pg}_3$) $\Big\{$ etex scaled 0.85, .5[c.nw,c.sw]);
+
+  label.rt(btex $\left.\vcenter to 46pt{}\right\}$ \texttt{EXPUNGE} ($\textit{pg}_4$) etex scaled 0.85, d.e);
+  label.rt(btex \kern2pt$\}$\kern3pt~\texttt{CHECK} etex scaled 0.85, d.se - (0,7));
+  
+  label.top(btex \texttt{mailbox.dst} etex, a.n + (0,4));
+  label.top(btex \texttt{mailbox.src} etex, (xpart d.n,ypart a.n) + (0,4));
+
+  z1 = (xpart d.w - 10, ypart a.n);
+  z2 = (x1, ypart d.s - 4);
+  drawconnarrow z1 -- z2;
+  label.lft(btex Time etex rotated 90, .5[z1,z2]);
+
+  drawconnpatch(b,a)(..);
+  label.lft(btex \texttt{pg\char`\_depend(}$\textit{pg}_2\texttt{,}\textit{pg}_1$\texttt{)}\strut etex scaled 0.8, .5[a.s,b.n]-(4,0));
+  
+  drawconnpatch(c,b)(..);
+  label.lft(btex \texttt{pg\char`\_depend(}$\textit{pg}_3\texttt{,}\textit{pg}_2$\texttt{)}\strut etex scaled 0.8, .5[b.s,c.n]-(4,0));
+
+  drawconnpatch(d,c)(..d.n{up}..tension 3..{up}c.s..);
+  label.lrt(btex \texttt{pg\char`\_depend(}$\textit{pg}_4\texttt{,}\textit{pg}_3$\texttt{)}\strut etex scaled 0.8, c.sw-(10,5));
 endfig;
 
 end
