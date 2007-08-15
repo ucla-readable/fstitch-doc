@@ -42,8 +42,9 @@ the superblock.
 %
 The best results can be obtained from \emph{minimal} \patches\ that change
 one independent field at a time.  \Kudos\ will merge these \patches\ when
-appropriate, but if they cannot be merged, minimal \patches\ cause
-fewer \patch\ revert operations and more flexibility in write ordering.
+appropriate, but if they cannot be merged, minimal \patches\ generally
+result in fewer \patch\ revert operations and more flexibility in write
+ordering.
 
 File system implementations can generate better dependency arrangements
 when they can detect that certain states will never appear on disk.
@@ -59,7 +60,7 @@ it---then there is no need to require the corresponding dependency.
 %
 Leaving out these dependencies can speed up the system by avoiding circular
 block dependencies, such as those in Figure~\ref{f:soft2hard}, and thus
-avoiding the attendant rollbacks and double writes.
+avoid the attendant rollbacks and double writes.
 %
 \begin{comment}
 A dependency from the inode clear onto the directory entry clear is
@@ -77,6 +78,12 @@ depend on the patch that deleted that directory entry.
 These optimizations significantly reduce the number of disk writes, number
 of patches created, and amount of undo data allocated when files are
 created and deleted within a short time.
+
+In analyzing \patch\ usage we often found it useful to visually
+analyze \patch\ graphs (looking at created \patches\ and the \patch's
+dependencies). \Kudos\ optionally logs \patch\ operations to disk;
+a separate \Kudos\ debugger can inspect and generate graphs from these
+logs.
 
 %% the changes to update a field in an inode structure
 %% on disk, a \patch\ spanning the entire inode could be created even though
