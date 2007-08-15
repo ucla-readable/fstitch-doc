@@ -215,9 +215,9 @@ smaller account for about 51\% of all \rb\ \patches.}
 
 \multicolumn{5}{@{}l}{\emph{Linux}\raise2pt\hbox{\strut}} \\
 \safe{ext3 writeback} & \safe{16.6 [1.0]} & \safe{4.5 [0.3]} & \safe{38.2 [~~3.7]} & \safe{36.8 [4.1]} \\
-\safe{ext3 journal} & \safe{12.8 [1.1]} & \safe{4.6 [0.3]} & \safe{69.6 [~~4.5]} & \safe{38.2 [4.0]} \\
+\safe{ext3 full journal} & \safe{12.8 [1.1]} & \safe{4.6 [0.3]} & \safe{69.6 [~~4.5]} & \safe{38.2 [4.0]} \\
 \unsafe{ext2} & \unsafe{4.4 [0.7]} & \unsafe{4.6 [0.1]} & \unsafe{35.7 [~~1.9]} & \unsafe{36.9 [4.0]} \\
-\unsafe{ext3 journal} & \unsafe{10.6 [1.1]} & \unsafe{4.4 [0.2]} & \unsafe{61.5 [~~4.5]} & \unsafe{37.2 [4.1]} \\
+\unsafe{ext3 full journal} & \unsafe{10.6 [1.1]} & \unsafe{4.4 [0.2]} & \unsafe{61.5 [~~4.5]} & \unsafe{37.2 [4.1]} \\
 
 %FreeBSD (soft updates) & 23.22 & 15.95 & & \\ 
 %FreeBSD (async) & 10.09 & 3.25 & & \\
@@ -334,7 +334,7 @@ Linux ext3 writeback, ordered, and full journal modes also perform similarly,
 so we report only for the full journal mode.
 %
 Using the linear consistency method with \Kudos\ full journaling performs
-similarly to the corresponding case with Linux fill journaling.
+similarly to the corresponding case with Linux full journaling.
 
 Fully journaled \Kudos\ with \patchgroups\ performs at least as well
 as all other (safe and unsafe) \Kudos\ and all Linux configurations.
@@ -401,9 +401,9 @@ full journal & \patchgroups & 1.4 [0.4] & 32 \\ \hline
 
 %fsync & Linux & ext2 & 16.7 [0.3] & 2,503 \\
 %%Linux ext3 ordered (fsync) & 23.9 [0.3] & 3,025 \\
-journal & fsync & 19.9 [0.3] & 2,531 \\
+full journal & fsync & 19.9 [0.3] & 2,531 \\
 
-journal & assume linear & 1.3 [0.3] & 26 \\
+full journal & assume linear & 1.3 [0.3] & 26 \\
 
 \end{tabular}
 \caption{\label{fig:imap-compare} IMAP benchmark: move 1,000 messages.
