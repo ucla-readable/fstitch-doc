@@ -58,15 +58,18 @@ Although our terminology originates in conventional disk-based file systems
  file systems with non-uniform blocks and to other media, including RAID
  and network storage.
 
-We assume data is committed to stable storage in units called
+We assume that stable storage commits data in units called
  \textbf{blocks}.
 %
 All writes affect one or more blocks, and it is impossible to selectively
  write part of a block.
+%
+In disk terms, a block is a sector or, for file system convenience,
+ a few contiguous sectors.
 
 A \textbf{patch} models any change to block data.
 %
-Each patch applies to exactly one block, so a file system change that
+Each patch applies to exactly one block, so a change that
  affects $n$ blocks requires at least $n$ patches to represent.
 %
 Each \patch\ is either
@@ -206,7 +209,7 @@ $q \PDepend p$ & $q$ depends on $p$ ($p$ must be written before $q$) \\
 $\PDepset{p}$ & $p$'s dependencies: $\{ x \mid p \PDepend x \}$ \\
 \noalign{\vskip3pt}
 $q \PDDepend p$ & $q$ directly depends on $p$ \\
-	& ($q\PDepend p$ means either $q\PDDepend p$ or $\exists x : q \PDepend x \PDDepend p$.) \\
+	& ($q\PDepend p$ means either $q\PDDepend p$ or $\exists x : q \PDepend x \PDDepend p$) \\
 $\PDDepset{p}$ & $p$'s direct dependencies: $\{ x \mid p \PDDepend x \}$ \\
 \end{tabular}
 \end{small}
