@@ -12,8 +12,8 @@ journal vary in each implementation, but in all cases, the system can use the
 journal to replay (or roll back) any transactions that did not complete due to
 the shutdown. A recovery procedure, if correct~\cite{yang04using}, 
 avoids time-consuming
-\emph{fsck}-like file system
-checks on reboot after a crash in favor of simple journal operations.
+file system
+checks on post-crash reboot in favor of simple journal operations.
 
 Soft updates~\cite{ganger00soft} is another important mechanism for
 ensuring post-crash consistency. Carefully managed write orderings
@@ -23,8 +23,9 @@ are allowed to appear on the file system. As in journaling, soft updates
 can avoid \emph{fsck} after a crash, although a background \emph{fsck} is
 required to recover leaked storage.
 
-Both journaling and soft updates are naturally represented in terms of
-patches, as Section~\ref{sec:patch:examples} demonstrates, and we use both
+Patches naturally represent both
+both journaling and soft updates,
+as Section~\ref{sec:patch:examples} demonstrates, and we use
 journaling and soft updates as running examples throughout the paper.
 %
 In both cases, the patch implementation extracts ad hoc orderings and
@@ -43,6 +44,11 @@ This should not be construed as a wholesale endorsement of soft updates,
 which relies on a property (atomic block writes) that many disks do not
 provide, and which often requires more seeks than journaling
 despite writing less data.
+
+Although patches were designed to represent any write-before relationship,
+implementations of other consistency mechanisms, such as the shadow
+paging-style techniques used to implement write anywhere file
+layouts~\cite{hitz94file}, are left for future work.
 
 CAPFS~\cite{vilayannur05providing} and Echo~\cite{mann94coherent}
 considered
@@ -76,7 +82,7 @@ and brings it to disk-based file systems.
 A similar application interface to \patchgroups\ is explored in
 Section~4 of Burnett's thesis~\cite{burnett06information}. However, the methods
 used to implement the interfaces are very different: Burnett's system tracks
-dependencies at the level of entire system calls, associates dirty blocks with
+dependencies among system calls, associates dirty blocks with
 unique IDs returned by those calls, and duplicates dirty blocks when necessary
 to preserve ordering. \Kudos\ tracks individual changes to blocks internally,
 allowing kernel modules a finer level of control, and only chooses to expose a
@@ -96,28 +102,28 @@ BlueFS~\cite{nightingale05speculative} and
 xsyncfs~\cite{nightingale06rethink} to reduce the aggregate performance
 impact of strong consistency guarantees.
 %
-In particular, xsyncfs provides \emph{external synchrony}, which
-has the same consistency guarantees as synchronous file system ordering for
-users, but does not actually block applications on each write.
+Xsyncfs's \emph{external synchrony} provides users with
+the same consistency guarantees as synchronous writes.
 %
-Writes are committed in groups using a journaling design, but
+Application writes are not synchronous, however.
 %
-xsyncfs enforces additional write-before relationships on
+They are committed in groups using a journaling design, but
+%
+additional write-before relationships are enforced on
 \emph{non-file system} communication: a journal transaction must commit
-before output from any process involved in that transaction can
-escape the kernel, for example via the terminal or a network connection.
+before output from any process involved in that transaction becomes externally
+visible, for example via the terminal or a network connection.
 %
-These dependency relationships are tracked across IPC as well.
+Dependency relationships are tracked across IPC as well.
 %
-\Featherstitch\ patches could generalize the link between the file system
-implementation and xsyncfs dependencies, or the cross-network dependencies
-sent in BlueFS; for instance, \Kudos\ patches apply at least conceptually
-to any file system, whereas the xsyncfs implementation assumes a file
-system like ext3.
+\Featherstitch\ patches could be used to link file system behavior
+and xsyncfs process dependencies, or to define cross-network dependencies
+as in BlueFS; this would remove, for instance, xsyncfs's reliance
+on ext3.
 %
 Conversely, \Featherstitch\ applications could benefit from the
 combination of strict ordering and nonblocking writes provided by xsyncfs.
-
+%
 \begin{comment}
 written by that transaction, \emph{or} any
 data written by processes involved in that transaction's writes after that
@@ -156,22 +162,22 @@ dependencies, allowing them to apply to any file system.
 Similar \patch-like dependencies are used to improve network file system
 performance in BlueFS~\cite{nightingale05speculative}.
 \end{comment}
-
+%
 % "allow the kernel to safely and efficiently handle any metadata layout without understanding the layout itself"
 % \cite{kaashoek97application}
-
+%
 %% \paragraph{Stackable File Systems}
-
+%
 % \cite{webber93portable}
-
-Stackable \module\ software for file systems continues to attract active
-research~\cite{rosenthal90evolving, heidemann91layered, skinner93stacking,
+%
+Like xsyncfs, stackable \module\ software for file systems%
+~\cite{rosenthal90evolving, heidemann91layered, skinner93stacking,
 heidemann94filesystem,zadok99extending,
-zadok00fist,wright03ncryptfs,wright06versatility}, as do other extensions
-to file system and disk interfaces~\cite{huang05fs2,sivathanu06typesafe};
-these systems could potentially
+zadok00fist,wright03ncryptfs,wright06versatility} and other extensions
+to file system and disk interfaces~\cite{huang05fs2,sivathanu06typesafe}
+might
 benefit from a patch-like mechanism that represented write-before
-relationships and consistency requirements in an agnostic manner.
+relationships and consistency requirements agnostically.
 
 \begin{comment}
 Previous
