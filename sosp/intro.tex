@@ -183,9 +183,9 @@ A naive \patch-based storage system scaled terribly,
 However, optimizations reduced \patch\ memory and
  CPU overheads significantly.
 %
-A PostMark test that writes approximately 4~GB of data
- requires 41~MB of memory to store \patches\ and
- soft updates-like dependencies, less than 2\% of the memory used for file
+A PostMark test that writes approximately 3.2~GB of data
+ allocates 75~MB of memory throughout the test to store \patches\ and
+ soft updates-like dependencies, less than 3\% of the memory used for file
  system data and about 1\% of the memory required by unoptimized
  \Featherstitch.
 %

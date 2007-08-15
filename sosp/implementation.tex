@@ -143,11 +143,8 @@ Our prototype's Linux integration has several performance problems.
 %% Future work will require hardening several aspects of our Linux
 %% integration.
 %
-For example, data blocks are often stored in Linux's buffer cache as well
-as our own, increasing memory pressure.
-%
-Writing a block requires copying that block's data whether or not any
-patches were undone.
+For example, writing a block requires copying that block's data
+whether or not any patches were undone.
 %
 Our buffer cache's size is more limited than Linux's, since it currently
 requires that all blocks are stored in permanently-mapped kernel memory.

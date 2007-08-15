@@ -37,21 +37,10 @@ CPU, 2~GB of RAM, and a Seagate ST3320620AS 320~GB 7200~RPM SATA2 disk.
 All tests use a 10~GB file system and the Linux 2.6.20.1 kernel
 with the Ubuntu v6.06.1 distribution.
 %
-Because the \Kudos-kernel integration does not use high memory and
-because \Kudos\ uses its own block cache in addition to the kernel's,
-we limit \Kudos\ and Linux configurations to an effective 312~MB of
-RAM available for the block cache.
-%
-(\Kudos\ is given more RAM total, roughly compensating for extra memory
-pressure due to Linux integration issues; see \S7.)
+Because \Kudos\ is not aware of high memory we disable high memory for
+all configurations, limiting \Kudos\ and Linux to 912~MB of RAM.
 %
 Only the PostMark benchmark is sensitive to cache size.
-
-%% Specifically, \Kudos\ configurations have 662~MB of RAM total and
-%% 312~MB of RAM for the \Kudos\ block cache
-%% %
-%% and Linux configurations have 350~MB of RAM total and 312~MB of RAM
-%% for the block cache.
 
 We examine Linux ext2 (in asynchronous mode) and ext3 (in writeback,
 ordered, and full journal modes), and \Kudos\ ext2 (in asynchronous,
@@ -123,35 +112,35 @@ the Ion window manager, version 2-20040729.
 \begin{tabular}{@{}lrrrr@{}}
 \textbf{Optimization}
         & \textbf{\# \Patches} & \textbf{Undo data} & \textbf{System time} \\ % Malloc Malloc-block_data
-% Results are from r4037, mean of 5 runs
+% Results are from r4121, mean of 5 runs
 % NOTE: also update numbers in \patchoptundo and \patchoptcount
 \hline
 \multicolumn{4}{@{}c@{}}{\textbf{Untar test}\raise2pt\hbox{\strut}} \\
-None              &   619,740 &   459.41~MB &  3.33~sec \\ % 768~MB 513~MB
-\Nrb\ \patches\   &   446,002 &   205.94~MB &  2.73~sec \\ % 515~MB 259~MB
-Overlap merging   &   111,486 &   254.02~MB &  1.87~sec \\ % 544~MB 289~MB
-Both              &    68,887 &     0.39~MB &  1.83~sec \\ % 293~MB  37~MB
+None              &   619,740 &   459.41~MB &  3.33~sec \\ % 528~MB
+\Nrb\ \patches\   &   446,002 &   205.94~MB &  2.73~sec \\ % 273~MB
+Overlap merging   &   111,486 &   254.02~MB &  1.87~sec \\ % 292~MB
+Both              &    68,887 &     0.39~MB &  1.83~sec \\ %  40~MB
 \hline
 
 \multicolumn{4}{@{}c@{}}{\textbf{Delete test}\raise2pt\hbox{\strut}} \\
-None              &   299,089 &     1.43~MB &  0.81~sec \\ % 48~MB
-\Nrb\ \patches\   &    41,113 &     0.91~MB &  0.24~sec \\ % 20~MB
-Overlap merging   &    54,665 &     0.93~MB &  0.31~sec \\ % 21~MB
-Both              &     1,800 &     0.00~MB &  0.15~sec \\ % 13~MB
+None              &   299,089 &     1.43~MB &  0.81~sec \\ % 42~MB
+\Nrb\ \patches\   &    41,113 &     0.91~MB &  0.24~sec \\ %  8~MB
+Overlap merging   &    54,665 &     0.93~MB &  0.31~sec \\ % 10~MB
+Both              &     1,800 &     0.00~MB &  0.15~sec \\ %  2~MB
 \hline
 
 \multicolumn{4}{@{}c@{}}{\textbf{PostMark test}\raise2pt\hbox{\strut}} \\
-None              & 4,591,628 & 3,175.28~MB & 24.46~sec \\ % 5,347~MB 3316MB
-\Nrb\ \patches\   & 2,544,300 & 1,583.75~MB & 20.00~sec \\ % 3,674~MB 3674MB
-Overlap merging   &   543,738 & 1,587.81~MB & 12.57~sec \\ % 3,649~MB 1618MB
-Both              &   624,776 &     0.10~MB & 13.78~sec \\ % 2,068~MB   41MB
+None              & - & - & - \\
+\Nrb\ \patches\   & - & - & - \\
+Overlap merging   &   550,442 & 1,590.27~MB & 12.88~sec \\ % 1,643~MB
+Both              &   675,308 &     0.11~MB & 11.05~sec \\ %    75~MB
 \hline
 
 \multicolumn{4}{@{}c@{}}{\textbf{Andrew test}\raise2pt\hbox{\strut}} \\
-None              &    70,925 &    64.09~MB &  4.33~sec \\ % 97~MB 69MB
-\Nrb\ \patches\   &    50,803 &    36.18~MB &  4.31~sec \\ % 69~MB 41MB
-Overlap merging   &    12,466 &    27.91~MB &  4.23~sec \\ % 60~MB 31MB
-Both              &    10,398 &     0.04~MB &  4.30~sec \\ % 32~MB  4MB
+None              &    70,932 &    64.09~MB &  4.34~sec \\ % 69~MB
+\Nrb\ \patches\   &    50,769 &    36.18~MB &  4.32~sec \\ % 41~MB
+Overlap merging   &    12,449 &    27.90~MB &  4.20~sec \\ % 31~MB
+Both              &    10,418 &     0.04~MB &  4.07~sec \\ %  4~MB
 \end{tabular}
 \caption{Effectiveness of \Kudos\ optimizations.}
 \label{f:optdata}
@@ -173,9 +162,7 @@ The results for metadata and full data journaling are similar.
 %
 Both optimizations work well alone, but their combination is particularly
 effective at reducing the amount of undo data---which, again, is pure
-overhead relative to conventional file systems.  (However, the combined
-optimizations slightly increase CPU time relative to overlap merging alone
-in some benchmarks.)
+overhead relative to conventional file systems.
 %
 Undo data memory usage is reduced by \patchoptundo,
 %
@@ -210,19 +197,19 @@ smaller account for about 51\% of all \rb\ \patches.}
 \small
 \begin{tabular}{@{}lrrrr@{}}
 \textbf{System} & \multicolumn{1}{c}{\textbf{Untar}} & \multicolumn{1}{c}{\textbf{Delete}} & \multicolumn{1}{c}{\textbf{PostMark}} & \multicolumn{1}{c}{\textbf{Andrew}} \\ \hline
-% Results are from r4037, mean of 5 runs
+% Results are from r4121, mean of 5 runs
 \multicolumn{5}{@{}l}{\emph{\Kudos\ ext2}\raise2pt\hbox{\strut}} \\
-\safe{soft updates} & \safe{6.4 [1.9]} & \safe{0.8 [0.2]} & \safe{47.0 [13.5]} & \safe{36.9 [4.1]} \\
-\safe{meta journal} & \safe{8.5 [2.6]} & \safe{1.4 [0.5]} & \safe{70.8 [15.6]} & \safe{36.7 [4.2]} \\
-\safe{full journal} & \safe{12.8 [3.2]} & \safe{1.3 [0.5]} & \safe{93.8 [19.7]} & \safe{36.9 [4.4]} \\
-\unsafe{async} & \unsafe{4.3 [1.4]} & \unsafe{0.7 [0.2]} & \unsafe{45.4 [~~7.3]} & \unsafe{36.4 [4.1]} \\
-\unsafe{full journal} & \unsafe{11.1 [3.8]} & \unsafe{1.1 [0.5]} & \unsafe{83.9 [23.7]} & \unsafe{36.7 [4.3]} \\ \hline
+\safe{soft updates} & \safe{6.4 [1.3]} & \safe{0.8 [0.1]} & \safe{38.3 [10.3]} & \safe{36.9 [4.1]} \\
+\safe{meta journal} & \safe{5.8 [1.3]} & \safe{1.4 [0.5]} & \safe{48.3 [14.5]} & \safe{36.7 [4.2]} \\
+\safe{full journal} & \safe{11.5 [3.0]} & \safe{1.4 [0.5]} & \safe{82.8 [19.3]} & \safe{36.8 [4.2]} \\
+\unsafe{async} & \unsafe{4.1 [1.2]} & \unsafe{0.7 [0.2]} & \unsafe{37.3 [~~6.1]} & \unsafe{36.4 [4.0]} \\
+\unsafe{full journal} & \unsafe{10.4 [3.7]} & \unsafe{1.1 [0.5]} & \unsafe{74.8 [23.1]} & \unsafe{36.5 [4.2]} \\ \hline
 
 \multicolumn{5}{@{}l}{\emph{Linux}\raise2pt\hbox{\strut}} \\
-\safe{ext3 writeback} & \safe{19.6 [1.0]} & \safe{4.5 [0.2]} & \safe{55.5 [~~3.6]} & \safe{37.6 [4.0]} \\
-\safe{ext3 journal} & \safe{17.1 [1.2]} & \safe{4.6 [0.3]} & \safe{80.5 [~~4.7]} & \safe{38.1 [4.0]} \\
-\unsafe{ext2} & \unsafe{9.2 [0.7]} & \unsafe{4.5 [0.1]} & \unsafe{45.4 [~~2.0]} & \unsafe{36.8 [4.0]} \\
-\unsafe{ext3 journal} & \unsafe{13.3 [1.2]} & \unsafe{4.3 [0.2]} & \unsafe{71.8 [~~4.7]} & \unsafe{37.2 [4.0]} \\
+\safe{ext3 writeback} & \safe{16.6 [1.0]} & \safe{4.5 [0.3]} & \safe{38.2 [~~3.7]} & \safe{36.8 [4.1]} \\
+\safe{ext3 journal} & \safe{12.8 [1.1]} & \safe{4.6 [0.3]} & \safe{69.6 [~~4.5]} & \safe{38.2 [4.0]} \\
+\unsafe{ext2} & \unsafe{4.4 [0.7]} & \unsafe{4.6 [0.1]} & \unsafe{35.7 [~~1.9]} & \unsafe{36.9 [4.0]} \\
+\unsafe{ext3 journal} & \unsafe{10.6 [1.1]} & \unsafe{4.4 [0.2]} & \unsafe{61.5 [~~4.5]} & \unsafe{37.2 [4.1]} \\
 
 %FreeBSD (soft updates) & 23.22 & 15.95 & & \\ 
 %FreeBSD (async) & 10.09 & 3.25 & & \\
@@ -245,9 +232,10 @@ and the PostMark test), and sometimes the reverse.
 \benchtable{}
 
 While \Kudos\ performs similarly for total time for the untar, delete,
-and Andrew benchmarks, during each test \Kudos\ uses significantly
+and Andrew benchmarks, during the untar and delete \Kudos\ uses significantly
 more CPU time than Linux ext2 or ext3 do---up to three times the CPU
-time.
+time. \Kudos\ uses a similar amount of CPU time as Linux ext2 and ext3 for
+the Andrew benchmark
 %
 Higher CPU requirements are an important concern and, despite much progress
 in our optimization efforts, remain a weakness.
@@ -369,7 +357,7 @@ also currently has this limitation.
 \begin{tabular}{@{}llrr@{}}
 \textbf{File System} & \textbf{Consistency method} & \textbf{Time} & \textbf{Writes} \\ \hline
 
-% Results are from r4037, mean of 5 runs
+% Results are from r4121, mean of 5 runs
 % Single commented out reuslts are from r3933
 %% Double commented out results are from r3862
 
@@ -392,10 +380,10 @@ also currently has this limitation.
 
 soft updates & fsync & 65.2 [0.3] & 8,083 \\
 %%\Kudos\ meta journal (pg) & 51.3 [0.4] & 7,111 \\
-full journal & fsync & 50.9 [0.4] & 7,114 \\
+full journal & fsync & 52.3 [0.4] & 7,114 \\
 
 %%\Kudos\ async (pg) & 1.6 [0.3] & 2,503 \\
-soft updates & \patchgroups & 27.4 [1.1] & 3,015 \\
+soft updates & \patchgroups & 28.0 [1.2] & 3,015 \\
 %%\Kudos\ meta journal (pg) & 1.5 [0.4] & 32 \\
 full journal & \patchgroups & 1.4 [0.4] & 32 \\ \hline
 
