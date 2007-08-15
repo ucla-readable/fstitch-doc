@@ -1,8 +1,11 @@
 * Must Do
 - Finish title easter egg
 - Check that we adequately address reviews
+- Ensure no widows
+- Fix postscript reference line breaks
 
 * Really Want To Do
+- Address Andrea's feedback
 - Fig 11: report meta or full journaling for fsync/patchgroups?
 - Improve understandability of patchgroup eval section
   Or mention how some journals implement some patchgroup uses for free?
