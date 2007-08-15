@@ -22,7 +22,7 @@ beginfig(1);
 
   d.c - a.c = (240,0);
   c.c - b.c = (80,0);
-  .5[c.c,b.c] - .5[a.c,d.c] = (-5,20);
+  .5[c.c,b.c] - .5[a.c,d.c] = (0,9);
 
   fillelement(b)(0.5white);
   drawelement(a,b,c,d);
@@ -45,8 +45,8 @@ beginfig(1);
   label.bot(btex \mlabel{\texttt{pg\char`\_engage(}\textit{pg}\texttt{)}} etex scaled textscale, .5[b.c,c.c]-(0,2));
   drawconnpatch(c,b)({dir -165}..);
 
-  label.bot(btex \mlabel{\texttt{pg\char`\_depend(*,} \textit{pg}\texttt{)}} etex scaled textscale, .5[a.c,d.c]+(0,1));
-  drawconnpatch(a,d)(..);
+  label.bot(btex \mlabel{\texttt{pg\char`\_depend(*,} \textit{pg}\texttt{)}} etex scaled textscale, .5[a.c,d.c]+(0,-9));
+  drawconnpatch(a,d)(.. .5[a.c,d.c]+(0,-11) ..);
 
   label.bot(btex \mlabel{\texttt{pg\char`\_depend(}\textit{pg}\texttt{,} \texttt{*)}} etex scaled textscale, a.c-(0,11));
   drawconnpatch(a,a)({dir -165}..a.c-(10,10)..a.c-(0,13)..a.c-(-10,10)..{dir 165});
@@ -56,7 +56,23 @@ beginfig(1);
 
   z2 = b.c - (20,-14);
   label.lft(btex \lmlabel{\emph{Engaged} state} etex scaled 0.75, z2);
-  drawconnarrowna z2 {right} .. {dir -45} b.nw withpen connectionpen dashed withdots scaled 0.5;
+  drawconnarrowna z2 {right} .. {dir -45} b.nw withpen connectionpen scaled 2 dashed withdots scaled 0.5;
+endfig;
+
+beginfig(2);
+  boxjoin(a.width = b.width; a.height = b.height; a.s - b.n = (0,8));
+  elementit.a(btex \mlabel{write copy\strut} etex, 0, 0, push);
+  elementit.b(btex \mlabel{write copy\strut} etex, 0, 0, push);
+  elementit.c(btex \mlabel{write copy\strut} etex, 0, 0, push);
+  a.dx = 10; a.dy = 2;
+
+  boxjoin();
+  elementit.d(btex \mlabel{delete\\originals} etex, 0, 0, push);
+  d.width = c.width;
+  c.sw - d.ne = (20,5);
+
+  drawelement(a,b,c,d);
+  
 endfig;
 
 end
