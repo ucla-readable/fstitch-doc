@@ -37,15 +37,16 @@ CPU, 2~GB of RAM, and a Seagate ST3320620AS 320~GB 7200~RPM SATA2 disk.
 All tests use a 10~GB file system and the Linux 2.6.20.1 kernel
 with the Ubuntu v6.06.1 distribution.
 %
-Because \Kudos\ is not aware of high memory we disable high memory for
-all configurations, limiting \Kudos\ and Linux to 912~MB of RAM.
+Because \Kudos\ is not aware of high memory we disable it for all
+configurations, limiting the computer to 912~MB of RAM.
 %
-Only the PostMark benchmark is sensitive to cache size.
+Only the PostMark benchmark is sensitive to this cache size limitation.
 
 We examine Linux ext2 (in asynchronous mode) and ext3 (in writeback,
 ordered, and full journal modes), and \Kudos\ ext2 (in asynchronous,
 soft updates, metadata journal, and full journal modes), all created
-with default configurations.
+with default configurations. All journaled file systems use a 64~MB
+journal.
 
 The three journal modes provide different consistency guarantees.
 The strength of these guarantees is strictly ordered:
