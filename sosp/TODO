@@ -4,7 +4,6 @@
 - Fix Fig 11's width
 
 * Really Want To Do
-- Note that we do not support writable mmap?
 - Address Andrea's feedback
 	- Improve clarity of pathgroup eval section
 - Improve understandability of patchgroup eval section
