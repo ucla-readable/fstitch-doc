@@ -14,19 +14,17 @@ The answer is a qualified yes.
 \end{comment}
 
 
-\emph{\Featherstitch} is a complete and relatively efficient storage system
- %% called \emph{\Featherstitch} that uses
- that uses
- a simple, uniform, and file system agnostic data type to represent
- all write-before relationships among changes to stable
- storage.
-%
 Write-before relationships, which require that some changes be committed
- before others, underlie every mechanism for ensuring file system
- consistency and reliability, from journaling to synchronous writes.
+ to stable storage before others, underlie every mechanism for ensuring file system
+ consistency and reliability from journaling to synchronous writes.
 %
-\Kudos's API design and optimizations make these relationships, in a concrete form
- called \emph{patches}, a promising implementation strategy as well.
+\emph{\Featherstitch} is a complete storage system
+ %% called \emph{\Featherstitch} that uses
+ built on a concrete form of these relationships,
+ a simple, uniform, and file system agnostic data type called the \emph{patch}.
+%
+\Kudos's API design and performance optimizations make patches
+ a promising implementation strategy as well as a useful abstraction.
 
 
 \begin{comment}
