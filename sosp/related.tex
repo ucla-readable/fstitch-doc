@@ -20,7 +20,7 @@ ensuring post-crash consistency. Carefully managed write orderings
 avoid the need for synchronous writes to disk or duplicate writes to
 a journal; only relatively harmless inconsistencies, such as leaked blocks,
 are allowed to appear on the file system. As in journaling, soft updates
-can avoid \emph{fsck} after a crash, although a background \emph{fsck} is
+can avoid \command{fsck} after a crash, although a background \command{fsck} is
 required to recover leaked storage.
 
 Patches naturally represent both journaling and soft updates,
@@ -85,7 +85,7 @@ dependencies among system calls, associates dirty blocks with
 unique IDs returned by those calls, and duplicates dirty blocks when necessary
 to preserve ordering. \Kudos\ tracks individual changes to blocks internally,
 allowing kernel modules a finer level of control, and only chooses to expose a
-userspace interface similar to Burnett's as a means to simplify the sanity
+user space interface similar to Burnett's as a means to simplify the sanity
 checking required of arbitrary user-submitted requests.
 %
 Additionally, our evaluation uses a real disk rather than trace-driven

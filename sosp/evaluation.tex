@@ -319,15 +319,15 @@ we implemented a \Kudos\ module which crashes the operating system, without
 giving it a chance to synchronize its buffers, at a random time during each
 run.
 %
-In \Kudos\ asynchronous mode, after crashing, fsck nearly always reported
+In \Kudos\ asynchronous mode, after crashing, \command{fsck} nearly always reported
 that the file system contained many references to inodes that had been
 deleted, among other errors: the file system was corrupt.
 %
 With our soft updates dependencies, the file system was always soft updates
-consistent: fsck reported that inode reference counts were higher than the
+consistent: \command{fsck} reported that inode reference counts were higher than the
 correct values (an expected discrepancy after a soft updates crash).
 %
-With journaling, fsck always reported that the file system was
+With journaling, \command{fsck} always reported that the file system was
 consistent after the journal replay.
 
 \subsection {\Patchgroups}
