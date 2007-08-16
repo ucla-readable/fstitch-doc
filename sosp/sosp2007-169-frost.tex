@@ -1,0 +1,4469 @@
+\documentclass[9pt,twocolumn,letterpaper]{article}
+\usepackage[9pt]{sigmin}
+\usepackage{amsmath,amssymb,alltt,comment,verbatim}
+\usepackage{times,mathptmx}
+\usepackage[square,comma,numbers,sort&compress]{natbib}
+\usepackage{multirow}
+\usepackage{amsthm}
+\usepackage{fancyhdr}
+\usepackage{hyperref,ifpdf,url}
+\IfFileExists{fonts.sty}{\input{fonts.sty}}{}%
+\newcommand{\pgCreate}{\texttt{pg\_create}}
+\newcommand{\pgDepend}{\texttt{pg\_depend}}
+\newcommand{\pgEngage}{\texttt{pg\_engage}}
+\newcommand{\pgDisengage}{\texttt{pg\_disengage}}
+\newcommand{\pgRelease}{\texttt{pg\_release}}
+\newcommand{\pgSync}{\texttt{pg\_sync}}
+\newcommand{\pgClose}{\texttt{pg\_close}}
+\newcommand{\pgOgNf}{O}
+\newcommand{\pgPgNf}{P}
+\newcommand{\pgQgNf}{Q}
+\newcommand{\pgOg}{{\rmfamily\itshape \pgOgNf\/}}
+\newcommand{\pgPg}{{\rmfamily\itshape \pgPgNf\/}}
+\newcommand{\pgQg}{{\rmfamily\itshape \pgQgNf\/}}
+\newcommand{\imapCheck}{{\rmfamily\scshape check}}
+\newcommand{\imapCopy}{{\rmfamily\scshape copy}}
+\newcommand{\imapExpunge}{{\rmfamily\scshape expunge}}
+\newcommand{\command}[1]{\emph{#1}}
+\frenchspacing
+\DeclareUrlCommand\url{}
+
+\iffalse
+\DeclareMathAlphabet{\mathcal}{U}{MathePiTwoCal}{m}{n}
+\DeclareFontFamily{U}{MathePiTwoCal}{}
+\DeclareFontShape{U}{MathePiTwoCal}{m}{n}{ <-> MathePiTwo--mpi2c }{}
+\let\mathpatchset\mathcal
+\else
+\def\mathpatchset#1{\text{\bfseries\itshape#1}}
+\fi
+% I prefer commas in math mode to be Times commas.
+\DeclareSymbolFont{MathTextrm}{OT1}{\rmdefault}{m}{n}
+\DeclareMathSymbol{,}{\mathpunct}{MathTextrm}{`,}
+
+% The names of commonly referenced things in our work which
+% we might want to give different names for the paper.
+
+\newcommand{\Kudos}{Featherstitch}
+\newcommand{\Featherstitch}{\Kudos}
+
+\newcommand{\patch}{patch}
+\newcommand{\patches}{patches}
+\newcommand{\Patch}{Patch}
+\newcommand{\Patches}{Patches}
+
+\newcommand{\module}{module}
+\newcommand{\modules}{modules}
+\newcommand{\Module}{Module}
+\newcommand{\Modules}{Modules}
+
+\newcommand{\patchgroup}{patchgroup}
+\newcommand{\patchgroups}{patchgroups}
+\newcommand{\Patchgroup}{Patchgroup}
+\newcommand{\Patchgroups}{Patchgroups}
+
+\newcommand{\noop}{empty}
+\newcommand{\Noop}{Empty}
+\newcommand{\anoop}{an empty}
+\newcommand{\aemphnoop}{an \emph{empty}}
+\newcommand{\Anoop}{An empty}
+
+\newcommand{\nrb}{hard}
+\newcommand{\Nrb}{Hard}
+\newcommand{\rb}{soft}
+\newcommand{\Rb}{Soft}
+
+\newcommand{\LFS}{L2FS}
+
+% TODO: Give the safety properties names? (But how to display the name?)
+\newcommand{\cdsafety}[3]{\begin{equation}#3\end{equation}\label{cdsafety:#1}}
+%\newcommand{\cdsafety}[3]{\(#3\).}
+
+\newtheorem{cdinvarthm}{Invariant}
+% TODO: reduce pre and post \cdinvar vspace
+\newcommand{\cdinvar}[2]{\begin{cdinvarthm}\label{cdinvar:#1}#2\end{cdinvarthm}}
+
+\newcommand{\notexists}{\ensuremath{\not\!\exists}}
+
+% patch notation
+
+\newcommand{\p}[1]{\ensuremath{#1}} % basic patch
+
+\newcommand{\depends}[2]{\ensuremath{#1\! \rightarrow\! #2}} % depends (right)
+\newcommand{\ldepends}[2]{\ensuremath{#1\! \leftarrow\! #2}} % depends (left)
+\newcommand{\indirdepends}[2]{\ensuremath{#1\! \leadsto\! #2}} % indirect depends
+\newcommand{\notindirdepends}[2]{\ensuremath{#1\! \not\leadsto\! #2}} % does not indirectly depend
+\newcommand{\cycledepends}[2]{\ensuremath{#1\! \leftrightarrow\! #2}} % cycle
+
+\newcommand{\block}[1]{\ensuremath{B_{#1}}}
+\newcommand{\blockof}[1]{\ensuremath{#1}.block} % the block of
+
+\newcommand{\inset}[2]{\ensuremath{#1\! \in\! #2}} % in set
+\newcommand{\notinset}[2]{\ensuremath{#1\! \notin\! #2}} % not in set
+
+% summary optimization results
+\newcommand{\patchoptcount}{85--99\%}
+\newcommand{\patchoptundo}{at least 99.99\%}
+
+\ifpdf
+  \usepackage[pdftex]{graphicx}
+  \usepackage{color}
+  \DeclareGraphicsExtensions{.jpg,.pdf,.mps,.png}
+  \pdfinfo
+  { 
+    /Title (Generalized File System Dependencies)
+    /Author (Christopher Frost, Mike Mammarella, Eddie Kohler, Andrew de los Reyes, Shant Hovsepian, Andrew Matsuoka, and Lei Zhang {frost,mikem,kohler,adlr,shant}@cs.ucla.edu, matsuoka@cs.utexas.edu, leiz@cs.ucla.edu)
+  }
+  \pdfcompresslevel=9
+\else
+  \usepackage{graphicx}
+  \usepackage{color}
+  \DeclareGraphicsExtensions{.eps,.jpg,.mps,.png}
+\fi
+
+% A list of stuff not to hyphenate
+\hyphenation{KudOS Kudos Feath-er-stitch feath-er-stitch}
+
+%\renewcommand{\dbltopfraction}{1.00}
+%\renewcommand{\topfraction}{1.00}
+%\renewcommand{\textfraction}{0.10}
+
+\iffalse
+\pagestyle{fancyplain}
+\input{svnversion}
+\lhead{}
+\chead{}
+\rhead{}
+\lfoot{}
+\cfoot{\thepage}
+\rfoot{\svnversion{}}
+\renewcommand{\headrulewidth}{0pt}
+\else
+\pagestyle{empty}
+\fi
+
+%\renewcommand{\topfraction}{.8}
+%\renewcommand{\bottomfraction}{.8}
+
+\newcommand{\todo}[1]{\footnote{\textbf{TODO}: #1}}
+
+\def\assast{\raise.2ex\hbox{$^\ast$}}
+\def\asscontact{\hbox{$^\S$}}
+
+% TODO: pick an easter egg
+%\title{\sffamily\textbf{Generalized F\makebox[.1pt][l]{i}\makebox[0.04cm][r]{\raisebox{0cm}{\scalebox{.03}{\rotatebox{90}{We $\heartsuit$ KudOS}}}}\hspace{.13cm}l\makebox[9pt][l]{e}\makebox[0.01cm][r]{\raisebox{0.203cm}{\scalebox{0.02}{We~~~~~~$\heartsuit$~~~~~~Kudos\hspace{5cm}}}} System Dependencies}\todo{Finish title easter egg.}}
+\title{\sffamily\textbf{Generalized File System Dependencies}}
+\author{Christopher Frost\assast\asscontact
+	\qquad Mike Mammarella\assast\asscontact
+	\qquad Eddie Kohler\assast \\
+	\sffamily Andrew de los Reyes$^\dag$
+	\quad Shant Hovsepian\assast
+	\quad Andrew Matsuoka$^\ddag$
+	\quad Lei Zhang$^\dag$ \\
+	\affaddr{\assast UCLA
+	\qquad $^\dag$Google
+	\qquad $^\ddag$UT Austin} \\
+	\affemail{\href{http://featherstitch.cs.ucla.edu/}{http://featherstitch.cs.ucla.edu/}} \\
+}
+\date{}
+
+\conferenceinfo{SOSP'07,}{October 14--17, 2007, Stevenson, Washington, USA.} 
+\CopyrightYear{2007}
+\crdata{978-1-59593-591-5/07/0010} 
+\toappear{$^\S$Contact authors.\\
+This work was completed while all authors were at UCLA.
+
+\defaulttoappear}
+
+\begin{document}
+
+\maketitle
+
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
+\begin{abstract}
+
+%% The reliability of a file system to correctly store and later provide
+%%  access to data is one of its most important properties.
+%% %
+%% File systems today deal with many challenges that make implementing this
+%%  reliability difficult: power losses, software failures, and even user
+%%  intervention all pose significant threats.
+%% %
+%% In order to avoid time-consuming and potentially ineffective manual
+%%  checks like \command{fsck} when recovering from failures, file systems use
+%%  a variety of techniques.
+%
+Reliable storage systems depend in part on ``write-before''
+ relationships where some changes to stable storage are delayed until
+ other changes commit.
+%
+A journaled file system, for example, must commit a
+ journal transaction before applying that transaction's changes, and
+ soft updates~\cite{ganger00soft} and other consistency enforcement
+ mechanisms have similar constraints, implemented in each case in
+ system-dependent ways.
+%
+%% These relationships are implemented in system-dependent ways.
+%
+We present a general abstraction, the \emph{\patch}, that makes write-before
+ relationships
+ explicit and file system agnostic.
+%
+A \patch-based file system implementation expresses dependencies among
+ writes, leaving lower system layers to determine write orders
+ that satisfy those dependencies.
+%
+Storage system \modules\ can examine and modify the dependency
+ structure, and % the buffer cache writes blocks as constrained by that structure.
+%
+generalized file system dependencies are naturally exportable to
+ user level.
+%
+Our patch-based storage system, \emph{\Featherstitch}, includes several
+ important optimizations that reduce \patch\ overheads by orders of magnitude.
+%
+Our ext2 prototype runs in the Linux kernel and supports asynchronous
+ writes, soft updates-like dependencies, and journaling.
+%
+It outperforms similarly reliable ext2 and ext3
+ configurations on some, but not all, benchmarks.
+%
+It also supports unusual configurations, such as correct dependency
+ enforcement within a loopback file system, and lets applications
+ define consistency requirements without micromanaging how those
+ requirements are satisfied.
+
+
+\begin{comment}
+
+File systems ensure that their data is kept consistent through careful
+ write ordering, where certain disk blocks must be committed to stable
+ storage before other blocks.
+%
+Previous file systems have enforced write orderings in system-dependent
+ ways, either with rules specialized for each file system
+ structure~\cite{ganger00soft} or with a journal, which enforces a
+ particular consistency protocol.
+%
+We present a general \emph{\patch} abstraction that can represent any
+ write ordering in a file system agnostic manner.
+%
+A \patch-based file system implementation expresses dependencies among
+ writes, but does not enforce specific block write orders that satisfy
+ those dependencies.
+%
+Storage system \modules\ can examine, preserve, and modify write
+ orderings.
+%
+Generalized file system dependencies are naturally exportable to user
+ level, allowing applications to specify their own consistency protocols
+ for the storage system to follow.
+
+We present the \patch\ abstraction, describe a number of important
+ optimizations for \patch-based storage systems, and present a Linux kernel
+ implementation of a storage subsystem that uses \patches\ to enforce
+ consistency.
+%
+Our ext2 prototype is competitive with Linux ext2 and ext3 and allows
+ several novel configurations, such as ext2 with soft updates or correct
+ dependency enforcement within a loopback file system, and provides a
+ simple interface for user applications to directly affect \patches.
+
+\end{comment}
+
+
+\begin{comment}
+
+We propose a file system implementation architecture, called \emph{\Kudos},
+where structures called \emph{\patches} represent any and all changes to
+stable storage.
+%
+%%  File systems generate \patches\ for all writes, then
+%% send them to block devices for eventual commit. Explicit dependencies between
+%% \patches\ let \Kudos\ \modules\ preserve necessary file system
+%% invariants without understanding the file system itself. \Patches\ can
+%% implement many consistency mechanisms, including soft updates and journaling.
+%
+\Kudos\ is decomposed into fine-grained \modules\ which generate, consume,
+ forward, and manipulate \patches.
+%
+The uniform abstraction of \patches\ allows modules to impose and
+ follow arbitrary file system consistency policies: a collection of
+ loosely-coupled modules cooperates to implement strong and possibly
+ complex guarantees, even though each individual module does a relatively
+ small part of the work.
+%
+%% A particular innovation of the
+%% \module\ design is the separation of the low-level specification of on-disk
+%% layout from higher-level file system-independent code, which operates on
+%% abstract disk structures. 
+%
+For example, by observing and modifying \patch\ constraints, our
+ journaling \module\ can automatically add journaling to any file system.
+%
+Additionally, a new system call interface gives applications some direct
+ control over \patches. We have used this interface to
+improve the UW IMAP server, removing inefficient and unnecessary calls to
+\texttt{fsync()} while preserving the integrity of mail messages.
+%
+We have implemented \Kudos\ as a Linux kernel module. Our current
+implementation is competitive with FreeBSD soft updates for number of
+blocks written, and allows several novel configurations like ext2 with
+soft updates or correct UFS soft updates over a loopback device.
+
+\end{comment}
+
+\end{abstract}
+
+\category{D.4.3}{Operating Systems}{File Systems Management}
+\category{D.4.5}{Operating Systems}{Reliability}[Fault-tolerance]
+\category{D.4.7}{Operating Systems}{Organization and Design}
+\vspace{-.5\baselineskip}
+\terms{Design, Performance, Reliability}
+\vspace{-.5\baselineskip}
+\keywords{dependencies, journaling, file systems, soft updates}
+
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
+\section {Introduction}
+\label{sec:intro}
+
+\begin{comment}
+This paper aims to evaluate whether a simple, unified abstraction that
+represents all modifications to stable storage, including
+\emph{dependencies} among modifications, can be used to efficiently
+implement a complete file system layer, where modifications are common
+and cache sizes are large.
+%
+The answer is a qualified yes.
+\end{comment}
+
+
+Write-before relationships, which require that some changes be committed
+ to stable storage before others, underlie every mechanism for ensuring file system
+ consistency and reliability from journaling to synchronous writes.
+%
+\Featherstitch\ is a complete storage system
+ %% called \emph{\Featherstitch} that uses
+ built on a concrete form of these relationships,
+ a simple, uniform, and file system agnostic data type called the \emph{patch}.
+%
+\Kudos's API design and performance optimizations make patches
+ a promising implementation strategy as well as a useful abstraction.
+
+
+\begin{comment}
+As file system functionality increases, maintaining file system
+ correctness in the presence of failures is increasingly a focus of
+ research~\cite{sivathanuetal05-logic,denehyetal05-journal-guided}.
+%
+File systems today deal with many challenges that make implementing this
+ property difficult: power losses, software failures, and even user
+ intervention all pose significant threats.
+%
+To meet this challenge, file systems use a variety of techniques, like
+ journaling and soft updates.
+%
+These mechanisms are each based on imposing some write-before
+ relationship among buffered changes to the data in stable storage.
+%
+The answer is a qualified yes.
+\end{comment}
+
+
+A patch represents both a change to disk data and any \emph{dependencies}
+ between that change and other changes. 
+%
+\Patches\ were initially inspired by BSD's soft updates dependencies%
+~\cite{ganger00soft}, but whereas soft updates
+ implement a particular type of consistency
+ and involve many structures specific to the UFS file
+ system~\cite{mckusick99soft}, \patches\ are fully general,
+ specifying only how a range of bytes should be changed.
+%
+This lets file system implementations specify a
+ write-before relationship between changes without dictating
+% (or worrying about)
+ a write order that honors that relationship.
+%
+It lets storage system components examine and
+ modify dependency structures independent of the file system's layout,
+ possibly even changing one type of consistency into another.
+%
+It also lets applications modify \patch\ dependency structures,
+%% : a
+%% user-level interface called \emph{\patchgroups} shows that applications can
+ thus defining consistency policies for the underlying
+ storage system to follow.
+
+
+A uniform and pervasive \patch\ abstraction may simplify
+ implementation, extension, and experimentation for
+ file system consistency and reliability mechanisms.
+%
+File system implementers currently find it difficult to provide
+ consistency guarantees~\cite{tweedie98journaling,mckusick99soft}
+ and implementations are often buggy~\cite{yang04using,yang06explode},
+ a situation further complicated by file system extensions and
+ special disk interfaces~\cite{soules03metadata,fast04versionfs,quinlan02venti,cornell04wayback,wright03ncryptfs,sivathanu03semantically-smart,sivathanu05database-aware}.
+%
+File system extension techniques such as stackable file
+ systems~\cite{zadok00fist,zadok99extending,heidemann94filesystem,rosenthal90evolving}
+ leave consistency up to the underlying file system; any extension-specific
+ ordering requirements are difficult to express at the VFS layer.
+%
+Although maintaining file system
+ correctness in the presence of failures is increasingly a focus of
+ research~\cite{sivathanuetal05-logic,denehyetal05-journal-guided},
+%
+other proposed systems for improving file system integrity
+ differ mainly in the kind of consistency they aim to impose, ranging from
+ metadata consistency to full data journaling and full ACID
+ transactions~\cite{gal05transactional,liskov04transactional,wright06extending}.
+%
+Some users, however, implement their own end-to-end reliability for some data
+ and prefer to avoid \emph{any} consistency
+ slowdowns in the file system layer~\cite{googleext2}.
+%
+\Patches\ can represent all these choices, and since they provide a common
+ language for file systems and extensions to discuss consistency
+ requirements, even combinations of consistency mechanisms can
+ comfortably coexist.
+
+
+\begin{comment}
+But different extensions within a file system, or different
+ applications over the file system, may require different types of
+ consistency semantics, and performance suffers when lower layers are
+ unnecessarily denied the opportunity to reorder writes;
+ %
+\Patches\ can implement many consistency mechanisms, including
+ soft updates and journaling, and can allow combinations of different
+ consistency protocols to exist at the same time.
+ %
+\Patches\ provide a simple and effective way for such extensions to
+ express their requirements of the storage system, adding to the
+ requirements already expressed by the file system itself.
+\end{comment}
+
+
+Applications likewise have few mechanisms
+ for controlling buffer cache behavior in today's systems, and
+%
+robust applications, including databases, mail servers, and source code
+ management tools, must choose between several mediocre options.
+%
+They can accept the performance penalty of expensive system calls like
+ \texttt{fsync} and \texttt{sync} or use tedious and fragile sequences
+ of operations that assume particular file system consistency semantics.
+%
+\emph{\Patchgroups}, our example user-level \patch\ interface,
+ export to applications some of \patches' benefits
+ for kernel file system implementations and extensions.
+%
+Modifying an IMAP mail server to use \patchgroups\ required only localized
+ changes.  The result both meets IMAP's consistency requirements on any reasonable
+ patch-based file system and avoids the performance hit of full
+ synchronization.
+
+
+\begin{comment}
+Our file system modules impose soft updates-style \patch\ requirements by
+ default, since doing so requires some knowledge of the file system's
+ structures; we have also written a journal module that can change
+ existing dependencies to express either full or metadata-only journaling.
+%
+A file system module not interested in supporting soft updates support
+ could instead impose no \patch\ requirements, and count on the journal
+ module to provide a consistency guarantee.
+
+
+The \Kudos\ storage system implementation is decomposed entirely into
+ pluggable \modules\ that manipulate \patches, hopefully making the system
+ as a whole more configurable, extensible, and easier to understand.
+%
+Any storage system \module\ can generate \patches; other modules can examine
+ them and modify them when required.
+%
+\Patch\ dependencies are obeyed by all other storage system layers, allowing
+ them to be passed through layers such as loopback block devices.
+%
+As a result, the loosely-coupled \modules\ that implement a file system
+ can cooperate to enforce strong and often complex consistency guarantees,
+ even though each \module\ only does a small part of the work.
+\end{comment}
+
+
+Production file systems use system-specific optimizations to achieve
+ consistency without sacrificing performance; we had to improve
+ performance in a general way.
+%
+A naive \patch-based storage system scaled terribly,
+ spending far more space and time on dependency manipulation than
+ conventional systems.
+%
+However, optimizations reduced \patch\ memory and
+ CPU overheads significantly.
+%
+A PostMark test that writes approximately 3.2~GB of data
+ allocates 75~MB of memory throughout the test to store \patches\ and
+ soft updates-like dependencies, less than 3\% of the memory used for file
+ system data and about 1\% of that required by unoptimized
+ \Featherstitch.
+%
+Room for improvement remains, particularly in system time, but
+ \Featherstitch\ outperforms equivalent Linux configurations on
+ many of our benchmarks; it is at most 30\% slower on others.
+
+
+Our contributions include the \patch\ model and design, our
+ optimizations for making \patches\ more efficient,
+ the \patchgroup\ mechanism that exports
+ \patches\ to applications, and several individual \Kudos\ modules, such as
+ the journal.
+
+
+In this paper, we describe \patches\ abstractly, state their behavior and safety
+ properties, give examples of their use, and reason about the
+ correctness of our optimizations.
+%
+We then describe the \Kudos\ implementation, which is decomposed
+ into pluggable modules, hopefully making it configurable,
+ extensible, and relatively easy to understand.
+%
+Finally, our evaluation compares \Kudos\ and Linux-native file
+ system implementations, and we conclude.
+
+
+
+
+\begin{comment}
+%
+Our benchmarks show that our optimizations can reduce the number of
+ \patches\ \Kudos\ creates by \patchoptcount\ and the amount of undo data
+ memory it allocates by \patchoptundo.
+%
+Our prototype is not yet as fast as we would like, but it is competitive
+ with Linux on many of our benchmarks.
+\end{comment}
+
+\section{Related Work}
+\label{sec:related}
+
+%% \paragraph{Consistency}
+
+Most modern file systems protect file system integrity in the face of
+possible power failure or crashes via journaling, which groups
+operations into transactions that commit
+atomically~\cite{seltzer00journaling}.
+The content and the layout of the
+journal vary in each implementation, but in all cases, the system can use the
+journal to replay (or roll back) any transactions that did not complete due to
+the shutdown. A recovery procedure, if correct~\cite{yang04using}, 
+avoids time-consuming
+file system
+checks on post-crash reboot in favor of simple journal operations.
+
+Soft updates~\cite{ganger00soft} is another important mechanism for
+ensuring post-crash consistency. Carefully managed write orderings
+avoid the need for synchronous writes to disk or duplicate writes to
+a journal; only relatively harmless inconsistencies, such as leaked blocks,
+are allowed to appear on the file system. As in journaling, soft updates
+can avoid \command{fsck} after a crash, although a background \command{fsck} is
+required to recover leaked storage.
+
+Patches naturally represent both journaling and soft updates,
+%% as Section~\ref{sec:patch:examples} demonstrates, 
+and we use them as running examples throughout the paper.
+%
+In each case, our patch implementation extracts ad hoc orderings and
+optimizations into general dependency graphs, making the orderings
+potentially easier to understand and modify.
+%
+Soft updates is in some ways a more challenging test of the patch
+abstraction: its dependencies are more variable and harder to predict,
+it is widely considered difficult to implement, and the existing FreeBSD
+implementation is quite optimized~\cite{mckusick99soft}.
+%
+We therefore frequently discuss soft updates-like
+dependencies.
+%
+This should not be construed as a wholesale endorsement of soft updates,
+which relies on a property (atomic block writes) that many disks do not
+provide, and which often requires more seeks than journaling
+despite writing less data.
+
+Although patches were designed to represent any write-before relationship,
+implementations of other consistency mechanisms, such as shadow
+paging-style techniques for write anywhere file
+layouts~\cite{hitz94file} or ACID transactions~\cite{wright06extending}, are left for future work.
+
+CAPFS~\cite{vilayannur05providing} and Echo~\cite{mann94coherent}
+considered
+customizable application-level consistency protocols
+in the context of distributed, parallel file systems.
+%
+CAPFS allows application writers to design plug-ins for a parallel file store
+that define what actions to take before and after each client-side system
+call.
+%
+These plug-ins can enforce additional consistency policies.
+%
+Echo maintains a partial order on the locally cached updates to the remote file
+system, and guarantees that the server will store the updates accordingly;
+applications can extend the partial order.
+%% , thus
+%% reducing the server's flexibility to choose how to write the data or make it
+%% available to other clients.
+%
+Both systems are based on the principle that not providing the right
+consistency protocol can cause unpredictable failures, yet enforcing
+unnecessary consistency protocols can be extremely expensive.
+%
+%% However, this is also true with a local file system, and as a result
+%% applications currently use expensive interfaces like \texttt{fsync()} when
+%% they require specific consistency guarantees.
+%
+\Kudos\ \patchgroups\ generalize this sort of customizable consistency
+and brings it to disk-based file systems.
+
+A similar application interface to \patchgroups\ is explored in
+Section~4 of Burnett's thesis~\cite{burnett06information}. However, the methods
+used to implement the interfaces are very different: Burnett's system tracks
+dependencies among system calls, associates dirty blocks with
+unique IDs returned by those calls, and duplicates dirty blocks when necessary
+to preserve ordering. \Kudos\ tracks individual changes to blocks internally,
+allowing kernel modules a finer level of control, and only chooses to expose a
+user space interface similar to Burnett's as a means to simplify the sanity
+checking required of arbitrary user-submitted requests.
+%
+Additionally, our evaluation uses a real disk rather than trace-driven
+simulations.
+%% rather than an implementation. We have found that some aspects of real disks
+%% have significant impacts which his simulator may not have taken into account;
+%% for instance, we have found that the number of I/O requests to the disk, rather
+%% than the theoretical seek time or the number of blocks accessed, can be a
+%% bottleneck.
+
+Dependencies have been used in
+BlueFS~\cite{nightingale05speculative} and
+xsyncfs~\cite{nightingale06rethink} to reduce the aggregate performance
+impact of strong consistency guarantees.
+%
+Xsyncfs's \emph{external synchrony} provides users with
+the same consistency guarantees as synchronous writes.
+%
+Application writes are not synchronous, however.
+%
+They are committed in groups using a journaling design, but
+%
+additional write-before relationships are enforced on
+\emph{non-file system} communication: a journal transaction must commit
+before output from any process involved in that transaction becomes externally
+visible via, for example, the terminal or a network connection.
+%
+Dependency relationships are tracked across IPC as well.
+%
+\Featherstitch\ patches could be used to link file system behavior
+and xsyncfs process dependencies, or to define cross-network dependencies
+as in BlueFS; this would remove, for instance, xsyncfs's reliance
+on ext3.
+%
+Conversely, \Featherstitch\ applications could benefit from the
+combination of strict ordering and nonblocking writes provided by xsyncfs.
+%
+\begin{comment}
+written by that transaction, \emph{or} any
+data written by processes involved in that transaction's writes after that
+transaction's data that might have been computed by a process that wrote
+anything in that process.
+%
+depending on any write in
+the assuming that commit
+
+but the system
+tracks any process output that followed---and, thus, might depend
+on---these writes.
+%
+Any user-visible operation
+
+the b operations are combined and com a journal, but a dependency subsystem
+tracks
+
+External synchrony~\cite{nightingale06rethink} builds on journaling to
+automatically provide strict file system operation ordering for applications,
+without requiring them to block on each write. It combines operations into a
+journal, but tracks the activity of the calling processes after returning
+control to them from the file system. If a process later performs some
+\emph{user-visible} operation like printing text to the screen or sending
+network traffic, the journal transaction containing the changes is forced to
+commit before the process can continue.
+%
+External synchrony depends inherently on dependency tracking; dependencies
+among processes with outstanding data are tracked to ensure that
+uncommitted output never reaches a user. However, it also depends on a
+particular file system consistency methodology, namely journaling, and it
+is implemented only in an ext3-like file system called xsyncfs. \Kudos\
+\patch\ dependencies could be a natural implementation strategy for its
+dependencies, allowing them to apply to any file system.
+%
+Similar \patch-like dependencies are used to improve network file system
+performance in BlueFS~\cite{nightingale05speculative}.
+\end{comment}
+%
+% "allow the kernel to safely and efficiently handle any metadata layout without understanding the layout itself"
+% \cite{kaashoek97application}
+%
+%% \paragraph{Stackable File Systems}
+%
+% \cite{webber93portable}
+%
+Like xsyncfs, stackable \module\ software for file systems%
+~\cite{rosenthal90evolving, skinner93stacking,
+heidemann94filesystem,zadok99extending,
+zadok00fist,wright03ncryptfs,wright06versatility} and other extensions
+to file system and disk interfaces~\cite{huang05fs2,sivathanu06typesafe}
+might
+benefit from a patch-like mechanism that represented write-before
+relationships and consistency requirements agnostically.
+
+Some systems have generalized a \emph{single} consistency mechanism.
+Linux's ext3 attempted to make its journaling layer a reusable component,
+although only ext3 itself uses it.  XN enforces a variant of soft updates
+on any associated library file system, but still requires that those file
+systems implement soft updates again themselves~\cite{kaashoek97application}.
+
+\begin{comment}
+Previous
+systems like FiST~\cite{zadok00fist} or GEOM~\cite{geom} generally focus on
+an individual portion of the system and thus restrict both what a \module\
+can do and how \modules\ can be arranged. FiST, for instance, does not
+provide a way to deal with structures on the disk directly -- it provides
+only ``wrapper'' functionality around existing file
+systems. %% (Wrapfs~\cite{zadok99stackable, zadok99extending} is similar.)
+GEOM, on the other hand, deals only with the block device layer, and has no
+way to work with the file systems stored on those block devices. Neither
+has a formal way of specifying or honoring complex write-ordering
+information, which is what \patches\ in \Kudos\ provide. We imagine that
+systems like these could be adapted to work with \patches, giving the
+benefits of both ideas.
+
+\paragraph{Applications}
+
+A variety of extensions to file systems and disk interfaces have been proposed
+in recent work, like the FS2 Free Space File System~\cite{huang05fs2},
+encrypting file systems like NCryptfs~\cite{wright03ncryptfs}, and type-safe
+disks~\cite{sivathanu06typesafe}. The \Kudos\
+\module\ system may provide an interesting platform for implementations 
+of these ideas.
+%% NCryptfs has been written in a
+%% stackable way already, allowing it to be easily adapted for new underlying file
+%% systems -- but FS2 is currently specific to ext2, since it deals directly with
+%% low-level disk structures. The \Kudos\ \module\ interface should allow such an
+%% extension to be written in a portable way, giving it the same benefit.
+\end{comment}
+
+
+%% \paragraph{} 
+\Kudos\ adds to this body of work by designing a primitive that
+generalizes and makes explicit the write-before relationship
+present in many storage systems, and implementing a storage system in which
+that primitive is pervasive throughout.
+%% the storage
+%% system. This allows many different consistency models to be created and
+%% combined in file system independent ways, and provides a means for file
+%% system extensions to deal directly with consistency. 
+%% It also allows the
+%% extension of this concept into userspace, so that even user applications
+%% can easily use this functionality.
+
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
+\section{\Patch\ Model}
+\label{sec:patch}
+
+\makeatletter
+\let\emptyset\varnothing
+%\newcommand{\PState}[1]{\ensuremath{#1.\textit{state}}}
+%\newcommand{\PBlock}[1]{\ensuremath{#1.\textit{block}}}
+%\newcommand{\PBlock}[1]{\ensuremath{B_{#1}}}
+%\newcommand{\PBlock}[1]{\ensuremath{B[{#1}]}}
+{\catcode`\_=12\gdef\_{_}}
+\newcommand{\PBlock}[1]{\ensuremath{\textit{blk}[{#1}]}}
+\newcommand{\PB}{\ensuremath{B}}
+%\newcommand{\PMemst}{\ensuremath{\textit{mem}}}
+%\newcommand{\PInfst}{\ensuremath{\textit{flight}}}
+%\newcommand{\PDiskst}{\ensuremath{\textit{disk}}}
+\newcommand{\PSetlim}[1]{\def\@next{#1}\ifx\@next\@empty\else_{\@next}\fi}
+%\newcommand{\PSetlim}[1]{\def\@next{#1}\ifx\@next\@empty\else\cap\@next\fi}
+\newcommand{\PMem}[1][]{\ensuremath{\mathpatchset{U}\PSetlim{#1}}}
+\newcommand{\PInf}[1][]{\ensuremath{\mathpatchset{F}\PSetlim{#1}}}
+\newcommand{\PDisk}[1][]{\ensuremath{\mathpatchset{C}\PSetlim{#1}}}
+\newcommand{\PHard}[1][]{\ensuremath{\textit{\Nrb}\PSetlim{#1}}}
+\newcommand{\PSoft}[1][]{\ensuremath{\textit{\Rb}\PSetlim{#1}}}
+\newcommand{\PEmpty}[1][]{\ensuremath{\textit{\Noop}\PSetlim{#1}}}
+%\newcommand{\PDDepset}[1]{\ensuremath{\def\@next{#1}\ifx\@next\@empty\else\@next.\fi\textit{ddeps}}}
+\newcommand{\PDDepset}[1]{\ensuremath{\textit{ddep}[#1]}}
+\newcommand{\PDepend}{\ensuremath{\leadsto}}
+\newcommand{\PDDepend}{\ensuremath{\rightarrow}}
+%\newcommand{\PDepset}[1]{\ensuremath{\textit{dep}[#1]}}
+\newcommand{\PDepset}[1]{\ensuremath{\textit{dep}[#1]}}
+\newcommand{\PRDepset}[1]{\ensuremath{\textit{RDep}[#1]}}
+\makeatother
+
+Every change to stable storage in a \Kudos\ system is represented by a
+\emph{\patch}.
+%
+This section describes the basic \patch\ abstraction
+ and describes our implementation of that abstraction.
+
+\begin{comment}
+%
+%% Although the \patch\ idea would apply to any stable medium, to network file
+%% systems, or to multiple disks, we use terms like ``the disk'' and ``the
+%% disk controller'' throughout to simplify our terminology.
+%
+Each \patch\ $p$ encapsulates four important pieces of information: its
+ \emph{block}, its \emph{state}, a set of \emph{direct dependencies}, and
+ some \emph{undo data}.
+\end{comment}
+
+\subsection{Disk Behavior}
+
+We first describe how disks behave in our model, and
+ especially how disks commit patches to stable storage.
+%
+Although our terminology originates in conventional disk-based file systems
+ with uniformly-sized blocks, the model would apply with small changes to
+ file systems with non-uniform blocks and to other media, including RAID
+ and network storage.
+
+We assume that stable storage commits data in units called
+ \textbf{blocks}.
+%
+All writes affect one or more blocks, and it is impossible to selectively
+ write part of a block.
+%
+In disk terms, a block is a sector or, for file system convenience,
+ a few contiguous sectors.
+
+A \textbf{patch} models any change to block data.
+%
+Each patch applies to exactly one block, so a change that
+ affects $n$ blocks requires at least $n$ patches to represent.
+%
+Each \patch\ is either
+ \textbf{committed}, meaning written to disk;
+ \textbf{uncommitted}, meaning not written to disk;
+ or \textbf{in flight}, meaning in the process of being written to disk.
+%
+The intermediate in-flight state models reordering and delay in
+ lower storage layers; for example, modern disks often cache
+ %% : blocks written by an operating system may be
+ %% committed in any order, possibly
+ writes to add opportunities for disk scheduling.
+%
+Patches are created as uncommitted.
+%
+The operating system moves uncommitted \patches\ to the in-flight state
+ by writing their blocks to the disk controller.  Some
+ time later, the disk writes these blocks
+ to stable storage and reports success; when the operating system receives this
+ acknowledgment, it commits the relevant patches.
+%
+Committed patches stay committed permanently, although their effects can
+ be undone by subsequent patches.
+%
+The sets $\PDisk$, $\PMem$, and $\PInf$ represent all committed,
+ uncommitted, and in-flight patches, respectively.
+%
+%% $p$'s state is written $\PState{p} \in \{\PMemst, \PInfst,
+%% \PDiskst\}$.  
+%
+%% The sets \PMem, \PInf, and \PDisk\ are defined to contain all \patches\ with
+%%  the given state, and 
+%% The notation $\PMem[b]$ represents the subset of $\PMem$ with the given
+%%  block $b$.
+
+Patch $p$'s block is written $\PBlock{p}$.
+%
+Given a block $\PB$, we write $\PDisk[\PB]$ for the set of committed
+ patches on that block, or in notation $\PDisk[\PB] = \{p\in\PDisk\mid\PBlock{p}=\PB\}$.
+%
+$\PInf[\PB]$ and $\PMem[\PB]$ are defined similarly.
+
+%%  is represented as a set containing
+%%  all patches that affect that block, including $p$ itself.
+%% %
+%% Thus, $\PBlock{p} \cap \PDisk$ is the set of committed patches on
+%%  $p$'s block, and the block is dirty if and only if $\PBlock{p} \cap \PDisk
+%%  \neq \PBlock{p}$.
+
+Disk controllers in this model write in-flight patches one block at a time,
+ choosing blocks in an arbitrary order. In notation:
+%
+\begin{tabbing}
+\qquad \quad 1. Pick some block $\PB$ with $\PInf[\PB] \neq \emptyset$. \\
+\qquad \quad 2. Write block $\PB$ and acknowledge each patch in $\PInf[\PB]$. \\
+\qquad \quad 3. Repeat.
+\end{tabbing}
+%
+\noindent
+%
+Disks perform better when allowed to reorder requests, so operating systems
+ try to keep many blocks in flight.
+%
+%% , as constrained by write-before
+%% relationships.  (For instance, in-flight blocks cannot depend on each
+%% other.)
+%
+A block write will generally put all of that block's uncommitted
+ patches in flight, but a file system may, instead, write a \emph{subset} of those
+ patches, leaving some of them in the uncommitted state.
+%
+As we will see, this is sometimes
+ required to preserve write-before relationships.
+%% %
+%% The effects of any unwritten patches must be
+%%  temporarily undone during a block write.
+
+
+We intentionally do not specify whether the storage system writes blocks
+ atomically.
+%
+Some file system designs, such as soft updates, rely on block write
+ atomicity, where
+%% Careful control over write-before relationships is \emph{necessary} to
+%%  ensure consistency, but for some file system designs, such as soft
+%%  updates, it \emph{suffices} only if the underlying storage system
+%%  writes blocks atomically.
+%
+if the disk fails while a block $\PB$ is
+ in flight, $\PB$ contains either the old data or the new data on recovery.
+%
+Many journal designs do not require this, and include recovery procedures
+ that handle in-flight block corruption---for instance, if the memory
+ holding the new value of the block loses coherence before the disk stops
+ writing~\cite{tso04ext3}.
+%
+Since patches model the write-before relationships underlying these
+ journal designs, patches do not provide block atomicity themselves, and
+%% , for instance by buffering blocks in non-volatile memory before writing them to disk.
+%
+a patch-based file system with soft updates-like dependencies
+ should be used in conjunction with a storage layer that provides block
+ atomicity.  (This is no different from other soft updates
+ implementations.)
+
+
+\begin{comment}
+This model does not completely define the disk's behavior on system crash,
+ in particular with respect to in-flight blocks.
+%
+%
+Most journal designs do not rely on this assumption, and can recover
+ properly even if in-flight blocks are corrupted---for instance,
+ because the memory holding the new value of the block lost its coherence
+ before the disk stopped writing~\cite{nightingale06rethink}.
+%
+However, some disks may actually provide an atomicity guarantee, for
+ instance by using non-volatile memory to store blocks before they make it
+ onto disk.
+%
+The \Kudos\ core makes no assumptions about block atomicity, instead relying
+ on software above it to implement a consistency protocol that makes sense
+ for the given disk.
+\end{comment}
+
+
+\begin{figure}[t]
+\centering
+\begin{small}
+\begin{tabular}{@{}l@{~~~}l@{}}
+$p$     & a patch \\
+$\PBlock{p}$ & patch $p$'s block \\
+% $\PState{p}$ & $p$'s state, $\in \{\PMemst, \PInfst, \PDiskst\}$ \\
+\noalign{\vskip3pt}
+$\PDisk, \PMem, \PInf$ & the sets of all committed, uncommitted, and in-flight \\
+        & \patches, respectively \\
+$\PDisk[\PB], \PMem[\PB], \PInf[\PB]$ & committed/uncommitted/in-flight patches on block $\PB$ \\
+\noalign{\vskip3pt}
+$q \PDepend p$ & $q$ depends on $p$ ($p$ must be written before $q$) \\
+$\PDepset{p}$ & $p$'s dependencies: $\{ x \mid p \PDepend x \}$ \\
+\noalign{\vskip3pt}
+$q \PDDepend p$ & $q$ directly depends on $p$ \\
+	& ($q\PDepend p$ means either $q\PDDepend p$ or $\exists x : q \PDepend x \PDDepend p$) \\
+$\PDDepset{p}$ & $p$'s direct dependencies: $\{ x \mid p \PDDepend x \}$ \\
+\end{tabular}
+\end{small}
+
+\caption{\Patch\ notation.}
+\label{fig:patchnot}
+\end{figure}
+
+
+\subsection{Dependencies}
+
+A patch-based storage system implementation represents write-before
+ relationships using an explicit \textbf{dependency} relation.
+%
+The disk controller and lower layers don't understand dependencies; instead,
+ the system
+ maintains dependencies and passes blocks to the controller in an
+ order that preserves dependency semantics.
+%
+Patch $q$ \emph{depends on} patch $p$, written $q \PDepend p$,
+ when the storage system must commit $q$ either after $p$ or at the same
+ time as $p$.
+%
+(Patches can be committed simultaneously only if they are on the same block.)
+%
+A file system should create dependencies that express its desired consistency
+ semantics.
+%
+For example, a file system with no durability
+ guarantees might create \patches\ with no dependencies at all;
+%
+a file system wishing to strictly order writes might set
+ $p_n \PDepend p_{n-1} \PDepend \cdots \PDepend p_1$.
+%
+%% In practice, an upper \Kudos\ layer defines an initial set of
+%%  dependencies;
+%% %
+%% intermediate layers mostly preserve this initial set, but can modify
+%%  it as necessary to change dependency semantics;
+%
+%% and finally, the buffer cache obeys the constraints thus defined.
+%
+Circular dependencies among patches cannot be resolved and are therefore
+ errors;  for example, neither $p$ nor $q$ could be written first
+ if $p \PDepend q \PDepend p$.
+%
+(Although a circular dependency chain entirely within a single block would be
+ acceptable, \Kudos\ treats all circular chains as errors.)
+%
+\Patch\ $p$'s \emph{set} of dependencies, written $\PDepset{p}$, consists
+ of all patches on which $p$ depends;
+%
+\( \PDepset{p} = \{ x \mid p \PDepend x \}. \)
+%
+Given a set of \patches\ $P$, we write $\PDepset{P}$ to mean the
+ combined dependency set $\bigcup_{p\in P} \PDepset{p}$. 
+
+
+The \textbf{disk safety property} formalizes dependency requirements by
+ stating that the dependencies of all committed \patches\ have also been
+ committed:
+%
+\[ \PDepset{\PDisk} \subseteq \PDisk. \]
+%
+Thus, no matter when the system crashes, the disk is consistent in terms of
+dependencies.
+%
+%% The file system's job is to set up dependencies so that the disk safety
+%% property implies file system correctness.
+%
+\begin{comment}
+ However, \Kudos\ can only control when \patches\ are handed to the disk
+ controller, not when they are written to disk.
+ %
+ Disk controller behavior is encapsulated in the following atomic action:
+
+ \begin{tabbing}
+ \textit{Commit block:} \\
+ \quad Pick some block $b$ with $\PInf[b] \neq \emptyset$. \\
+ \quad Move each $p \in \PInf[b]$ to $\PDisk$ (committed).
+ \end{tabbing}
+\end{comment}
+%
+Since, as described above, the disk controller can write blocks in any
+ order, a \Kudos\ storage system must also ensure
+the independence of in-flight blocks.  This is precisely stated
+by the \textbf{in-flight safety property:}
+%
+\[ \text{For any block $\PB$,~~} \PDepset{\PInf[\PB]} \subseteq \PDisk \cup \PInf[\PB] . \]
+%
+\begin{comment}
+%% Do we need this comment?
+(The union with $\PInf[\PB]$ is necessary for the case of multiple in-flight
+\patches\ on the same block.)
+\end{comment}
+%
+This implies that $\PDepset{\PInf[\PB]} \cap \PDepset{\PInf[\PB']} \subseteq \PDisk$ for
+ any $\PB' \neq \PB$, so the disk controller can write in-flight blocks
+ in any order and still preserve disk safety.
+%
+To uphold the in-flight safety property, the buffer cache must
+ write blocks as follows:
+%
+\begin{tabbing}
+\quad \quad 1. Pick some block $\PB$ with $\PMem[\PB] \neq \emptyset$ and $\PInf[\PB] =
+\emptyset$. \\
+\quad \quad 2. Pick some $P \subseteq \PMem[\PB]$ with $\PDepset{P} \subseteq P \cup
+\PDisk$. \\
+\quad \quad 3. Move each $p \in P$ to $\PInf$ (in-flight).
+\end{tabbing}
+%
+\noindent
+%
+The requirement that $\PInf[\PB] = \emptyset$ ensures that at most one version of
+ a block is in flight at any time.
+%
+Also, the buffer cache must eventually write \emph{all} dirty blocks, a
+ liveness property.
+
+The main \Featherstitch\ implementation challenge is to design
+ data structures that make it easy to create patches and quick to manipulate
+ patches, and that help the buffer cache write blocks and patches according
+ to the above procedure.
+
+
+\subsection{Dependency Implementation}
+
+
+
+\begin{figure*}[t]
+\centering
+\begin{tabular}{@{}cc@{\qquad\qquad}c@{}}
+\includegraphics[scale=0.78]{fig/examplesb_3}
+& \includegraphics[scale=0.78]{fig/examplesb_4}
+& \includegraphics[scale=0.78]{fig/examplesb_2} \\
+\textbf{a)} Adding a block (soft updates)
+& \textbf{b)} \dots plus removing a file
+& \textbf{c)} Adding a block (journaling) \\
+\end{tabular}
+\caption{Example patch arrangements for an ext2-like file system.
+ Circles represent patches, shaded boxes represent disk blocks, and arrows
+ represent direct dependencies.
+ \textbf{a)} A soft updates order for appending a zeroed-out block to
+ a file.  \textbf{b)} A different file on the same inode block is removed
+ before the previous changes commit, inducing a circular block dependency.
+ \textbf{c)} A journal order for appending a zeroed-out block to a
+ file.}
+\label{f:ex}
+\end{figure*}
+
+
+The write-before relationship is transitive, so if $r \PDepend q$ and $q
+ \PDepend p$, there is no need to explicitly store an $r \PDepend p$
+ dependency.
+%
+To reduce storage requirements, a \Kudos\ implementation maintains a
+ subset of the dependencies called the \emph{direct dependencies}.
+%
+Each patch $p$ has a corresponding set of direct dependencies
+ $\PDDepset{p}$; 
+%
+we say $q$ \emph{directly depends on} $p$, and write $q \PDDepend p$, when
+ $p \in \PDDepset{q}$.
+%
+The dependency relation $q \PDepend p$ means that either $q
+ \PDDepend p$ or $q \PDepend x \PDDepend p$ for some patch $x$.
+
+
+\begin{comment}
+\paragraph{Undo data}
+%
+When a \patch\ is created, the buffer cache's copy of the block data
+is modified in-place to reflect the change. However,
+%
+some arrangements of \patches\ may require that the buffer cache
+%\emph{not} write one or more \patches\ on some block.
+first write a block with only some \patches\ applied, and then write a
+different block before being able to write the remaining \patches.
+%
+(An example of this is given in Section~\ref{sec:patch:examples}.)
+\end{comment}
+
+
+
+%% Another implementation choice defines how the buffer cache can
+%%  write a subset of a block's patches.
+%
+\Featherstitch\ maintains each block in its dirty state, including the
+ effects of all uncommitted patches.
+%
+However, each patch carries \textbf{undo data}, the 
+ previous version of the block data altered by the \patch.
+%
+If a \patch\ $p$ is not written with its containing block, the buffer cache
+ \emph{reverts} the \patch, which swaps the new data on the buffered block
+ and the previous version in the undo data.
+%
+Once the block is written, the system will re-apply the \patch\ and, when
+ allowed, write the block again, this time including the \patch.
+%
+Some undo mechanism is required to break potential block-level dependency cycles, as
+ shown in the next section.
+%
+We considered alternate designs, such as maintaining a single ``old''
+ version of the block, but per-patch undo data gives file systems the
+ maximum flexibility to create \patch\ structures.
+%
+However, many of our optimizations avoid storing unnecessary undo data, greatly
+ reducing memory usage and CPU utilization.
+
+Figure~\ref{fig:patchnot} summarizes our patch notation.
+
+\label{sec:patch:dependencies}
+
+\begin{comment}
+\paragraph{Example}
+%
+Suppose a \Kudos\ system contains the \patches\ in Figure~\ref{f:ex}c,
+where the journal entry patches $d_\textrm{J}$, $i_\textrm{J}$, and
+ $b_\textrm{J}$ have committed and all other patches have not.
+%
+The buffer cache cannot write blocks $\PBlock{b}$, $\PBlock{i}$, or $\PBlock{d}$,
+since $\{b$, $i$, $i'$, $d\} \PDDepend \PXcmt$ and $\PXcmt \not\in \PDisk$.
+%
+Its only option is to write $\PBlock{\PXcmt}$ with $P = \{\PXcmt\}$, since
+ $\PDepset{\PXcmt} = \{d_\textrm{J}$, $i_\textrm{J}$, $b_\textrm{J}\}
+ \subseteq \PDisk$.
+%
+Since $\PXcmp$ has unmet dependencies on other blocks, it must be undone
+ before the write and is excluded from $P$.
+%
+Later, when $\PXcmt$ commits, the buffer cache has the option to
+write any of $\PBlock{b}$, $\PBlock{i}$, or $\PBlock{d}$.
+\end{comment}
+
+
+\subsection{Examples}
+\label{sec:patch:examples}
+
+This section illustrates \patch\ implementations of two widely-used
+ file system consistency mechanisms, soft updates and journaling.
+%
+Our basic example extends an existing file by a single block---perhaps an
+ application calls \texttt{ftruncate} to append 512 zero bytes to an
+ empty file.
+%
+The file system is based on Linux's ext2, an FFS-like file system with inodes and
+ a free block bitmap.
+%
+In such a file system, extending a file by one block requires (1) allocating a block by
+ marking the corresponding bit as ``allocated'' in the free block bitmap,
+ (2) attaching the block to the file's inode, (3) setting the inode's size,
+ and (4) clearing the allocated data block.
+%
+These operations affect three blocks---a free block bitmap block, an inode
+ block, and a data block---and correspond to four patches: $b$ (allocate),
+ $i$ (attach), $i'$ (size), and $d$ (clear).
+
+
+\paragraph{Soft updates}
+%
+Early file systems aimed to avoid post-crash disk inconsistencies by
+ writing some, or all, blocks synchronously.
+%
+For example, the write system call might block until all metadata writes
+ have completed---clearly bad for performance.
+%
+Soft updates provides post-crash consistency without
+ synchronous writes by tracking and obeying necessary dependencies among
+ writes.
+%
+A soft updates file system orders its writes to enforce three simple rules
+ for metadata consistency~\cite{ganger00soft}:
+
+\begin{compactenumerate}
+\item \label{rule:pointer} ``Never write a pointer to a structure until it
+ has been initialized (e.g., an inode must be initialized before a
+ directory entry references it).''
+\item \label{rule:reuse} ``Never reuse a resource before nullifying all
+ previous pointers to it.''
+\item \label{rule:overwrite} ``Never reset the last pointer to a live
+ resource before a new pointer has been set.''
+\end{compactenumerate}
+
+\noindent
+By following these rules, a file system limits possible disk inconsistencies
+to leaked resources, such as blocks or inodes
+marked as in use but unreferenced. The file system can be used immediately
+ on reboot; a background scan can locate and recover the leaked resources
+ while the system is in use.
+
+These rules map directly to \Featherstitch.
+%
+Figure~\ref{f:ex}a shows a set of soft updates-like patches and dependencies for
+ our block-append operation.
+%
+%% Each circle represents a single \patch. The shaded boxes indicate disk blocks.
+%
+%% The arrows between \patches\ represent the dependency relationship \PDDepend.
+%
+%% For example, appending a block to an empty file in an FFS-like file system
+%% requires allocating a block by writing a bit to the block bitmap ($b$),
+%% initializing the block by writing zeroes to it ($d$), writing the block number
+%% to the inode for the file ($i$), and updating the file's size ($i'$).
+%
+Soft updates Rule~\ref{rule:pointer} requires that $i \PDDepend b$.
+%
+Rule~\ref{rule:reuse} requires that $d$ depend on the nullification of previous pointers to the
+ block;
+%
+a simple, though more restrictive, way to accomplish this is to let $d
+ \PDDepend b$, where $b$ depends on any such nullifications
+ (there are none here).
+%
+The dependencies $i \PDDepend d$ and $i' \PDDepend d$ provide an
+ additional guarantee above and beyond metadata consistency, namely
+ that no file ever contains accessible uninitialized data.
+%
+%% A similar dependency would make inode updates depend on actual data
+%%  writes.
+%
+Unlike \Featherstitch, the BSD UFS soft updates implementation represents each UFS
+ operation by a different specialized structure encapsulating
+ all of that operation's disk changes and dependencies.
+%% As a result, many specialized data structures
+%% represent the different possible file system operations. 
+These structures, their
+relationships, and their uses %% for tracking and enforcing dependencies 
+are quite complex~\cite{mckusick99soft}.
+
+\begin{comment}
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=92pt]{fig/examplesb_3}
+  \caption{\label{fig:softupdate} Soft updates \patches\
+  for appending one block to an empty file in an FFS-like file system.}
+\end{figure}
+\end{comment}
+
+Figure~\ref{f:ex}b shows how an additional file system operation can induce
+ a circular dependency among blocks.
+%
+Before the changes in Figure~\ref{f:ex}a commit, the user deletes a
+ one-block file whose data block and inode happen to lie on the bitmap
+ and inode blocks used by the previous operation.
+%
+Rule~\ref{rule:reuse} requires the dependency $b_2 \PDDepend i_2$; but
+ given this dependency and the previous $i \PDDepend b$, neither the bitmap
+ block nor the inode block can be written first!
+%
+Breaking the cycle requires rolling back one or more patches, which in turn
+ requires undo data.
+%
+For example, the system might roll back $b_2$ and write the resulting
+ bitmap block, which contains only
+ $b$.  Once this write commits, all of $i$, $i'$, and
+ $i_2$ are safe to write; and once \emph{they} commit, the system can write
+ the bitmap block again, this time including $b_2$.
+
+
+\paragraph{Journal transactions}
+%
+A journaling file system ensures post-crash consistency using
+ a write-ahead log.
+%
+%Each transaction leaves the disk in a consistent state, thus avoiding the need
+%to check the file system when recovering from a failure.
+%
+All changes in a transaction are first copied into an on-disk journal.
+%
+Once these copies commit, a \emph{commit record} is written
+ to the journal, signaling that the transaction is complete and all
+ its changes are valid.
+%
+Once the commit record is written, the original changes can be written to the
+file system in any order, since after a crash the system can replay the
+ journal transaction to recover.
+%% the journal later and recopy the data back out into the file system.
+%
+Finally, once all the changes have been written to the file system, the commit
+record can be erased, allowing that portion of the journal to be reused.
+
+\begin{comment}
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=.8\hsize]{fig/examplesb_2}
+  \caption{\label{fig:journal} An example journal transaction using \patches.}
+\end{figure}
+\end{comment}
+
+\def\PXcmt{\textit{cmt}}
+\def\PXcmp{\textit{cmp}}
+
+This process also maps directly to patch dependencies, as shown in
+ Figure~\ref{f:ex}c.
+%
+Copies of the affected blocks are written into the journal area using
+ \patches\ $d_\textrm{J}$, $i_\textrm{J}$, and $b_\textrm{J}$, each on its
+ own block.
+%
+Patch $\PXcmt$ creates the commit record on a fourth block in the journal
+ area; it depends on $d_\textrm{J}$,
+$i_\textrm{J}$, and $b_\textrm{J}$.
+%
+The changes to the main file system all depend on $\PXcmt$.
+%
+Finally, \patch\ $\PXcmp$, which depends on the main file system changes,
+ overwrites the commit record with a completion record.
+%
+Again, a circular block dependency requires the system to roll back a
+ patch, namely $\PXcmp$, and write the commit/completion block twice.
+
+\begin{comment}
+This arrangement of dependencies ensures that the commit record is not written
+to disk until all the journal data is present there, that the updates to the
+file system itself are not written until the commit record is present on disk,
+and that the completion record is not written until the entire transaction is
+complete.
+
+This example also contains an instance of a \patch\ which will need to be
+reverted: $cmp$, which overwrites the commit record written by $cmt$ (and
+thus $\PBlock{cmp} = \PBlock{cmt}$), cannot be written with $cmt$ since
+$cmp \PDDepend \{b$, $i$, $i'$, $d\} \PDDepend cmt$.
+%
+So, we must revert $cmp$ and write $\PBlock{cmp}$ with only $cmt$ applied,
+then write $b$, $i$, $i'$, and $d$, and finally write $\PBlock{cmp}$
+again in order to write $cmp$.
+\end{comment}
+
+
+
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
+\subsection{Patch Implementation}
+\label{sec:patch:noop}
+
+Our \Kudos\ file system implementation creates patch structures
+corresponding directly to this abstraction.
+%
+Functions like \texttt{patch\_\-create\_\-byte} create patches;
+%
+their arguments include the relevant block, any
+direct dependencies, and the new data.
+%
+Most \patches\ specify this data as a contiguous byte range, including an
+offset into the block and the \patch\ length in bytes.
+%
+The undo data for very small \patches\ (4 bytes or less) is stored in the
+\patch\ structure itself; for larger \patches, undo data is stored in
+separately allocated memory.
+%
+In bitmap blocks, changes to individual bits in a word can have independent
+dependencies, which we handle with a special bit-flip patch type.
+
+
+The implementation automatically detects one type of dependency.
+%
+If two \patches\ $q$ and $p$ affect the same block and have overlapping data
+ranges, and $q$ was created after $p$, then \Kudos\ adds an \emph{overlap
+dependency} $q \PDDepend p$ to ensure that $q$ is written after $p$.
+%
+File systems need not detect such
+dependencies themselves.
+
+
+For each block $\PB$, \Kudos\ maintains a list of all \patches\ with
+$\PBlock{p} = \PB$.
+%
+However, committed \patches\ are not tracked; when
+\patch\ $p$ commits, \Kudos\ destroys $p$'s data structure and removes all
+dependencies $q \PDDepend p$.
+%
+Thus, a patch whose dependencies have all committed appears like a patch
+with no dependencies at all.
+%
+Each patch $p$ maintains doubly linked lists of its direct dependencies
+and ``reverse dependencies'' (that is, all $q$ where $q
+\PDDepend p$).
+
+
+The implementation also supports \emph{\noop} \patches, which have
+ no associated data or block.
+%
+%% \Noop\ \patches\ are useful for representing sets of dependencies and for
+%%  preventing other \patches\ from being written.
+%
+For example, during a journal transaction,
+ changes to the main body of the disk should depend on a
+ journal commit record that has not yet been created.
+%
+\Kudos\ makes these \patches\ depend on an \noop\ \patch\
+ that is explicitly held in memory.
+%
+Once the commit record is created, the \noop\ \patch\ is updated to depend on
+ the actual commit record and then released.
+%
+The \noop\ \patch\ automatically commits at the same time as the commit
+ record, allowing the main file system changes to follow.
+%
+%
+\Noop\ \patches\ can shrink memory usage by representing quadratic sets of
+ dependencies with a linear number of edges: if all $m$ \patches\ in $Q$
+ must depend on all $n$ \patches\ in $P$, one could
+ %% add $mn$ direct dependencies $p_i \PDDepend q_j$ or
+ add an \noop\ \patch\ $e$ and $m+n$ direct dependencies
+ $q_i \PDDepend e$ and $e \PDDepend p_j$.
+%
+This is useful for \patchgroups; see Section~\ref{sec:patchgroup}.
+%
+However, extensive use of \noop\ \patches\ adds to system time by
+ requiring that functions traverse \noop\ \patch\ layers to find true
+ dependencies.
+%
+Our implementation uses \noop\ \patches\ infrequently, and in the
+ rest of this paper, patches are nonempty unless explicitly
+ stated.
+
+
+\begin{comment}
+To solve this problem, we introduce an additional type of \patch. The
+prototypical \patch\ corresponds to some change on disk, but \Kudos\ also
+supports \aemphnoop\ \patch\ type, which doesn't change the disk at all.
+\Noop\ \patches\ can have \befores, like other \patches, but they don't need to
+be written to disk: they are trivially satisfied when all of their \befores\ are
+satisfied. Thus, they can be used to ``stand for'' entire sets of other changes.
+%
+This capability is extremely useful, and is used by most operations on disk
+structures so that a single \patch\ can be returned that depends on the whole
+change. Likewise, \anoop\ \patch\ can be passed in as a parameter to a disk
+operation to make the whole operation depend on a set of other changes. \Noop\
+\patches\ allow dependencies between sets with only a linear number of
+dependency edges in the \patch\ graph, and without having to pass around arrays
+of \patches.
+%
+The cost is that some functions may have to traverse trees of \noop\ \patches\
+to determine true dependencies.
+\end{comment}
+
+
+
+\subsection{Discussion}
+
+The patch abstraction places only one substantive restriction on its users,
+ namely, that circular dependency chains are errors.
+%
+This restriction arises from the file system context: \Kudos\ assumes a
+ lower layer that commits one block at a time.
+%
+Disks certainly behave this way, but a dependency tracker built above a
+ more advanced lower layer---such as a journal---could resolve many
+ circular dependency chains by forcing the relevant blocks into a single
+ transaction or transaction equivalent.
+%
+\Featherstitch's journal module could potentially implement this, allowing
+ upper layers to create (size-limited) circular dependency chains, but we
+ leave the implementation for future work.
+
+Patches model write-before relationships, but one might instead build a
+ generalized dependency system that modeled abstract
+ transactions.
+%
+We chose write-before relationships as our foundation since they minimally
+ constrain file system disk layout.
+%% ; nevertheless, it would be interesting
+%%  to consider whether a transaction abstraction could model, say, soft
+%%  updates-like dependencies.
+
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
+\section{\Patch\ Optimizations}
+\label{sec:patch:optimizations}
+
+\begin{comment}
+%% This initial paragraph irritates me now.
+A naive \Featherstitch\ implementation 
+%% of this model has all the properties we want except good performance.
+%
+allows file system modules to define and modify consistency-preserving
+orderings, and allows applications to add consistency requirements of their
+own (using the interface described below).
+%
+But although all this is relatively easy, it performs badly.
+\end{comment}
+
+
+Figure~\ref{fig:opt}a shows the \patches\ generated by a naive \Kudos\
+implementation when an application appends
+16~kB of data to an existing empty file using four 4~kB writes.
+%
+The file system is ext2 with soft updates-like
+dependencies and 4~kB blocks.
+%
+%Each circle represents a single \patch. The shaded boxes indicate disk blocks.
+%
+%The arrows between \patches\ represent the dependency relationship \PDDepend.
+%
+%
+Four blocks are allocated (\patches\ $b_1$--$b_4$),
+written ($d_1$--$d_4$ and $d_1'$--$d_4'$), and attached to the file's
+inode ($i_1$--$i_4$); the inode's file size and modification time are updated
+($i_1'$--$i_4'$ and $i''$); and changes to the ``group descriptor'' and superblock
+account for the allocated blocks ($g$ and $s$).
+%
+\begin{comment}
+The operation is broken into four one-block appends; the numeric subscripts in
+the \patch\ labels indicate with which each \patch\ is associated.
+\end{comment}
+%
+Each application write updates the inode; note, for example, how overlap
+dependencies force each modification of the inode's size to depend on the
+previous one.
+%
+A total of eight blocks are written during the operation.
+%
+Unoptimized \Kudos, however, represents the operation with 23 \patches\ and
+roughly 33,000 (!) bytes of undo data.
+%
+The \patches\ slow down the buffer cache system by making graph traversals
+more expensive.
+%
+Storing undo data for \patches\ on data blocks is particularly painful
+here, since they will \emph{never} need to be reverted.
+%
+And in larger examples, the effects are even worse. For example, when
+256~MB of blocks are allocated in the untar benchmark described in
+Section~\ref{eval}, unoptimized \Kudos\ allocates an additional 533~MB,
+mostly for \patches\ and undo data.
+
+This section presents optimizations based on generic
+dependency analysis that reduce these 23 \patches\ and 33,000 bytes
+of undo data to the 8 \patches\ and 0 bytes of
+undo data in Figure~\ref{fig:opt}d.
+%
+Additional optimizations simplify \Kudos's other main overhead, the CPU
+time required for the buffer cache to find a suitable set of patches to
+write.
+%
+These optimizations apply transparently to any \Kudos\ file system, and as
+we demonstrate in our evaluation, have dramatic effects on real benchmarks
+as well; for instance, they reduce memory overhead in the untar benchmark
+from 533~MB to just 40~MB.
+
+\begin{comment}
+
+Challenges in a \patch-based file system implementation include:
+
+\textbf{Buffer cache graph traversal.}
+%
+In order to evict and write a block, the buffer cache must choose a block
+$b$,
+%
+and then find a set of \patches\ $P_b \subseteq \PMem[b]$ whose dependencies
+satisfy a graph property, namely that $\PDepset{P_b} \subseteq P_b \cup
+\PDisk$.
+%
+It usually makes sense to define $P_b$ maximally---that is, as the
+\emph{largest} corresponding set of \patches.
+%
+In the ideal (and common) case $P_b = \PMem[b]$, which lets the cache reuse
+$b$'s memory once $P_b$ is committed to disk.  However, in some cases there
+may be no block for which $P_b = \PMem[b]$.
+%
+It would also be nice if the blocks chosen for writing also maximized the
+disk's commit rate, by minimizing seeks and so forth.
+
+A naive implementation might calculate, for each in-memory block $b$, the
+largest set of \patches\ $P_b \subseteq \PMem[b]$ with $\PDepset{P_b}
+\subseteq P_b \cup \PDisk$, then evict some block close to previously
+written blocks and with few reverted \patches\ (where $\PMem[b] - P_b$
+is small).
+%
+This, however, would be extraordinarily expensive.
+%
+Finding $P_b$ requires traversing a dependency graph which might contain
+thousands and thousands of nodes.
+%
+Doing so for each block, once per eviction, would take huge amounts of CPU
+time.
+
+
+\textbf{Undo memory usage.}
+%
+Only a small fraction of \patches\ will ever need to be reverted.
+%
+For example, most data writes never need to be reverted in any file
+system.
+%
+If a \patch\ won't be reverted under any circumstances, the memory and
+CPU time spent to preserve the old version is wasted.
+
+
+\textbf{\Patch\ memory usage.}
+%
+\Patches\ themselves take up memory and require time to allocate, free, and
+traverse.
+%
+If two \patches\ have redundant dependencies, it would be faster to combine
+them.
+
+
+%% \textbf{Dependency memory usage.}
+%% %
+%% The $\PDDepset{}$ sets are stored as doubly linked lists; each individual
+%% dependency takes up memory.
+%% %
+%% Important and common dependency relations require many dependencies to
+%% express; for example, if \patches\ $p_1,\dots,p_n$ depend, as a group, on
+%% \patches\ $q_1,\dots,q_n$, expressing this constraint would require $n^2$
+%% total dependencies.
+
+
+The next section tackles all of these challenges.
+\end{comment}
+
+
+\begin{figure}
+\centering
+
+\includegraphics[scale=0.62]{fig/opt_1}
+
+\textbf{a)} Naive implementation
+
+\vskip.5\baselineskip
+
+\includegraphics[scale=0.62]{fig/opt_2}
+
+\textbf{b)} With \nrb\ \patches\ \dots
+
+\vskip.5\baselineskip
+
+\includegraphics[scale=0.62]{fig/opt_3}
+
+\textbf{c)} \dots plus \nrb\ \patch\ merging \dots
+
+\vskip.5\baselineskip
+
+\includegraphics[scale=0.62]{fig/opt_4}
+
+\textbf{d)} \dots plus overlap merging
+
+\caption{\Patches\ required to append 4 blocks to an existing file, without
+and with optimization.  \Nrb\ \patches\ are shown with heavy borders.}
+\label{fig:opt}
+\label{f:opt} % EDDIE: OK
+\end{figure}
+
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
+\subsection{\Nrb\ \Patches}
+\label{sec:patch:nrb}
+
+The first optimization reduces space overhead by
+eliminating undo data.
+%
+When a \patch\ $p$ is created, \Kudos\ conservatively detects whether $p$
+ might require reversion:
+%
+that is, whether any possible future patches and dependencies could force
+ the buffer cache to undo $p$ before making further progress.
+%
+If no future patches and dependencies could force
+ $p$'s reversion, then $p$ does not need undo data, and \Kudos\ does not
+ allocate any.
+%
+This makes $p$ a \textbf{hard patch}: a patch without undo data.
+%
+The system aims to reduce memory usage by making most patches hard.
+%
+The challenge is to detect such patches without
+ an oracle for future dependencies.
+%
+%% We solve this challenge by restricting the creation of dependencies.
+
+
+%
+(Since a hard patch $h$ cannot be rolled back, any other patch on its block
+ effectively depends on it.
+%
+We represent this explicitly using, for example, overlap dependencies, and
+%
+as a result, the buffer cache will write all of a block's hard patches
+ whenever it writes the block.)
+
+
+We now characterize one type of patch that can be made hard.
+%
+Define a \emph{block-level cycle} as a dependency chain of uncommitted
+ patches $p_n \PDepend \cdots \PDepend p_1$ where the ends are on the same
+ block $\PBlock{p_n} = \PBlock{p_1}$, and at least one patch in the middle
+ is on a different block $\PBlock{p_i} \neq \PBlock{p_1}$.
+%
+The patch $p_n$ is called the \emph{head} of the block-level cycle.
+%
+Now assume that a patch $p \in \PMem$ is not the head of any block-level
+ cycle.
+%
+One can then show that the buffer cache can write at least one patch
+ without rolling back $p$.
+%
+This is trivially possible if $p$ itself is ready to write.
+%
+If it is not, then $p$ must depend on some uncommitted patch $x$ on a different
+ block.
+%
+However, we know that $x$'s uncommitted dependencies, if any, are all on
+ blocks other than $p$'s; otherwise there would be a block-level cycle.
+%
+Since \Featherstitch\ disallows circular dependencies, every
+ chain of dependencies starting at $x$ has finite length, and therefore
+ contains an uncommitted patch $y$ whose dependencies have all
+ committed.
+%
+(If $y$ has in-flight dependencies, simply wait
+ for the disk controller to commit them.)
+%
+Since $y$ is not on $p$'s block, the buffer cache can write $y$ without
+ rolling back $p$.
+
+
+\Featherstitch\ may thus make a patch hard when it can prove that patch
+ will \emph{never} be the head of a block-level cycle.
+%
+Its proof strategy has two parts.
+%
+First, the \Kudos\ API restricts the creation of block-level cycles by
+ restricting the creation of dependencies:
+%
+\emph{a \patch's direct dependencies are all supplied at creation time}.
+%
+Once $p$ is created, the system can add new dependencies $q \PDDepend p$,
+ but will never add new dependencies $p \PDDepend q$.\footnote{The actual
+ rule is somewhat more flexible: modules may add new direct dependencies if
+ they guarantee that those dependencies don't produce any new block-level
+ cycles.  As one example, if no \patch\ depends on some \noop\ \patch\ $e$,
+ then adding a new $e \PDDepend q$ dependency can't produce a cycle.}
+%
+Since every \patch\ follows this rule, all possible block-level cycles with
+ head $p$ are present in the dependency graph when $p$ is created.
+%
+\Featherstitch\ must still check for these cycles, of course, and
+%
+actual graph traversals proved expensive.
+%
+We thus implemented a conservative approximation.
+%
+\Patch\ $p$ is
+created as \nrb\ if \emph{no} patches on other blocks depend on uncommitted
+ patches on $\PBlock{p}$---that is, if
+%
+for all $y \PDepend x$ with $x$ an uncommitted patch on $p$'s block,
+ $y$ is also on $p$'s block.
+%
+If no other block depends on $p$'s, then clearly $p$ can't head up
+ a current block-level cycle no matter its dependencies.
+%
+This heuristic works well in practice and, given some bookkeeping, 
+ takes $O(1)$ time to check.
+
+
+\begin{comment}
+\Kudos\ further ensures that the dependency structure correctly
+represents dependencies on the same block through overlap
+dependencies: since \nrb\ \patches\ are considered to cover the entire
+block, every succeeding \patch\ will overlap at least one \nrb\ \patch,
+and \Kudos\ will automatically add a dependency.
+%
+(Some cases are handled by other optimizations.)
+
+
+The buffer cache's ``write block'' behavior must account for \nrb\
+\patches, as it \emph{must} write any \nrb\ \patches\ that exist on a
+block.
+%
+Let $\PHard[b]$ be the set of \nrb\ \patches\ on block $b$.
+%
+Then to write block $b$, the buffer cache must choose some $P \subseteq
+\PMem[b]$ with
+%
+\[ \PDepset{P} \subseteq P \cup \PDisk \text{ and } \PHard[b] \cap \PMem
+\subseteq P. \]
+%
+If no such $P$ exists, then the cache must write a different block.
+\end{comment}
+
+
+Applying \nrb\ \patch\ rules to our example makes 16 of the 23 \patches\ \nrb\
+(Figure~\ref{fig:opt}b),
+%
+reducing the undo data required by slightly more than half.
+
+
+\begin{comment}
+%
+To avoid this overhead, \Kudos\ identifies \patches\ that will never
+need to be reverted and omits their undo data. We call these \emph{\nrb}
+\patches. (The opposite naturally being a \emph{\rb} \patch, when
+necessary to differentiate them.)
+%
+Since a \nrb\ \patch\ cannot be reverted, a write of any \patches\
+on block $\PB$ must include all \nrb\ \patches\ on $\PB$. To accordingly
+update our formal model we define a new set of \patches, \PHard, which
+contains all \nrb\ \patches. We write \PHard[\PB] to restrict the set
+to block $\PB$\todo{Introduce \PSoft\ and \PSoft[\PB].}:
+
+\begin{tabbing}
+\textbf{Write block.} \\
+\quad Pick some block $b$ with $\PMem[b] \neq \emptyset$. \\
+\quad Pick some $P \subseteq \PMem[b]$ with $\PDepset{P} \subseteq P \cup
+\PDisk$ and $\PHard[\PB] \subseteq P$. \\
+\quad Move each $p \in P$ to $\PInf$ (in-flight). \\
+\quad For each $p \in \PMem[\PB]-P$, set $\PDDepset{p} \gets \PDDepset{p}
+\cup P$.
+\end{tabbing}
+
+\paragraph{}
+To avoid (expensive) dependency traversals to determine whether a new
+\patch\ will need to be reverted,
+%
+\Kudos\ conservatively identifies \nrb\ \patches\ using only local
+dependency information.
+%
+\Kudos\ detects that a new \patch\ on block $\PB$ may need to be reverted if:
+\todo{Which form is easier to read? Can we write \(\PMem - \PMem[\PB] - \PEmpty\) more concisely?}
+%
+\todo{Actually, our implementation also uses in flight \patches. Can we make
+it not?}
+%
+\[ \PRDepset{\PMem[b]} \cap (\PMem - \PMem[b] - \PEmpty) \ne \emptyset \]
+\[ \exists \inset{p}{\PMem[b]}\!:\
+   \exists c\!:\ \exists \inset{q}{\PMem[c]}\!:\
+   \indirdepends{q}{p} \]
+%
+This is both a safe and useful indicator because
+%
+the presence of an external \after\ is a necessary condition for a new
+\patch's \before\ to induce a block-level cycle
+%
+and many blocks have no \patches\ with external \afters\ (e.g. most
+file data blocks).
+
+While this algorithm detects whether a \patch\ may need to be reverted,
+\Kudos\ must also be sure that no future dependency manipulation
+will cause the \patch\ to require being reverted.
+%
+We introduce Invariant~\ref{cdinvar:add-before} to support such reasoning:
+%
+\cdinvar{add-before}{All block-level cycles induced through
+\patch\ \p{p}'s \befores\ exist when \p{p} is
+created\todo{Change this phrasing? ``Once created, a \patch\ will not
+gain any \befores\ that induce block-level cycles.''}.}
+%
+\noindent \Kudos\ ensures this invariant by restricting \before\
+additions to \patch\ creation, \noop\ \patches\ with no \afters, or
+when the invariant is statically proven to hold for the affected
+\patches.
+\end{comment}
+
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
+\subsection{\Nrb\ \Patch\ Merging}
+\label{sec:patch:merge}
+
+File operations such as block allocations, inode updates, and directory updates
+create many distinct \patches. Keeping track of these
+\patches\ and their dependencies requires memory and
+CPU time.
+%
+\Kudos\ therefore \emph{merges} \patches\ when possible, drastically reducing
+\patch\ counts and memory usage, by conservatively identifying when a
+new \patch\ could always be written at the same time as an existing \patch.
+%
+Rather than creating a new \patch\ in this case, \Kudos\ updates data
+and dependencies to merge the new \patch\ into the existing one.
+
+
+Two types of patch merging involve hard patches, and the first is trivial
+to explain:
+%
+since all of a block's \nrb\ \patches\ \emph{must} be written at the same
+time, they can \emph{always} be merged.
+%
+\Kudos\ ensures that each block contains at most one \nrb\ \patch.
+%
+If a new patch $p$ could be created as \nrb\ and $p$'s
+block already contains a \nrb\ \patch\ $h$, then
+%
+the implementation merges $p$ into $h$ by applying $p$'s data to the block
+and setting $\PDDepset{h} \gets \PDDepset{h} \cup \PDDepset{p}$.
+%
+% Steve is right: we don't mention callers anywhere before this
+%% The existing \nrb\ \patch\ $h$ is returned to the caller.
+%
+This changes $h$'s direct dependency set after $h$ was created, but
+since $p$ could have been created \nrb, the change cannot introduce any new
+block-level cycles.
+%
+Unfortunately, the merge can create \emph{intra}-block cycles:
+%
+if some \noop\ \patch\ $e$ has $p \PDepend e \PDepend h$, then after
+the merge $h \PDepend e \PDepend h$.
+%
+\Kudos\ detects and prunes any cyclic
+dependencies during the merge.
+%
+\Nrb\ \patch\ merging is able to eliminate 8 of the \patches\ in our running
+example, as shown in Figure~\ref{fig:opt}c.
+
+
+Second, \Featherstitch\ detects when a new \nrb\ patch can be merged with
+ a block's existing \emph{\rb} \patches.
+%
+Block-level cycles may force a patch $p$ to be created as soft.
+%
+Once those cycles are broken (because the relevant patches commit), $p$
+ could be converted to hard; but to avoid unnecessary work,
+%
+\Kudos\ delays the conversion, performing it only when it detects that a
+ new patch on $p$'s block could be created \nrb.
+%
+Figure~\ref{f:soft2hard} demonstrates this using soft
+ updates-like dependencies.
+%
+Consider a new \nrb\ \patch\ $h$ added to a block that
+contains some \rb\ \patch\ $p$.
+%
+Since $h$ is considered to overlap $p$, \Kudos\ adds a direct dependency
+$h \PDDepend p$.
+%
+Since $h$ could be \nrb\ even including this overlap dependency, we know
+there are no block-level cycles with head $h$.
+%
+But as a result, we know that there are no block-level cycles
+with head $p$, and
+%
+$p$ can be transformed into a \nrb\ \patch.  \Kudos\ will make $p$
+hard by dropping its undo data, then merge $h$ into $p$.
+%
+Although this type of merging is not very common in practice, it is
+ necessary to preserve useful invariants, such as that no hard patch has a
+ dependency on the same block.
+
+
+\begin{figure}
+\centering
+\begin{small}
+\begin{tabular}{@{}p{.32\hsize}@{~~}p{.32\hsize}@{~~}p{.32\hsize}@{}}
+\centering \includegraphics[width=.93\hsize]{fig/softhard_1} &
+\centering \includegraphics[width=.93\hsize]{fig/softhard_2} &
+\centering \includegraphics[width=.93\hsize]{fig/softhard_3} \cr
+\centering \textbf{a)} Block-level cycle &
+\centering \textbf{b)} $d_1$ commits &
+\centering \textbf{c)} After merge
+\end{tabular}
+\end{small}
+\caption{\Rb-to-\nrb\ patch merging.  \textbf{a)} Soft updates-like
+dependencies among directory data and an inode block. $d_1$ deletes a file
+whose inode is on $i$, so Rule~\ref{rule:reuse} requires $i \PDDepend d_1$;
+$d_2$ allocates a file whose inode is on $i$, so Rule~\ref{rule:pointer}
+requires $d_2 \PDDepend i$. \textbf{b)} Writing $d_1$ removes the
+cycle. \textbf{c)} $d_3$, which adds a hard link to $d_2$'s file, initiates
+soft-to-hard merging.}
+\label{f:soft2hard}
+\end{figure}
+
+
+
+\begin{comment}
+
+\Kudos\ includes three distinct \patch\ merge algorithms.
+%
+All three use Invariant~\ref{cdinvar:add-before} to reason about future
+graph changes and use fast, conservative checks during \patch\ creation;
+they differ in their applicable conditions.
+
+
+\subsubsection{\Nrb\ \Patch\ Merging}
+\label{sec:patches:merge:nrb}
+
+Recall from Section~\ref{sec:patches:nrb} that a write of any \patches\ on
+block $b$ must include all \nrb\ \patches\ on $b$.
+%
+This additional requirement is in fact an exquisite optimization
+opportunity; it implies that all \nrb\ \patches\ on a given block can
+be merged.
+%
+Further, merging can remove the need for the \nrb\ \patch\ implicit
+dependency rules by ensuring that
+%
+there is at most one \nrb\ \patch\ per block (\nrb-\nrb\ merging)
+%
+and that all \rb\ \patches\ on a given block depend on the \nrb\ \patch\
+(\nrb-\rb\ merging).
+%
+We describe these two \patch\ merging algorithms and how they
+preserve dependency semantics in this section.
+
+\paragraph{\Nrb-\Nrb\ \Patch\ Merging}
+\label{sec:patches:merge:nrb:hard-hard}
+
+\emph{\Nrb-\nrb\ \patch\ merging} merges a new \nrb\ \patch\ \p{q}
+into an existing \nrb\ \patch\ \p{p} instead of creating \p{q}.
+%
+Any two \nrb\ \patches\ on the same block may be (and are) merged.
+%
+Merging all \nrb\ \patches\ ensures:
+%
+\cdinvar{one-nrb}{\(\forall\! b\!: |\PHard[b]| \leq 1\)}
+%
+\noindent
+%
+Invariant~\ref{cdinvar:one-nrb} simplifies \nrb\ \patch\ handling by
+%
+removing the implicit dependencies that ensure all \nrb\ \patches\
+are written together
+%
+and by removing the need to scan for an existing \nrb\ \patch\ when
+\nrb-\nrb\ \patch\ merging.
+%
+% Although merging two \patches\ will not induce block-level dependency
+% cycles, without sufficient care merging could induce \patch-level
+% dependency cycles.  A trivial example is merging \p{q} into \p{p} when
+% \p{q} has an explicit dependency on \p{p}; the combined \p{(p+q)}
+% should not and need not depend on itself.
+%
+To preserve dependency semantics, the merged \p{(p+q)} must depend on
+the union of \p{p} and \p{q}'s transitive \befores. Additionally, while the
+\patches\ can be merged without forming a \patch-level dependency cycle,
+the merge must ensure that it does not introduce a needless cycle, e.g.
+through \anoop\ \patch\ \p{e} in \depends{q}{\depends{e}{p}}
+\todo{Is cycle avoidance worth mentioning? Is this a good way to mention it?}.
+
+From Invariant~\ref{cdinvar:add-before} and the \nrb\ \patch\
+creation condition (no external \afters), the only possible
+dependencies involving \p{p} and \p{q} are those shown in
+Figure~\ref{fig:nrb-merge}\todo{Should we give these deductions or a
+  flavor?}.
+%
+Notice, for example, that any \p{r} such that
+\indirdepends{q}{\indirdepends{r}{p}} is \anoop\ \patch\todo{This is
+  a strong statement. Expand on its implications?}.
+%
+Our algorithm to transform dependencies for \nrb-\nrb\ \patch\ merges
+(Figure~\ref{algo:merge:hard-hard}) follows from these possible
+dependencies.
+%
+It updates \p{p}'s transitive \befores\ to ensure
+\(\PDepset{q}\todo{Incorrect! Only the true \patches.} \subseteq
+\PDepset{p}\)\todo{Note that Invariant~\ref{cdinvar:add-before}
+  ensures that \noop\ \patches\ reachable from \p{q} will not gain
+  data \patch\ \befores?}\todo{Note that it only needs to move dependencies?}.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\columnwidth]{nrb_merge}
+  \caption{Possible dependencies when merging \nrb\ \patch\ \p{q}
+    into existing \nrb\ \patch\ \p{p}.}
+  \label{fig:nrb-merge}
+\end{figure}
+
+\noindent Algorithm called on \p{q} and \p{p}:\\
+Input: \patch\ \p{a} and existing \nrb\ \patch\ \p{p}.\\
+Returns: whether \indirdepends{a}{p} exists. \(\forall\! \p{b}\!: \indirdepends{a}{b}\) and \notindirdepends{b}{p}, creates \indirdepends{p}{b}.
+
+\begin{itemize}
+\item If \p{a} is external, return ``no path to \p{p}.''
+\item If \p{a} equals \p{p}, return ``path to \p{p}.''
+\item Call self on \p{a} and \p{p}.
+\item If \p{a} has no path to \p{p}, return ``no path to \p{p}.''
+\item For each \p{a} \before\ \p{b}:
+  \begin{itemize}
+  \item If \p{b} has no path to \p{p}:
+    \begin{itemize}
+    \item Move \p{b} from a \before\ of \p{a} to a \before\ of \p{p}.
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\paragraph{\Nrb-\Rb\ \Patch\ Merging}
+\label{sec:patches:merge:nrb:hard-soft}
+
+When creating the first \nrb\ \patch\ on a block, \emph{\nrb-\rb\
+  \patch\ merging} merges all existing (\rb) \patches\ into the new
+\nrb\ \patch.
+%
+Such an arrangement can arise through a combination of \patch\ creates
+and block writes; 
+%
+for example, the block may first obtain an initial (\nrb{}) \patch,
+%
+then gain external \afters\ on its \patch,
+%
+accumulate additional (\rb{}) \patches,
+%
+write the subset of its \patches\ with external \afters\ (leaving some
+\rb\ \patches\ on the block),
+%
+and then gain a \nrb\ \patch.
+%
+In addition to reducing the number of data \patches, \nrb-\rb\
+\patch\ merging removes the second implicit \nrb\ \patch\
+dependency, that \rb\ \patches\ not explicitly dependent on the
+block's \nrb\ \patch\ implicitly depend on it.
+%
+As in \nrb-\nrb\ \patch\ merging, \Kudos\ merges such \patches\ to
+avoid the complications of their implicit dependencies.
+
+\Nrb-\rb\ \patch\ merging's implementation first merges all \rb\ \patches\
+into a \nrb\ \patch\ and then \nrb-\nrb\ \patch\ merges the new \nrb\
+\patch\ into the now-existing \nrb\ \patch.
+%
+Our algorithm to transform the dependencies for \nrb-\rb\ \patch\
+merges (Figure~\ref{algo:merge:hard-soft}) for block $b$
+%
+chooses a \patch\ \p{p} such that
+\(\notexists \inset{q}{\PMem[b]}\!: \indirdepends{p}{q}\)
+%
+and updates its transitive \befores\ to ensure
+\(\PDepset{\PSoft[b]} \subseteq \PDepset{p}\).
+%
+Because any \(\inset{q}{\PMem[b] - p}\) may have \afters, to
+preserve dependencies we convert such a \p{q} into \anoop\ \patch\
+and ensure \depends{q}{p}.
+
+\noindent Algorithm:
+\begin{itemize}
+\item Choose a \(\inset{p}{\PMem[b]}\!:\
+\notexists\! \inset{q}{\PMem[b]}\!:\ \indirdepends{p}{q}\).
+\item For each \inset{q}{\PMem[b] - p}:
+  \begin{itemize}
+  \item Call the \nrb-\nrb\ \before\ move algorithm on \p{q} and \p{p}.
+  \item Convert \p{q} into \anoop\ \patch.
+  \end{itemize}
+\item Convert \p{p} into a \nrb\ \patch\ (free it's previous data copy).
+\end{itemize}
+
+\todo{Note that \nrb-\rb\ merging is rare? Note why it is helpful even though
+it is rare?}
+\todo{Explain why this preserves dependency semantics? Show possible
+dependencies? For the paper, free \patches\ instead of convert them
+into \noop{}s? (Must modify \nrb-\nrb\ algo usage.)}
+
+\end{comment}
+
+
+\subsection{Overlap Merging}
+\label{sec:patches:merge:overlap}
+
+The final type of merging combines \rb\ \patches\ with other \patches,
+\nrb\ or \rb, when they overlap.
+%
+Metadata blocks, such as bitmap blocks, inodes, and directory data, tend to
+accumulate many nearby and overlapping \patches\ as the file system
+gradually changes; for instance, Figure~\ref{f:opt}'s $i_1$--$i_4$ all
+affect the same inode field.
+%
+Even data blocks can collect overlapping dependencies. Figure~\ref{f:opt}'s
+ data writes $d'_n$ overlap, and therefore depend on, the initialization
+ writes $d_n$---but
+%
+our heuristic cannot make $d'_n$ \nrb\ since when they are created,
+ dependencies exist from the inode block onto $d_n$.
+%
+Overlap merging can combine these, and many other, mergeable patches,
+further reducing \patch\ and undo data overhead.
+
+
+Overlapping \patches\ $p_1$ and $p_2$, with $p_2 \PDepend p_1$, may be
+merged \emph{unless} future patches and dependencies might
+force the buffer cache to undo $p_2$, but not $p_1$.
+%
+Reusing the reasoning developed for \nrb\ \patches, we can carve out a
+class of \patches\ that will never cause this problem:
+%
+if $p_2$ is not the head of a block-level cycle containing $p_1$,
+then $p_2$ and $p_1$ can always be committed together.
+
+To detect mergeable pairs, the \Kudos\ implementation again uses a
+conservative heuristic that detects many pairs while limiting the
+cost of traversing dependency graphs.
+%
+However, while the hard patch heuristic is both simple and effective, the heuristic
+for overlap merging has required some tuning to balance CPU expense and
+missed merge opportunities.
+%
+The current version examines all dependency chains of uncommitted patches
+starting at $p_2$.  It succeeds if no such chain matches $p_2 \PDepend x
+\PDepend p_1$ with $x$ on a different block,
+failing conservatively if any of the chains grows too long (more than 10
+links) or there are too many chains.  
+%
+(It also simplifies the implementation to fail when $p_2$
+overlaps with two or more soft patches that do not themselves overlap.)
+%
+However, some chains cannot induce block-level cycles and are allowed
+regardless of how long they grow.
+%
+Consider a chain $p_2 \PDepend x$ not containing $p_1$.
+%
+If $p_1 \PDepend x$ as well, then since there are no circular dependencies, 
+any continuation of the chain $p_2 \PDepend x$ will never encounter $p_1$.
+%
+Our heuristic white-lists several such chains, including $p_2 \PDepend h$
+where $h$ is a hard patch on $p_1$'s block.
+%
+%% We tuned the heuristic to cope with
+%% long dependency chains created by the Andrew benchmark on soft updates-like
+%% dependencies.
+%
+\begin{comment}
+%
+It checks that every path starting at $p_1$ fits at least one of the
+following cases:
+
+%byte overlap selection details, in case we want to describe them:
+% - if overlap one other byte patch, it is target
+% - if overlap two byte patches and one is the hard, non-hard is target
+% - else fail
+
+%bit overlap merge details, in case we want to describe them:
+% try to merge into bits if there are inram bit changes in this word:
+% overlap:
+% - if overlap one other bit patch (bit-wise), it is target
+% - if overlap one other bit patch (word-wise), it is target
+% - else fail
+% if target overlaps a byte patch, fail
+%
+% dependency cycle check, look at the single p->q:
+% if add_overlap_depend_head_is_ok(target, q), merge
+% else fail
+% 
+% else if there are no bit changes in this word:
+% - if there is a hard patch, it is the only patch, and
+%    add_overlap_depend_head_is_ok(hard, q), merge into hard
+%
+% function add_overlap_depend_head_is_ok(overlap, head)
+% - if !head, head = overlap, or head notin ram, return true
+% - if |Deps(overlap)|, return true
+% - if head in Deps(overlap), truen true (check first two befores)
+% - if |Deps(head)| = 0, return true
+% - let Y = { y | exists x, y: target->x->y and q->y } (branch at most 2, |Y| <= 3)
+%   then foreach z in Deps(q) - Y:
+%   - if z = target, return false
+%   - if Deps(z) > 1, return false
+%   - if Deps(z) !<= Y, return false
+% return true
+
+\begin{xcompactitemize}
+\item $p_1 \PDDepend p_2$.
+\item $p_1 \PDDepend h$, where $h$ is the \nrb\ \patch\ on $\PBlock{p_1}$.
+\item $p_1 \PDDepend q$, where $q \not\in \PMem$.
+% This rule is covered by the next (but we do do this check for speed)
+%\item $p_1 \PDDepend q$, where $q$ depends on no other \patch.
+\item $p_1 \PDDepend q$, where $p_2 \PDDepend q$.
+\item $p_1 \PDDepend q$, where $\PDepset{q} \subseteq \PDepset{p_2}$
+  and $|\PDepset{q}| \leq 2$.
+\item Has length at most 10, traverses no node with more than 10
+  direct dependencies, and does not traverse $p_2$.\todo{Yuck\ldots}
+\end{xcompactitemize}
+
+\noindent
+\end{comment}
+%
+If all chains fit, then there are no block-level cycles from $p_2$
+to $p_1$, $p_2$ and $p_1$ can have the same lifetime, and $p_2$ can be
+merged into $p_1$ to create a combined patch.
+
+
+\begin{comment}
+, and to limit $p \PDDepend q$ existence checks to just $p$'s
+and $q$'s two oldest and newest dependencies.
+%
+The rules to overlap merge two bit \patches\ are similar.
+\end{comment}
+
+
+
+In our running example, overlap merging combines all remaining
+\rb\ \patches\ with their \nrb\ counterparts, reducing the number of \patches\
+to the minimum of 8 and the amount of undo data to the minimum of 0.
+%
+In our experiments, \nrb\ \patches\ and our \patch\ merging
+optimizations reduce the amount of memory allocated for undo data in
+soft updates and journaling orderings by \patchoptundo.
+
+
+\begin{comment}
+%
+If the only dependency between $p_1$ and $p_2$ is direct---that is, no path
+$p_1 \PDepend x \PDepend p_2$ exists for any $x \not\in \{p_1,
+p_2\}$---then it will always be possible to write $p_1$ and $p_2$ at the
+same time.
+%
+Specifically, it is possible to write $p_1$ 
+
+
+Many of these and similar \patches\ are mergeable and have
+dependencies that allow simple (and fast) reasoning to identify many
+of the mergeable pairs: two \patches\ on block $b$ that overlap no other \patches\ in \PMem[b]
+and which have no dependency path from the new to the existing \patch\
+will not induce a block-level cycle and so are writable together.
+We know that \textit{later} changes will not cause them to induce a block-level cycle due to
+invariant~\ref{cdinvar:add-before} and by not merging if the new \patch\
+has a before and the before is marked as allowed to violate
+invariant~\ref{cdinvar:add-before}.
+%
+While path existence testing is expensive, a conservative path test
+of only a depth of two identifies most mergeable \patches. If the new
+\patch\ has an explicit \before\ that is not the existing \patch\ and
+this \before\ has a \before, then there may be a path to the existing
+\patch.
+%
+To merge two such overlapping \patches, add the new \patch's explicit
+before to the existing \patch\ (if any and if not the existing \patch).
+
+
+%%
+
+At the end of \patch\ optimizations, say something along the lines:
+%
+The dynamic optimizations facilitated through \nrb\
+\patches\ implement the efficiency in systems using soft updates or
+journaling\todo{Actually do this for journaling} while expressing
+changes modularly through structural descriptions rather than through
+internal and semantic file system descriptions.
+
+\todo{Should we talk about why we allow NRBs and merging to be
+  disabled? (Debugging simplicity and depend add to \noop\ \patches\
+  with \afters\ bug catching.)}
+\end{comment}
+
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
+\subsection{Ready \Patch\ Lists}
+\label{sec:patch:readylist}
+\label{readylist}
+
+\newcommand{\PReady}[1]{\ensuremath{#1.\textit{ready}}}
+
+A different class of optimization addresses CPU time spent in the
+\Kudos\ buffer cache.
+%
+The buffer cache's main task is to choose sets of \patches\ $P$ that
+satisfy the in-flight safety property $\PDepset{P} \subseteq P \cup
+\PDisk$.
+%
+A naive implementation would guess a set $P$ and then traverse the dependency graph starting
+at $P$, looking for problematic dependencies.
+%
+Patch merging limits the size of these traversals by reducing the number of
+patches.
+%
+Unfortunately, even modest traversals become painfully slow when executed
+on every block in a large buffer cache, and in our initial implementation
+these traversals were a bottleneck for cache
+sizes above 128 blocks (!).
+ 
+Luckily, much of the information
+required for the buffer cache to choose a set $P$ can be precomputed.
+%
+\Kudos\ explicitly tracks, for each \patch, how many of its
+direct dependencies remain uncommitted or in flight.
+%
+These counts are incremented as \patches\ are added to the system and
+decremented as the system receives commit notifications from the disk.
+%
+When both counts reach zero, the \patch\ is safe to write, and it is moved
+into a \emph{ready list} on its containing block.
+%
+\begin{comment}
+(\Noop\ \patches\ automatically commit when all their dependencies commit.)
+\end{comment}
+%
+The buffer cache, then, can immediately tell whether a block has writable
+patches.
+%
+To write a block $\PB$, the buffer cache initially populates the set $P$ with the
+contents of $\PB$'s ready list.
+%
+While moving a patch $p$ into $P$, \Kudos\ checks whether there exist
+dependencies $q \PDDepend p$ where $q$ is also on block $\PB$.
+%
+The system can write $q$ at the same time as $p$, so $q$'s
+counts are updated as if $p$ has already committed.
+%
+This may make $q$ ready, after which it in turn is added to $P$.
+%
+(This premature accounting is safe because the system won't try to write
+$\PB$ again until $p$ and $q$ actually commit.)
+
+
+While the basic principle of this optimization is simple, its efficient
+implementation depends on several other optimizations, such as soft-to-hard
+patch merging, that preserve important dependency invariants.
+%
+Although ready count maintenance makes some
+\patch\ manipulations more expensive, ready lists save enough duplicate work in
+the buffer cache that the system as a whole is more efficient by multiple orders of
+magnitude.
+
+
+\begin{comment}
+For a \module\ like the write-back cache to forward \patches\ in a
+dependency-preserving order, the \module\ must find \patches\ whose \befores\
+are all ``closer to the disk'' (or are also being forwarded as part of the same
+block write). We say that such \patches\ are \emph{ready}. 
+
+
+Each \patch\ has a count of the number of \befores\ it has at block device
+modules just as close to the disk as it currently is, and a count of the number
+of \befores\ it has which are in flight. When these counts are both zero, it is
+ready. A \patch's \before\ counts are incrementally updated as \befores\ are
+added and removed and as \beforing\ \patches\ are moved closer to the disk.
+
+Because \Kudos\ makes sure that the \befores\ of a \patch\ are at least as
+close to the disk as it is, only directly reachable \beforing\ \patches\ need to
+be included in a \patch's \before\ counts. \Noop\ \patches, with the exception
+of managed \noop\ \patches\ (which have an explicit owning block device), add a
+wrinkle to this simplifying rule, however. They are considered to be as close to
+the disk as their \before\ which is the farthest from the disk, in effect,
+propagating the distance to the disk metric through them.
+
+When a \before\ count update changes whether a \patch\ is ready to write, the
+\patch's inclusion in its block's ready list is updated. To write a block, a
+\module\ thus iterates through the block's ready list, sending \patches\ to the
+target block device, until the list is empty. Thus instead of having to
+repeatedly traverse \patch\ graphs to determine readiness on demand, we have
+this information maintained automatically as it changes. This automatic
+maintenance adds some cost to forwarding \patches\ and changing the graph
+structure, but since it saves so much duplicate work\footnote{The amount of
+duplicate work saved is actually superlinear in the size of the write-back
+cache.} it is much more efficient.
+\end{comment}
+
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
+\subsection{Other Optimizations}
+\label{sec:patch:misc}
+
+Optimizations can only do so much
+with bad dependencies.
+%
+Just as having too few dependencies can compromise system correctness,
+having too many dependencies, or the wrong dependencies, can non-trivially
+degrade system performance.
+%
+For example, in both the following \patch\ arrangements, $s$ depends on all
+of $r$, $q$, and $p$, but the left-hand arrangement gives the system more
+freedom to reorder block writes:
+
+\begin{figure}[htb]
+\vskip-.4\baselineskip
+\centering
+\begin{tabular}{@{}p{.3\hsize}p{.3\hsize}@{}}
+\centering \includegraphics[scale=.62]{fig/figures_4} &
+\centering \includegraphics[scale=.62]{fig/figures_6}
+\end{tabular}
+\vskip-1.2\baselineskip
+\end{figure}
+
+\noindent%
+If $r$, $q$, and $p$ are adjacent on disk, the left-hand
+arrangement can be satisfied with two disk requests while the right-hand
+one will require four.
+%
+Although neither arrangement is much harder to code, in several cases
+we discovered that one of our file system implementations was performing
+slowly because it created an arrangement like the one on the right.
+
+Care must be taken to avoid unnecessary \emph{implicit} dependencies,
+and in particular overlap dependencies.
+%
+For instance, inode blocks contain multiple inodes, and changes to two
+inodes should generally be independent; a similar statement holds for
+directories.
+%% and even sometimes for different fields in a summary block like
+%% the superblock.
+%
+Patches that change one independent field at a time generally give
+the best results.
+%%  can be obtained from \emph{minimal} \patches\ that change
+%% one independent field at a time. 
+\Kudos\ will merge these \patches\ when
+appropriate, but if they cannot be merged, minimal \patches\ tend to
+cause fewer \patch\ reversions and give more flexibility in write
+ordering.
+
+File system implementations can generate better dependency arrangements
+when they can detect that certain states will never appear on disk.
+%
+For example, soft updates requires that clearing an inode
+depend on nullifications of all corresponding directory entries, which
+normally induces dependencies from the inode onto the directory
+entries.
+%
+However, if a directory entry will never exist on disk---for example,
+because a patch to remove the entry merged with the patch that created
+it---then there is no need to require the corresponding dependency.
+%
+Similarly, if \emph{all} a file's directory entries will never exist on
+disk, the patches that free the file's blocks need not depend on the
+directory entries.
+%
+Leaving out these dependencies can speed up the system by avoiding
+block-level cycles, such as those in Figure~\ref{f:soft2hard}, and the
+rollbacks and double writes they cause.
+%
+\begin{comment}
+A dependency from the inode clear onto the directory entry clear is
+sufficient to ensure this property. However, when a directory entry
+will never exist on disk because it is created and removed before the
+creation is committed, the inode clear need not depend on the
+directory entry clear.
+\end{comment}
+%
+The \Kudos\ ext2 module implements these optimizations,
+%%  and another, related
+%% one: if a directory entry will never reference an inode, then the patches
+%% that clear the corresponding inode bitmap and block bitmap entries need not
+%% depend on the patch that deleted that directory entry.
+%
+significantly reducing disk writes, patch allocations, and undo data required
+when files are created and deleted within a short time.
+%
+Although the optimizations are file system specific, the file system
+implements them using general properties, namely, whether two patches
+successfully merge.
+
+%% the changes to update a field in an inode structure
+%% on disk, a \patch\ spanning the entire inode could be created even though
+%% only a single field changed. A later change to a different field in the
+%% same inode would appear to overlap the first, possibly creating an
+%% unnecessary dependency. Creating \patches\ that correspond more precisely
+%% to the changes being made avoids this problem, so a utility function is
+%% provided by \Kudos\ to make this operation as convenient as creating a
+%% single \patch\ for an entire large structure.
+
+%% \subsubsection{\Patch\ List Ordering}
+
+\begin{comment}
+%% Declared uninteresting.
+The buffer cache and a few other \modules\ perform better in the
+common case that each block's \patches\ are listed in order of creation
+time,
+%
+taking $O(n)$ time to process $n$ patches rather than $O(n^2)$.
+%% in the common case that this order is preserved.
+\end{comment}
+
+Finally, block allocation policies can have a dramatic effect on the number of
+I/O requests required to write changes to the disk. For instance, soft
+updates-like dependencies require that data blocks be initialized before
+an indirect block references them.   
+Allocating an
+indirect block in the middle of a range of file data blocks
+forces the data blocks to be
+written as two smaller I/O requests, since the indirect block
+cannot be written at the same time. Allocating the indirect block somewhere
+else allows the data blocks to be written in one larger I/O request, at the
+cost of (depending on readahead policies) a potential slowdown in read performance.
+
+
+
+We often found it useful to examine \patch\ dependency graphs visually.
+%% (looking at created \patches\ and the \patch's
+\Kudos\ optionally logs \patch\ operations to disk;
+a separate debugger inspects and generates graphs from these
+logs.
+%
+Although the graphs could be daunting, they provided some evidence that
+patches work as we had hoped: performance problems could
+be analyzed by examining general dependency structures, and
+sometimes easily fixed by manipulating those structures.
+
+
+\begin{comment}
+Several functions in \Kudos\ iterate over lists of \patches\ looking for either
+a single \patch\ or set of \patches\ satisfying some property, or trying to
+process all the \patches\ in the list in some order determined by the dependency
+graph. It is generally the case that the \patches\ satisfying the property or
+the order in which the \patches\ should be processed can be determined very
+quickly by keeping the lists sorted. For instance, the library function which
+reverts \patches\ needs to perform the revert operations essentially in inverse
+creation order, so that reverting a \patch\ which has since been overwritten
+by a later \patch\ does the right thing. Keeping the list of all \patches\ on a
+block sorted in creation order (which is very easy) makes this an efficient
+operation, while it might otherwise take $O(n^2)$ time to execute. Similarly,
+many \patch\ merging functions need to find for a given block some \patch\
+which has no \befores\ on the same block, and the oldest \patch\ on a block
+always satisfies this requirement.
+\end{comment}
+
+\section{\Patchgroups}
+\label{sec:patchgroup}
+
+% notation removed to notation.tex
+
+
+Currently,
+robust applications
+%% often manipulate valuable data, e.g. a mail server's mail
+%% or a version control system's local checkout.
+%
+can enforce necessary write-before relationships, and thus ensure the
+consistency of on-disk data even after system crash, in only limited
+ways:
+%% requiring their changes be committed in
+%% a specified order.
+%% %
+%% Existing systems can ensure such orders in two ways:
+%
+they can force synchronous writes using
+\texttt{sync}, \texttt{fsync}, or \texttt{sync\_file\_range}, or
+%
+they can assume particular file system implementation
+semantics, such as journaling.
+%
+With the \patch\ abstraction, however, a process might specify
+just dependencies; the storage system could use those dependencies to implement
+an appropriate ordering.
+%
+This approach assumes little about file system implementation semantics,
+but unlike synchronous writes, the storage system can still
+buffer, combine, and reorder disk operations.
+%
+This section describes \emph{\patchgroups}, an example API for extending
+\patches\ to user space.
+%
+Applications \emph{engage} \patchgroups\ to associate them with file system
+changes; dependencies are
+defined among groups.  A parent process can set up a dependency structure
+that its child process will obey unknowingly.  \Patchgroups\ apply to
+any file system, including raw block device writes.  
+
+In this section we describe the \patchgroup\ abstraction
+%
+and apply it to three robust applications.
+
+%%  it usefulness on three and show how it allows gzip, Subversion, and UW IMAP to easily specify
+%% their application-level consistency protocols.
+
+\subsection{Interface and Implementation}
+\label{sec:patchgroup:interface}
+
+\Patchgroups\ encapsulate sets of file system operations into units among
+which dependencies can be applied.
+%
+%% applications can specify ordering requirements among \patchgroups.
+%
+The \patchgroup\ interface is as follows:
+
+\vspace{-0.5\baselineskip}
+\begin{scriptsize}
+\begin{alltt}
+  typedef int pg_t;          pg_t \textbf{pg_create}(void);
+  int \textbf{pg_depend}(pg_t \pgQg, pg_t \pgPg);  /* \textrm{adds \(\pgQgNf\PDepend\pgPgNf\)} */
+  int \textbf{pg_engage}(pg_t \pgPg);     int  \textbf{pg_disengage}(pg_t \pgPg);
+  int \textbf{pg_sync}(pg_t \pgPg);       int  \textbf{pg_close}(pg_t \pgPg);
+\end{alltt}
+\end{scriptsize}
+\vspace{-0.5\baselineskip}
+
+Each process has its own set of \patchgroups, which are currently shared
+among all threads.
+%
+The call \texttt{\pgDepend(\pgQg, \pgPg)} makes \patchgroup\ \pgQg\ depend on
+\patchgroup\ \pgPg: all \patches\ associated with \pgPg\ will
+commit prior to any of those associated with \pgQg.
+%
+\emph{Engaging} a patchgroup with \pgEngage\ associates subsequent file
+system operations with that patchgroup.
+%
+\pgSync\ forces an immediate write of a \patchgroup\ to disk.
+%
+\pgCreate\ creates a new \patchgroup\ and returns its ID
+%
+and \pgClose\ disassociates a \patchgroup\ ID from the underlying
+\patches\ which implement it.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\hsize]{fig/pg_1}
+\caption{\label{fig:patchgroup-transitions} \Patchgroup\ lifespan.}
+\end{figure}
+%
+Whereas \Kudos\ \modules\ are presumed to not create cyclic
+dependencies, the kernel cannot safely trust user applications to be
+so well behaved, so
+%
+the \patchgroup\ API makes cycles
+unconstructable.
+%
+Figure~\ref{fig:patchgroup-transitions} shows when different
+\patchgroup\ dependency operations are valid.
+%
+As with patches themselves, all a patchgroup's direct dependencies are
+added first.  After this, a patchgroup becomes engaged zero or more times;
+however, once a patchgroup \pgPg\ gains a dependency via \texttt{\pgDepend(*,
+\pgPg)}, it is sealed and can never be engaged again.  
+%
+This prevents applications from using patchgroups to hold dirty blocks in
+memory: \pgQg\ can depend on \pgPg\ only once the system has seen the
+complete set of \pgPg's changes.
+
+%% but the system will refuse to engage any patc   example, a dependency to an engaged (or previously-engaged)
+%% patchgroup cannot For example, \texttt{\pgDepend(\pgQg, \pgPg)} returns an
+%% error if \pgQg\ has \emph{ever} been engaged; if it succeeds, a subsequent
+%% \texttt{\pgEngage(\pgPg)} will return an error.\footnote{These rules are
+%% really just a strictly enforced version of the requirement from
+%% \S\ref{sec:patch:nrb} that all dependencies must be specified up-front.}
+
+\Patchgroups\ and file descriptors are managed similarly---they are copied
+across \texttt{fork}, preserved across \texttt{exec}, and closed on
+\texttt{exit}.
+%
+This allows existing, unaware programs to interact with \patchgroups,
+in the same way that the shell can connect pipe-oblivious programs
+into a pipeline.
+%
+For example, a \texttt{depend} program could apply \patchgroups\ to
+unmodified applications by setting up the \patchgroups\ before calling
+\texttt{exec}.  The following command line would ensure that \texttt{in} is
+not removed until all changes in the preceding \texttt{sort} have committed
+to disk:
+
+\vspace{-0.5\baselineskip}
+\begin{center}
+\begin{small}
+\verb+depend "sort < in > out" "rm in"+
+\end{small}
+\end{center}
+\vspace{-0.5\baselineskip}
+
+% FIXME: Mention simplicity using patchgroups vs fsync?
+
+Inside the kernel, each \patchgroup\ corresponds to a pair of containing
+\noop\ \patches,
+and each inter-\patchgroup\ dependency corresponds to a dependency between
+the \noop\ \patches.
+%
+All file system changes are inserted
+between all engaged \patchgroups' \noop\ \patches.
+%
+Figure~\ref{fig:patchgroup-patches} shows an example \patch\ arrangement for
+two \patchgroups.
+%
+(The actual implementation uses additional empty patches for bookkeeping.)
+
+\begin{figure}[t]
+\centering
+%% \includegraphics[width=0.7\hsize]{fig/figures_5}
+%% \caption{\label{fig:patchgroup-patches} \Patches\ corresponding to two
+%%   \patchgroups, $p$ and $q$.  The $h$ and $t$ \patches\ are created by the 
+%%   \patchgroup\ module; the heavy dependency between $t_p$ and $h_q$ was added
+%%   by \texttt{pg~depend(p, q)}.  Each of $a_i$, $b$, and $c$ corresponds to
+%%   a different file system change.}
+\includegraphics[width=\hsize]{fig/figures_7}
+\caption{\Patchgroup\ implementation (simplified).  Empty
+patches $h_{\pgPgNf}$ and $t_{\pgPgNf}$ bracket file system patches created while
+\patchgroup\ \pgPg\ is engaged.  \pgDepend\ connects one
+\patchgroup's $t$ patch to another's $h$.}
+\label{fig:patchgroup-patches} 
+\end{figure}
+
+These dependencies suffice to enforce patchgroups when using soft
+updates-like dependencies, but for journaling, some extra work is required.
+%
+Since writing the commit record atomically commits a
+transaction, additional \patchgroup-specified dependencies for the data in each
+transaction must be shifted to the commit record itself.
+%
+These dependencies then collapse into harmless dependencies from the commit
+record to itself or to previous commit records.
+%
+Also, a metadata-only journal, which by default does not journal data
+blocks at all, pulls \patchgroup-related data blocks into its journal,
+making it act like a full journal for those data blocks.
+
+Patchgroups currently \emph{augment} the underlying file system's
+consistency semantics, although a fuller implementation might let a
+patchgroup declare \emph{reduced} consistency requirements as well.
+
+\subsection{Case Studies}
+\label{sec:patchgroup:casestudies}
+
+%% \todo{Introduce and contrast gzip, Subversion, and UW IMAP}
+%% %
+%% UW IMAP case study (faster, same safety, server) vs
+%% Subversion case study (about same speed, additional safety on non-ext3
+%% ordered, client).
+
+We studied the \patchgroup\ interface by adding \patchgroup\ support to three
+applications: the gzip compression utility, the Subversion version control
+client, and the UW IMAP mail server daemon.
+%
+These applications were chosen for their relatively simple and explicit
+consistency requirements; we intended to test how well patchgroups
+implement existing consistency mechanisms, not to create new mechanisms.
+One effect of this choice is that versions of
+these applications could attain similar consistency guarantees
+by running on a
+fully-journaled file system with a conventional API, although at least IMAP
+would require modification to do so.  Patchgroups, however,
+make the required guarantees explicit, can be implemented on other types of
+file system, and introduce no additional cost on fully-journaled systems.
+
+% discussion potential gains (in addition to actual gains)?
+
+\paragraph{Gzip}
+\label{sec:patchgroup:gzip}
+
+%% Our first test showed that simple consistency requirements were simple to
+%% add.  
+Our modified gzip uses \patchgroups\ to make the input file's
+removal depend on the output file's data being written; thus,
+a crash cannot lose both files. The update adds 10 lines of code to gzip
+v1.3.9, showing that simple consistency requirements are simple to
+implement with patchgroups.
+
+\paragraph{Subversion}
+\label{sec:patchgroup:svn}
+
+% describe why pgs are easier/better than journaling
+
+The Subversion version control system's client~\cite{svn} manipulates a
+local working copy of a repository.
+%% In this case study we take an interest in how the Subversion version
+%% control system client~\cite{svn} manipulates a local checkout (a
+%% Subversion ``working copy'').
+%
+The working copy library is designed to avoid data corruption or loss
+should the process exit prematurely from a working copy operation.
+%
+This safety is achieved using application-level write ahead journaling,
+where each entry in Subversion's journal is either idempotent or
+atomic.
+%
+Depending on the file system, however, even this precaution may not protect
+a working copy operation against a crash.
+%
+For example, the journal file is marked as complete by moving it from
+a temporary location to its live location.
+%
+Should the file system completely commit the file rename before
+the file data, and crash before completing the file data commit, then
+a subsequent journal replay could corrupt the working copy.
+
+The working copy library could ensure a safe commit ordering by
+syncing files as necessary, and the Subversion server (repository) library
+takes this approach, but
+%
+developers deemed this approach too slow to be worthwhile at the
+client~\cite{svntradeoff}.
+%
+Instead, the working copy library assumes that
+%
+first, all preceding writes to a file's data are committed before the file
+is renamed,
+%
+and second, metadata updates are effectively committed in their system call
+order.
+%
+%% The combination of these properties ensures the creation of file $i$
+%% precedes the creation of file $(i+1)$.
+%
+This does not hold on
+many systems; for example, neither NTFS with journaling nor BSD UFS with
+soft updates provide the required properties.  The Subversion developers
+essentially specialized their consistency mechanism for one file system,
+ext3 in either ``ordered'' or full journaling mode.
+%
+%% Additionally, non-journaled systems such as BSD UFS with soft updates
+%% do not provide the metadata ordering property.  On such systems the
+%% journal file's installation may precede earlier file installations,
+%% leaving the working copy in an inconsistent state.
+
+We updated the Subversion working copy library to
+express commit ordering requirements directly using \patchgroups.
+%% \todo{Use consistency protocol phrase here and throughout?} 
+%% without relying on properties of the
+%% underlying file system implementation.
+%
+The file rename property was replaced in two ways.
+%
+Files created in a temporary location and then moved into their
+live location, such as directory status and journal files, now
+make the rename depend on the file data writes; but
+%
+files only referenced by live files, such as updated file
+copies used by journal file entries, can live with a weaker ordering:
+the installation of referencing files is made to depend on the
+file data writes.
+%
+The use of linearly ordered metadata updates was also replaced by
+\patchgroup\ dependencies, and
+%
+making the dependencies explicit let us reason about Subversion's actual
+order requirements, which are much less strict than linear ordering.
+%
+%% Although the original operations assumed a linear ordering of metadata
+%% updates, the actual order requirements are considerably less strict.
+%
+For example, the updated file copies used by the journal may be
+committed in any order, and most journal playback operations
+may commit in any order.
+%
+Only interacting operations, such as a
+file read and subsequent rename, require ordering.
+
+Once we understood Subversion v1.4.3's requirements, it took a day to add
+the 220 lines of code that enforce safety for conflicted updates (out of
+25,000 in the working copy library).
+
+\paragraph{UW IMAP}
+\label{sec:patchgroup:uwimap}
+
+We updated the University of Washington's IMAP mail server
+(v2004g)~\cite{uwimap} to ensure mail updates are safely committed to disk.
+%
+The Internet Message Access Protocol (IMAP)~\cite{rfc3501} provides
+remote access to a mail server's email message store.
+%
+The most relevant IMAP commands synchronize changes to the server's
+disk (\imapCheck), copy a message from the selected mailbox to another
+mailbox (\imapCopy), and delete messages marked for deletion (\imapExpunge).
+
+We updated the imapd and mbox mail storage drivers to use
+\patchgroups, ensuring that all disk writes occur in a safe ordering
+without enforcing a specific block write order.
+%
+The original server conservatively preserved command ordering by
+syncing the mailbox file after each \imapCheck\ on it or \imapCopy\ into it.
+%
+For example, Figure~\ref{fig:imap}a illustrates moving messages from
+one mailbox to another.
+%
+With \patchgroups, each command's file system updates are executed under a
+distinct \patchgroup\ and, through the \patchgroup, made to depend on the
+previous command's updates. This is necessary, for example, so that
+moving a message to another folder (accomplished by copying to the
+destination file and then removing from the source file) cannot lose
+the copied message should the server crash part way through the disk
+updates.
+%
+The updated \imapCheck\ and \imapExpunge\ commands use \pgSync\ to sync all preceding disk
+updates. This removes the requirement that \imapCopy\
+sync its destination mailbox: the client's \imapCheck\ or \imapExpunge\ request will ensure
+changes are committed to disk, and the \patchgroup\ dependencies ensure
+changes are committed in a safe ordering.
+%
+Figure~\ref{fig:imap}b illustrates using patches to move messages.
+
+\begin{figure}[tb]
+\centering
+\begin{tabular}{@{}cc@{}}
+\includegraphics[scale=0.6]{fig/pg_2} & 
+\includegraphics[scale=0.6]{fig/pg_3}\\
+\textbf{a)} Unmodified, \texttt{fsync} & 
+\textbf{b)} \Patchgroups
+\end{tabular}
+\caption{UW IMAP server, without and with \patchgroups, moving three
+messages from \texttt{mailbox.src} to \texttt{mailbox.dst}.}
+\label{fig:imap}
+\end{figure}
+
+These changes improve UW IMAP by
+%
+ensuring disk write ordering correctness
+%
+and by performing disk writes more efficiently than synchronous writes.
+%
+As each command's changes now depend on the preceding command's
+changes, it is no longer required that all code
+specifically ensure its changes are committed before any later, dependent
+command's changes. Without \patchgroups, modules like the mbox driver
+forced a conservative disk sync protocol because ensuring safety more
+efficiently required additional state information, adding further
+complexity. The Dovecot IMAP server's source code notes this exact
+difficulty~\cite[maildir-save.c]{dovecot}:
+
+\vspace{-0.5\baselineskip}
+\begin{scriptsize}
+\begin{verbatim}
+/* FIXME: when saving multiple messages, we could get
+   better performance if we left the fd open and
+   fsync()ed it later */
+\end{verbatim}
+\end{scriptsize}
+\vspace{-0.5\baselineskip}
+
+The performance of the \patchgroup{}-enabled UW IMAP mail server is
+evaluated in Section~\ref{sec:evaluation:uwimap}.
+
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
+\section{\Modules}
+\label{sec:modules}
+
+A \Kudos\ configuration is composed of \modules\ that cooperate to
+ implement file system functionality.
+%
+\Modules\ fall into three major categories.
+%
+\emph{Block device} (BD) \modules\ are closest to the disk; they have a fairly
+conventional block device interface with interfaces such as ``read block'' and
+``flush.''
+%
+\emph{Common file system} (CFS) \modules\ are closest to the system call
+interface, and have an interface similar to VFS~\cite{kleiman86vnodes}. 
+%
+In between these interfaces are modules implementing a  \emph{low-level file
+system} (\LFS) interface, which helps divide file system implementations
+into code common across block-structured file systems and code specific to
+a given file system layout.
+%
+The \LFS\ interface has functions to allocate blocks, add blocks to files,
+allocate file names, and other file system micro-operations. 
+%% A \module\
+%% implementing the \LFS\ interface defines how bits are laid out on the disk, but
+%% doesn't have to know how to combine the micro-operations into larger, more
+%% familiar file system operations. 
+A generic CFS-to-\LFS\ \module\ called UHFS
+(``universal high-level file system'') decomposes familiar VFS operations
+like write, read, and append into \LFS\ micro-operations. 
+%
+%% File system extensions like those often implemented by stackable file
+%% systems would generally use the CFS interface; for example, we wrote a
+%% simple CFS module that provides case-insensitive access to a case-sensitive
+%% file system.
+%
+Our ext2 and UFS file system modules
+implement the \LFS\ interface.
+
+
+Modules examine and modify dependencies via patches passed to them as
+arguments.
+%
+For instance, every \LFS\ function that might modify the file system takes a
+\texttt{\textit{patch\char`\_t **p}} argument.
+%
+Before the function is called, \texttt{*p} is set to the \patch,
+if any, on which the modification should depend;
+%
+when the function returns, \texttt{*p} is set to some \patch\
+corresponding to the modification itself.
+%
+\begin{comment}
+(\Noop\ \patches\ allow this interface to generalize to multiple
+dependencies.)
+\end{comment}
+%
+For example, this function is called to append a block to an \LFS\ inode
+\verb+f+:
+
+\vspace{-0.5\baselineskip}
+\begin{small}
+\begin{alltt}
+int (*append_file_block)(LFS_t *module, 
+   fdesc_t *f, uint32_t block, patch_t **p);
+\end{alltt}
+\end{small}
+\vspace{-0.5\baselineskip}
+
+\begin{comment}
+\noindent
+This design lets \LFS\ modules examine and modify the dependency structure.
+\end{comment}
+
+
+
+\subsection{ext2 and UFS}
+
+\Kudos\ currently has \modules\ that implement two file system types, Linux
+ext2 and 4.2 BSD UFS (Unix File System, the modern incarnation of the Fast File
+System~\cite{mckusick84fast}).
+%
+Both of these \modules\ initially generate dependencies arranged according to the
+soft updates rules; other dependency arrangements are achieved by transforming these.
+To the best of our knowledge, our implementation of ext2 is the first to provide
+soft updates consistency guarantees.
+%
+%We verified that file systems generated by our modules are considered
+%correct by their reference implementations on FreeBSD and Linux by mounting
+%and running \command{fsck} on \Kudos-generated disk images.
+
+Both \modules\ are implemented at the \LFS\ interface. 
+%
+%% This keeps properties
+%% specific to the file system (such as the on-disk format and rules governing
+%% block allocation) hidden within the \module. 
+%
+%The \modules\ create \patches\ for all their changes to the disk and
+%connect them to form subgraphs that enforce the soft updates
+%rules~\cite{ganger00soft} as applied to each file system. 
+%
+%The UHFS \module\ is also aware of soft updates order when necessary; when
+%it implements a single operation using multiple \LFS\ calls, it hooks the
+%resulting \patches\ up in the correct order.
+%
+Unlike FreeBSD's soft updates implementation, once these modules set up 
+dependencies, they no longer need to concern themselves with file system
+consistency; the block device subsystem will track
+and enforce the dependencies.
+
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[height=2.5in]{fig/figures_1}
+  \caption{A running \Kudos\ configuration. {\it/} is a soft updated
+    file system on an IDE drive; {\it/loop} is an externally journaled
+    file system on loop devices.}
+  \label{fig:kfs-graph}
+\end{figure}
+
+
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
+\subsection{Journal}
+\label{sec:modules:journal}
+
+The journal module sits below a regular file system, such as ext2, and transforms
+incoming \patches\ into patches implementing journal transactions.
+%
+File system blocks are copied into the journal, a commit record depends on the
+journal \patches, and the original file system \patches\ depend in turn on the
+commit record.
+%
+Any soft updates-like dependencies among the original \patches\ are removed,
+since they are not needed when the journal handles consistency; however, the
+journal does obey user-specified dependencies, such as
+\patchgroups, by potentially shifting dependent \patches\ into the current
+transaction.
+%
+%% itself provides consistency for each high-level file system operation by
+%% replaying outstanding transactions on recovery.
+%% \footnote{However, it does take care to ensure that the user-specified
+%% dependencies described in \S\ref{sec:patchgroup} are not violated.}
+%
+The journal format is similar to ext3's~\cite{tweedie98journaling}: a
+transaction contains a list of block numbers, the data to be written to
+those blocks, and finally a single commit record.
+%
+Although the journal modifies existing \patches' direct dependencies, it
+ensures that any new dependencies do not introduce block-level
+cycles.
+
+As in ext3, transactions are required to commit in sequence. The
+journal \module\ sets each commit record to depend on the previous commit record, and each
+completion record to depend on the previous completion record. This allows
+multiple outstanding transactions in the journal, which benefits performance,
+but ensures that in the event of a crash, the journal's committed
+transactions will be both contiguous and sequential.
+
+Since the commit record is created at the end of the transaction, the journal
+\module\ uses a special \noop\ \patch\ explicitly held in memory to prevent
+file system changes from being written to the disk until the transaction is
+complete. This \noop\ \patch\ is set to depend on the previous transaction's
+completion record, which prevents merging between transactions while allowing
+merging within a transaction. This temporary dependency is removed when the
+real commit record is created.
+%% and its dependencies are set up as described above.
+
+%Due to this design, the journal \module\ is completely independent of any
+%specific file system. It is a block device \module\ that automatically journals
+%whatever file system is stored on it. In fact, the incoming \patches\ need not
+%be arranged for soft updates, or for that matter in any particular configuration
+%at all.
+
+% Is it important to specify how we figure out where transaction boundaries
+% are? It seemed confusing to one reviewer due to this section preceeding the
+% modules section.
+
+Our journal module prototype can run in full data journal mode, where every
+updated block is written to the journal, or in metadata-only mode, where only
+blocks containing file system metadata are written to the journal. It can
+tell which blocks are which by looking for a special flag on each \patch\ set
+by the UHFS module.
+
+We provide several other modules that modify dependencies, including an
+``asynchronous mode'' module that removes all dependencies, allowing the
+buffer cache to write blocks in any order.
+%
+%% This implements similar semantics as existing file systems like ext2 in
+%% asynchronous write mode.
+
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
+\subsection{Buffer Cache}
+\label{sec:modules:wbcache}
+
+The \Kudos\ buffer cache both
+%
+caches blocks in memory and
+ensures that modifications are written to stable storage in a safe order.
+%
+Modules ``below'' the buffer cache---that is, between its output interface
+and the disk---are considered part of the ``disk controller''; they can
+reorder block writes at will without violating dependencies, since those block
+writes will contain only in-flight patches.
+%
+%% There can be many write-back caches in a configuration at once (for
+%% instance, one for each block device). 
+%
+The buffer cache sees the complex
+consistency mechanisms that other \modules\ define as nothing more
+than sets of dependencies among \patches; it has no idea what consistency
+mechanisms it is implementing, if any.
+% Yet it is the \module\ that ends up doing most of the work to make sure that
+% \patches\ are written in an acceptable order.
+
+% Despite this, write-back caches are relatively simple; they are only slightly
+% more complex than the naive implementation already suggested.
+Our prototype buffer cache \module\ 
+%% is little more than a front end to
+%% the automatically-maintained ready \patch\ lists described in
+%% Section~\ref{sec:patch:readylist}.
+%
+uses a modified FIFO policy to write dirty blocks and an LRU policy to
+evict clean blocks.  (Upon being written, a dirty block becomes clean and
+may then be evicted.)
+%
+The FIFO policy used to write blocks is modified only to preserve the
+in-flight safety property: a block will not be written if none of its
+\patches\ are ready to write.
+%
+Once the cache finds a block with ready \patches, it extracts all ready
+patches $P$ from the block, reverts any remaining \patches\ on that block,
+and sends the resulting data to the disk driver.  The ready \patches\ are
+marked in-flight and will be committed when the disk driver acknowledges
+the write.
+%% \patches\ on that block are reverted, the resulting block data is copied
+%% and sent to the disk driver, the ready \patches\ are marked in-flight, and
+%% the reverted \patches\ are re-applied.
+%
+The block itself is also marked in flight until the current version
+commits, ensuring that the cache will wait until then to write the block
+again.
+
+
+As a performance heuristic, when the cache finds a writable block $n$, it
+then checks to see if block $n+1$ can be written as
+well.
+%
+It continues writing increasing block numbers until some block is either
+unwritable or not in the cache.
+%
+\begin{comment}
+The block itself is also marked \PInfst, so that only
+one version of its data will be in flight at a time. (This whole procedure is
+basically the buffer cache \textit{Write block} action.)
+\end{comment}
+%
+This simple optimization greatly improves I/O wait time, since the I/O
+requests are merged and reordered in Linux's elevator scheduler.
+%
+Nevertheless, there may still be important opportunities for further
+optimization: for example, since the cache will write a block even if only
+one of its \patches\ is ready, it can choose to revert \patches\
+unnecessarily when a different order would have required fewer writes.
+
+
+\begin{comment}
+Each \patch\ on a cached block may or may not be visible to a given \module.
+For example, \modules\ that respond to user requests generally view the most
+current state of every block -- the block with all \patches\ applied. However, a
+write-back cache may choose to write some \patches\ on a block while reverting
+others, since those others currently have outstanding dependencies. In this
+case, \modules\ below the write-back cache (i.e. closer to the disk) should view
+those \patches\ in the reverted state. \Kudos\ provides a block revisioning
+library function that automatically reverts those \patches\ that should not
+be visible at a particular \module, and then re-applies them after that
+\module\ is done with the block.
+\end{comment}
+
+\subsection{Loopback}
+\label{sec:modules:loop}
+
+The \Featherstitch\ loopback module demonstrates how pervasive
+support for patches can implement previously unfamiliar dependency
+semantics.
+%
+Like Linux's loopback device, it provides a block device interface that
+uses a file in some other file system as its storage layer; unlike Linux's
+block device, consistency requirements on this block device are obeyed by
+the underlying file system.
+%% interface provides consistency  for a block device.
+%% demonstrates how is a BD module that uses a file in an \LFS\ module as
+%% its underlying data store. It is very similar to the device of the same
+%% name in Linux, but with one critical difference: it is aware of \patches.
+%
+The loopback module forwards incoming dependencies to its underlying file
+system.
+%
+As a result, the file system will honor those dependencies and preserve the
+loopback file system's consistency, even if it would normally
+provide no consistency guarantees for file data (for instance, it used
+metadata-only journaling).
+
+Figure~\ref{fig:kfs-graph} shows a complete, albeit contrived, example
+configuration using the loopback module.
+%
+A file system image is mounted with an external journal, both of
+which are loopback block devices stored on the root file system (which uses
+soft updates). The journaled file system's ordering requirements are sent
+through the loopback module as \patches, maintaining dependencies
+across boundaries that might otherwise lose that information. 
+Most systems cannot enforce consistency requirements through loopback
+devices this way---unfortunate, as file system images are becoming popular
+tools in  conventional operating systems, used for example to implement
+encrypted home directories in Mac OS~X.
+%
+A simpler version of this configuration allows the journal module to
+store a file system's journal in a file on the file system itself, the
+configuration used in our evaluation.
+
+%% The \modules\ in Figure~\ref{fig:kfs-graph} are a complete \Kudos\ configuration.
+
+%%  and although the use of a loopback
+%% device is somewhat contrived in the example, they are increasingly being used in
+%% conventional operating systems. For instance, Mac OS X uses them in order to
+%% allow users to encrypt their home directories.
+
+\begin{comment}
+\subsection{Asynchronous writes}
+\label{sec:modules:unlink}
+
+Finally, we also wrote a trivial module that removes all dependencies from
+incoming \patches, allowing the buffer cache to write blocks in any order.
+%
+This implements similar semantics to existing file systems like ext2 in
+asynchronous write mode.
+\end{comment}
+
+\section{Implementation}
+\label{sec:implementation}
+
+The \Kudos\ prototype implementation runs as a Linux 2.6 kernel module.
+%
+%% was originally implemented as a stand-alone file system server daemon
+%% for a small operating system (called ``KudOS''), then later as a
+%% FUSE~\cite{fuse} file system server under Linux or BSD. It currently runs as a
+%% Linux kernel module. The FUSE implementation was particularly useful for
+%% debugging, but we have found (unsurprisingly) that the Linux kernel module
+%% version is best for real-world performance testing and actual use. Due to the
+%% complexity involved in maintaining both versions, we eventually dropped the
+%% FUSE version.
+%
+It interfaces with the Linux kernel at the VFS layer and the generic block
+device layer.
+%
+In between, a \Kudos\ module graph replaces Linux's conventional
+file system layers.
+%
+A small kernel patch informs \Kudos\ of process fork and exit events as
+required to update per-process \patchgroup\ state.
+
+
+During initialization, the \Kudos\ kernel module registers a VFS file system
+type with Linux.  %% (like ``nfs'' or ``ext2'').
+%
+Each file system \Kudos\ detects on a specified disk device can then be mounted
+from Linux using a command like \texttt{mount -t kfs kfs:\textit{name}
+/mnt/point}.
+%
+Since \Kudos\ provides its own \patch-aware buffer cache, it sets
+\texttt{O\_SYNC} on all opened files as the simplest way to bypass the normal
+Linux cache and ensure that the \Kudos\ buffer cache obeys all necessary
+dependency orderings.
+
+
+\Kudos\ modules interact with Linux's generic block device layer mainly via
+\verb+generic_make_request+.
+%
+This function sends read or write requests to a Linux disk scheduler, which
+may reorder and/or merge the requests before eventually releasing them to
+the device.
+%
+Writes are considered in flight as soon as they are enqueued on the disk
+scheduler.
+%
+A callback notifies \Kudos\ when the disk controller reports request
+completion; for writes, this commits the corresponding \patches.
+%
+The disk safety property requires that the disk controller wait to report
+completion until a write has reached stable storage.
+%
+Most drives instead report completion when a write has reached the drive's
+volatile cache.
+%
+Ensuring the stronger property could be quite expensive, requiring frequent
+barriers or setting the drive cache to write-through mode; either choice
+seems to prevent older drives from reordering requests.
+%
+The solution is a combination of SCSI tagged command queuing (TCQ) or SATA
+native command queuing (NCQ) with either a write-through cache or ``forced
+unit access'' (FUA).
+%
+TCQ and NCQ allow a drive to independently report completion for multiple
+outstanding requests, and FUA is a per-request flag that tells the disk
+to report completion only after the request reaches stable storage.
+%
+Recent SATA drives handle NCQ plus write-through caching or FUA exactly as
+we would want: the drive appears to reorder write requests, improving
+performance dramatically relative to older drives, but reports completion
+only when data reaches the disk.
+%
+We use a patched version of the Linux 2.6.20.1 kernel with good support for
+NCQ and FUA, and a recent SATA2 drive.
+
+
+\begin{comment}
+At the other end of the \Kudos\ \module\ graph, the terminal block device
+\modules\ are wrappers for Linux's normal block devices. By using Linux's
+generic block layer, \Kudos\ can interface with any existing block device (e.g.
+RAM disk, IDE disk, etc.). When the \module\ receives read or write calls, it
+passes the requests to Linux via \texttt{generic\_make\_request()}. Linux may
+then reorder or merge them, and eventually they are sent to the disk controller.
+%
+When a request is complete, the disk controller notifies Linux, which in turn
+notifies \Kudos. Depending on the hardware configuration, a request being
+``complete'' might mean one of two things: first, the data may merely be in the
+drive's volatile cache, so that a power outage might cause it to be lost. This
+can be a catastrophic disaster, as shown in~\cite{nightingale06rethink}.
+Alternately, the data may have been successfully stored on the physical media.
+This situation, which is necessary for the strong guarantee \Kudos\ aims to
+provide, can be arranged either by disabling the drive's write-back cache, or by
+using the ``force unit access'' (FUA) mode when writing to the disk (though a
+small patch to the Linux kernel is required to support this mode). Both of these
+approaches significantly degrade performance when used alone; additionally,
+traditional FUA mode is supported by very few drives\todo{cite something?}.
+%
+However, using a write-through cache or FUA mode in conjunction with SCSI tagged
+command queuing (TCQ) or SATA native command queuing (NCQ) only slightly slows
+write performance compared to using the write-back cache without FUA\todo{give
+figures to support this claim}, since many write requests may be outstanding at
+a time and the drive can choose how to service them in a manner not unlike how
+it would choose to write data stored in its volatile cache. Additionally, FUA is
+a standard part of the SATA NCQ specification\todo{cite SATA spec}, so all SATA
+disks support it when using NCQ.
+\end{comment}
+
+\begin{comment}
+The Linux kernel must be modified in order to
+provide support for \patchgroups.  As a kernel module, there is no way to
+get notifications about when processes are created, or when they terminate; this
+is necessary to clone the \patchgroup\ scope 
+from the parent process when the process is created, and to release all
+the \patchgroups\ when it terminates. Ordinarily, this sort of state would be kept
+as part of the Linux \texttt{task\_struct} (i.e. process) structure, but this is
+not a viable option for a dynamically loadable kernel module. Instead, the
+\Kudos\ module keeps this state internally and uses new kernel hooks
+to be notified when processes fork or exit. 
+%% The patch to add these hooks
+%% is based on the ``process events connector'' which was introduced in Linux
+%% 2.6.15, and is only about 250 lines long. Without it, \Kudos\ can still operate,
+%% but it does not allow \patchgroups.
+
+Our interfaces bypass all Linux caches, because \Kudos\ provides its own
+\patch-aware caches (\S\ref{sec:modules:wbcache}) in order to provide its
+write-ordering guarantees.
+
+Our current implementation uses Linux's queuing structures for queuing I/O
+requests for block devices. Although this is working, there are a couple subtle
+problems that we would like to solve in a future version. For instance, we would
+like to be able to give more priority to read requests, potentially even
+reserving a SCSI TCQ or SATA NCQ command tag for reads only. In the current
+implementation, read delay increases noticeably when there are many writes; we
+suspect that a factor in this behavior is that the command tags are typically
+all used for outstanding writes (since we request that the commands complete
+only after the physical media has been written), while the Linux queues are
+designed for a different situation: writes complete quickly (to the disk's
+cache) and only reads take a long time.
+\end{comment}
+
+Our prototype has several performance problems caused by incomplete Linux
+integration.
+%% Future work will require hardening several aspects of our Linux
+%% integration.
+%
+For example, writing a block requires copying that block's data
+whether or not any patches were undone, and
+%
+our buffer cache currently
+stores all blocks in permanently-mapped kernel memory,
+limiting its maximum size.
+
+
+\begin{comment}
+We also observe that read delay increases notably when there are many
+writes.
+%
+We suspect that write requests, which for \Kudos\ take far longer than
+Linux expects because the drive must delay completion notification, are
+using all available command slots; one or more slots should probably be
+reserved for reads.
+\end{comment}
+% -*- mode: latex; tex-main-file: "paper.tex" -*-
+
+\section {Evaluation}
+\label{sec:evaluation}
+\label{eval}
+
+We evaluate
+%
+the effectiveness of \patch\ optimizations,
+%
+the performance of the \Kudos\ implementation relative to Linux ext2
+and ext3,
+%
+the correctness of the \Kudos\ implementation,
+%
+and the performance of \patchgroups.
+%
+This evaluation shows
+%
+that \patch\ optimizations significantly reduce \patch\ memory and CPU
+requirements;
+%
+that a \Kudos\ \patch-based storage system has overall performance
+competitive with Linux, though using up to four times more CPU time;
+%
+that \Kudos\ file systems are consistent after system crashes;
+%
+and that a \patchgroup-enabled IMAP server outperforms
+the unmodified server on \Kudos.
+
+\subsection{Methodology}
+
+All tests were run on a Dell Precision 380 with a 3.2~GHz Pentium 4
+CPU (with hyperthreading disabled), 2~GB of RAM, and a Seagate ST3320620AS 320~GB 7200~RPM SATA2 disk.
+%
+Tests use a 10~GB file system and the Linux 2.6.20.1 kernel
+with the Ubuntu v6.06.1 distribution.
+%
+Because \Kudos\ only uses permanently-mapped memory, we disable high
+memory for all configurations, limiting the computer to 912~MB of RAM.
+%
+Only the PostMark benchmark performs slower due to this cache size limitation.
+%
+All timing results are the mean over five runs.
+
+To evaluate \patch\ optimizations and \Kudos\ as a whole we ran four
+benchmarks.
+%
+The \emph{untar benchmark} untars and syncs the Linux 2.6.15 source code
+from the cached file \texttt{linux-2.6.15.tar} (218~MB).
+%
+The \emph{delete benchmark}, after unmounting and remounting the file
+system following the untar benchmark, deletes the result of the untar
+benchmark and syncs.
+%
+The \emph{PostMark benchmark} emulates the small file workloads seen
+on email and netnews servers~\cite{postmark}. We use PostMark v1.5,
+configured to create 500 files ranging in size from 500~B to 4~MB;
+perform 500 transactions consisting of file reads, writes, creates,
+and deletes; delete its files; and finally sync.
+%
+The modified \emph{Andrew benchmark} emulates a software development
+workload.  The benchmark creates a directory hierarchy, copies a
+source tree, reads the extracted files, compiles the extracted files,
+and syncs. The source code we use for the modified Andrew benchmark is
+the Ion window manager, version 2-20040729.
+
+\subsection {Optimization Benefits}
+
+% this table is a command so that we can move its placement without conflicts
+\newcommand{\opttable}{
+\begin{figure}[t]
+\centering
+\small
+\begin{tabular}{@{}lrrr@{}}
+\textbf{Optimization}
+        & \textbf{\# \Patches} & \textbf{Undo data} & \textbf{System time} \\ % Malloc Blocks
+% Results are from r4121, mean of 5 runs
+% Postmark none and hard were run with a 20k dblock cache
+% NOTE: also update numbers in \patchoptundo and \patchoptcount
+\hline
+\multicolumn{4}{@{}c@{}}{\textbf{Untar}\raise2pt\hbox{\strut}} \\
+None              &   619,740 &   459.41~MB &  3.33~sec \\ % 789MB 256MB
+\Nrb\ \patches\   &   446,002 &   205.94~MB &  2.73~sec \\
+Overlap merging   &   111,486 &   254.02~MB &  1.87~sec \\
+Both              &    68,887 &     0.39~MB &  1.83~sec \\ % 296MB 256MB
+\hline
+
+\multicolumn{4}{@{}c@{}}{\textbf{Delete}\raise2pt\hbox{\strut}} \\
+None              &   299,089 &     1.43~MB &  0.81~sec \\ % 50MB 11MB
+\Nrb\ \patches\   &    41,113 &     0.91~MB &  0.24~sec \\
+Overlap merging   &    54,665 &     0.93~MB &  0.31~sec \\
+Both              &     1,800 &     0.00~MB &  0.15~sec \\ % 13MB 11MB
+\hline
+
+\multicolumn{4}{@{}c@{}}{\textbf{PostMark}\raise2pt\hbox{\strut}} \\
+None              & 4,590,571 & 3,175.28~MB & 23.64~sec \\ % 5,607MB 2,286MB
+\Nrb\ \patches\   & 2,544,198 & 1,582.94~MB & 18.62~sec \\
+Overlap merging   &   550,442 & 1,590.27~MB & 12.88~sec \\
+Both              &   675,308 &     0.11~MB & 11.05~sec \\ % 2,119MB 2,045MB
+\hline
+
+\multicolumn{4}{@{}c@{}}{\textbf{Andrew}\raise2pt\hbox{\strut}} \\
+None              &    70,932 &    64.09~MB &  4.34~sec \\ % 108MB 39MB
+\Nrb\ \patches\   &    50,769 &    36.18~MB &  4.32~sec \\
+Overlap merging   &    12,449 &    27.90~MB &  4.20~sec \\
+Both              &    10,418 &     0.04~MB &  4.07~sec \\ % 43MB 39MB
+\end{tabular}
+\caption{Effectiveness of \Kudos\ optimizations.}
+\label{f:optdata}
+\end{figure}
+}
+
+\opttable{}
+
+We evaluate the effectiveness of the \patch\ optimizations discussed in
+Section~\ref{sec:patch:optimizations} in terms of
+%
+the total number of \patches\ created, amount of undo data allocated,
+and system CPU time used.
+%
+Figure~\ref{f:optdata} shows these results for the untar, delete,
+PostMark, and Andrew benchmarks for \Kudos\ ext2 in soft updates mode,
+with all combinations of using \nrb\ \patches\ and overlap merging.
+%
+The PostMark results for no optimizations and for just the \nrb\
+\patches\ optimization use a smaller maximum \Kudos\ cache size,
+80,000 blocks vs. 160,000 blocks, so that the benchmark does not run
+our machine out of memory.
+%
+Optimization effectiveness is similar for journaling configurations.
+
+Both optimizations work well alone, but their combination is particularly
+effective at reducing the amount of undo data---which, again, is pure
+overhead relative to conventional file systems.
+%
+Undo data memory usage is reduced by \patchoptundo,
+%
+the number of \patches\ created is reduced by \patchoptcount,
+%
+and system CPU time is reduced by up to 81\%.
+%
+These savings reduce \Kudos\ memory overhead
+%
+from 145--355\% of the memory allocated for block data
+to 4--18\% of that memory, a 95--97\% reduction. For
+example, \Kudos\ allocations are reduced from 3,321~MB to 74~MB for
+the PostMark benchmark, which sees 2,165~MB of block
+allocations.\footnote{Not all the remaining 74~MB is pure \Featherstitch\
+overhead; for example, our ext2 implementation contains an inode cache.}
+
+%% benchmark: kudos:block without and with optimizations
+% untar: 533:256 to 40:256
+% delete: 39:11 to 2:11
+% PostMark: 3321:2286 to 74:2045
+% Andrew: 69:39 to 4:39
+
+\begin{comment}
+\begin{figure}[t]
+\vspace{-0.5\baselineskip}
+\centering{
+\includegraphics[width=\hsize]{rb_patch_size}
+}
+\vspace{-0.5\baselineskip}
+\caption{\label{fig:patchsize-histo} \Rb\ \patch\ size histogram for a sample
+workload (extracting a large archive into ext2). All the \patches\ larger than
+63 bytes have been optimized into \nrb\ \patches. \Rb\ \patches\ 4 bytes and
+smaller account for about 51\% of all \rb\ \patches.}
+\end{figure}
+\end{comment}
+
+\subsection{Benchmarks and Linux Comparison}
+\label{sec:eval:bench}
+
+\newcommand{\safe}[1]{\textbf{#1}}
+\newcommand{\unsafe}[1]{#1}
+
+% this table is a command so that we can move its placement without conflicts
+\newcommand{\benchtable}{
+\begin{figure}[tb]
+\centering
+\small
+\begin{tabular}{@{}l@{~~~~}r@{~~~~}r@{~~~~}r@{~~~~}r@{}}
+%\textbf{System} & \multicolumn{1}{@{~~~}c@{~~~}}{\textbf{Untar}} &
+%\multicolumn{1}{@{~~~}c@{~~~}}{\textbf{Delete}} &
+%\multicolumn{1}{@{~~~}c@{~~~}}{\textbf{PostMark}} &
+%\multicolumn{1}{@{~~~}c@{~~~}}{\textbf{Andrew}} \\ \hline
+\textbf{System}
+	& \textbf{Untar}\hfil\kern0pt
+	& \textbf{Delete}\hfil\kern0pt
+	& \textbf{PostMark}\hfil\kern0pt
+	& \textbf{Andrew}\hfil\kern0pt \\ \hline
+% Results are from r4121, mean of 5 runs
+\multicolumn{5}{@{}l}{\emph{\Kudos\ ext2}\raise2pt\hbox{\strut}} \\
+\safe{soft updates} & \safe{6.4 [1.3]} & \safe{0.8 [0.1]} & \safe{38.3 [10.3]} & \safe{36.9 [4.1]} \\
+\safe{meta journal} & \safe{5.8 [1.3]} & \safe{1.4 [0.5]} & \safe{48.3 [14.5]} & \safe{36.7 [4.2]} \\
+\safe{full journal} & \safe{11.5 [3.0]} & \safe{1.4 [0.5]} & \safe{82.8 [19.3]} & \safe{36.8 [4.2]} \\
+\unsafe{async} & \unsafe{4.1 [1.2]} & \unsafe{0.7 [0.2]} & \unsafe{37.3 [~~6.1]} & \unsafe{36.4 [4.0]} \\
+\unsafe{full journal} & \unsafe{10.4 [3.7]} & \unsafe{1.1 [0.5]} & \unsafe{74.8 [23.1]} & \unsafe{36.5 [4.2]} \\ \hline
+
+\multicolumn{5}{@{}l}{\emph{Linux}\raise2pt\hbox{\strut}} \\
+\safe{ext3 writeback} & \safe{16.6 [1.0]} & \safe{4.5 [0.3]} & \safe{38.2 [~~3.7]} & \safe{36.8 [4.1]} \\
+\safe{ext3 full journal} & \safe{12.8 [1.1]} & \safe{4.6 [0.3]} & \safe{69.6 [~~4.5]} & \safe{38.2 [4.0]} \\
+\unsafe{ext2} & \unsafe{4.4 [0.7]} & \unsafe{4.6 [0.1]} & \unsafe{35.7 [~~1.9]} & \unsafe{36.9 [4.0]} \\
+\unsafe{ext3 full journal} & \unsafe{10.6 [1.1]} & \unsafe{4.4 [0.2]} & \unsafe{61.5 [~~4.5]} & \unsafe{37.2 [4.1]} \\
+
+%FreeBSD (soft updates) & 23.22 & 15.95 & & \\ 
+%FreeBSD (async) & 10.09 & 3.25 & & \\
+\end{tabular}
+\caption{\label{fig:bench_time} Benchmark times (seconds). System CPU
+  times are in square brackets. Safe configurations are \safe{bold},
+  unsafe configurations are \unsafe{normal text}.}
+\end{figure}
+}
+
+We benchmark \Kudos\ and Linux for all four benchmarks, comparing the
+effects of different consistency models and comparing patch-based with
+non-patch-based implementations.
+%% , with both soft updates and journaling dependencies,
+%% and Linux, in several consistency modes, for the untar, delete,
+%% PostMark, and Andrew benchmarks. 
+%
+Specifically, we examine Linux ext2 in asynchronous mode; ext3 in
+writeback and full journal modes; and \Kudos\ ext2 in
+asynchronous, soft updates, metadata journal, and full journal modes.  All
+file systems were created with default configurations, and all journaled
+file systems used a 64~MB journal.
+%
+Ext3 implements three different journaling modes, which provide different
+consistency guarantees.
+The strength of these guarantees is strictly ordered as
+``writeback $<$ ordered $<$ full.''
+Writeback journaling commits metadata atomically and commits data only
+after the corresponding metadata. \Kudos\ metadata journaling is
+equivalent to ext3 writeback journaling.
+%
+Ordered journaling commits data associated with a given transaction
+prior to the following transaction's metadata, and is the most
+commonly used ext3 journaling mode.
+%
+In all tests ext3 writeback and ordered journaling modes performed
+similarly, and \Kudos\ does not implement ordered mode, so we report
+only writeback results.
+%
+Full journaling commits data atomically.
+
+There is a notable write durability difference between the default
+\Kudos\ and Linux ext2/ext3 configurations: \Kudos\ safely presumes a write
+is durable after it is on the disk platter, whereas Linux ext2 and
+ext3 by default presume a write is durable once it reaches the disk cache.
+However, Linux can write safely, by restricting the disk to providing only
+a write-through cache, and \Kudos\ can write unsafely by disabling FUA.
+%
+We distinguish safe (FUA or a write-through cache) from unsafe results
+when comparing the systems.
+%
+Although safe results for \Kudos\ and Linux utilize different
+mechanisms (FUA vs. a write-through cache), we note that \Kudos\
+performs identically in these benchmarks when using either mechanism.
+
+\benchtable{}
+
+
+The results are listed in
+Figure~\ref{fig:bench_time};
+%
+safe configurations are listed in bold.
+%
+In general, \Kudos\ performs comparably with Linux
+ext2/ext3 when providing similar durability guarantees. Linux
+ext2/ext3 sometimes outperforms \Kudos\ (for the PostMark test in
+journaling modes), but more often \Kudos\ outperforms Linux.  There are
+several possible reasons, including slight differences in block allocation
+policy, but the main point is that \Kudos's general mechanism for
+tracking dependencies does not significantly degrade total time.
+%
+Unfortunately, 
+\Kudos\ can use up to four times more CPU time than Linux ext2 or
+ext3. (\Kudos\ and Linux have similar
+system time results for the Andrew benchmark, perhaps because Andrew
+creates relatively few patches even in the unoptimized case.)
+%
+%% \Kudos\ is significantly slower than Linux ext3 at the PostMark
+%% benchmark when the systems use journaling, where \Kudos\ uses up to
+%% 3.3 times more CPU time than Linux ext3.
+%
+Higher CPU requirements are an important concern and, despite much progress
+in our optimization efforts, remain a weakness.
+%
+Some of the contributors to \Kudos\ CPU usage are inherent, such as
+\patch\ creation, while others are artifacts of the current
+implementation, such as creating a second copy of a block to write it to
+disk; we have not separated these categories.
+%
+%
+\begin{comment}
+Further, while \Kudos\ I/O times are lower than Linux ext2/ext3 I/O
+times for the untar and delete benchmarks, we have found that small
+block allocation strategy changes can significantly affect I/O time
+for many of these benchmarks. This further emphasizes the importance
+of the system CPU time difference.
+\end{comment}
+
+\begin{comment}
+Unlike the untar, delete, and Andrew benchmarks, Linux ext3 writeback
+and journal modes outperform \Kudos\ meta journal and full journal
+modes, respectively, at PostMark.
+\end{comment}
+
+%This demonstrates that the overhead of using \patches\ in \Kudos\ is not
+%entirely unreasonable, but has room for significant improvement.
+
+\subsection {Correctness}
+\label{sec:eval:correctness}
+
+In order to check that we had implemented the journaling and soft updates
+rules correctly,
+we implemented a \Kudos\ module which crashes the operating system, without
+giving it a chance to synchronize its buffers, at a random time during each
+run.
+%
+In \Kudos\ asynchronous mode, after crashing, \command{fsck} nearly always reported
+that the file system contained many references to inodes that had been
+deleted, among other errors: the file system was corrupt.
+%
+With our soft updates dependencies, the file system was always soft
+updates consistent: \command{fsck} reported, at most, that inode
+reference counts were higher than the correct values (an expected
+discrepancy after a soft updates crash).
+%
+With journaling, \command{fsck} always reported that the file system was
+consistent after the journal replay.
+
+\subsection {\Patchgroups}
+\label{sec:evaluation:uwimap}
+
+% #reviewers who want measurements of all case studies: 1
+% #reviewers who want measurements of at least svn and imap studies: 2
+
+% this table is a command so that we can move its placement without conflicts
+\newcommand{\imaptable}{
+\begin{figure}[t]
+\centering
+\small
+\begin{tabular}{@{}lrr@{}}
+\textbf{Implementation} & \textbf{Time (sec)}\hfil\kern0pt & \textbf{\# Writes}\hfil\kern0pt \\ \hline
+
+% Results are from r4121, mean of 5 runs
+% Single commented out reuslts are from r3933
+%% Double commented out results are from r3862
+
+%\multicolumn{5}{@{}c@{}}{\textbf{Unsafe}\raise2pt\hbox{\strut}} \\
+
+% WB
+%fsync & Linux & ext2 & 1.5 [0.3] & 2,503 \\
+%%Linux ext3 ordered (fsync) & 2.0 [0.3] & 3,025 \\
+%fsync & Linux & ext3 journal & 1.8 [0.3] & 2,531 \\
+
+% NOFUA
+%\patchgroups & \Kudos & async & 1.2 [0.3] & 18 \\
+%%\Kudos\ soft updates (pg) & 11.4 [0.4] & 3,015 \\
+%%\Kudos\ meta journal (pg) & 1.4 [0.4] & 33 \\
+%\patchgroups & \Kudos & full journal & 1.3 [0.5] & 33 \\ \hline
+
+%\multicolumn{5}{@{}c@{}}{\textbf{Safe}\raise2pt\hbox{\strut}} \\
+
+\multicolumn{3}{@{}l}{\emph{\Kudos\ ext2}\raise2pt\hbox{\strut}} \\
+
+soft updates, fsync per operation & 65.2 [0.3] & 8,083 \\
+%%\Kudos\ meta journal (pg) & 51.3 [0.4] & 7,111 \\
+full journal, fsync per operation & 52.3 [0.4] & 7,114 \\
+
+%%\Kudos\ async (pg) & 1.6 [0.3] & 2,503 \\
+soft updates, \patchgroups & 28.0 [1.2] & 3,015 \\
+%%\Kudos\ meta journal (pg) & 1.5 [0.4] & 32 \\
+full journal, \patchgroups & 1.4 [0.4] & 32 \\ \hline
+
+%linear & \Kudos & full journal & 1.4 [0.4] & 31 \\
+
+\multicolumn{3}{@{}l}{\emph{Linux ext3}\raise2pt\hbox{\strut}} \\
+
+%fsync & Linux & ext2 & 16.7 [0.3] & 2,503 \\
+%%Linux ext3 ordered (fsync) & 23.9 [0.3] & 3,025 \\
+full journal, fsync per operation & 19.9 [0.3] & 2,531 \\
+
+full journal, fsync per durable operation & 1.3 [0.3] & 26 \\
+
+\end{tabular}
+\caption{\label{fig:imap-compare} IMAP benchmark: move 1,000 messages.
+  System CPU times shown in square brackets.
+  Writes are in number of requests.  All configurations are safe.}
+\end{figure}
+}
+
+We evaluate the performance of the \patchgroup-enabled UW IMAP mail
+server by benchmarking moving 1,000
+messages from one folder to another.
+%
+To move the messages, the client selects the source mailbox (containing
+1,000 2~kB messages), creates a new mailbox, copies each message to
+the new mailbox and marks each source message for deletion, expunges
+the marked messages, commits the mailboxes, and logs out.
+
+Figure~\ref{fig:imap-compare} shows the results for safe file system
+configurations,
+%
+reporting total time, system CPU time, and the number of disk write
+requests (an indicator of the number of required seeks in safe
+configurations).
+%
+We benchmark
+%
+\Kudos\ and Linux with the unmodified server (sync after each operation),
+%
+\Kudos\ with the \patchgroup-enabled server (\pgSync\ on durable
+operations),
+%
+and Linux and \Kudos\ with the server modified to assume and take
+advantage of fully journaled file systems (changes are effectively
+committed in order, so sync only on durable operations).
+%
+Only safe configurations are listed; unsafe
+configurations complete in about 1.5~seconds on either system.
+%
+\Kudos\ meta and full journal modes perform similarly; we report
+only the full journal mode.
+%
+Linux ext3 writeback, ordered, and full journal modes also perform similarly;
+we again report only the full journal mode.
+%
+Using an fsync per durable operation (\imapCheck\ and \imapExpunge) on
+a fully journaled file system performs similarly for \Kudos\ and
+Linux; we report the results only for Linux full journal mode.
+
+In all cases \Kudos\ with \patchgroups\ performs better than \Kudos\ with
+fsync operations.
+%
+Fully journaled \Kudos\ with \patchgroups\ performs at least as well
+as all other (safe and unsafe) \Kudos\ and all Linux configurations, and is
+11--13 times faster than safe Linux ext3 with the unmodified
+server.
+%
+Soft updates dependencies are far slower than journaling for \patchgroups:
+as the number of write requests
+indicates, each \patchgroup\ on a soft updates file system requires
+multiple write requests, such as to update the destination mailbox and
+the destination mailbox's modification time. In contrast, journaling
+is able to commit a large number of copies atomically using only a
+small constant number of requests.
+%
+The unmodified fsync-per-operation server generates dramatically more
+requests on \Kudos\ with full journaling than Linux, possibly indicating a
+difference in fsync behavior.
+%
+The last line of the table shows that synchronizing to disk once per
+durable operation with a fully journaled file system performs similarly to
+using \patchgroups\ on a journaled file system. However, \patchgroups\
+have the advantage that they work equally safely, and efficiently, for
+other forms of journaling.
+
+
+
+\imaptable{}
+
+With the addition of \patchgroups\ UW IMAP is able to perform mailbox
+modifications significantly more efficiently, while preserving mailbox
+modification safety. On a metadata or fully journaled file system, UW
+IMAP with \patchgroups\ is 97\% faster at moving 1,000 messages than
+the unmodified server achieves using fsync to ensure its write
+ordering requirements.
+
+
+\subsection{Summary}
+\label{sec:evaluation:summary}
+
+We find
+%
+that our optimizations greatly reduce system overheads, including
+undo data and system CPU time;
+%
+that \Kudos\ has competitive performance on several benchmarks,
+despite the additional effort required to maintain patches;
+%
+that CPU time remains an optimization opportunity;
+%
+that applications can effectively define consistency requirements with
+\patchgroups\ that apply to many file systems;
+%
+and that the \Kudos\ implementation correctly
+implements soft updates and journaling consistency.
+%
+Our results indicate that even a patch-based prototype
+can implement different consistency models with reasonable cost.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+\Kudos\ \patches\ provide a new way for file system implementations to formalize
+the ``write-before'' relationship among buffered changes to stable storage.
+%
+Thanks to several optimizations,
+\begin{comment}
+which significantly decrease the overhead
+required to use \patches, both in terms of the amount of memory required and the
+CPU time spent.
+%
+We evaluate a prototype file system implementation using \patches\ to determine
+whether these ideas can be used in production file systems.
+%
+\end{comment}
+the
+performance of our prototype is usually at least as fast as Linux when
+configured to provide similar consistency guarantees, although in some cases it
+still requires improvement.
+%
+\Patches\ simplify the implementation of consistency mechanisms like journaling
+and soft updates by separating the specification of write-before
+relationships from their enforcement.
+%
+Using \patches\ also allows our prototype to be divided into \modules\ that
+cooperate loosely to implement strong consistency guarantees.
+%
+Additionally, \patches\ can be extended into user space, allowing applications to
+specify more precisely what their specific consistency requirements are.
+%
+This provides the buffer cache more freedom to reorder writes without violating
+the application's needs, while simultaneously freeing the application from
+having to micromanage writes to disk.
+%
+We present results for an IMAP server modified to take advantage of this
+feature, and show that it can significantly reduce both the total time and the
+number of writes required for our benchmark.
+
+
+For future work, we plan to improve performance further, particularly for
+system time; %
+%% There are several areas in which we would like to improve our work. The obvious
+%% first area we would like to work on is the performance of our \Kudos\ prototype.
+%
+we have already improved performance by at least five orders of magnitude
+over the original implementation, but problems remain.
+%
+The \patch\ abstraction seems amenable to implementation elsewhere,
+such as over network file systems, and was designed to implement other consistency
+mechanisms like shadow paging.
+%
+Finally, we would like to adapt \patchgroups\ to more complicated
+applications, like databases, to see how well they fit the needed semantics and
+how well they perform.
+
+\section*{Acknowledgments}
+
+We would like to thank the members of our lab at UCLA, ``TERTL,'' for many
+useful discussions about this work, and for reviewing drafts of this paper. In
+particular, Steve VanDeBogart provided extensive help with Linux
+kernel details, memory semantics, and drafts. Further thanks go to Liuba
+Shrira, who provided sustained encouraging interest in the project, and
+Stefan Savage for early inspiration.
+Our shepherd, Andrea Arpaci-Dusseau, and the anonymous reviewers
+provided very useful feedback and guidance.
+%
+Our work on \Kudos\ was supported by the National Science
+ Foundation under Grant Nos. 0546892 and 0427202; by a Microsoft Research
+ New Faculty Fellowship; and by an equipment grant from Intel.
+%
+Additionally, Christopher Frost and Mike Mammarella were awarded SOSP student
+travel scholarships, supported by the National Science Foundation, to present
+this paper at the
+% seems that PDF and PS need different metrics for this easter egg:
+\ifpdf
+conference\makebox[.1pt][l]{.}\makebox[0.056cm][r]{\scalebox{.035}{\raisebox{.28cm}{\begin{tabular}{c}
+\color{white}We $\heartsuit$ \\
+\color{white}Kudos
+\end{tabular}}}}
+
+\else
+conference\makebox[.1pt][l]{.}\makebox[0.055cm][r]{\scalebox{.035}{\raisebox{.28cm}{\begin{tabular}{c}
+\color{white}We $\heartsuit$ \\
+\color{white}Kudos
+\end{tabular}}}}
+
+\fi
+
+% alternative easter eggs. first one adds a tiny final sentence. the second
+% puts a pdf in place of the period, which caused many pdf rendering issues
+
+%\scalebox{.04}{Finally, we $\heartsuit$ Kudos.}
+%\makebox[2pt][r]{\scalebox{.09}{\includegraphics[clip=true,bb=1cm .6cm 15cm 15cm,scale=.04]{egg.pdf}}}
+
+
+\begin{footnotesize}
+\bibsep=.8ex plus1ex minus.3ex
+\begin{thebibliography}{43}
+\providecommand{\natexlab}[1]{#1}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[dov()]{dovecot}
+\emph{Dovecot}.
+\newblock Version 1.0 beta7, \url{http://www.dovecot.org/}.
+
+\bibitem[svn()]{svn}
+\emph{Subversion}.
+\newblock \url{http://subversion.tigris.org/}.
+
+\bibitem[uwi()]{uwimap}
+\emph{{UW IMAP} toolkit}.
+\newblock \url{http://www.washington.edu/imap/}.
+
+\bibitem[Burnett(2006)]{burnett06information}
+Burnett, N.~C.
+\newblock \emph{Information and Control in File System Buffer Management}.
+\newblock PhD thesis, University of Wisconsin---Madison, July 2006.
+
+\bibitem[Cornell et~al.(2004)Cornell, Dinda, and Bustamante]{cornell04wayback}
+Cornell, B., P.~A. Dinda, and F.~E. Bustamante.
+\newblock Wayback: A user-level versioning file system for {L}inux.
+\newblock In \emph{Proc. 2004 USENIX Annual Technical Conference, FREENIX
+  Track}, pages 19--28, June 2004.
+
+\bibitem[Crispin(2003)]{rfc3501}
+Crispin, M.
+\newblock {I}nternet {M}essage {A}ccess {P}rotocol---version 4rev1.
+\newblock {RFC~3501}, IETF, Mar. 2003.
+
+\bibitem[Denehy et~al.(2005)Denehy, Arpaci-Dusseau, and
+  Arpaci-Dusseau]{denehyetal05-journal-guided}
+Denehy, T.~E., A.~C. Arpaci-Dusseau, and R.~H. Arpaci-Dusseau.
+\newblock Journal-guided resynchronization for software {RAID}.
+\newblock In \emph{Proc. 4th {USENIX} Conference on File and Storage
+  Technologies ({FAST} '05)}, pages 87--100, Dec. 2005.
+
+\bibitem[Gal and Toledo(2005)]{gal05transactional}
+Gal, E. and S.~Toledo.
+\newblock A transactional {F}lash file system for microcontrollers.
+\newblock In \emph{Proc. 2005 {USENIX} Annual Technical Conference}, pages
+  89--104, Apr. 2005.
+
+\bibitem[Ganger et~al.(2000)Ganger, McKusick, Soules, and Patt]{ganger00soft}
+Ganger, G.~R., M.~K. McKusick, C.~A.~N. Soules, and Y.~N. Patt.
+\newblock Soft updates: A solution to the metadata update problem in file
+  systems.
+\newblock \emph{{ACM} Transactions on Computer Systems}, 18\penalty0
+  (2):\penalty0 127--153, May 2000.
+
+\bibitem[Heidemann and Popek(1994)]{heidemann94filesystem}
+Heidemann, J.~S. and G.~J. Popek.
+\newblock File-system development with stackable layers.
+\newblock \emph{{ACM} Transactions on Computer Systems}, 12\penalty0
+  (1):\penalty0 58--89, Feb. 1994.
+
+\bibitem[Hitz et~al.(1994)Hitz, Lau, and Malcolm]{hitz94file}
+Hitz, D., J.~Lau, and M.~Malcolm.
+\newblock File system design for an {NFS} file server appliance.
+\newblock In \emph{Proc. USENIX Winter 1994 Technical Conference}, pages
+  235--246, Jan. 1994.
+
+\bibitem[Huang et~al.(2005)Huang, Hung, and Shin]{huang05fs2}
+Huang, H., W.~Hung, and K.~G. Shin.
+\newblock {FS2}: Dynamic data replication in free disk space for improving disk
+  performance and energy consumption.
+\newblock In \emph{Proc. 20th {ACM} {S}ymposium on {O}perating {S}ystems
+  {P}rinciples}, pages 263--276, Oct. 2005.
+
+\bibitem[Kaashoek et~al.(1997)Kaashoek, Engler, Ganger, Brice{\~{n}}o, Hunt,
+  Mazi{\`{e}}res, Pinckney, Grimm, Jannotti, and
+  Mackenzie]{kaashoek97application}
+Kaashoek, M.~F., D.~R. Engler, G.~R. Ganger, H.~M. Brice{\~{n}}o, R.~Hunt,
+  D.~Mazi{\`{e}}res, T.~Pinckney, R.~Grimm, J.~Jannotti, and K.~Mackenzie.
+\newblock Application performance and flexibility on {E}xokernel systems.
+\newblock In \emph{Proc. 16th {ACM} {S}ymposium on {O}perating {S}ystems
+  {P}rinciples}, pages 52--65, Oct. 1997.
+
+\bibitem[Katcher(1997)]{postmark}
+Katcher, J.
+\newblock {PostMark}: A new file system benchmark.
+\newblock Technical Report TR0322, Network Appliance, 1997.
+\newblock \url{http://tinyurl.com/27ommd}.
+
+\bibitem[Kleiman(1986)]{kleiman86vnodes}
+Kleiman, S.~R.
+\newblock Vnodes: An architecture for multiple file system types in {S}un
+  {UNIX}.
+\newblock In \emph{Proc. USENIX Summer 1986 Technical Conference}, pages
+  238--247, 1986.
+
+\bibitem[Liskov and Rodrigues(2004)]{liskov04transactional}
+Liskov, B. and R.~Rodrigues.
+\newblock Transactional file systems can be fast.
+\newblock In \emph{Proc. 11th ACM SIGOPS European Workshop}, Sept. 2004.
+
+\bibitem[Mann et~al.(1994)Mann, Birrell, Hisgen, Jerian, and
+  Swart]{mann94coherent}
+Mann, T., A.~Birrell, A.~Hisgen, C.~Jerian, and G.~Swart.
+\newblock A coherent distributed file cache with directory write-behind.
+\newblock \emph{{ACM} Transactions on Computer Systems}, 12\penalty0
+  (2):\penalty0 123--164, May 1994.
+
+\bibitem[McKusick and Ganger(1999)]{mckusick99soft}
+McKusick, M.~K. and G.~R. Ganger.
+\newblock Soft updates: A technique for eliminating most synchronous writes in
+  the {F}ast {F}ilesystem.
+\newblock In \emph{Proc. 1999 USENIX Annual Technical Conference, FREENIX
+  Track}, pages 1--17, June 1999.
+
+\bibitem[McKusick et~al.(1984)McKusick, Joy, Leffler, and
+  Fabry]{mckusick84fast}
+McKusick, M.~K., W.~N. Joy, S.~J. Leffler, and R.~S. Fabry.
+\newblock A fast file system for {UNIX}.
+\newblock \emph{{ACM} Transactions on Computer Systems}, 2\penalty0
+  (3):\penalty0 181--197, Aug. 1984.
+
+\bibitem[Muniswamy-Reddy et~al.(2004)Muniswamy-Reddy, Wright, Himmer, and
+  Zadok]{fast04versionfs}
+Muniswamy-Reddy, K.-K., C.~P. Wright, A.~Himmer, and E.~Zadok.
+\newblock A versatile and user-oriented versioning file system.
+\newblock In \emph{Proc. 3rd {USENIX} Conference on File and Storage
+  Technologies ({FAST} '04)}, pages 115--128, Mar. 2004.
+
+\bibitem[Nightingale et~al.(2005)Nightingale, Chen, and
+  Flinn]{nightingale05speculative}
+Nightingale, E.~B., P.~M. Chen, and J.~Flinn.
+\newblock Speculative execution in a distributed file system.
+\newblock In \emph{Proc. 20th {ACM} {S}ymposium on {O}perating {S}ystems
+  {P}rinciples}, pages 191--205, Oct. 2005.
+
+\bibitem[Nightingale et~al.(2006)Nightingale, Veeraraghavan, Chen, and
+  Flinn]{nightingale06rethink}
+Nightingale, E.~B., K.~Veeraraghavan, P.~M. Chen, and J.~Flinn.
+\newblock Rethink the sync.
+\newblock In \emph{Proc. 7th Symposium on Operating Systems Design and
+  Implementation ({OSDI} '06)}, pages 1--14, Nov. 2006.
+
+\bibitem[Quinlan and Dorward(2003)]{quinlan02venti}
+Quinlan, S. and S.~Dorward.
+\newblock Venti: a new approach to archival storage.
+\newblock In \emph{Proc. 1st {USENIX} Conference on File and Storage
+  Technologies ({FAST} '02)}, pages 89--101, Jan. 2003.
+
+\bibitem[Rosenthal(1990)]{rosenthal90evolving}
+Rosenthal, D.~S.~H.
+\newblock Evolving the {V}node interface.
+\newblock In \emph{Proc. USENIX Summer 1990 Technical Conference}, pages
+  107--118, Jan. 1990.
+
+\bibitem[Rowe(2007)]{svntradeoff}
+Rowe, M.
+\newblock Re: wc atomic rename safety on non-ext3 file systems.
+\newblock Subversion developer mailing list, Mar.~5 2007.
+\newblock \url{http://svn.haxx.se/dev/archive-2007-03/0064.shtml} (retrieved
+  August 2007).
+
+\bibitem[Seltzer et~al.(2000)Seltzer, Ganger, McKusick, Smith, Soules, and
+  Stein]{seltzer00journaling}
+Seltzer, M.~I., G.~R. Ganger, M.~K. McKusick, K.~A. Smith, C.~A.~N. Soules, and
+  C.~A. Stein.
+\newblock Journaling versus soft updates: Asynchronous meta-data protection in
+  file systems.
+\newblock In \emph{Proc. 2000 {USENIX} Annual Technical Conference}, pages
+  71--84, June 2000.
+
+\bibitem[Sivathanu et~al.(2006)Sivathanu, Sundararaman, and
+  Zadok]{sivathanu06typesafe}
+Sivathanu, G., S.~Sundararaman, and E.~Zadok.
+\newblock Type-safe disks.
+\newblock In \emph{Proc. 7th Symposium on Operating Systems Design and
+  Implementation ({OSDI} '06)}, pages 15--28, Nov. 2006.
+
+\bibitem[Sivathanu et~al.(2003)Sivathanu, Prabhakaran, Popovici, Denehy,
+  Arpaci-Dusseau, and Arpaci-Dusseau]{sivathanu03semantically-smart}
+Sivathanu, M., V.~Prabhakaran, F.~Popovici, T.~Denehy, A.~C. Arpaci-Dusseau,
+  and R.~H. Arpaci-Dusseau.
+\newblock Semantically-smart disk systems.
+\newblock In \emph{Proc. 2nd {USENIX} Conference on File and Storage
+  Technologies ({FAST} '03)}, Mar. 2003.
+
+\bibitem[Sivathanu et~al.(2005{\natexlab{a}})Sivathanu, Arpaci-Dusseau,
+  Arpaci-Dusseau, and Jha]{sivathanuetal05-logic}
+Sivathanu, M., A.~C. Arpaci-Dusseau, R.~H. Arpaci-Dusseau, and S.~Jha.
+\newblock A logic of file systems.
+\newblock In \emph{Proc. 4th {USENIX} Conference on File and Storage
+  Technologies ({FAST} '05)}, pages 1--15, Dec. 2005{\natexlab{a}}.
+
+\bibitem[Sivathanu et~al.(2005{\natexlab{b}})Sivathanu, Bairavasundaram,
+  Arpaci-Dusseau, and Arpaci-Dusseau]{sivathanu05database-aware}
+Sivathanu, M., L.~N. Bairavasundaram, A.~C. Arpaci-Dusseau, and R.~H.
+  Arpaci-Dusseau.
+\newblock Database-aware semantically-smart storage.
+\newblock In \emph{Proc. 4th {USENIX} Conference on File and Storage
+  Technologies ({FAST} '05)}, pages 239--252, Dec. 2005{\natexlab{b}}.
+
+\bibitem[Skinner and Wong(1993)]{skinner93stacking}
+Skinner, G.~C. and T.~K. Wong.
+\newblock ``{S}tacking'' {V}nodes: A progress report.
+\newblock In \emph{Proc. USENIX Summer 1993 Technical Conference}, pages
+  161--174, June 1993.
+
+\bibitem[Soules et~al.(2003)Soules, Goodson, Strunk, and
+  Ganger]{soules03metadata}
+Soules, C.~A.~N., G.~R. Goodson, J.~D. Strunk, and G.~R. Ganger.
+\newblock Metadata efficiency in versioning file systems.
+\newblock In \emph{Proc. 2nd {USENIX} Conference on File and Storage
+  Technologies ({FAST} '03)}, pages 43--58, Mar. 2003.
+
+\bibitem[Ts'o(2004)]{tso04ext3}
+Ts'o, T.
+\newblock Re: [evals] ext3 vs reiser with quotas, Dec.~19 2004.
+\newblock \url{http://linuxmafia.com/faq/Filesystems/reiserfs.html} (retrieved
+  August 2007).
+
+\bibitem[Tweedie(1998)]{tweedie98journaling}
+Tweedie, S.
+\newblock Journaling the {L}inux {ext2fs} filesystem.
+\newblock In \emph{Proc. 4th Annual LinuxExpo}, 1998.
+
+\bibitem[Vilayannur et~al.(2005)Vilayannur, Nath, and
+  Sivasubramaniam]{vilayannur05providing}
+Vilayannur, M., P.~Nath, and A.~Sivasubramaniam.
+\newblock Providing tunable consistency for a parallel file store.
+\newblock In \emph{Proc. 4th {USENIX} Conference on File and Storage
+  Technologies ({FAST} '05)}, pages 17--30, Dec. 2005.
+
+\bibitem[Waychison(2007)]{googleext2}
+Waychison, M.
+\newblock Re: fallocate support for bitmap-based files.
+\newblock linux-ext4 mailing list, June~29 2007.
+\newblock
+  \url{http://www.mail-archive.com/linux-ext4@vger.kernel.org/msg02382.html}
+  (retrieved August 2007).
+
+\bibitem[Wright(2006)]{wright06extending}
+Wright, C.~P.
+\newblock \emph{Extending {ACID} Semantics to the File System via {ptrace}}.
+\newblock PhD thesis, Stony Brook University, May 2006.
+
+\bibitem[Wright et~al.(2003)Wright, Martino, and Zadok]{wright03ncryptfs}
+Wright, C.~P., M.~C. Martino, and E.~Zadok.
+\newblock {NCryptfs}: A secure and convenient cryptographic file system.
+\newblock In \emph{Proc. 2003 {USENIX} Annual Technical Conference}, pages
+  197--210, June 2003.
+
+\bibitem[Wright et~al.(2006)Wright, Dave, Gupta, Krishnan, Quigley, Zadok, and
+  Zubair]{wright06versatility}
+Wright, C.~P., J.~Dave, P.~Gupta, H.~Krishnan, D.~P. Quigley, E.~Zadok, and
+  M.~N. Zubair.
+\newblock Versatility and {U}nix semantics in namespace unification.
+\newblock \emph{{ACM} Transactions on Storage}, Mar. 2006.
+
+\bibitem[Yang et~al.(2004)Yang, Twohey, Engler, and Musuvathni]{yang04using}
+Yang, J., P.~Twohey, D.~Engler, and M.~Musuvathni.
+\newblock Using model checking to find serious file system errors.
+\newblock In \emph{Proc. 6th Symposium on Operating Systems Design and
+  Implementation ({OSDI} '04)}, pages 273--288, Dec. 2004.
+
+\bibitem[Yang et~al.(2006)Yang, Sar, and Engler]{yang06explode}
+Yang, J., C.~Sar, and D.~Engler.
+\newblock \textsc{eXplode}: a lightweight, general system for finding serious
+  storage system errors.
+\newblock In \emph{Proc. 7th Symposium on Operating Systems Design and
+  Implementation ({OSDI} '06)}, pages 131--146, Nov. 2006.
+
+\bibitem[{Zadok} and {Nieh}(2000)]{zadok00fist}
+{Zadok}, E. and J.~{Nieh}.
+\newblock {FiST}: A language for stackable file systems.
+\newblock In \emph{Proc. 2000 {USENIX} Annual Technical Conference}, pages
+  55--70, June 2000.
+
+\bibitem[Zadok et~al.(1999)Zadok, Badulescu, and Shender]{zadok99extending}
+Zadok, E., I.~Badulescu, and A.~Shender.
+\newblock {Extending File Systems Using Stackable Templates}.
+\newblock In \emph{Proc. 1999 {USENIX} Annual Technical Conference}, pages
+  57--70, June 1999.
+
+\end{thebibliography}
+\end{footnotesize}
+\label{lastpage}
+
+\end{document}
