@@ -3,7 +3,6 @@
 - Ensure no widows
 - Fix Fig 11's width
 - Fix postscript reference line breaks
-- Check that references are consistent and that bibtex does no mangling
 
 * Really Want To Do
 - Note that we do not support writable mmap?
