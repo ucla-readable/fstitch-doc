@@ -1,84 +1,104 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+	"http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-	<meta http-equiv="Content-Language" content="en" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Language" content="en">
 
-	<title>Kudos</title>
+	<title>Featherstitch</title>
 
-	<link rel="stylesheet" type="text/css" href="css/color.css" />
-	<link rel="stylesheet" type="text/css" href="css/format.css" />
-	<link rel="stylesheet" type="text/css" href="css/layout.css" />
+	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
 
+<div id="content">
 
-<div id="master">
+	<h1>The Featherstitch File System Project</h1>
 
-	<div id="leftcontent">
-
-	<h1>Kudos</h1>
-
-	<h2>Ingredients</h2> <!-- What is it //-->
+	<h2>About</h2>
 
 	<p>
-	We propose a new file system implementation architecture,
-	called Kudos, where change descriptor structures represent
-	any and all changes to stable storage. File systems generate
-	change descriptors for all writes, then send them to block
-	devices for eventual commit. Each change descriptor stores
-	the old state of the block and the change's
-	dependencies---other change descriptors that must be
-	committed before it is safe to commit this change. Explicit
-	dependencies let Kudos modules preserve necessary file system
-	invariants without understanding the file system itself; the
-	old state lets Kudos roll back changes when necessary to
-	break cyclic block dependencies. Change descriptors can
-	implement many consistency mechanisms, including soft
-	updates and journalling.
+	Reliable storage systems depend in part on "write-before"
+	relationships where some changes to stable storage are delayed
+	until other changes commit.  A journaled file system, for example,
+	must commit a journal transaction before applying that
+	transaction's changes, and soft updates and other consistency
+	enforcement mechanisms have similar constraints, implemented in
+	each case in system-dependent ways.  We present a general
+	abstraction, the <em>patch</em>, that makes write-before
+	relationships explicit and file system agnostic.  A patch-based
+	file system implementation expresses dependencies among writes,
+	leaving lower system layers to determine write orders that satisfy
+	those dependencies.  Storage system modules can examine and modify
+	the dependency structure, and generalized file system dependencies
+	are naturally exportable to user level.  Our patch-based storage
+	system, Featherstitch, includes several important optimizations
+	that reduce patch overheads by orders of magnitude.  Our ext2
+	prototype runs in the Linux kernel and supports asynchronous
+	writes, soft updates-like dependencies, and journaling.  It
+	outperforms similarly reliable ext2 and ext3 configurations on
+	some, but not all, benchmarks.  It also supports unusual
+	configurations, such as correct dependency enforcement within a
+	loopback file system, and lets applications define consistency
+	requirements without micromanaging how those requirements are
+	satisfied.
 	</p>
 
-	<h2>Nutrition Info</h2> <!-- Publications //-->
+	<h2>Publications</h2>
 
-	<ul>
+	<ul class="big">
 		<li>
-		<em>The Kudos Architecture for File Systems</em><br />
-		Andrew de los Reyes, Christopher Frost, Eddie Kohler, Mike Mammarella, and Lei Zhang<br />
-		SOSP 2005 WIP<br />
-		Brighton, United Kingdom, October 2005 [ <a href="publications/kudos-sosp_wip.pdf">PDF</a> ]<br />
+		<em>Generalized File System Dependencies</em>
+		[<a href="publications/featherstitch-sosp07.pdf">PDF</a>]<br>
+		Christopher Frost, Mike Mammarella, Eddie Kohler, Andrew de los Reyes, Shant Hovsepian, Andrew Matsuoka, and Lei Zhang<br>
+		Proceedings of the 21st Symposium on Operating Systems Principles (<a href="http://www.sosp.org/2007">SOSP 2007</a>)<br>
+		Stevenson, WA, October, 2007
+		</li>
+		<li>
+		<em>The Kudos Architecture for File Systems</em>
+		[<a href="publications/kudos-sosp_wip.pdf">PDF</a>]<br>
+		Andrew de los Reyes, Christopher Frost, Eddie Kohler, Mike Mammarella, and Lei Zhang<br>
+		<a href="http://www.sigops.org/sosp/sosp05/">SOSP 2005</a> WIP<br>
+		Brighton, United Kingdom, October 2005
 		</li>
 	</ul>
 
-	<h2>Manufacturers</h2> <!-- Who made it //-->
+	<a href="http://www.gutenberg.org/etext/20386"><img class="floatright" src="images/featherstitch.jpg" width="345" height="364" alt="featherstitch"></a>
+
+	<h2>People</h2>
 
 	<ul>
-		<li class="student">Andrew de los Reyes</li>
-		<li class="student">Chris Frost</li>
-		<li class="professor">Eddie Kohler</li>
-		<li class="student">Lei Zhang</li>
-		<li class="student">Mike Mammarella</li>
+		<li><a href="http://adlr.info">Andrew de los Reyes</a></li>
+		<li><a href="http://www.frostnet.net/chris/">Chris Frost</a></li>
+		<li><a href="http://superdupershant.com/">Shant Hovsepian</a></li>
+		<li><a href="http://www.cs.ucla.edu/~kohler/">Eddie Kohler</a></li>
+		<li><a href="http://www.crystalorb.net/">Mike Mammarella</a></li>
+		<li><a href="http://www.cs.utexas.edu/~matsuoka/">Andrew Matsuoka</a></li>
+		<li><a href="http://linux.ucla.edu/~leiz/">Lei Zhang</a></li>
 	</ul>
 
-	<h2>Product Locator</h2> <!-- Get it //-->
+	<h2>Software</h2>
 
 	<p>
-	Coming soon!
+	Coming soon.
 	</p>
 
-	<h2>Contact Us</h2> <!-- Duh //-->
+	<h2>Contact Us</h2>
 
 	<p>
-	<img src="images/kudos-email.png" width="170" height="29" alt="email us!" />
+	<img src="images/kudos-email.png" width="170" height="29" alt="contact email address">
 	</p>
 
-	</div>
+	<h2>Thanks</h2>
 
-	<div id="rightcontent">
-	&nbsp;
-	</div>
+	<p>
+	Featherstitch development is supported by the National Science
+	Foundation under Grant Nos. 0546892 and 0427202, by a Microsoft
+	Research New Faculty Fellowship, and by an equipment grant from
+	Intel.
+	</p>
+
 </div>
-
 
 </body>
 </html>

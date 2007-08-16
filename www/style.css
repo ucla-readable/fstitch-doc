@@ -1,0 +1,38 @@
+body {
+	background: #99c;
+	margin-left: 5%;
+	margin-right: 5%;
+	font-family: sans-serif;
+}
+
+#content {
+	background: white;
+	border-style: solid;
+	border-width: thin;
+	padding-left: 1em;
+	padding-right: 1em;
+}
+
+h1, h2 {
+	font-family: serif;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+ul.big li {
+	margin-bottom: 0.25em;
+	padding-bottom: 0.15em;
+}
+
+img.floatright
+{
+	float: right;
+	border: none;
+	margin-left: 1em;
+}
