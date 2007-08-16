@@ -9,9 +9,9 @@ caches blocks in memory and
 ensures that modifications are written to stable storage in a safe order.
 %
 Modules ``below'' the buffer cache---that is, between its output interface
-and the disk---can reorder block writes at will without violating
-dependencies, since block writes below the buffer cache contain only
-in-flight patches.
+and the disk---are considered part of the ``disk controller''; they can
+reorder block writes at will without violating dependencies, since those block
+writes will contain only in-flight patches.
 %
 %% There can be many write-back caches in a configuration at once (for
 %% instance, one for each block device). 
