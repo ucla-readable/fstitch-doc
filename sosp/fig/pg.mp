@@ -82,8 +82,8 @@ beginfig(2);
   label.lft(btex \texttt{\imapCopy}$_2$ $\Bigg\{$ etex scaled 0.85, .5[b.nw,b.sw-(0,14)]);
   label.lft(btex \texttt{\imapCopy}$_3$ $\Bigg\{$ etex scaled 0.85, .5[c.nw,c.sw-(0,14)]);
 
-  label.rt(btex $\left.\vcenter to 46pt{}\right\}$ \texttt{\imapExpunge} etex scaled 0.85, d.e);
-  label.rt(btex \kern2pt$\}$\kern3pt~\texttt{\imapCheck} etex scaled 0.85, d.se - (0,7));
+  label.rt(btex $\left.\vcenter to 56pt{}\right\}$ \texttt{\imapExpunge} etex scaled 0.85, d.e-(0,5));
+  %label.rt(btex \kern2pt$\}$\kern3pt~\texttt{\imapCheck} etex scaled 0.85, d.se - (0,7));
   
   label.top(btex \texttt{mailbox.dst} etex, a.n + (0,4));
   label.top(btex \texttt{mailbox.src} etex, (xpart d.n,ypart a.n) + (0,4));
@@ -113,8 +113,8 @@ beginfig(3);
   label.lft(btex \texttt{\imapCopy}$_2$ $\Big\{$ etex scaled 0.85, .5[b.nw,b.sw]);
   label.lft(btex \texttt{\imapCopy}$_3$ $\Big\{$ etex scaled 0.85, .5[c.nw,c.sw]);
 
-  label.rt(btex $\left.\vcenter to 46pt{}\right\}$ \texttt{\imapExpunge} etex scaled 0.85, d.e);
-  label.rt(btex \kern2pt$\}$\kern3pt~\texttt{\imapCheck} etex scaled 0.85, d.se - (0,7));
+  label.rt(btex $\left.\vcenter to 56pt{}\right\}$ \texttt{\imapExpunge} etex scaled 0.85, d.e-(0,5));
+  % label.rt(btex \kern2pt$\}$\kern3pt~\texttt{\imapCheck} etex scaled 0.85, d.se - (0,7));
   
   label.top(btex \texttt{mailbox.dst} etex, a.n + (0,4));
   label.top(btex \texttt{mailbox.src} etex, (xpart d.n,ypart a.n) + (0,4));

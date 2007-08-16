@@ -25,8 +25,8 @@ competitive with Linux, though using up to 3.3 times more CPU time;
 %
 that \Kudos\ file systems are consistent after system crashes;
 %
-and that a \patchgroup-enabled IMAP server significantly outperforms
-the unmodified server.
+and that a \patchgroup-enabled IMAP server outperforms
+the unmodified server on \Kudos.
 
 \subsection{Methodology}
 
@@ -447,9 +447,9 @@ the destination mailbox's modification time. In contrast, journaling
 is able to commit a large number of copies atomically using only a
 small constant number of requests.
 %
-The unmodified fsync-based server generates dramatically more requests on
-\Kudos\ with full journaling than Linux, possibly indicating a difference
-in fsync behavior.
+The unmodified fsync-per-operation server generates dramatically more
+requests on \Kudos\ with full journaling than Linux, possibly indicating a
+difference in fsync behavior.
 %
 The last line of the table shows that synchronizing to disk once per
 durable operation with a fully journaled file system performs similarly to

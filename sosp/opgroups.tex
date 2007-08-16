@@ -350,9 +350,9 @@ destination file and then removing from the source file) cannot lose
 the copied message should the server crash part way through the disk
 updates.
 %
-The updated \imapCheck\ command uses \pgSync\ to sync all preceding disk
-updates. This enhancement to \imapCheck\ removes the requirement that \imapCopy\
-sync its destination mailbox: the client's \imapCheck\ request will ensure
+The updated \imapCheck\ and \imapExpunge\ commands use \pgSync\ to sync all preceding disk
+updates. This removes the requirement that \imapCopy\
+sync its destination mailbox: the client's \imapCheck\ or \imapExpunge\ request will ensure
 changes are committed to disk, and the \patchgroup\ dependencies ensure
 changes are committed in a safe ordering.
 %
