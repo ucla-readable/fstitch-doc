@@ -24,10 +24,10 @@ can avoid \emph{fsck} after a crash, although a background \emph{fsck} is
 required to recover leaked storage.
 
 Patches naturally represent both journaling and soft updates,
-as Section~\ref{sec:patch:examples} demonstrates, and we use
-journaling and soft updates as running examples throughout the paper.
+%% as Section~\ref{sec:patch:examples} demonstrates, 
+and we use them as running examples throughout the paper.
 %
-In both cases, the patch implementation extracts ad hoc orderings and
+In each case, our patch implementation extracts ad hoc orderings and
 optimizations into general dependency graphs, making the orderings
 potentially easier to understand and modify.
 %
@@ -47,8 +47,7 @@ despite writing less data.
 Patches were designed to represent any write-before relationship, but
 implementations of other consistency mechanisms, such as the shadow
 paging-style techniques used to implement write anywhere file
-layouts~\cite{hitz94file} or versions of soft updates with optimizations
-for temporary files~\cite{kaashoek97application}, are left for future work.
+layouts~\cite{hitz94file}, are left for future work.
 
 CAPFS~\cite{vilayannur05providing} and Echo~\cite{mann94coherent}
 considered
@@ -178,6 +177,12 @@ to file system and disk interfaces~\cite{huang05fs2,sivathanu06typesafe}
 might
 benefit from a patch-like mechanism that represented write-before
 relationships and consistency requirements agnostically.
+
+Some systems have generalized a \emph{single} consistency mechanism.
+Linux's ext3 attempted to make its journaling layer a reusable component,
+although only ext3 itself uses it.  XN enforces a variant of soft updates
+on any associated library file system, but still requires that those file
+systems implement soft updates again themselves~\cite{kaashoek97application}.
 
 \begin{comment}
 Previous
