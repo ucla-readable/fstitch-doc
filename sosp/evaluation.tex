@@ -21,7 +21,7 @@ that \patch\ optimizations significantly reduce \patch\ memory and CPU
 requirements;
 %
 that a \Kudos\ \patch-based storage system has overall performance
-competitive with Linux, though using up to 3.3 times more CPU time;
+competitive with Linux, though using up to four times more CPU time;
 %
 that \Kudos\ file systems are consistent after system crashes;
 %
@@ -36,8 +36,8 @@ CPU (with hyperthreading disabled), 2~GB of RAM, and a Seagate ST3320620AS 320~G
 Tests use a 10~GB file system and the Linux 2.6.20.1 kernel
 with the Ubuntu v6.06.1 distribution.
 %
-Because \Kudos\ is not aware of high memory we disable it for all
-configurations, limiting the computer to 912~MB of RAM.
+Because \Kudos\ only uses permanently-mapped memory, we disable high
+memory for all configurations, limiting the computer to 912~MB of RAM.
 %
 Only the PostMark benchmark performs slower due to this cache size limitation.
 %
@@ -251,7 +251,7 @@ ext3 by default presume a write is durable once it reaches the disk cache.
 However, Linux can write safely, by restricting the disk to providing only
 a write-through cache, and \Kudos\ can write unsafely by disabling FUA.
 %
-We distinguish safe (FUA or write-through cache) from unsafe results
+We distinguish safe (FUA or a write-through cache) from unsafe results
 when comparing the systems.
 %
 Although safe results for \Kudos\ and Linux utilize different
@@ -323,9 +323,10 @@ In \Kudos\ asynchronous mode, after crashing, \command{fsck} nearly always repor
 that the file system contained many references to inodes that had been
 deleted, among other errors: the file system was corrupt.
 %
-With our soft updates dependencies, the file system was always soft updates
-consistent: \command{fsck} reported that inode reference counts were higher than the
-correct values (an expected discrepancy after a soft updates crash).
+With our soft updates dependencies, the file system was always soft
+updates consistent: \command{fsck} reported, at most, that inode
+reference counts were higher than the correct values (an expected
+discrepancy after a soft updates crash).
 %
 With journaling, \command{fsck} always reported that the file system was
 consistent after the journal replay.
@@ -416,7 +417,7 @@ operations),
 %
 and Linux and \Kudos\ with the server modified to assume and take
 advantage of fully journaled file systems (changes are effectively
-committed in order, so sync only for durable operations).
+committed in order, so sync only on durable operations).
 %
 Only safe configurations are listed; unsafe
 configurations complete in about 1.5~seconds on either system.
@@ -477,9 +478,8 @@ We find
 that our optimizations greatly reduce system overheads, including
 undo data and system CPU time;
 %
-that \Kudos\ obtains reasonable performance on several benchmarks,
-comparable with Linux in most cases despite the additional effort required
-to maintain patches;
+that \Kudos\ has competitive performance on several benchmarks,
+despite the additional effort required to maintain patches;
 %
 that CPU time remains an optimization opportunity;
 %

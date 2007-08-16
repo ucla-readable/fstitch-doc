@@ -9,7 +9,6 @@
 	- Improve clarity of pathgroup eval section
 
 * Want To Do
-- Add a summary sentence to each eval subsection?
 - Explicitly mention that patchgroups allow specification of precisely
   happens-before? They cannot be used to ``hold patches'' in ram.
 - Cite http://www.fsl.cs.sunysb.edu/project-kbdb.html?
