@@ -6,31 +6,31 @@
 
 \newcommand{\PReady}[1]{\ensuremath{#1.\textit{ready}}}
 
-Another important optimization greatly reduces CPU time spent in the
+A different class of optimization addresses CPU time spent in the
 \Kudos\ buffer cache.
 %
 The buffer cache's main task is to choose sets of \patches\ $P$ that
 satisfy the in-flight safety property $\PDepset{P} \subseteq P \cup
 \PDisk$.
 %
-A naive implementation would simply traverse the dependency graph starting
-at these patches, looking for problematic dependencies.
+A naive implementation would guess a set $P$ and then traverse the dependency graph starting
+at $P$, looking for problematic dependencies.
 %
-Patch merging can reduce the size of these traversals by combining patches
-together.
+Patch merging limits the size of these traversals by reducing the number of
+patches.
 %
 Unfortunately, even modest traversals become painfully slow when executed
 on every block in a large buffer cache, and in our initial implementation
-these traversals were a performance bottleneck for even modest cache
-sizes.
-% 
-\Featherstitch\ therefore precomputes much of the information
-required for the buffer cache to choose a set of \patches\ to write.
-
+these traversals were a bottleneck for cache
+sizes above 128 blocks (!).
+ 
+Luckily, much of the information
+required for the buffer cache to choose a set $P$ can be precomputed.
+%
 \Kudos\ explicitly tracks, for each \patch, how many of its
 direct dependencies remain uncommitted or in flight.
 %
-These counts are incremented as \patches\ are added to the system, and
+These counts are incremented as \patches\ are added to the system and
 decremented as the system receives commit notifications from the disk.
 %
 When both counts reach zero, the \patch\ is safe to write, and it is moved
@@ -40,29 +40,32 @@ into a \emph{ready list} on its containing block.
 (\Noop\ \patches\ automatically commit when all their dependencies commit.)
 \end{comment}
 %
-The buffer cache, then, can immediately tell whether any of a block's
-patches are writable by examining its ready list.
-
+The buffer cache, then, can immediately tell whether a block has writable
+patches.
+%
 To write a block $\PB$, the buffer cache initially populates the set $P$ with the
-contents of the ready list.
+contents of $\PB$'s ready list.
 %
 While moving a patch $p$ into $P$, \Kudos\ checks whether there exist
 dependencies $q \PDDepend p$ where $q$ is also on block $\PB$.
 %
-The system can potentially write $q$ at the same time as $p$, so $q$'s
+The system can write $q$ at the same time as $p$, so $q$'s
 counts are updated as if $p$ has already committed.
 %
 This may make $q$ ready, after which it in turn is added to $P$.
 %
 (This premature accounting is safe because the system won't try to write
-$\PB$ again until $p$ actually commits.)
+$\PB$ again until $p$ and $q$ actually commit.)
 
 
-On-line maintenance of the ready counts adds some cost to several \patch\
-manipulations, but since it saves so much duplicate work in the buffer
-cache the resulting system is more efficient by multiple orders of
-magnitude---and in particular, CPU time no longer scales superlinearly with
-the size of the cache.
+While the basic principle of this optimization is simple, its efficient
+implementation depends on several other optimizations, such as soft-to-hard
+patch merging, that preserve important dependency invariants.
+%
+Although ready count maintenance makes some
+\patch\ manipulations more expensive, ready lists save enough duplicate work in
+the buffer cache that the system as a whole is more efficient by multiple orders of
+magnitude.
 
 
 \begin{comment}

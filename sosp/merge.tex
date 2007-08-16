@@ -79,8 +79,8 @@ $p$ can be transformed into a \nrb\ \patch.  \Kudos\ will make $p$
 hard by dropping its undo data, then merge $h$ into $p$.
 %
 Although this type of merging is not very common in practice, it is
- necessary to preserve useful invariants on which Section~\ref{readylist}'s
- optimizations depend.
+ necessary to preserve useful invariants, such as that no hard patch has a
+ dependency on the same block.
 
 
 \begin{figure}
