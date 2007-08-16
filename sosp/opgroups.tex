@@ -152,10 +152,11 @@ two \patchgroups.
 %%   by \texttt{pg~depend(p, q)}.  Each of $a_i$, $b$, and $c$ corresponds to
 %%   a different file system change.}
 \includegraphics[width=\hsize]{fig/figures_7}
-\caption{\label{fig:patchgroup-patches} \Patchgroup\ \patch\ layout.  Empty
-patches $h_{\pgPgNf}$ and $t_{\pgPgNf}$ bracket file system patches that occur while
-\patchgroup\ \pgPg\ is engaged.  \Patchgroup\ dependencies connect one
+\caption{\Patchgroup\ implementation (simplified).  Empty
+patches $h_{\pgPgNf}$ and $t_{\pgPgNf}$ bracket file system patches created while
+\patchgroup\ \pgPg\ is engaged.  \pgDepend\ connects one
 \patchgroup's $t$ patch to another's $h$.}
+\label{fig:patchgroup-patches} 
 \end{figure}
 
 While these simple dependencies are all that is necessary when using soft
