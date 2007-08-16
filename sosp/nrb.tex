@@ -61,8 +61,8 @@ However, we know that $x$'s uncommitted dependencies, if any, are all on
 %
 Since \Featherstitch\ disallows circular dependencies, every
  chain of dependencies starting at $x$ has finite length, and therefore
- contains an uncommitted patch $y$, all of whose dependencies have
- been committed.
+ contains an uncommitted patch $y$ whose dependencies have all
+ committed.
 %
 (If $y$ has in-flight dependencies, simply wait
  for the disk controller to commit them.)
