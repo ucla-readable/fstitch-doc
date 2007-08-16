@@ -4,40 +4,41 @@
 % notation removed to notation.tex
 
 
-This section describes \emph{\patchgroups}, a simple API that extends \patches\ to user
-space and lets applications express dependencies among file system
-operations.
-%
 Currently,
 robust applications
 %% often manipulate valuable data, e.g. a mail server's mail
 %% or a version control system's local checkout.
 %
-can ensure their on-disk data remains in a sane state even after a
-system crash by enforcing write-before relationships in one of two ways:
+can enforce necessary write-before relationships, and thus ensure the
+consistency of on-disk data even after system crash, in only limited
+ways:
 %% requiring their changes be committed in
 %% a specified order.
 %% %
 %% Existing systems can ensure such orders in two ways:
 %
-either forcing an ordering by requiring immediate syncs
-(e.g., \texttt{sync}, \texttt{fsync}, or \texttt{sync\_file\_range}),
+they can force synchronous writes using
+\texttt{sync}, \texttt{fsync}, or \texttt{sync\_file\_range}, or
 %
-or assuming an ordering by depending on particular file system implementation
-semantics (e.g. journaling).
+they can assume particular file system implementation
+semantics, such as journaling.
 %
 The \patch\ abstraction, in contrast, can let a process specify
-\emph{what} ordering is required and leave the storage system to implement
-that ordering in the most appropriate way.
+dependencies, leaving the storage system to implement
+a suitable ordering in the most appropriate way.
 %
 Compared to forcing block writes in the application, this lets the file
 system buffer, combine, and reorder block writes, but is still relatively
 independent of the underlying file system.
 %
-For example, \patchgroups\ even allow an application to specify
-dependencies among raw block device writes.
-
-
+This section describes \emph{\patchgroups}, one simple API for extending
+\patches\ to user space.
+%
+\Patchgroups\ let applications group writes together; dependencies are
+defined among groups.  A parent process can set up a dependency structure
+that its child process will obey unknowingly.  \Patchgroups\ apply to
+any file system, even including raw block device writes.  
+%
 In this section we describe the \patchgroup\ abstraction
 %
 and apply it to three robust applications.
