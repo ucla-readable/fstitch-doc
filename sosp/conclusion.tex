@@ -38,16 +38,18 @@ feature, and show that it can significantly reduce both the total time and the
 number of writes required for our benchmark.
 
 
-There are several areas in which we would like to improve our work. The obvious
-first area we would like to work on is the performance of our \Kudos\ prototype.
+For future work, we plan to improve performance further, particularly for
+system time; %
+%% There are several areas in which we would like to improve our work. The obvious
+%% first area we would like to work on is the performance of our \Kudos\ prototype.
 %
-We have already improved the performance by at least five orders of magnitude
-over the original implementation, but it is still not as fast as it could be.
+we have already improved performance by at least five orders of magnitude
+over the original implementation, but problems remain.
 %
-We would also like to explore a variety of extensions to \Kudos, such as
-sending \patches\ over network file systems and implementing other consistency
+The \patch\ abstraction seems amenable to implementation elsewhere,
+such as over network file systems, and was designed to implement other consistency
 mechanisms like shadow paging.
 %
-Finally, we would like to try using \patchgroups\ for several more complicated
+Finally, we would like to adapt \patchgroups\ to more complicated
 applications, like databases, to see how well they fit the needed semantics and
 how well they perform.
