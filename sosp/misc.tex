@@ -4,7 +4,7 @@
 \label{sec:patch:misc}
 
 Optimizations can only do so much
-with bad sets of dependencies.
+with bad dependencies.
 %
 Just as having too few dependencies can compromise system correctness,
 having too many dependencies, or the wrong dependencies, can non-trivially
@@ -15,12 +15,13 @@ of $r$, $q$, and $p$, but the left-hand arrangement gives the system more
 freedom to reorder block writes:
 
 \begin{figure}[htb]
+\vskip-.4\baselineskip
 \centering
-\begin{tabular}{@{}p{.45\hsize}p{.45\hsize}@{}}
-\centering \includegraphics[width=.7\hsize]{fig/figures_4} &
-\centering \includegraphics[width=.7\hsize]{fig/figures_6}
+\begin{tabular}{@{}p{.3\hsize}p{.3\hsize}@{}}
+\centering \includegraphics[scale=.62]{fig/figures_4} &
+\centering \includegraphics[scale=.62]{fig/figures_6}
 \end{tabular}
-\vskip-\baselineskip
+\vskip-1.2\baselineskip
 \end{figure}
 
 \noindent%
@@ -28,7 +29,7 @@ If $r$, $q$, and $p$ are adjacent on disk, the left-hand
 arrangement can be satisfied with two disk requests while the right-hand
 one will require four.
 %
-Although the arrangements have similar coding difficulty, in several cases
+Although neither arrangement is much harder to code, in several cases
 we discovered that one of our file system implementations was performing
 slowly because it created an arrangement like the one on the right.
 
@@ -37,20 +38,24 @@ and in particular overlap dependencies.
 %
 For instance, inode blocks contain multiple inodes, and changes to two
 inodes should generally be independent; a similar statement holds for
-directories and even sometimes for different fields in a summary block like
-the superblock.
+directories.
+%% and even sometimes for different fields in a summary block like
+%% the superblock.
 %
-The best results can be obtained from \emph{minimal} \patches\ that change
-one independent field at a time.  \Kudos\ will merge these \patches\ when
-appropriate, but if they cannot be merged, minimal \patches\ generally
-result in fewer \patch\ revert operations and more flexibility in write
+Patches that change one independent field at a time generally give
+the best results.
+%%  can be obtained from \emph{minimal} \patches\ that change
+%% one independent field at a time. 
+\Kudos\ will merge these \patches\ when
+appropriate, but if they cannot be merged, minimal \patches\ tend to
+cause fewer \patch\ reversions and give more flexibility in write
 ordering.
 
 File system implementations can generate better dependency arrangements
 when they can detect that certain states will never appear on disk.
 %
 For example, soft updates requires that clearing an inode
-depend on nullifications of all the corresponding directory entries, which
+depend on nullifications of all corresponding directory entries, which
 normally induces dependencies from the inode onto the directory
 entries.
 %
@@ -58,9 +63,13 @@ However, if a directory entry will never exist on disk---for example,
 because a patch to remove the entry merged with the patch that created
 it---then there is no need to require the corresponding dependency.
 %
-Leaving out these dependencies can speed up the system by avoiding circular
-block dependencies, such as those in Figure~\ref{f:soft2hard}, and thus
-avoid the attendant rollbacks and double writes.
+Similarly, if \emph{all} a file's directory entries will never exist on
+disk, the patches that free the file's blocks need not depend on the
+directory entries.
+%
+Leaving out these dependencies can speed up the system by avoiding
+block-level cycles, such as those in Figure~\ref{f:soft2hard}, and the
+rollbacks and double writes they cause.
 %
 \begin{comment}
 A dependency from the inode clear onto the directory entry clear is
@@ -70,20 +79,18 @@ creation is committed, the inode clear need not depend on the
 directory entry clear.
 \end{comment}
 %
-The \Kudos\ ext2 module implements this optimization and another, related
-one: if a directory entry will never reference an inode, then the patches
-that clear the corresponding inode bitmap and block bitmap entries need not
-depend on the patch that deleted that directory entry.
+The \Kudos\ ext2 module implements these optimizations,
+%%  and another, related
+%% one: if a directory entry will never reference an inode, then the patches
+%% that clear the corresponding inode bitmap and block bitmap entries need not
+%% depend on the patch that deleted that directory entry.
 %
-These optimizations significantly reduce the number of disk writes, number
-of patches created, and amount of undo data allocated when files are
-created and deleted within a short time.
-
-In analyzing \patch\ usage we often found it useful to visually
-analyze \patch\ graphs (looking at created \patches\ and the \patch's
-dependencies). \Kudos\ optionally logs \patch\ operations to disk;
-a separate \Kudos\ debugger can inspect and generate graphs from these
-logs.
+significantly reducing disk writes, patch allocations, and undo data required
+when files are created and deleted within a short time.
+%
+Although the optimizations are file system specific, the file system
+implements them using general properties, namely, whether two patches
+successfully merge.
 
 %% the changes to update a field in an inode structure
 %% on disk, a \patch\ spanning the entire inode could be created even though
@@ -110,12 +117,26 @@ Finally, block allocation policies can have a dramatic effect on the number of
 I/O requests required to write changes to the disk. For instance, soft
 updates-like dependencies require that data blocks be initialized before
 an indirect block references them.   
-By allocating an
-indirect block in the middle of a range of data blocks for a file, the data
-blocks must be written as two smaller I/O requests since the indirect block
+Allocating an
+indirect block in the middle of a range of file data blocks
+forces the data blocks to be
+written as two smaller I/O requests, since the indirect block
 cannot be written at the same time. Allocating the indirect block somewhere
 else allows the data blocks to be written in one larger I/O request, at the
 cost of (depending on readahead policies) a potential slowdown in read performance.
+
+
+
+We often found it useful to examine \patch\ dependency graphs visually.
+%% (looking at created \patches\ and the \patch's
+\Kudos\ optionally logs \patch\ operations to disk;
+a separate debugger inspects and generates graphs from these
+logs.
+%
+Although the graphs could be daunting, they provided some evidence that
+patches work as we had hoped: performance problems could
+be analyzed by examining general dependency structures, and
+sometimes easily fixed by manipulating those structures.
 
 
 \begin{comment}
