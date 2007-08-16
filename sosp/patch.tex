@@ -273,7 +273,7 @@ Given a set of \patches\ $P$, we write $\PDepset{P}$ to mean the
 
 
 The \textbf{disk safety property} formalizes dependency requirements by
- stating that the dependencies of all committed \patches\ must have been
+ stating that the dependencies of all committed \patches\ have also been
  committed:
 %
 \[ \PDepset{\PDisk} \subseteq \PDisk. \]
@@ -330,13 +330,13 @@ To uphold the in-flight safety property, the buffer cache must
 The requirement that $\PInf[\PB] = \emptyset$ ensures that at most one version of
  a block is in flight at any time.
 %
-The buffer cache is also expected to write all blocks eventually, a
+Also, the buffer cache must eventually write \emph{all} dirty blocks, a
  liveness property.
 
 The main \Featherstitch\ implementation challenge is to design
  data structures that make it easy to create patches and quick to manipulate
- patches, and that help the buffer cache write blocks and patches in line
- with the above procedure.
+ patches, and that help the buffer cache write blocks and patches according
+ to the above procedure.
 
 
 \subsection{Dependency Implementation}
@@ -414,14 +414,14 @@ If a \patch\ $p$ is not written with its containing block, the buffer cache
 Once the block is written, the system will re-apply the \patch\ and, when
  allowed, write the block again, this time including the \patch.
 %
-Some undo mechanism is required to break block-level dependency cycles, as
+Some undo mechanism is required to break potential block-level dependency cycles, as
  shown in the next section.
 %
 We considered alternate designs, such as maintaining a single ``old''
  version of the block, but per-patch undo data gives file systems the
  maximum flexibility to create \patch\ structures.
 %
-However, many of our optimizations optimize undo data away, greatly
+However, many of our optimizations avoid storing unnecessary undo data, greatly
  reducing memory usage and CPU utilization.
 
 Figure~\ref{fig:patchnot} summarizes our patch notation.

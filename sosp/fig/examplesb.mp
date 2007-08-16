@@ -20,6 +20,13 @@ vardef drawconnpatchx(suffix $,$$)(text conn) text rest =
   drawconnpatch($,$$)(conn) rest
 enddef;
 
+vardef drawconnpatchy(suffix $,$$)(text conn) text rest =
+  save oahlength; oahlength = ahlength; ahlength := oahlength/3;
+  drawconnpatch($,$$)(conn) withpen connectionpen scaled 3 withcolor white;
+  ahlength := oahlength;
+  drawconnpatch($,$$)(conn) rest
+enddef;
+
 beginfig(1);
   save d,e,height,width;
   
@@ -137,7 +144,7 @@ beginfig(2);
   enddef;
 
   % Clip cmt\S vs. cmp\S
-  color oldarrow; oldarrow = .9white;
+  color oldarrow; oldarrow = blockcolor;
   save pk, pp; picture pk[]; path pp[]; pk1 = nullpicture;
   wogna;
   clip currentpicture to bpath.jcp1;
@@ -159,6 +166,10 @@ beginfig(2);
   z5 = d1.c + (-width,height)/2;  z6 = d1.c - (-width,height)/2;
   blockbox((x5,y5) -- (x6,y5) -- (x6,y6) -- (x5,y6) -- cycle);
 
+  % Journal box
+  z.a = (jd1.nw+(-e,d')+(-e,d')); z.b = (jx1.se+(e,-d)+(e,-2.8d));
+  draw z.a -- (x.a,y.b) -- z.b -- (x.b,y.a) -- cycle withpen connectionpen scaled .75;
+  
   % Finish clipping
   pp1 := jcp1.c -- jcp1.c-(0,100);
   pp2 := bpath.jcp1 cutbefore pp1;
@@ -169,6 +180,7 @@ beginfig(2);
   -- (point infinity of pp4) - (-500,-200)
   -- (point infinity of pp4) - (-500,200)
   -- (point infinity of pp4) - (0,200) -- cycle;
+  drawconnpatchy(d1,jc1)(--d1.c-(.3,0){dir -110}..sz1.w-(0,20)..{dir 125}) scaled 0.8;
   wogna;
   clip currentpicture to pp5;
   addto currentpicture also pk1 withcolor oldarrow;
@@ -178,9 +190,7 @@ beginfig(2);
   blockbox(jx1.nw+(-e,d') -- jx1.sw+(-e,-d) -- jx1.se+(e,-d));
   
   drawelement(jd1,ji1,jb1);
-
-  z.a = (jd1.nw+(-e,d')+(-e,d')); z.b = (jx1.se+(e,-d)+(e,-2.8d));
-  draw z.a -- (x.a,y.b) -- z.b -- (x.b,y.a) -- cycle withpen connectionpen scaled .75;
+  draw (x.b,y.a) -- z.a -- (x.a,y.b) -- z.b withpen connectionpen scaled .75;
   
   label.top(btex \textsc{Journal} etex, .5[jd1.nw+(0,d'),ji1.ne+(0,d')]+(0,5));
   label.top(btex \mlabel{journaled\\data block} etex scaled 0.65, jd1.n-(0,2));
@@ -196,9 +206,9 @@ beginfig(2);
   drawconnpatch(jc1,jd1)(..);
   drawconnpatch(jc1,ji1)(..);
   drawconnpatch(jc1,jb1)(..);
-  drawconnpatch(sz1,jc1)(--sz1.c+(0,.7)..) scaled 0.8;
-  drawconnpatch(bk1,jc1)(..) scaled 0.8;
-  drawconnpatch(bi1,jc1)(--bi1.c+(0,.7)..) scaled 0.8;
+  drawconnpatchy(sz1,jc1)(--sz1.c+(0,.7)..) scaled 0.8;
+  drawconnpatchy(bk1,jc1)(..) scaled 0.8;
+  drawconnpatchy(bi1,jc1)(--bi1.c+(0,.7)..) scaled 0.8;
   
   drawconnpatchx(jcp1,bi1)(..bi1.c-(0,.7)--) scaled 1.5;
   drawconnpatchx(jcp1,sz1)(..sz1.c-(0,.7)--) scaled 1.5;
