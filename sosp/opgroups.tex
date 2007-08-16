@@ -180,9 +180,13 @@ transaction must be shifted to the commit record itself.
 These dependencies then collapse into harmless dependencies from the commit
 record to itself or to previous commit records.
 %
-Also, for a metadata-only journal, blocks which are modified as part of a
-\patchgroup\ are pulled into the transaction, making the metadata
-journal act like a full journal for those data blocks.
+Also, a metadata-only journal, which by default does not journal data
+blocks at all, must pull data blocks into its journal as required by
+\patchgroups, making it act like a full journal for those data blocks.
+
+Patchgroups currently \emph{augment} the underlying file system's
+consistency semantics, although a fuller implementation might let a
+patchgroup declare \emph{reduced} consistency requirements as well.
 
 \subsection{Case Studies}
 \label{sec:patchgroup:casestudies}
@@ -199,11 +203,12 @@ client, and the UW IMAP mail server daemon.
 %
 These applications were chosen for their relatively simple and explicit
 consistency requirements; we intended to test how well patchgroups
-implement existing application requirements, not to create new mechanisms.
-One effect of this choice is that, after some modification, versions of
-these applications could attain consistency guarantees similar to those
-attained using \patchgroups\ if they are ran on a
-fully-journaled file system with a conventional API.\todo{Not correct. Subversion is already correct and only requires ordered journaling.}  Patchgroups, however,
+implement existing consistency mechanisms, not to create new mechanisms.
+One effect of this choice is that versions of
+these applications could attain similar consistency guarantees
+by running on a
+fully-journaled file system with a conventional API, although gzip and IMAP
+would require modification to do so.  Patchgroups, however,
 make the required guarantees explicit, can be implemented on other types of
 file system, and introduce no additional cost on fully-journaled systems.
 
@@ -217,7 +222,8 @@ file system, and introduce no additional cost on fully-journaled systems.
 Our modified gzip uses \patchgroups\ to make the input file's
 removal depend on the output file's data being written; thus,
 a crash cannot lose both files. The update adds 10 lines of code to gzip
-v1.3.9: simple consistency requirements are simple to add.
+v1.3.9, showing that simple consistency requirements are simple to
+implement with patchgroups.
 
 \paragraph{Subversion}
 \label{sec:patchgroup:svn}
@@ -237,28 +243,27 @@ This safety is achieved using application-level write ahead journaling,
 where each entry in Subversion's journal is either idempotent or
 atomic.
 %
-Depending on the file system, however, even with this precaution a
-working copy operation may not be protected against a crash.
+Depending on the file system, however, even this precaution may not protect
+a working copy operation against a crash.
 %
 For example, the journal file is marked as complete by moving it from
-its temporary to live location.
+a temporary location to its live location.
 %
 Should the file system completely commit the file rename before
 the file data, and crash before completing the file data commit, then
 a subsequent journal replay could corrupt the working copy.
 
 The working copy library could ensure a safe commit ordering by
-syncing files as necessary. The Subversion server (repository) library
+syncing files as necessary, and the Subversion server (repository) library
 takes this approach, but
 %
-the Subversion
 developers deemed this approach too slow to be worthwhile at the
 client~\cite{svntradeoff}.
 %
 Instead, the working copy library assumes that
 %
 first, all preceding writes to a file's data are committed before the file
-is renamed;
+is renamed,
 %
 and second, metadata updates are effectively committed in their system call
 order.
@@ -266,7 +271,7 @@ order.
 %% The combination of these properties ensures the creation of file $i$
 %% precedes the creation of file $(i+1)$.
 %
-In addition to being obtuse, file renaming does not behave as required on
+This does not hold on
 many systems; for example, neither NTFS with journaling nor BSD UFS with
 soft updates provide the required properties.  The Subversion developers
 essentially specialized their consistency mechanism for one file system,
@@ -277,35 +282,38 @@ ext3 in either ``ordered'' or full journaling mode.
 %% journal file's installation may precede earlier file installations,
 %% leaving the working copy in an inconsistent state.
 
-We updated the Subversion working copy library to use \patchgroups\ to
-express commit ordering requirements
+We updated the Subversion working copy library to
+express commit ordering requirements directly using \patchgroups.
 %% \todo{Use consistency protocol phrase here and throughout?} 
-without relying on properties of the
-underlying file system implementation.
+%% without relying on properties of the
+%% underlying file system implementation.
 %
-The use of the file rename property is replaced in two ways.
+The file rename property was replaced in two ways.
 %
-First, files created in a temporary location and then moved into their
-live location (e.g. directory status and journal files) now
-make the rename depend on the file data writes.
+Files created in a temporary location and then moved into their
+live location, such as directory status and journal files, now
+make the rename depend on the file data writes; but
 %
-Second, files only referenced by live files (e.g. updated file
-copies used by journal file entries) can live with a weaker ordering;
-the data for these files need only precede the installation of the
-referencing file.
+files only referenced by live files, such as updated file
+copies used by journal file entries, can live with a weaker ordering:
+the installation of referencing files is made to depend on the
+file data writes.
 %
-The use of linearly ordered metadata updates is also replaced by
-\patchgroup\ dependencies.
+The use of linearly ordered metadata updates was also replaced by
+\patchgroup\ dependencies, and
 %
-Although the original operations assumed a linear ordering of metadata
-updates, the actual order requirements are considerably less strict.
+making the dependencies explicit let us reason about Subversion's actual
+order requirements, which are much less strict than linear ordering.
+%
+%% Although the original operations assumed a linear ordering of metadata
+%% updates, the actual order requirements are considerably less strict.
 %
 For example, the updated file copies used by the journal may be
-committed independently of each other.
+committed in any order, and most journal playback operations
+may commit in any order.
 %
-Furthermore, most journal playback operations may commit
-independently of each other; only interacting operations, such as a
-file read and subsequent rename, need ordering.
+Only interacting operations, such as a
+file read and subsequent rename, require ordering.
 
 Once we understood Subversion v1.4.3's requirements, it took a day to add
 the 220 lines of code that enforce safety for conflicted updates (out of
@@ -315,8 +323,7 @@ the 220 lines of code that enforce safety for conflicted updates (out of
 \label{sec:patchgroup:uwimap}
 
 We updated the University of Washington's IMAP mail server
-(v2004g)~\cite{uwimap} to ensure mail updates are committed to disk
-in safe and more efficient orderings.
+(v2004g)~\cite{uwimap} to ensure mail updates are safely committed to disk.
 %
 The Internet Message Access Protocol (IMAP)~\cite{rfc3501} provides
 remote access to a mail server's email message store.
@@ -368,7 +375,7 @@ These changes improve UW IMAP by
 %
 ensuring disk write ordering correctness
 %
-and by performing disk writes more efficiently.
+and by performing disk writes more efficiently than synchronous writes.
 %
 As each command's changes now depend on the preceding command's
 changes, it is no longer required that all code
