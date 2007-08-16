@@ -16,11 +16,11 @@ But although all this is relatively easy, it performs badly.
 \end{comment}
 
 
-Assume \Kudos\ is running an ext2 file system with soft updates-like
-dependencies and 4~kB blocks.
-%
 Figure~\ref{fig:opt}a shows the \patches\ generated when an application appends
 16~kB of data to an existing empty file using four 4~kB writes.
+%
+Assume \Kudos\ is running an ext2 file system with soft updates-like
+dependencies and 4~kB blocks.
 %
 %Each circle represents a single \patch. The shaded boxes indicate disk blocks.
 %
