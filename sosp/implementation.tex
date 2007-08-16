@@ -15,8 +15,8 @@ The \Kudos\ prototype implementation runs as a Linux 2.6 kernel module.
 It interfaces with the Linux kernel at the VFS layer and the generic block
 device layer.
 %
-In between is a \Kudos\ module graph that replaces Linux's conventional
-file system layers and buffer cache.
+In between, a \Kudos\ module graph replaces Linux's conventional
+file system layers.
 %
 A small kernel patch informs \Kudos\ of process fork and exit events as
 required to update per-process \patchgroup\ state.
@@ -63,8 +63,8 @@ native command queuing (NCQ) with either a write-through cache or ``forced
 unit access'' (FUA).
 %
 TCQ and NCQ allow a drive to independently report completion for multiple
-outstanding requests, and FUA is a per-request flag that says the disk
-should report completion only after the request reaches stable storage.
+outstanding requests, and FUA is a per-request flag that tells the disk
+to report completion only after the request reaches stable storage.
 %
 Recent SATA drives handle NCQ plus write-through caching or FUA exactly as
 we would want: the drive appears to reorder write requests, improving
@@ -139,15 +139,17 @@ designed for a different situation: writes complete quickly (to the disk's
 cache) and only reads take a long time.
 \end{comment}
 
-Our prototype's Linux integration has several performance problems.
+Our prototype has several performance problems caused by incomplete Linux
+integration.
 %% Future work will require hardening several aspects of our Linux
 %% integration.
 %
 For example, writing a block requires copying that block's data
-whether or not any patches were undone.
+whether or not any patches were undone, and
 %
-Our buffer cache's size is more limited than Linux's, since it currently
-requires that all blocks are stored in permanently-mapped kernel memory.
+our buffer cache currently
+stores all blocks in permanently-mapped kernel memory,
+limiting its maximum size.
 
 
 \begin{comment}

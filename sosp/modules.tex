@@ -132,7 +132,7 @@ support for patches can implement previously unfamiliar dependency
 semantics.
 %
 Like Linux's loopback device, it provides a block device interface that
-uses a file in some other file system as its data store; unlike Linux's
+uses a file in some other file system as its storage layer; unlike Linux's
 block device, consistency requirements on this block device are obeyed by
 the underlying file system.
 %% interface provides consistency  for a block device.
@@ -140,12 +140,12 @@ the underlying file system.
 %% its underlying data store. It is very similar to the device of the same
 %% name in Linux, but with one critical difference: it is aware of \patches.
 %
-The loopback module preserves incoming dependencies and forwards
-them to the underlying data store.
+The loopback module forwards incoming dependencies to its underlying file
+system.
 %
-As a result, the data store will honor those dependencies and preserve the
-loopback file system's consistency, even if the data store would normally
-provide no guarantees for consistency of file system data (e.g., it used
+As a result, the file system will honor those dependencies and preserve the
+loopback file system's consistency, even if it would normally
+provide no consistency guarantees for file data (for instance, it used
 metadata-only journaling).
 
 Figure~\ref{fig:kfs-graph} shows a complete, albeit contrived, example
@@ -154,14 +154,16 @@ configuration using the loopback module.
 A file system image is mounted with an external journal, both of
 which are loopback block devices stored on the root file system (which uses
 soft updates). The journaled file system's ordering requirements are sent
-through the loopback module as \patches, maintaining dependency information
-across boundaries that might otherwise lose ordering relationships. 
+through the loopback module as \patches, maintaining dependencies
+across boundaries that might otherwise lose that information. 
 Most systems cannot enforce consistency requirements through loopback
-devices this way.
+devices this way---unfortunate, as file system images are becoming popular
+tools in  conventional operating systems, used for example to implement
+encrypted home directories in Mac OS~X.
 %
-The \Featherstitch\ journaling configurations in our evaluation use
-loopback modules in a similar way to store the file system's journal as a
-file on the file system itself.
+A simpler version of this configuration allows the journal module to
+store a file system's journal in a file on the file system itself, the
+configuration used in our evaluation.
 
 %% The \modules\ in Figure~\ref{fig:kfs-graph} are a complete \Kudos\ configuration.
 
