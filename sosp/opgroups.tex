@@ -59,9 +59,9 @@ The \patchgroup\ interface is as follows:
 \begin{scriptsize}
 \begin{alltt}
   typedef int pg_t;          pg_t \textbf{pg_create}(void);
-  int \textbf{pg_engage}(pg_t \pgPgNf);     int  \textbf{pg_disengage}(pg_t \pgPgNf);
-  int \textbf{pg_sync}(pg_t \pgPgNf);       int  \textbf{pg_close}(pg_t \pgPgNf);
-  int \textbf{pg_depend}(pg_t \pgQgNf, pg_t \pgPgNf);  /* \textrm{adds \(\pgQgNf\PDepend\pgPgNf\)} */
+  int \textbf{pg_depend}(pg_t \pgQg, pg_t \pgPg);  /* \textrm{adds \(\pgQgNf\PDepend\pgPgNf\)} */
+  int \textbf{pg_engage}(pg_t \pgPg);     int  \textbf{pg_disengage}(pg_t \pgPg);
+  int \textbf{pg_sync}(pg_t \pgPg);       int  \textbf{pg_close}(pg_t \pgPg);
 \end{alltt}
 \end{scriptsize}
 \vspace{-0.5\baselineskip}
@@ -349,7 +349,7 @@ Figure~\ref{fig:imap}b illustrates using patches to move messages.
 \textbf{b)} \Patchgroups
 \end{tabular}
 \caption{UW IMAP server, without and with \patchgroups, moving three
-messages from mailbox.src to mailbox.dst.}
+messages from \texttt{mailbox.src} to \texttt{mailbox.dst}.}
 \label{fig:imap}
 \end{figure}
 

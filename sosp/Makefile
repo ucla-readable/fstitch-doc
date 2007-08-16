@@ -102,7 +102,7 @@ fonts.sty:
 
 clean: cleanfig
 	/bin/rm -f *.log *.aux *.dvi *.bbl *.blg *.lof *.lot *.toc *~ \
-	grammar.tab.c grammar.output fonts.sty .fonts.sty svnversion.tex paper.out paper.ps paper.pdf paper.dvi
+	grammar.tab.c grammar.output .fonts.sty svnversion.tex paper.out paper.ps paper.pdf paper.dvi
 
 cleanfig:
 	/bin/rm -f $(TMP_PDF_IMAGES) $(TMP_DVI_IMAGES) \
