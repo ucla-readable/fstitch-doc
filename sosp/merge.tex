@@ -61,10 +61,7 @@ Once those cycles are broken (because the relevant patches commit), $p$
  new patch on $p$'s block could be created \nrb.
 %
 Figure~\ref{f:soft2hard} demonstrates this using soft
- updates-like dependencies;
-%
-similar scenarios observed in practice led us to invent this type of
- merging.
+ updates-like dependencies.
 %
 Consider a new \nrb\ \patch\ $h$ added to a block that
 contains some \rb\ \patch\ $p$.
@@ -79,8 +76,11 @@ But as a result, we know that there are no block-level cycles
 with head $p$, and
 %
 $p$ can be transformed into a \nrb\ \patch.  \Kudos\ will make $p$
-hard by dropping its undo data, then merge $h$ into $p$, preserving the
-invariant that any block has at most one hard patch.
+hard by dropping its undo data, then merge $h$ into $p$.
+%
+Although this type of merging is not very common in practice, but it is
+ necessary to preserve useful invariants on which other optimizations
+ depend.
 
 
 \begin{figure}

@@ -59,9 +59,9 @@ And in larger examples, the effects are even worse. For example, when
 Section~\ref{eval}, unoptimized \Kudos\ allocates an additional 533~MB,
 mostly for \patches\ and undo data.
 
-This section shows how optimizations based on generic \patch\
-properties and dependency analysis can reduce the 23 \patches\ and 33,000 bytes
-of undo data in Figure~\ref{fig:opt}a to the 8 \patches\ and 0 bytes of
+This section presents optimizations based on generic
+dependency analysis that reduce these 23 \patches\ and 33,000 bytes
+of undo data to the 8 \patches\ and 0 bytes of
 undo data in Figure~\ref{fig:opt}d.
 %
 Additional optimizations simplify \Kudos's other main overhead, the CPU

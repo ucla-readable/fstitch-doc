@@ -20,18 +20,17 @@ This makes $p$ a \textbf{hard patch}: a patch without undo data.
 %
 The system aims to reduce memory usage by making most patches hard.
 %
-The challenge is to detect patches that may be made hard without
+The challenge is to detect such patches without
  an oracle for future dependencies.
 %
 %% We solve this challenge by restricting the creation of dependencies.
 
 
 %
-(Since a hard patch $h$ cannot be reverted, any other patch on $h$'s block
- must depend on $h$ (the other patches can't be written without $h$).
+(Since a hard patch $h$ cannot be rolled back, any other patch on its block
+ effectively depends on it.
 %
-We enforce this requirement using overlap dependencies (and some special-case
- analyses), and
+We represent this explicitly using, for example, overlap dependencies, and
 %
 as a result, the buffer cache will write all of a block's hard patches
  whenever it writes the block.)
