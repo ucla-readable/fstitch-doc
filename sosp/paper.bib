@@ -1,11 +1,9 @@
 @article{ mckusick84fast,
 	author = "Marshall K. McKusick and William N. Joy and Samuel J. Leffler and Robert S. Fabry",
 	title = "A Fast File System for {UNIX}",
-	journal = "Computer Systems",
-	volume = "2",
-	number = "3",
+	crossref = "j:tocs",
+	volume = 2, number = 3, year = 1984, month = aug,
 	pages = "181--197",
-	year = "1984",
 	xxxurl = "http://citeseer.ist.psu.edu/article/mckusick84fast.html"
 }
 
@@ -23,8 +21,8 @@
 @inproceedings{ tweedie98journaling,
 	author = "Stephen Tweedie",
 	title = "Journaling the {L}inux {ext2fs} Filesystem",
-	booktitle = "LinuxExpo '98",
-	year = "1998",
+	booktitle = Proc # "4th Annual LinuxExpo",
+	year = "1998", address = "Durham, North Carolina",
 	xxxurl = "http://citeseer.ist.psu.edu/tweedie98journaling.html"
 }
 
@@ -62,12 +60,11 @@
 }
 
 @techreport{ rfc3501,
-	author = "Mark Crispin",
-	title = "{I}nternet {M}essage {A}ccess {P}rotocol---version 4rev1",
+	author = "M. Crispin",
+	title = "{I}nternet {M}essage {A}ccess {P}rotocol---Version 4rev1",
 	type ="{RFC~3501}",
 	institution = "IETF",
-	year = "2003",
-	month = "March"
+	year = 2003, month = mar
 }
 
 @manual{ uwimap,
@@ -87,26 +84,26 @@
 
 @misc{ svntradeoff,
 	author = "Malcom Rowe",
-	title = "wc atomic rename safety on non-ext3 file systems",
+	title = "Re: wc atomic rename safety on non-ext3 file systems",
 	howpublished = "Subversion developer mailing list",
 	year = 2007,
-	month = "March",
-	note = "\url{http://svn.haxx.se/dev/archive-2007-03/0064.shtml}"
+	month = mar # "~5",
+	note = "\url{http://svn.haxx.se/dev/archive-2007-03/0064.shtml} (retrieved August 2007)"
 }
 
 @misc{ googleext2,
 	author = "Mike Waychison",
-	title = "fallocate support for bitmap-based files",
+	title = "Re: fallocate support for bitmap-based files",
 	howpublished = "linux-ext4 mailing list",
 	year = 2007,
-	month = "June",
-	note = "\url{http://www.mail-archive.com/linux-ext4@vger.kernel.org/msg02382.html}"
+	month = jun # "~29",
+	note = "\url{http://www.mail-archive.com/linux-ext4@vger.kernel.org/msg02382.html} (retrieved August 2007)"
 }
 
 @misc{tso04ext3,
 	author = "Theodore Ts'o",
-	title = "Mail thread: ext3 vs reiser with quotas",
-	year = 2004, month = dec,
+	title = "Re: [evals] ext3 vs reiser with quotas",
+	year = 2004, month = dec # "~19",
 	note = "\url{http://linuxmafia.com/faq/Filesystems/reiserfs.html} (retrieved August 2007)"
 }
 
@@ -143,7 +140,7 @@
 }
 
 @inproceedings{ skinner93stacking,
-	author = "G. C. Skinner and T. K. Wong",
+	author = "Glenn C. Skinner and Thomas K. Wong",
 	title = "``{S}tacking'' {V}nodes: A Progress Report",
         crossref = "usenix93summer",
 	pages = "161--174"
@@ -159,14 +156,13 @@
 @inproceedings{ huang05fs2,
 	author = "Hai Huang and Wanda Hung and Kang G. Shin",
 	title = "{FS2}: Dynamic Data Replication in Free Disk Space for Improving Disk Performance and Energy Consumption",
-	crossref = "sosp20",
-	pages = "263--276"
+	crossref = "sosp20", pages = "263--276"
 }
 
 @inproceedings{ cornell04wayback,
-	author = "Brian Cornell and Peter A. Dinda and Fabian E. Bustamante",
+	author = "Brian Cornell and Peter A. Dinda and Fabi{\'a}n E. Bustamante",
 	title = "Wayback: A User-level Versioning File System for {L}inux",
-	crossref = "usenix04",
+	crossref = "freenix04",
 	pages = "19--28",
 	xxxurl = "http://citeseer.ist.psu.edu/cornell04wayback.html"
 }
@@ -180,14 +176,14 @@
 }
 
 @inproceedings{ quinlan02venti,
-	author = "S. Quinlan and S. Dorward",
-	title = "Venti: A new approach to archival storage",
-	crossref = "fast02",
+	author = "Sean Quinlan and Sean Dorward",
+	title = "Venti: a new approach to archival storage",
+	crossref = "fast02", pages = "89--101",
 	xxxurl = "http://citeseer.ist.psu.edu/article/quinlan02venti.html"
 }
 
 @inproceedings{ fast04versionfs,
-	author = "K. Muniswamy-Reddy and C. P. Wright and A. Himmer and E. Zadok",
+	author = "Kiran-Kumar Muniswamy-Reddy and Charles P. Wright and Andrew Himmer and Erez Zadok",
 	title = "A Versatile and User-Oriented Versioning File System",
 	pages = "115--128",
 	crossref = "fast04"
@@ -204,19 +200,21 @@
 @inproceedings{ sivathanuetal05-logic,
 	title = "A Logic of File Systems",
 	author = "Muthian Sivathanu and Andrea C. Arpaci-Dusseau and Remzi H. Arpaci-Dusseau and Somesh Jha",
-	crossref = "fast05"
+	crossref = "fast05",
+	pages = "1--15"
 }
 
 @inproceedings{ denehyetal05-journal-guided,
 	title = "Journal-guided Resynchronization for Software {RAID}",
 	author = "Timothy E. Denehy and Andrea C. Arpaci-Dusseau and Remzi H. Arpaci-Dusseau",
-	crossref = "fast05"
+	crossref = "fast05",
+	pages = "87--100"
 }
 
 @inproceedings{ soules03metadata,
-	author = "C. Soules and G. Goodson and J. Strunk and G. Ganger",
+	author = "Craig A. N. Soules and Garth R. Goodson and John D. Strunk and Gregory R. Ganger",
 	title = "Metadata Efficiency in Versioning File Systems",
-	crossref = "fast03",
+	crossref = "fast03", pages = "43--58",
 	xxxurl = "http://citeseer.ist.psu.edu/soules03metadata.html"
 }
 
@@ -237,32 +235,26 @@
 @inproceedings{ nightingale05speculative,
 	author = "Edmund B. Nightingale and Peter M. Chen and Jason Flinn",
 	title = "Speculative Execution in a Distributed File System",
-	crossref = "sosp20"
+	crossref = "sosp20", pages = "191--205"
 }
 
 @article{ mann94coherent,
 	author = {Timothy Mann and Andrew Birrell and Andy Hisgen and Charles Jerian and Garret Swart},
 	title = {A coherent distributed file cache with directory write-behind},
-	journal = {ACM Transactions on Computer Systems (TOCS)},
-	volume = {12},
-	number = {2},
-	year = {1994},
-	issn = {0734-2071},
-	pages = {123--164},
-	publisher = {ACM Press},
-	address = {New York, NY, USA},
+	crossref = "j:tocs",
+	volume = 12, number = 2, year = 1994, month = may,
+	pages = {123--164}
 }
 
 @inproceedings{ sivathanu06typesafe,
 	author = "Gopalan Sivathanu and Swaminathan Sundararaman and Erez Zadok",
 	title = "Type-Safe Disks",
-	crossref = "osdi06"
+	crossref = "osdi06", pages = "15--28"
 }
 
 @phdthesis{ burnett06information,
 	author = "Nathan Christopher Burnett",
 	title = "Information and Control in File System Buffer Management",
 	school = "University of Wisconsin---Madison",
-	month = "July",
-	year = "2006"
+	month = jul, year = 2006
 }
