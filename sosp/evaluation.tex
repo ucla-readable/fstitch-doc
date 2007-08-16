@@ -21,13 +21,12 @@ that \patch\ optimizations significantly reduce \patch\ memory and CPU
 requirements;
 %
 that a \Kudos\ \patch-based storage system has overall performance
-that is within reason, even though it is slower than Linux in some
-benchmarks;
+competitive with Linux, though using up to 3.3 times more CPU time;
 %
 that \Kudos\ file systems are consistent after system crashes;
 %
-and that a \patchgroup-enabled IMAP server performs as well as or
-better than the unmodified server.
+and that a \patchgroup-enabled IMAP server significantly outperforms
+the unmodified server.
 
 \subsection{Methodology}
 
@@ -268,10 +267,10 @@ performs identically in these benchmarks when using either mechanism.
 \benchtable{}
 
 \Kudos\ performs similarly for total time for the untar, delete, and
-Andrew benchmarks. However, during the untar and delete benchmarks
-\Kudos\ uses significantly more CPU time than Linux ext2 or ext3
-do---up to three times the CPU time. \Kudos\ uses a similar amount of
-CPU time as Linux ext2 and ext3 for the Andrew benchmark.
+Andrew benchmarks. However, for some of the untar and delete
+benchmarks \Kudos\ uses significantly more CPU time than Linux ext2 or
+ext3 do, up to three times the CPU time. \Kudos\ uses a similar
+amount of CPU time as Linux ext2 and ext3 for the Andrew benchmark.
 %
 \Kudos\ is significantly slower than Linux ext3 at the PostMark
 benchmark when the systems use journaling, where \Kudos\ uses up to
@@ -450,6 +449,13 @@ requests than Linux ext3; we believe this is due to \Kudos\ also
 committing file system summary information that Linux does not commit
 for the \texttt{fsync} system call. \Kudos\ with \patchgroups\
 also currently has this limitation.
+
+With the addition of \patchgroups\ UW IMAP is able to perform mailbox
+modifications significantly more efficiently, while preserving mailbox
+modification safety. On a meta-data or fully journaled file system, UW
+IMAP with \patchgroups\ is 97\% faster at moving 1,000 messages than
+the unmodified server achieves using fsync to ensure its write
+ordering requirements.
 
 
 \subsection{Summary}
