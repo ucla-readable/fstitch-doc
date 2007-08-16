@@ -245,14 +245,14 @@ There is a notable write durability difference between the default
 is durable after it is on the disk platter, whereas Linux ext2 and
 ext3 by default presume a write is durable once it reaches the disk cache.
 However, Linux can write safely (by restricting the disk to providing only
-a write through cache) and \Kudos\ can write unsafely (by disabling FUA).
+a write-through cache) and \Kudos\ can write unsafely (by disabling FUA).
 %
 We distinguish safe (e.g., FUA/write-through cache) from unsafe results
 when comparing the systems.
 %
-Although safe results for \Kudos\ and Linux use different mechanisms
-(FUA vs a write through cache), we note that \Kudos\ performs
-identically in these benchmarks when using either mechanism.
+Although safe results for \Kudos\ and Linux utilize different
+mechanisms (FUA vs a write-through cache), we note that \Kudos\
+performs identically in these benchmarks when using either mechanism.
 
 \benchtable{}
 
