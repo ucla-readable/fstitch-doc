@@ -207,7 +207,7 @@ implement existing consistency mechanisms, not to create new mechanisms.
 One effect of this choice is that versions of
 these applications could attain similar consistency guarantees
 by running on a
-fully-journaled file system with a conventional API, although gzip and IMAP
+fully-journaled file system with a conventional API, although at least IMAP
 would require modification to do so.  Patchgroups, however,
 make the required guarantees explicit, can be implemented on other types of
 file system, and introduce no additional cost on fully-journaled systems.
