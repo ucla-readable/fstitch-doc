@@ -9,6 +9,7 @@
 %\newcommand{\PBlock}[1]{\ensuremath{#1.\textit{block}}}
 %\newcommand{\PBlock}[1]{\ensuremath{B_{#1}}}
 %\newcommand{\PBlock}[1]{\ensuremath{B[{#1}]}}
+{\catcode`\_=12\gdef\_{_}}
 \newcommand{\PBlock}[1]{\ensuremath{\textit{blk}[{#1}]}}
 \newcommand{\PB}{\ensuremath{B}}
 %\newcommand{\PMemst}{\ensuremath{\textit{mem}}}
@@ -108,7 +109,7 @@ The sets $\PDisk$, $\PMem$, and $\PInf$ represent all committed,
 Patch $p$'s block is written $\PBlock{p}$.
 %
 Given a block $\PB$, we write $\PDisk[\PB]$ for the set of committed
- patches on block $\PB$, or in notation $\PDisk[\PB] = \{p\in\PDisk\mid\PBlock{p}=\PB\}$.
+ patches on that block, or in notation $\PDisk[\PB] = \{p\in\PDisk\mid\PBlock{p}=\PB\}$.
 %
 $\PInf[\PB]$ and $\PMem[\PB]$ are defined similarly.
 

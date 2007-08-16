@@ -21,3 +21,8 @@ opts-patches.pdf
 opts-patches.eps
 rb_chdesc_size.pdf
 rb_chdesc_size.eps
+svnversion.tex
+imap_fsync.eps
+imap_pg.eps
+imap_fsync.pdf
+imap_pg.pdf

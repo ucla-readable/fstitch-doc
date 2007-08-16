@@ -6,9 +6,11 @@
 \usepackage{multirow}
 \usepackage{amsthm}
 \usepackage{fancyhdr}
+\usepackage{hyperref,ifpdf,url}
 \IfFileExists{fonts.sty}{\input{fonts.sty}}{}%
 \input{notation}
 \frenchspacing
+\DeclareUrlCommand\url{}
 
 \iffalse
 \DeclareMathAlphabet{\mathcal}{U}{MathePiTwoCal}{m}{n}
@@ -86,7 +88,6 @@
 \newcommand{\patchoptcount}{85--99\%}
 \newcommand{\patchoptundo}{at least 99.99\%}
 
-\usepackage{url,hyperref,ifpdf}
 \ifpdf
   \usepackage[pdftex]{graphicx}
   \usepackage{color}
@@ -196,7 +197,7 @@ This work was completed while all authors were at UCLA.
 \begin{footnotesize}
 \bibsep=.8ex plus1ex minus.3ex
 \bibliography{paper,kmaster}
-\bibliographystyle{abbrvnat}
+\bibliographystyle{myabbrvnat}
 \end{footnotesize}
 \label{lastpage}
 

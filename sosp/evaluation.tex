@@ -80,28 +80,28 @@ the Ion window manager, version 2-20040729.
 % Postmark none and hard were run with a 20k dblock cache
 % NOTE: also update numbers in \patchoptundo and \patchoptcount
 \hline
-\multicolumn{4}{@{}c@{}}{\textbf{Untar test}\raise2pt\hbox{\strut}} \\
+\multicolumn{4}{@{}c@{}}{\textbf{Untar}\raise2pt\hbox{\strut}} \\
 None              &   619,740 &   459.41~MB &  3.33~sec \\ % 789MB 256MB
 \Nrb\ \patches\   &   446,002 &   205.94~MB &  2.73~sec \\
 Overlap merging   &   111,486 &   254.02~MB &  1.87~sec \\
 Both              &    68,887 &     0.39~MB &  1.83~sec \\ % 296MB 256MB
 \hline
 
-\multicolumn{4}{@{}c@{}}{\textbf{Delete test}\raise2pt\hbox{\strut}} \\
+\multicolumn{4}{@{}c@{}}{\textbf{Delete}\raise2pt\hbox{\strut}} \\
 None              &   299,089 &     1.43~MB &  0.81~sec \\ % 50MB 11MB
 \Nrb\ \patches\   &    41,113 &     0.91~MB &  0.24~sec \\
 Overlap merging   &    54,665 &     0.93~MB &  0.31~sec \\
 Both              &     1,800 &     0.00~MB &  0.15~sec \\ % 13MB 11MB
 \hline
 
-\multicolumn{4}{@{}c@{}}{\textbf{PostMark test}\raise2pt\hbox{\strut}} \\
+\multicolumn{4}{@{}c@{}}{\textbf{PostMark}\raise2pt\hbox{\strut}} \\
 None              & 4,590,571 & 3,175.28~MB & 23.64~sec \\ % 5,607MB 2,286MB
 \Nrb\ \patches\   & 2,544,198 & 1,582.94~MB & 18.62~sec \\
 Overlap merging   &   550,442 & 1,590.27~MB & 12.88~sec \\
 Both              &   675,308 &     0.11~MB & 11.05~sec \\ % 2,119MB 2,045MB
 \hline
 
-\multicolumn{4}{@{}c@{}}{\textbf{Andrew test}\raise2pt\hbox{\strut}} \\
+\multicolumn{4}{@{}c@{}}{\textbf{Andrew}\raise2pt\hbox{\strut}} \\
 None              &    70,932 &    64.09~MB &  4.34~sec \\ % 108MB 39MB
 \Nrb\ \patches\   &    50,769 &    36.18~MB &  4.32~sec \\
 Overlap merging   &    12,449 &    27.90~MB &  4.20~sec \\
@@ -179,8 +179,16 @@ smaller account for about 51\% of all \rb\ \patches.}
 \begin{figure}[tb]
 \centering
 \small
-\begin{tabular}{@{}lrrrr@{}}
-\textbf{System} & \multicolumn{1}{c}{\textbf{Untar}} & \multicolumn{1}{c}{\textbf{Delete}} & \multicolumn{1}{c}{\textbf{PostMark}} & \multicolumn{1}{c}{\textbf{Andrew}} \\ \hline
+\begin{tabular}{@{}l@{~~~~}r@{~~~~}r@{~~~~}r@{~~~~}r@{}}
+%\textbf{System} & \multicolumn{1}{@{~~~}c@{~~~}}{\textbf{Untar}} &
+%\multicolumn{1}{@{~~~}c@{~~~}}{\textbf{Delete}} &
+%\multicolumn{1}{@{~~~}c@{~~~}}{\textbf{PostMark}} &
+%\multicolumn{1}{@{~~~}c@{~~~}}{\textbf{Andrew}} \\ \hline
+\textbf{System}
+	& \textbf{Untar}\hfil\kern0pt
+	& \textbf{Delete}\hfil\kern0pt
+	& \textbf{PostMark}\hfil\kern0pt
+	& \textbf{Andrew}\hfil\kern0pt \\ \hline
 % Results are from r4121, mean of 5 runs
 \multicolumn{5}{@{}l}{\emph{\Kudos\ ext2}\raise2pt\hbox{\strut}} \\
 \safe{soft updates} & \safe{6.4 [1.3]} & \safe{0.8 [0.1]} & \safe{38.3 [10.3]} & \safe{36.9 [4.1]} \\
@@ -384,7 +392,7 @@ also currently has this limitation.
 \begin{figure}[t]
 \centering
 \begin{tabular}{@{}llrr@{}}
-\textbf{File System} & \textbf{Consistency mechanism} & \textbf{Time} & \textbf{Writes} \\ \hline
+\textbf{File System} & \textbf{Consistency Mechanism} & \textbf{Time (sec)}\hfil\kern0pt & \textbf{\# Writes}\hfil\kern0pt \\ \hline
 
 % Results are from r4121, mean of 5 runs
 % Single commented out reuslts are from r3933

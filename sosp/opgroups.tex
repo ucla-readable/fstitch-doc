@@ -311,15 +311,15 @@ The Internet Message Access Protocol (IMAP)~\cite{rfc3501} provides
 remote access to a mail server's email message store.
 %
 The most relevant IMAP commands synchronize changes to the server's
-disk (CHECK), copy a message from the selected mailbox to another
-mailbox (COPY), and delete messages marked for deletion (EXPUNGE).
+disk (\imapCheck), copy a message from the selected mailbox to another
+mailbox (\imapCopy), and delete messages marked for deletion (\imapExpunge).
 
 We updated the imapd and mbox mail storage drivers to use
 \patchgroups, ensuring that all disk writes occur in a safe ordering
 without enforcing a specific block write order.
 %
 The original server conservatively preserved command ordering by
-syncing the mailbox file after each CHECK on it or COPY into it.
+syncing the mailbox file after each \imapCheck\ on it or \imapCopy\ into it.
 %
 For example, Figure~\ref{fig:imap}a illustrates moving messages from
 one mailbox to another.
@@ -332,9 +332,9 @@ destination file and then removing from the source file) cannot lose
 the copied message should the server crash part way through the disk
 updates.
 %
-The updated CHECK command uses \pgSync\ to sync all preceding disk
-updates. This enhancement to CHECK removes the requirement that COPY
-sync its destination mailbox: the client's CHECK request will ensure
+The updated \imapCheck\ command uses \pgSync\ to sync all preceding disk
+updates. This enhancement to \imapCheck\ removes the requirement that \imapCopy\
+sync its destination mailbox: the client's \imapCheck\ request will ensure
 changes are committed to disk, and the \patchgroup\ dependencies ensure
 changes are committed in a safe ordering.
 %
