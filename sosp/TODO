@@ -7,14 +7,10 @@
 - Address Andrea's feedback
 	- Explain why postmark is slower and untar/rm are faster
 	- Improve clarity of pathgroup eval section
-- Improve understandability of patchgroup eval section
-  Or mention how some journals implement some patchgroup uses for free?
 - Deal with long/tiny urls
 
 * Want To Do
 - Add a summary sentence to each eval subsection?
-- Should we state that kudos overhead numbers also include inode and dirent
-  cache, etc? (not just patches)
 - Explicitly mention that patchgroups allow specification of precisely
   happens-before? They cannot be used to ``hold patches'' in ram.
 - Cite http://www.fsl.cs.sunysb.edu/project-kbdb.html?

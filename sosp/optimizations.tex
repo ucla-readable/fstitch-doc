@@ -55,8 +55,9 @@ here, as data blocks will \emph{never} need to be reverted.
 %
 And in larger examples, the effects are even worse. For example, when
 256~MB of blocks are allocated in the untar benchmark described in
-Section~\ref{eval}, \Kudos\ allocates an additional 533~MB. \Patch\
-optimizations reduce this 533~MB to 40~MB.
+Section~\ref{eval}, \Kudos\ allocates an additional 533~MB, which is
+predominately for \patches. \Patch\ optimizations reduce this 533~MB
+to 40~MB.
 
 This section shows how generic \patch\
 properties and dependency analysis can reduce the 23 \patches\ and 33,000 bytes

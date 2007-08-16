@@ -147,6 +147,9 @@ allocated \Kudos\ memory relative to allocated block memory)
 from 145--355\% to 4--18\%, a 95--97\% reduction in overhead. For
 example, \Kudos\ allocations are reduced from 3,321~MB to 74~MB for
 the PostMark benchmark, which sees 2,165~MB of block allocations.
+%
+We note that some of the \Kudos\ memory is unrelated to \patches,
+e.g., the inode cache.
 
 %% benchmark: kudos:block without and with optimizations
 % untar: 533:256 to 40:256
