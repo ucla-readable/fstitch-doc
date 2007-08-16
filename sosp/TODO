@@ -5,6 +5,7 @@
 
 * Really Want To Do
 - Address Andrea's feedback
+	- Explain why postmark is slower and untar/rm are faster
 	- Improve clarity of pathgroup eval section
 - Improve understandability of patchgroup eval section
   Or mention how some journals implement some patchgroup uses for free?
