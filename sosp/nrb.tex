@@ -13,73 +13,76 @@ that is, whether any possible future patches and dependencies could force
  the buffer cache to undo $p$ before making further progress.
 %
 If no future patches and dependencies could force
- $p$'s reversion, then $p$ does not need undo data.
+ $p$'s reversion, then $p$ does not need undo data, and \Kudos\ does not
+ allocate any.
 %
-The challenge is to detect this condition without predicting the future.
-%
-We solve this challenge by restricting dependency creation.
-
-
-We implemented support for \textbf{hard patches}, which are simply patches
- that lack undo data.
-%
-Since a hard patch $h$ cannot be reverted, any other patch on its block
- must depend on $h$ (the other patches can't be written without $h$).
-%
-We enforce this requirement, for example using overlap
- dependencies, and
-%
-as a result, the buffer cache will write a block's hard patches (if any)
- whenever it writes the block.
+This makes $p$ a \textbf{hard patch}: a patch without undo data.
 %
 The system aims to reduce memory usage by making most patches hard.
+%
+The challenge is to detect patches that may be made hard without
+ an oracle for future dependencies.
+%
+%% We solve this challenge by restricting the creation of dependencies.
 
 
-But which patches can be made hard?
+%
+(Since a hard patch $h$ cannot be reverted, any other patch on $h$'s block
+ must depend on $h$ (the other patches can't be written without $h$).
+%
+We enforce this requirement using overlap dependencies (and some special-case
+ analyses), and
+%
+as a result, the buffer cache will write all of a block's hard patches
+ whenever it writes the block.)
+
+
+We now characterize one type of patch that can be made hard.
 %
 Define a \emph{block-level cycle} as a dependency chain of uncommitted
- patches $p_n \PDepend \cdots \PDepend p_1$ where the ends have the same
+ patches $p_n \PDepend \cdots \PDepend p_1$ where the ends are on the same
  block $\PBlock{p_n} = \PBlock{p_1}$, and at least one patch in the middle
- has a different block $\PBlock{p_i} \neq \PBlock{p_1}$.
+ is on a different block $\PBlock{p_i} \neq \PBlock{p_1}$.
 %
 The patch $p_n$ is called the \emph{head} of the block-level cycle.
 %
 Now assume that a patch $p \in \PMem$ is not the head of any block-level
  cycle.
 %
-One can then show that the buffer cache can always write a block without
- rolling back $p$.
+One can then show that the buffer cache can write at least one patch
+ without rolling back $p$.
 %
-The hard case is where $\PBlock{p}$ cannot itself be written without
- rolling back $p$, which occurs when $p$ has an uncommitted dependency $q$
- on a different block.
+This is trivially possible if $p$ itself is ready to write.
 %
-However, we know that $q$'s uncommitted dependencies, if any, are all on
+If it is not, then $p$ must depend on some uncommitted patch $x$ on a different
+ block.
+%
+However, we know that $x$'s uncommitted dependencies, if any, are all on
  blocks other than $p$'s; otherwise there would be a block-level cycle.
 %
 Since \Featherstitch\ disallows circular dependencies, every
- chain of dependencies starting at $q$ has finite length, and therefore
- contains an uncommitted patch $x$ all of whose dependencies have
+ chain of dependencies starting at $x$ has finite length, and therefore
+ contains an uncommitted patch $y$ all of whose dependencies have
  been committed.
 %
-(If $x$ has in-flight dependencies, simply wait
+(If $y$ has in-flight dependencies, simply wait
  for the disk controller to commit them.)
 %
-Since $x$ is not on $p$'s block, the buffer cache can write $x$ without
+Since $y$ is not on $p$'s block, the buffer cache can write $y$ without
  rolling back $p$.
 
 
 \Featherstitch\ may thus make a patch hard when it can prove that patch
- will never be the head of a block-level cycle.
+ will \emph{never} be the head of a block-level cycle.
 %
-This requires two tricks.
+Its proof strategy has two parts.
 %
-First, an API restriction allows us to search for \emph{existing},
- rather than future, block-level cycles:
+First, the \Kudos\ API restricts the creation of block-level cycles by
+ restricting the creation of dependencies:
 %
-\emph{A \patch's direct dependencies are all supplied at creation time}.
+\emph{a \patch's direct dependencies are all supplied at creation time}.
 %
-After $p$ is created, the system can add new dependencies $q \PDDepend p$,
+Once $p$ is created, the system can add new dependencies $q \PDDepend p$,
  but will never add new dependencies $p \PDDepend q$.\footnote{The actual
  rule is somewhat more flexible: modules may add new direct dependencies if
  they guarantee that those dependencies don't produce any new block-level
@@ -93,16 +96,17 @@ Since every \patch\ follows this rule, all possible block-level cycles with
 %
 actual graph traversals proved expensive.
 %
-We thus implemented a conservative approximation: \patch\ $p$ is
+We thus implemented a conservative approximation.
+%
+\Patch\ $p$ is
 created as \nrb\ if \emph{no} patches on other blocks depend on uncommitted
- patches on $\PBlock{p}$.
+ patches on $\PBlock{p}$---that is, if
 %
-That is, given any dependency between uncommitted patches $y \PDepend x$,
- either $\PBlock{x}$ isn't on $p$'s block or \emph{both} $x$ and $y$ are on
- $p$'s block.
+for all $y \PDepend x$ with $x$ an uncommitted patch on $p$'s block,
+ $y$ is also on $p$'s block.
 %
-If this holds, then $p$ cannot head a block-level cycle no matter its
- dependencies.
+If no other block depends on $p$'s, then clearly $p$ can't head up
+ a current block-level cycle no matter its dependencies.
 %
 This heuristic works well in practice and, given some bookkeeping, 
  takes $O(1)$ time to check.

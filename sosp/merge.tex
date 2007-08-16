@@ -12,39 +12,39 @@ CPU time.
 \patch\ counts and memory usage, by conservatively identifying when a
 new \patch\ could always be written at the same time as an existing \patch.
 %
-Rather than creating a new \patch\ in this case, \Kudos\ updates the data
-and dependencies so as to merge the new \patch\ into the existing one.
+Rather than creating a new \patch\ in this case, \Kudos\ updates data
+and dependencies to merge the new \patch\ into the existing one.
 
 
 Two types of patch merging involve hard patches, and the first is trivial
 to explain:
 %
 since all of a block's \nrb\ \patches\ \emph{must} be written at the same
-time, they can always safely be merged.
+time, they can \emph{always} be merged.
 %
-\Kudos\ thus ensures that each block contains at most one \nrb\ \patch.
+\Kudos\ ensures that each block contains at most one \nrb\ \patch.
 %
-If \Kudos\ detects that a new patch $p$ could be created as \nrb\ and $p$'s
+If a new patch $p$ could be created as \nrb\ and $p$'s
 block already contains a \nrb\ \patch\ $h$, then
 %
 the implementation merges $p$ into $h$ by applying $p$'s data to the block
 and setting $\PDDepset{h} \gets \PDDepset{h} \cup \PDDepset{p}$.
 %
-The existing \nrb\ \patch\ $h$ is returned to the caller.
+% Steve is right: we don't mention callers anywhere before this
+%% The existing \nrb\ \patch\ $h$ is returned to the caller.
 %
-This changes $h$'s direct dependency set after $h$'s creation time, but
+This changes $h$'s direct dependency set after $h$ was created time, but
 since $p$ could have been created \nrb, the change cannot introduce any new
 block-level cycles.
 %
-Unfortunately, the merge can create \emph{intra}-block cycles.
+Unfortunately, the merge can create \emph{intra}-block cycles:
 %
-If some \noop\ \patch\ $e$ has $p \PDepend e \PDepend h$, then after
+if some \noop\ \patch\ $e$ has $p \PDepend e \PDepend h$, then after
 the merge $h \PDepend e \PDepend h$.
 %
-\Kudos\ detects and prunes these cyclic
-dependencies as $p$'s dependencies are merged into $h$.
-
-
+\Kudos\ detects and prunes any cyclic
+dependencies during the merge.
+%
 \Nrb\ \patch\ merging is able to eliminate 8 of the \patches\ in our running
 example, as shown in Figure~\ref{fig:opt}c.
 
@@ -60,11 +60,13 @@ Once those cycles are broken (because the relevant patches commit), $p$
 \Kudos\ delays the conversion, performing it only when it detects that a
  new patch on $p$'s block could be created \nrb.
 %
-Figure~\ref{f:soft2hard} demonstrates this scenario using soft updates-like
- dependencies.
-
-
-Specifically, consider a new \nrb\ \patch\ $h$ added to a block that
+Figure~\ref{f:soft2hard} demonstrates this using soft
+ updates-like dependencies;
+%
+similar scenarios observed in practice led us to invent this type of
+ merging.
+%
+Consider a new \nrb\ \patch\ $h$ added to a block that
 contains some \rb\ \patch\ $p$.
 %
 Since $h$ is considered to overlap $p$, \Kudos\ adds a direct dependency
@@ -73,12 +75,12 @@ $h \PDDepend p$.
 Since $h$ could be \nrb\ even including this overlap dependency, we know
 there are no block-level cycles with head $h$.
 %
-But as a result, we know that there are no block-level dependency cycles
-with head $p$, since any such cycle $p \PDepend \cdots \PDepend p_1$ would
-imply an $h$-headed cycle $h \PDDepend p \PDepend \cdots \PDepend p_1$.
+But as a result, we know that there are no block-level cycles
+with head $p$, and
 %
-Thus, $p$ can be transformed into a \nrb\ \patch.  \Kudos\ performs this
-transformation and merges $p$ and $h$ via \nrb\ \patch\ merging.
+$p$ can be transformed into a \nrb\ \patch.  \Kudos\ will make $p$
+hard by dropping its undo data, then merge $h$ into $p$, preserving the
+invariant that any block has at most one hard patch.
 
 
 \begin{figure}
