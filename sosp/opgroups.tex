@@ -23,22 +23,23 @@ they can force synchronous writes using
 they can assume particular file system implementation
 semantics, such as journaling.
 %
-The \patch\ abstraction, in contrast, can let a process specify
-dependencies, leaving the storage system to implement
-a suitable ordering in the most appropriate way.
+With the \patch\ abstraction, however, a process might specify
+just dependencies; the storage system could use those dependencies to implement
+an appropriate ordering.
 %
-Compared to forcing block writes in the application, this lets the file
-system buffer, combine, and reorder block writes, but is still relatively
-independent of the underlying file system.
+This approach assumes little about file system implementation semantics,
+but unlike synchronous writes, the storage system can still
+buffer, combine, and reorder disk operations.
 %
-This section describes \emph{\patchgroups}, one simple API for extending
+This section describes \emph{\patchgroups}, an example API for extending
 \patches\ to user space.
 %
-\Patchgroups\ let applications group writes together; dependencies are
+Applications \emph{engage} \patchgroups\ to associate them with file system
+changes; dependencies are
 defined among groups.  A parent process can set up a dependency structure
 that its child process will obey unknowingly.  \Patchgroups\ apply to
-any file system, even including raw block device writes.  
-%
+any file system, including raw block device writes.  
+
 In this section we describe the \patchgroup\ abstraction
 %
 and apply it to three robust applications.
