@@ -1,25 +1,15 @@
 * Must Do
-- Check that we adequately address reviews
 - Ensure no widows
 - Disable footer
 
-* Really Want To Do
-- Address Andrea's feedback
-	- Explain why postmark is slower and untar/rm are faster
-	- Improve clarity of pathgroup eval section
-
 * Want To Do
-- Explicitly mention that patchgroups allow specification of precisely
-  happens-before? They cannot be used to ``hold patches'' in ram.
 - Cite http://www.fsl.cs.sunysb.edu/project-kbdb.html?
 - Cite http://www.fsl.cs.sunysb.edu/project-amino.html?
 - Decide how to cite email threads (esp reference's title)
-- Note that we do not know why kudos is slowish at postmark?
-- More fully explain allocator differences and the effects
-- Explain when patch opts do not apply
 
 
 * No Time To Do
+- Note that we do not know why kudos is slowish at postmark?
 - Improve postmark perf
 - Speed up imap/svn SU
 - Give Linux ext2 SU
