@@ -2,6 +2,7 @@
 - Check that we adequately address reviews
 - Ensure no widows
 - Fix Fig 11's width
+- Be consistent with "in-flight" and "in flight"
 
 * Really Want To Do
 - Address Andrea's feedback
@@ -33,13 +34,6 @@
 
 * Paper
 
-review_todos file
-
-Improve system name?
-
-Title:
-- Write "We <heart> Kudos" in teeny tiny letters somewhere?
-
 Related work:
 - ext2?
 	http://web.mit.edu/tytso/www/linux/ext2intro.html
@@ -47,7 +41,6 @@ Related work:
 - recent stackable: https://ols2006.108.redhat.com/2007/Reprints/sipek-Reprint.pdf ?
 
 Patchgroups:
-- Remove svn figure?
 - Note that our journal + patches implementation is not optimally efficient
 - Add macro imap benchmarks?
 - Compare data journaling (unnecessarily strict) vs minimal opgroups
@@ -57,18 +50,12 @@ Patchgroups:
 Modules:
 - Explore modules not possible within a stackable file system (osdi reviewer)
 
-Implementation:
-- Note that the current implementation stores two copies of each block
-
 Eval:
 - Describe what uses system time
 - More fully explain allocator differences and the effects
-- Note size of a patch? Note #deps and size?
 
 Misc:
 - Look at BSD implementation of soft updates; how does it work?
-- Be consistent with "Section" and "\S", "in-flight" and "in flight", etc.
-- Decide how to cite email threads (esp reference's title)
 
 * Kudos
 
@@ -87,24 +74,7 @@ Misc:
 
 * Benchmarking
 
-- Increase postmark test size
-- Try benchmarks with larger cache
-- Start running correctness tests?
 - Add SU to Linux ext2?
 - Add gzip benchmark
 - Add svn benchmark
-- Track other patch-related datastructure memory usage?
-  - bit overlap hash maps
-  - number of hard patches
-- Increase number of runs from 3 to maybe 10
-- Check that NOFUA==WB and FUA==WT
-	- Benchmark ext3 with barriers?
-
-
-Chris up next:
-- Big postmark (why do we read so much?)
-- Speed up imap/svn SU?
-	- why are they slow?
-- Update to not commit file system summary data on fsync?
-- Improve understandability of patchgroup eval section
-- Add 8.6 summary
+- Benchmark ext3 with barriers?
