@@ -235,7 +235,7 @@ after the corresponding metadata. \Kudos\ metadata journaling is
 equivalent to ext3 writeback journaling.
 %
 Ordered journaling commits data associated with a given transaction
-prior to the preceding transaction's metadata, and is the most
+prior to the following transaction's metadata, and is the most
 commonly used ext3 journaling mode.
 %
 In all tests ext3 writeback and ordered journaling modes performed
@@ -262,7 +262,9 @@ performs identically in these benchmarks when using either mechanism.
 
 
 The results are listed in
-Figure~\ref{fig:bench_time}.
+Figure~\ref{fig:bench_time};
+%
+safe configurations are listed in bold.
 %
 In general, \Kudos\ performs comparably with Linux
 ext2/ext3 when providing similar durability guarantees. Linux
@@ -275,7 +277,8 @@ tracking dependencies does not significantly degrade total time.
 Unfortunately, 
 \Kudos\ can use up to four times more CPU time than Linux ext2 or
 ext3. (\Kudos\ and Linux have similar
-system time results for the Andrew benchmark.)
+system time results for the Andrew benchmark, perhaps because Andrew
+creates relatively few patches even in the unoptimized case.)
 %
 %% \Kudos\ is significantly slower than Linux ext3 at the PostMark
 %% benchmark when the systems use journaling, where \Kudos\ uses up to
@@ -388,10 +391,8 @@ full journal & fsync per durable operation & 1.3 [0.3] & 26 \\
 \end{figure}
 }
 
-\imaptable{}
-
 We evaluate the performance of the \patchgroup-enabled UW IMAP mail
-server (\S\ref{sec:patchgroup:uwimap}) by benchmarking moving 1,000
+server by benchmarking moving 1,000
 messages from one folder to another.
 %
 To move the messages, the client selects the source mailbox (containing
@@ -440,6 +441,9 @@ journaled file system performs similarly to using \patchgroups\ on a
 journaled file system. However, the former requires that the
 underlying file system use full data journaling for the server to be
 safe.
+
+
+\imaptable{}
 
 \Kudos\ in soft updates mode with \patchgroups\ is significantly
 slower than \Kudos\ in journal modes. As the number of write requests
