@@ -2,7 +2,6 @@
 - Check that we adequately address reviews
 - Ensure no widows
 - Fix Fig 11's width
-- Fix postscript reference line breaks
 
 * Really Want To Do
 - Note that we do not support writable mmap?
