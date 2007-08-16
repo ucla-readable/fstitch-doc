@@ -148,18 +148,22 @@ loopback file system's consistency, even if the data store would normally
 provide no guarantees for consistency of file system data (e.g., it used
 metadata-only journaling).
 
-Figure~\ref{fig:kfs-graph} shows an albeit contrived example
+Figure~\ref{fig:kfs-graph} shows a complete, albeit contrived, example
 configuration using the loopback module.
 %
 A file system image is mounted with an external journal, both of
 which are loopback block devices stored on the root file system (which uses
 soft updates). The journaled file system's ordering requirements are sent
-through the loopback module as \patches, allowing dependency information to be
-maintained across boundaries that might otherwise lose that information. In
-contrast, without \patches\ and the ability to forward \patches\ through
-loopback devices, BSD cannot express soft updates' consistency requirements
-through loopback devices. The \modules\ in Figure~\ref{fig:kfs-graph} are a
-complete \Kudos\ configuration.
+through the loopback module as \patches, maintaining dependency information
+across boundaries that might otherwise lose ordering relationships. 
+Most systems cannot enforce consistency requirements through loopback
+devices this way.
+%
+The \Featherstitch\ journaling configurations in our evaluation use
+loopback modules in a similar way to store the file system's journal as a
+file on the file system itself.
+
+%% The \modules\ in Figure~\ref{fig:kfs-graph} are a complete \Kudos\ configuration.
 
 %%  and although the use of a loopback
 %% device is somewhat contrived in the example, they are increasingly being used in
