@@ -181,8 +181,8 @@ These dependencies then collapse into harmless dependencies from the commit
 record to itself or to previous commit records.
 %
 Also, a metadata-only journal, which by default does not journal data
-blocks at all, must pull data blocks into its journal as required by
-\patchgroups, making it act like a full journal for those data blocks.
+blocks at all, pulls \patchgroup-related data blocks into its journal,
+making it act like a full journal for those data blocks.
 
 Patchgroups currently \emph{augment} the underlying file system's
 consistency semantics, although a fuller implementation might let a
