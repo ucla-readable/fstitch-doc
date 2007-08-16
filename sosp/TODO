@@ -22,13 +22,12 @@
 - Decide how to cite email threads (esp reference's title)
 - Note that we do not know why kudos is slowish at postmark?
 - More fully explain allocator differences and the effects
-
-* Might Try To Do?
 - Explain when patch opts do not apply
-- Improve postmark perf
-- Speed up imap/svn SU
+
 
 * No Time To Do
+- Improve postmark perf
+- Speed up imap/svn SU
 - Give Linux ext2 SU
 / Patchgroups: less consistency flag
 / Make allocated data block init depend on prev free, not alloc
