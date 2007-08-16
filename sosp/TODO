@@ -1,7 +1,7 @@
 * Must Do
 - Check that we adequately address reviews
 - Ensure no widows
-- Fix Fig 10's width
+- Fix Fig 11's width
 - Fix postscript reference line breaks
 - Check that references are consistent and that bibtex does no mangling
 
@@ -14,6 +14,7 @@
 - Deal with long/tiny urls
 
 * Want To Do
+- Add a summary sentence to each eval subsection?
 - Should we state that kudos overhead numbers also include inode and dirent
   cache, etc? (not just patches)
 - Explicitly mention that patchgroups allow specification of precisely
@@ -24,7 +25,6 @@
 - More fully explain allocator differences and the effects
 
 * Might Try To Do?
-- Thank Intel/MS
 - Explain when patch opts do not apply
 - Improve postmark perf
 - Speed up imap/svn SU
