@@ -326,7 +326,8 @@ for overlap merging has required some tuning to balance CPU expense and
 missed merge opportunities.
 %
 The current version examines all dependency chains of uncommitted patches
-starting at $p_2$.  It succeeds if $p_1$ is not in any of the chains,
+starting at $p_2$.  It succeeds if no such chain matches $p_2 \PDepend x
+\PDepend p_1$ with $x$ on a different block,
 failing conservatively if any of the chains grows too long (more than 10
 links) or there are too many chains.  
 %

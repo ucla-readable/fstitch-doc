@@ -114,7 +114,7 @@ Both              &    10,418 &     0.04~MB &  4.07~sec \\ % 43MB 39MB
 \opttable{}
 
 We evaluate the effectiveness of the \patch\ optimizations discussed in
-Section~\ref{sec:patch:optimizations}, in terms of
+Section~\ref{sec:patch:optimizations} in terms of
 %
 the total number of \patches\ created, amount of undo data allocated,
 and system CPU time used.
@@ -125,10 +125,10 @@ with all combinations of using \nrb\ \patches\ and overlap merging.
 %
 The PostMark results for no optimizations and for just the \nrb\
 \patches\ optimization use a smaller maximum \Kudos\ cache size,
-80,000 blocks vs 160,000 blocks, so that the benchmark does not run
-out of memory.
+80,000 blocks vs. 160,000 blocks, so that the benchmark does not run
+our machine out of memory.
 %
-The results for metadata and full data journaling are similar.
+Optimization effectiveness is similar for journaling configurations.
 
 Both optimizations work well alone, but their combination is particularly
 effective at reducing the amount of undo data---which, again, is pure
@@ -140,15 +140,14 @@ the number of \patches\ created is reduced by \patchoptcount,
 %
 and system CPU time is reduced by up to 81\%.
 %
-These savings reduce \Kudos\ memory overhead (that is, amount of
-allocated \Kudos\ memory relative to allocated block memory)
+These savings reduce \Kudos\ memory overhead
 %
-from 145--355\% to 4--18\%, a 95--97\% reduction in overhead. For
+from 145--355\% of the memory allocated for block data
+to 4--18\% of that memory, a 95--97\% reduction. For
 example, \Kudos\ allocations are reduced from 3,321~MB to 74~MB for
-the PostMark benchmark, which sees 2,165~MB of block allocations.
-%
-We note that some of the \Kudos\ memory is unrelated to \patches,
-e.g., the inode cache.
+the PostMark benchmark, which sees 2,165~MB of block
+allocations.\footnote{Not all the remaining 74~MB is pure \Featherstitch\
+overhead; for example, our ext2 implementation contains an inode cache.}
 
 %% benchmark: kudos:block without and with optimizations
 % untar: 533:256 to 40:256
@@ -170,7 +169,7 @@ smaller account for about 51\% of all \rb\ \patches.}
 \end{figure}
 \end{comment}
 
-\subsection {Benchmarks}
+\subsection{Benchmarks and Linux Comparison}
 \label{sec:eval:bench}
 
 \newcommand{\safe}[1]{\textbf{#1}}
@@ -214,34 +213,29 @@ smaller account for about 51\% of all \rb\ \patches.}
 \end{figure}
 }
 
-We benchmark \Kudos\ and Linux ext2/ext3 for the untar, delete,
-PostMark, and Andrew benchmarks. Results are listed in
-Figure~\ref{fig:bench_time}.
+We benchmark \Kudos\ and Linux for all four benchmarks, comparing the
+effects of different consistency models and comparing patch-based with
+non-patch-based implementations.
+%% , with both soft updates and journaling dependencies,
+%% and Linux, in several consistency modes, for the untar, delete,
+%% PostMark, and Andrew benchmarks. 
 %
-The general result is that \Kudos\ performs comparably with Linux
-ext2/ext3 when providing similar durability guarantees. Linux
-ext2/ext3 sometimes outperforms \Kudos\ (for the PostMark test in
-journaling modes), and sometimes the reverse.
-
-Specifically, we examine Linux ext2 (in asynchronous mode) and ext3
-(in writeback, ordered, and full journal modes), and \Kudos\ ext2 (in
-asynchronous, soft updates, metadata journal, and full journal modes),
-all created with default configurations. All journaled file systems
-use a 64~MB journal.
-
-The three journal modes provide different consistency guarantees.
-The strength of these guarantees is strictly ordered:
-\vspace{-0.5\baselineskip}
-\begin{center}
-asynchronous $<$ writeback $<$ ordered $<$ full
-\end{center}
-\vspace{-0.5\baselineskip}
+Specifically, we examine Linux ext2 in asynchronous mode; ext3 in
+writeback and full journal modes; and \Kudos\ ext2 in
+asynchronous, soft updates, metadata journal, and full journal modes.  All
+file systems were created with default configurations, and all journaled
+file systems used a 64~MB journal.
+%
+Ext3 implements three different journaling modes, which provide different
+consistency guarantees.
+The strength of these guarantees is strictly ordered as
+``writeback $<$ ordered $<$ full.''
 Writeback journaling commits metadata atomically and commits data only
 after the corresponding metadata. \Kudos\ metadata journaling is
 equivalent to ext3 writeback journaling.
 %
 Ordered journaling commits data associated with a given transaction
-prior to the proceeding transaction's metadata, and is the most
+prior to the preceding transaction's metadata, and is the most
 commonly used ext3 journaling mode.
 %
 In all tests ext3 writeback and ordered journaling modes performed
@@ -254,27 +248,38 @@ There is a notable write durability difference between the default
 \Kudos\ and Linux ext2/ext3 configurations: \Kudos\ safely presumes a write
 is durable after it is on the disk platter, whereas Linux ext2 and
 ext3 by default presume a write is durable once it reaches the disk cache.
-However, Linux can write safely (by restricting the disk to providing only
-a write-through cache) and \Kudos\ can write unsafely (by disabling FUA).
+However, Linux can write safely, by restricting the disk to providing only
+a write-through cache, and \Kudos\ can write unsafely by disabling FUA.
 %
-We distinguish safe (e.g., FUA/write-through cache) from unsafe results
+We distinguish safe (FUA or write-through cache) from unsafe results
 when comparing the systems.
 %
 Although safe results for \Kudos\ and Linux utilize different
-mechanisms (FUA vs a write-through cache), we note that \Kudos\
+mechanisms (FUA vs. a write-through cache), we note that \Kudos\
 performs identically in these benchmarks when using either mechanism.
 
 \benchtable{}
 
-\Kudos\ performs similarly for total time for the untar, delete, and
-Andrew benchmarks. However, for some of the untar and delete
-benchmarks \Kudos\ uses significantly more CPU time than Linux ext2 or
-ext3 do, up to three times the CPU time. \Kudos\ uses a similar
-amount of CPU time as Linux ext2 and ext3 for the Andrew benchmark.
+
+The results are listed in
+Figure~\ref{fig:bench_time}.
 %
-\Kudos\ is significantly slower than Linux ext3 at the PostMark
-benchmark when the systems use journaling, where \Kudos\ uses up to
-3.3 times more CPU time than Linux ext3.
+In general, \Kudos\ performs comparably with Linux
+ext2/ext3 when providing similar durability guarantees. Linux
+ext2/ext3 sometimes outperforms \Kudos\ (for the PostMark test in
+journaling modes), but more often \Kudos\ outperforms Linux.  There are
+several possible reasons, including slight differences in block allocation
+policy, but the main point is that \Kudos's general mechanism for
+tracking dependencies does not significantly degrade total time.
+%
+Unfortunately, 
+\Kudos\ can use up to four times more CPU time than Linux ext2 or
+ext3. (\Kudos\ and Linux have similar
+system time results for the Andrew benchmark.)
+%
+%% \Kudos\ is significantly slower than Linux ext3 at the PostMark
+%% benchmark when the systems use journaling, where \Kudos\ uses up to
+%% 3.3 times more CPU time than Linux ext3.
 %
 Higher CPU requirements are an important concern and, despite much progress
 in our optimization efforts, remain a weakness.
@@ -282,7 +287,7 @@ in our optimization efforts, remain a weakness.
 Some of the contributors to \Kudos\ CPU usage are inherent, such as
 \patch\ creation, while others are artifacts of the current
 implementation, such as creating a second copy of a block to write it to
-disk; we have not separated these two categories.
+disk; we have not separated these categories.
 %
 %
 \begin{comment}
@@ -315,7 +320,7 @@ In \Kudos\ asynchronous mode, after crashing, fsck nearly always reported
 that the file system contained many references to inodes that had been
 deleted, among other errors: the file system was corrupt.
 %
-With our soft updates dependencies, the file system was always soft update
+With our soft updates dependencies, the file system was always soft updates
 consistent: fsck reported that inode reference counts were higher than the
 correct values (an expected discrepancy after a soft updates crash).
 %
@@ -438,7 +443,7 @@ safe.
 
 \Kudos\ in soft updates mode with \patchgroups\ is significantly
 slower than \Kudos\ in journal modes. As the number of write requests
-indicate, each \patchgroup\ on a soft update file system require
+indicate, each \patchgroup\ on a soft updates file system require
 multiple write requests (e.g., to update the destination mailbox and
 the destination mailbox's modification time). In contrast, journaling
 is able to commit a large number of copies atomically, using only a
