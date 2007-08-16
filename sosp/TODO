@@ -19,7 +19,8 @@
   cache, etc? (not just patches)
 - Explicitly mention that patchgroups allow specification of precisely
   happens-before? They cannot be used to ``hold patches'' in ram.
-- Check that we did not forget any todos sent to kudos@
+- Cite http://www.fsl.cs.sunysb.edu/project-kbdb.html?
+- Cite http://www.fsl.cs.sunysb.edu/project-amino.html?
 - Decide how to cite email threads (esp reference's title)
 - Note that we do not know why kudos is slowish at postmark?
 - More fully explain allocator differences and the effects
@@ -73,7 +74,6 @@ Eval:
 
 Misc:
 - Look at BSD implementation of soft updates; how does it work?
-- Check that we did not forget any todos sent to kudos@
 - Be consistent with "Section" and "\S", "in-flight" and "in flight", etc.
 - Decide how to cite email threads (esp reference's title)
 
