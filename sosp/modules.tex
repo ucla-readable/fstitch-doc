@@ -3,17 +3,17 @@
 \section{\Modules}
 \label{sec:modules}
 
-A \Kudos\ configuration is composed of many \modules\ that cooperate to
+A \Kudos\ configuration is composed of \modules\ that cooperate to
  implement file system functionality.
 %
-There are three major types of \modules.
+\Modules\ fall into three major categories.
 %
-Closest to the disk are block device (BD) \modules, which have a fairly
+\emph{Block device} (BD) \modules\ are closest to the disk; they have a fairly
 conventional block device interface with interfaces such as ``read block'' and
 ``flush.''
 %
-Closest to the system call interface are \emph{common file system} (CFS)
-\modules, which have an interface similar to VFS~\cite{kleiman86vnodes}. 
+\emph{Common file system} (CFS) \modules\ are closest to the system call
+interface, and have an interface similar to VFS~\cite{kleiman86vnodes}. 
 %
 In between these interfaces are modules implementing a  \emph{low-level file
 system} (\LFS) interface, which helps divide file system implementations
@@ -35,17 +35,17 @@ like write, read, and append into \LFS\ micro-operations.
 %% simple CFS module that provides case-insensitive access to a case-sensitive
 %% file system.
 %
-File system implementations, such as our ext2 and UFS implementations,
-generally use the \LFS\ interface.
+Our ext2 and UFS file system implementations
+use the \LFS\ interface.
 
 
-Module interfaces include patches explicitly, allowing modules to examine
-and modify dependencies.
+Modules to examine and modify dependencies via patches passed to them as
+arguments.
 %
 For instance, every \LFS\ function that might modify the file system takes a
 \texttt{\textit{patch\char`\_t **p}} argument.
 %
-Before the function is called, \texttt{*p} should be set to the \patch,
+Before the function is called, \texttt{*p} is set to the \patch,
 if any, on which the modification should depend;
 %
 when the function returns, \texttt{*p} is set to some \patch\
@@ -104,9 +104,9 @@ Both \modules\ are implemented at the \LFS\ interface.
 %it implements a single operation using multiple \LFS\ calls, it hooks the
 %resulting \patches\ up in the correct order.
 %
-Unlike FreeBSD's soft updates implementation, once these modules set up the
-desired dependencies for the \patches\ they create, they no longer need to
-concern themselves with those \patches---the block device subsystem will track
+Unlike FreeBSD's soft updates implementation, once these modules set up 
+dependencies, they no longer need to concern themselves with file system
+consistency; the block device subsystem will track
 and enforce the dependencies.
 
 

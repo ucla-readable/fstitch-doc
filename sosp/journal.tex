@@ -6,14 +6,15 @@
 The journal module sits below a regular file system, such as ext2, and transforms
 incoming \patches\ into patches implementing journal transactions.
 %
-File system blocks are copied into the journal; a commit record depends on the
-journal \patches; and the original file system \patches\ depend in turn on the
+File system blocks are copied into the journal, a commit record depends on the
+journal \patches, and the original file system \patches\ depend in turn on the
 commit record.
 %
 Any soft updates-like dependencies among the original \patches\ are removed,
 since they are not needed when the journal handles consistency; however, the
-journal does care to ensure that user-specified dependencies, such as
-\patchgroups, are not violated.
+journal does obey user-specified dependencies, such as
+\patchgroups, by potentially shifting dependent \patches\ into the current
+transaction.
 %
 %% itself provides consistency for each high-level file system operation by
 %% replaying outstanding transactions on recovery.
@@ -25,15 +26,15 @@ transaction contains a list of block numbers, the data to be written to
 those blocks, and finally a single commit record.
 %
 Although the journal modifies existing \patches' direct dependencies, it
-ensures that the new dependencies will never introduce a block-level
-cycle.
+ensures that any new dependencies do not introduce block-level
+cycles.
 
-Like ext3, transactions are required to commit in sequence. Therefore the
+As in ext3, transactions are required to commit in sequence. The
 journal \module\ sets each commit record to depend on the previous commit record, and each
 completion record to depend on the previous completion record. This allows
 multiple outstanding transactions in the journal, which benefits performance,
-but ensures that in the event of a crash, the journal will contain only
-contiguous sequential transactions.
+but ensures that in the event of a crash, the journal's committed
+transactions will be both contiguous and sequential.
 
 Since the commit record is created at the end of the transaction, the journal
 \module\ uses a special \noop\ \patch\ explicitly held in memory to prevent
@@ -41,8 +42,8 @@ file system changes from being written to the disk until the transaction is
 complete. This \noop\ \patch\ is set to depend on the previous transaction's
 completion record, which prevents merging between transactions while allowing
 merging within a transaction. This temporary dependency is removed when the
-real commit record is created and its dependencies are set up as described
-above.
+real commit record is created.
+%% and its dependencies are set up as described above.
 
 %Due to this design, the journal \module\ is completely independent of any
 %specific file system. It is a block device \module\ that automatically journals
@@ -64,5 +65,5 @@ We provide several other modules that modify dependencies, including an
 ``asynchronous mode'' module that removes all dependencies, allowing the
 buffer cache to write blocks in any order.
 %
-This implements similar semantics as existing file systems like ext2 in
-asynchronous write mode.
+%% This implements similar semantics as existing file systems like ext2 in
+%% asynchronous write mode.
