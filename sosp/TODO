@@ -1,16 +1,12 @@
 * Must Do
 - Check that we adequately address reviews
 - Ensure no widows
-- Fix Fig 11's width
-- Be consistent with "in-flight" and "in flight"
 - Disable footer
 
 * Really Want To Do
-- Update IMAP figure to show that EXPUNGE syncs
 - Address Andrea's feedback
 	- Explain why postmark is slower and untar/rm are faster
 	- Improve clarity of pathgroup eval section
-- Deal with long/tiny urls
 
 * Want To Do
 - Add a summary sentence to each eval subsection?

@@ -44,10 +44,11 @@ which relies on a property (atomic block writes) that many disks do not
 provide, and which often requires more seeks than journaling
 despite writing less data.
 
-Although patches were designed to represent any write-before relationship,
+Patches were designed to represent any write-before relationship, but
 implementations of other consistency mechanisms, such as the shadow
 paging-style techniques used to implement write anywhere file
-layouts~\cite{hitz94file}, are left for future work.
+layouts~\cite{hitz94file} or versions of soft updates with optimizations
+for temporary files~\cite{kaashoek97application}, are left for future work.
 
 CAPFS~\cite{vilayannur05providing} and Echo~\cite{mann94coherent}
 considered

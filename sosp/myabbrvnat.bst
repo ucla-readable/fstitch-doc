@@ -218,18 +218,18 @@ FUNCTION {format.names}
   #1 'nameptr :=
   s num.names$ 'numnames :=
   numnames 'namesleft :=
-  namesleft #5 > { #2 'namesleft := } 'skip$ if$
+  namesleft #10 > { #2 'namesleft := } 'skip$ if$
     { namesleft #0 > }
     { nameptr #1 =
 	{ s nameptr "{vv~}{ll, }{f.}{, jj}" format.name$ 't := }
 	{ s nameptr "{f.~}{vv~}{ll}{, jj}" format.name$ 't := }
       if$
-      namesleft #1 = { numnames #5 > { "others" 't := } 'skip$ if$ } 'skip$ if$
+      namesleft #1 = { numnames #10 > { "others" 't := } 'skip$ if$ } 'skip$ if$
       nameptr #1 >
         { namesleft #1 >
             { ", " * t * }
             { numnames #2 >
-                { numnames #6 < { "," * } 'skip$ if$ }
+                { numnames #11 < { "," * } 'skip$ if$ }
                 'skip$
               if$
               t "others" =
