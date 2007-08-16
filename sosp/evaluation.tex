@@ -41,43 +41,6 @@ Because \Kudos\ is not aware of high memory we disable it for all
 configurations, limiting the computer to 912~MB of RAM.
 %
 Only the PostMark benchmark is sensitive to this cache size limitation.
-
-We examine Linux ext2 (in asynchronous mode) and ext3 (in writeback,
-ordered, and full journal modes), and \Kudos\ ext2 (in asynchronous,
-soft updates, metadata journal, and full journal modes), all created
-with default configurations. All journaled file systems use a 64~MB
-journal.
-
-The three journal modes provide different consistency guarantees.
-The strength of these guarantees is strictly ordered:
-\vspace{-0.5\baselineskip}
-\begin{center}
-asynchronous $<$ writeback $<$ ordered $<$ full
-\end{center}
-\vspace{-0.5\baselineskip}
-Writeback journaling commits metadata atomically and commits data only
-after the corresponding metadata. \Kudos\ metadata journaling is
-equivalent to ext3 writeback journaling.
-%
-Ordered journaling commits data associated with a given transaction
-prior to the proceeding transaction's metadata, and is the most
-commonly used ext3 journaling mode.
-%
-In all tests ext3 writeback and ordered journaling modes performed
-similarly, and \Kudos\ does not implement ordered mode, so we report
-only writeback results.
-%
-Full journaling commits data atomically.
-
-There is a notable write durability difference between the default
-\Kudos\ and Linux ext2/ext3 configurations: \Kudos\ safely presumes a write
-is durable after it is on the disk platter, whereas Linux ext2 and
-ext3 by default presume a write is durable once it reaches the disk cache. However, Linux can write
-safely (by restricting the disk to providing only a write through
-cache) and \Kudos\ can write unsafely (by disabling FUA).
-%
-We distinguish safe (e.g., FUA/write-through cache) from unsafe results
-when comparing the systems.
 %
 All timing results are the mean over five runs.
 
@@ -234,16 +197,57 @@ Figure~\ref{fig:bench_time}.
 %
 The general result is that \Kudos\ performs comparably with Linux
 ext2/ext3 when providing similar durability guarantees. Linux
-ext2/ext3 sometimes outperforms \Kudos\ (particularly for journaling modes
-and the PostMark test), and sometimes the reverse.
+ext2/ext3 sometimes outperforms \Kudos\ (for the PostMark test in
+journaling modes), and sometimes the reverse.
+
+Specifically, we examine Linux ext2 (in asynchronous mode) and ext3
+(in writeback, ordered, and full journal modes), and \Kudos\ ext2 (in
+asynchronous, soft updates, metadata journal, and full journal modes),
+all created with default configurations. All journaled file systems
+use a 64~MB journal.
+
+The three journal modes provide different consistency guarantees.
+The strength of these guarantees is strictly ordered:
+\vspace{-0.5\baselineskip}
+\begin{center}
+asynchronous $<$ writeback $<$ ordered $<$ full
+\end{center}
+\vspace{-0.5\baselineskip}
+Writeback journaling commits metadata atomically and commits data only
+after the corresponding metadata. \Kudos\ metadata journaling is
+equivalent to ext3 writeback journaling.
+%
+Ordered journaling commits data associated with a given transaction
+prior to the proceeding transaction's metadata, and is the most
+commonly used ext3 journaling mode.
+%
+In all tests ext3 writeback and ordered journaling modes performed
+similarly, and \Kudos\ does not implement ordered mode, so we report
+only writeback results.
+%
+Full journaling commits data atomically.
+
+There is a notable write durability difference between the default
+\Kudos\ and Linux ext2/ext3 configurations: \Kudos\ safely presumes a write
+is durable after it is on the disk platter, whereas Linux ext2 and
+ext3 by default presume a write is durable once it reaches the disk cache.
+However, Linux can write safely (by restricting the disk to providing only
+a write through cache) and \Kudos\ can write unsafely (by disabling FUA).
+%
+We distinguish safe (e.g., FUA/write-through cache) from unsafe results
+when comparing the systems.
 
 \benchtable{}
 
-While \Kudos\ performs similarly for total time for the untar, delete,
-and Andrew benchmarks, during the untar and delete \Kudos\ uses significantly
-more CPU time than Linux ext2 or ext3 do---up to three times the CPU
-time. \Kudos\ uses a similar amount of CPU time as Linux ext2 and ext3 for
-the Andrew benchmark.
+\Kudos\ performs similarly for total time for the untar, delete, and
+Andrew benchmarks. However, during the untar and delete benchmarks
+\Kudos\ uses significantly more CPU time than Linux ext2 or ext3
+do---up to three times the CPU time. \Kudos\ uses a similar amount of
+CPU time as Linux ext2 and ext3 for the Andrew benchmark.
+%
+\Kudos\ is significantly slower than Linux ext3 at the PostMark
+benchmark when the systems use journaling, where \Kudos\ uses up to
+3.3 times more CPU time than Linux ext3.
 %
 Higher CPU requirements are an important concern and, despite much progress
 in our optimization efforts, remain a weakness.
