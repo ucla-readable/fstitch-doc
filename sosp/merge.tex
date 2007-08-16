@@ -79,8 +79,8 @@ $p$ can be transformed into a \nrb\ \patch.  \Kudos\ will make $p$
 hard by dropping its undo data, then merge $h$ into $p$.
 %
 Although this type of merging is not very common in practice, it is
- necessary to preserve useful invariants on which other optimizations
- depend.
+ necessary to preserve useful invariants on which Section~\ref{readylist}'s
+ optimizations depend.
 
 
 \begin{figure}
@@ -288,58 +288,65 @@ into \noop{}s? (Must modify \nrb-\nrb\ algo usage.)}
 \subsection{Overlap Merging}
 \label{sec:patches:merge:overlap}
 
-The final type of merging merges \rb\ \patches\ with other \patches,
+The final type of merging combines \rb\ \patches\ with other \patches,
 \nrb\ or \rb, when they overlap.
 %
-Bitmap blocks, inodes, and directory entries accumulate many nearby
-and overlapping \patches\ as data is appended to or truncated from a
-file and as files are created and removed.
+Metadata blocks, such as bitmap blocks, inodes, and directory data, tend to
+accumulate many nearby and overlapping \patches\ as the file system
+gradually changes; for instance, Figure~\ref{f:opt}'s $i_1$--$i_4$ all
+affect the same inode field.
 %
-Figure~\ref{fig:opt} shows how even data blocks can collect overlapping
-dependencies: actual data writes $d'_j$ overlap, and therefore depend on,
-block initialization writes $d_j$, but cannot be made \nrb\ since when they
-are created another block (the inode) already depends on the data block.
+Even data blocks can collect overlapping dependencies. Figure~\ref{f:opt}'s
+ data writes $d'_n$ overlap, and therefore depend on, the initialization
+ writes $d_n$---but
 %
-Luckily, simple reasoning can identify many mergeable pairs,
-further reducing the number of \patches\ and the amount of undo data
-required.
+our heuristic cannot make $d'_n$ \nrb\ since when they are created,
+ dependencies exist from the inode block onto $d_n$.
+%
+Overlap merging can combine these, and many other, mergeable patches,
+further reducing \patch\ and undo data overhead.
 
 
 Overlapping \patches\ $p_1$ and $p_2$, with $p_2 \PDepend p_1$, may be
-merged \emph{unless} some possible future patches and dependencies could
+merged \emph{unless} future patches and dependencies might
 force the buffer cache to undo $p_2$, but not $p_1$.
 %
-Here we may reuse the reasoning developed for \nrb\ \patches\ above,
-arriving at a simpler property.
+Reusing the reasoning developed for \nrb\ \patches, we can carve out a
+class of \patches\ that will never cause this problem:
 %
-If $p_2$ will never be the head of a block-level cycle containing $p_1$,
-then $p_2$ and $p_1$ can always be committed together; and any such
-block-level cycle will exist when $p_2$ is created.
+if $p_2$ is not the head of a block-level cycle containing $p_1$,
+then $p_2$ and $p_1$ can always be committed together.
 
-As with \nrb\ \patch\ creation, the \Kudos\ implementation checks a simpler
-property that limits required graph traversals.
+To detect mergeable pairs, the \Kudos\ implementation again uses a
+conservative heuristic that detects many pairs while limiting the
+cost of traversing dependency graphs.
 %
-We experimented with various heuristics to balance CPU expense and missed
-merge opportunities.
+However, while the hard patch heuristic is both simple and effective, the heuristic
+for overlap merging has required some tuning to balance CPU expense and
+missed merge opportunities.
 %
-The final heuristic examines all dependency chains of uncommitted patches
+The current version examines all dependency chains of uncommitted patches
 starting at $p_2$.  It succeeds if $p_1$ is not in any of the chains,
 failing conservatively if any of the chains grows too long (more than 10
 links) or there are too many chains.  
 %
+(It also simplifies the implementation to fail when $p_2$
+overlaps with two or more soft patches that do not themselves overlap.)
+%
 However, some chains cannot induce block-level cycles and are allowed
-regardless of length:
+regardless of how long they grow.
 %
-if $p_1 \PDepend x$ for some $x$, then
+Consider a chain $p_2 \PDepend x$ not containing $p_1$.
 %
-since there are no circular dependencies, any chain from $p_2$ that
-encounters $x$ will never encounter $p_1$ later.  Our heuristic detects
-several easy-to-check instances of this principle, including $h$, a
-hard patch on $p_1$'s block ($p_2 \PDepend h$ by definition).
+If $p_1 \PDepend x$ as well, then since there are no circular dependencies, 
+any continuation of the chain $p_2 \PDepend x$ will never encounter $p_1$.
 %
-We tuned the heuristic to cope with
-long dependency chains created by the Andrew benchmark on soft updates-like
-dependencies.
+Our heuristic white-lists several such chains, including $p_2 \PDepend h$
+where $h$ is a hard patch on $p_1$'s block.
+%
+%% We tuned the heuristic to cope with
+%% long dependency chains created by the Andrew benchmark on soft updates-like
+%% dependencies.
 %
 \begin{comment}
 %
@@ -397,12 +404,8 @@ following cases:
 %
 If all chains fit, then there are no block-level cycles from $p_2$
 to $p_1$, $p_2$ and $p_1$ can have the same lifetime, and $p_2$ can be
-merged into $p_1$ where they overlap
-%
-(which may require growing $p_1$'s data range).
-%
-It also simplifies the implementation to avoid overlap merging when $p_2$
-overlaps with two or more soft patches that do not themselves overlap.
+merged into $p_1$ to create a combined patch.
+
 
 \begin{comment}
 , and to limit $p \PDDepend q$ existence checks to just $p$'s
@@ -413,11 +416,11 @@ The rules to overlap merge two bit \patches\ are similar.
 
 
 
-In our running example, overlap merging is able to combine all remaining
+In our running example, overlap merging combines all remaining
 \rb\ \patches\ with their \nrb\ counterparts, reducing the number of \patches\
 to the minimum of 8 and the amount of undo data to the minimum of 0.
 %
-In our experiments, we observe that \nrb\ \patches\ and our \patch\ merging
+In our experiments, \nrb\ \patches\ and our \patch\ merging
 optimizations reduce the amount of memory allocated for undo data in
 soft updates and journaling orderings by \patchoptundo.
 
