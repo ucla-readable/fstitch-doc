@@ -75,8 +75,8 @@ The call \texttt{\pgDepend(\pgQg, \pgPg)} makes \patchgroup\ \pgQg\ depend on
 \patchgroup\ \pgPg: all \patches\ associated with \pgPg\ will
 commit prior to any of those associated with \pgQg.
 %
-The \patches\ associated with a \patchgroup\ are those created while
-the \patchgroup\ is engaged.
+\emph{Engaging} a patchgroup with \pgEngage\ associates subsequent file
+system operations with that patchgroup.
 %
 \pgSync\ forces an immediate write of a \patchgroup\ to disk.
 %
@@ -95,25 +95,35 @@ Whereas \Kudos\ \modules\ are presumed to not create cyclic
 dependencies, the kernel cannot safely trust user applications to be
 so well behaved, so
 %
-the \patchgroup\ API restricts dependency manipulation so that cycles are
+the \patchgroup\ API makes cycles are
 inconstructible.
 %
-Figure~\ref{fig:patchgroup-transitions} shows when a given
-\patchgroup\ dependency operation is valid.
+Figure~\ref{fig:patchgroup-transitions} shows when different
+\patchgroup\ dependency operations are valid.
 %
-For example, \texttt{\pgDepend(\pgQg, \pgPg)} returns an error if
-\pgQg\ has \emph{ever} been engaged; if it succeeds, a subsequent
-\texttt{\pgEngage(\pgPg)} will return an error.\footnote{These rules are really
-just a strictly enforced version of the requirement from \S\ref{sec:patch:nrb}
-that all dependencies must be specified up-front.}
+As with patches themselves, all a patchgroup's direct dependencies are
+added first.  After this, a patchgroup becomes engaged zero or more times;
+however, once a patchgroup \pgPg\ gains a dependency via \texttt{\pgDepend(*,
+\pgPg)}, it is sealed and can never be engaged again.  
+%
+This prevents applications from using patchgroups to hold dirty blocks in
+memory: \pgQg\ can depend on \pgPg\ only once the system has seen the
+complete set of \pgPg's changes.
+
+%% but the system will refuse to engage any patc   example, a dependency to an engaged (or previously-engaged)
+%% patchgroup cannot For example, \texttt{\pgDepend(\pgQg, \pgPg)} returns an
+%% error if \pgQg\ has \emph{ever} been engaged; if it succeeds, a subsequent
+%% \texttt{\pgEngage(\pgPg)} will return an error.\footnote{These rules are
+%% really just a strictly enforced version of the requirement from
+%% \S\ref{sec:patch:nrb} that all dependencies must be specified up-front.}
 
 \Patchgroups\ and file descriptors are managed similarly---they are copied
 across \texttt{fork}, preserved across \texttt{exec}, and closed on
 \texttt{exit}.
 %
 This allows existing, unaware programs to interact with \patchgroups,
-in the same way that programs do not have to know about pipes for the
-shell to connect them in a pipeline.
+in the same way that the shell can connect pipe-oblivious programs
+into a pipeline.
 %
 For example, a \texttt{depend} program could apply \patchgroups\ to
 unmodified applications by setting up the \patchgroups\ before calling
@@ -131,18 +141,18 @@ to disk:
 
 % FIXME: Mention simplicity using patchgroups vs fsync?
 
-\Patchgroup\ support is implemented by an \LFS\ module that lives above a file
-system module like ext2.
-%
-Each \patchgroup\ corresponds to a pair of containing \noop\ \patches,
+Inside the kernel, each \patchgroup\ corresponds to a pair of containing
+\noop\ \patches,
 and each inter-\patchgroup\ dependency corresponds to a dependency between
 the \noop\ \patches.
 %
-The \LFS\ module ensures that all file system changes are inserted
-between engaged \patchgroups' \noop\ \patches.
+All file system changes are inserted
+between all engaged \patchgroups' \noop\ \patches.
 %
 Figure~\ref{fig:patchgroup-patches} shows an example \patch\ arrangement for
 two \patchgroups.
+%
+(The actual implementation uses additional empty patches for bookkeeping.)
 
 \begin{figure}[t]
 \centering
@@ -160,19 +170,18 @@ patches $h_{\pgPgNf}$ and $t_{\pgPgNf}$ bracket file system patches created whil
 \label{fig:patchgroup-patches} 
 \end{figure}
 
-While these simple dependencies are all that is necessary when using soft
-updates as the underlying consistency model, some extra work is required in the
-journal module to support \patchgroups.
+These dependencies suffice to enforce patchgroups when using soft
+updates-like dependencies, but for journaling, some extra work is required.
 %
-When using a journal, writing the commit record atomically commits a
-transaction; additional \patchgroup-specified dependencies for the data in each
+Since writing the commit record atomically commits a
+transaction, additional \patchgroup-specified dependencies for the data in each
 transaction must be shifted to the commit record itself.
 %
 These dependencies then collapse into harmless dependencies from the commit
 record to itself or to previous commit records.
 %
-Finally, for a metadata journal, blocks which are modified as part of a
-\patchgroup\ must also be included in the transaction, making the metadata
+Also, for a metadata-only journal, blocks which are modified as part of a
+\patchgroup\ are pulled into the transaction, making the metadata
 journal act like a full journal for those data blocks.
 
 \subsection{Case Studies}

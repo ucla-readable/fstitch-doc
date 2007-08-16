@@ -52,7 +52,7 @@ The \patches\ slow down the buffer cache system by making graph traversals
 more expensive.
 %
 Storing undo data for \patches\ on data blocks is particularly painful
-here, as ext2 data blocks \emph{never} need to be reverted.
+here, since they will \emph{never} need to be reverted.
 %
 And in larger examples, the effects are even worse. For example, when
 256~MB of blocks are allocated in the untar benchmark described in
