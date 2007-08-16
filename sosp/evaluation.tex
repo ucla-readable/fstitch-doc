@@ -404,14 +404,14 @@ configurations).
 %
 We benchmark
 %
-\Kudos\ and Linux with the unmodified server (sync after each message
-copy),
+\Kudos\ and Linux with the unmodified server (sync after each operation),
 %
-\Kudos\ with the \patchgroup-enabled server (sync only at the end),
+\Kudos\ with the \patchgroup-enabled server (sync only for durable
+operations),
 %
 and Linux and \Kudos\ with the server modified to assume and take
 advantage of fully journaled file systems (changes are effectively
-committed in order, so sync only at the end).
+committed in order, so sync only for durable operations).
 
 Figure~\ref{fig:imap-compare} lists only safe configurations; unsafe
 \Kudos\ and Linux configurations complete in about 1.5~seconds.
