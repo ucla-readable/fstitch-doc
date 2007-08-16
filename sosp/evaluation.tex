@@ -362,7 +362,7 @@ only for the full journal mode.
 Linux ext3 writeback, ordered, and full journal modes also perform similarly,
 so we report only for the full journal mode.
 %
-Using an fsync per CHECK on a fully journaled file system performs
+Using an fsync per \imapCheck\ on a fully journaled file system performs
 similarly for \Kudos\ and Linux.
 
 Fully journaled \Kudos\ with \patchgroups\ performs at least as well
@@ -370,7 +370,7 @@ as all other (safe and unsafe) \Kudos\ and all Linux configurations.
 It is 11--13 times faster than safe Linux ext3 with the unmodified
 server.
 %
-Synchronizing to disk once per CHECK with a fully journaled file
+Synchronizing to disk once per \imapCheck\ with a fully journaled file
 system, for both \Kudos\ and Linux, performs similarly to using
 \patchgroups\ on a journaled file system. However, the former requires
 the underlying file system use full data journaling for it to be safe.
@@ -432,7 +432,7 @@ full journal & \patchgroups & 1.4 [0.4] & 32 \\ \hline
 %%Linux ext3 ordered (fsync) & 23.9 [0.3] & 3,025 \\
 full journal & fsync per operation & 19.9 [0.3] & 2,531 \\
 
-full journal & fsync per CHECK & 1.3 [0.3] & 26 \\
+full journal & fsync per \imapCheck\ & 1.3 [0.3] & 26 \\
 
 \end{tabular}
 \caption{\label{fig:imap-compare} IMAP benchmark: move 1,000 messages.
