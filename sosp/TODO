@@ -6,6 +6,7 @@
 - Disable footer
 
 * Really Want To Do
+- Update IMAP figure to show that EXPUNGE syncs
 - Address Andrea's feedback
 	- Explain why postmark is slower and untar/rm are faster
 	- Improve clarity of pathgroup eval section
