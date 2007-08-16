@@ -249,6 +249,10 @@ a write through cache) and \Kudos\ can write unsafely (by disabling FUA).
 %
 We distinguish safe (e.g., FUA/write-through cache) from unsafe results
 when comparing the systems.
+%
+Although safe results for \Kudos\ and Linux use different mechanisms
+(FUA vs a write through cache), we note that \Kudos\ performs
+identically in these benchmarks when using either mechanism.
 
 \benchtable{}
 
