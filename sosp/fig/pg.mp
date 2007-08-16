@@ -24,8 +24,9 @@ beginfig(1);
   c.c - b.c = (80,0);
   .5[c.c,b.c] - .5[a.c,d.c] = (0,9);
 
-  fillelement(b)(0.5white);
   drawelement(a,b,c,d);
+  
+  label(btex $\ast$ etex, b.c);
 
   save textscale; textscale = 0.7;
 
