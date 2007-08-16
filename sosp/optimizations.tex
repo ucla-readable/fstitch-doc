@@ -48,15 +48,15 @@ Unoptimized \Kudos, however, represents the operation with 23 \patches\ and
 roughly 33,000 (!) bytes of undo data.
 %
 The \patches\ slow down the buffer cache system by making graph traversals
-more expensive;
+more expensive.
 %
-storing undo data for \patches\ on data blocks is particularly painful
-here, as data blocks will \emph{never} need to be reverted;
+Storing undo data for \patches\ on data blocks is particularly painful
+here, as data blocks will \emph{never} need to be reverted.
 %
-and in larger examples, the effects are even worse: when running the
-benchmarks described in \S\ref{eval}, unoptimized \Kudos\ allocates twice
-as much memory for undo data as for cached block data, or even more.
-
+And in larger examples, the effects are even worse. For example, when
+256~MB of blocks are allocated in the untar benchmark described in
+Section~\ref{eval}, \Kudos\ allocates an additional 533~MB. \Patch\
+optimizations reduce this 533~MB to 40~MB.
 
 This section shows how generic \patch\
 properties and dependency analysis can reduce the 23 \patches\ and 33,000 bytes
