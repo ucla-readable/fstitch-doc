@@ -14,7 +14,8 @@ body {
 }
 
 h1, h2 {
-	font-family: serif;
+	font-family: "Trebuchet MS", Trebuchet, Verdana, Sans-Serif;
+	color: #dd6600;
 }
 
 a {
