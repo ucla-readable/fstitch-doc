@@ -1,4 +1,4 @@
-How to Profile kkfsd Using Oprofile
+How to Profile kfstitchd Using Oprofile
 
 Kernel and unix-user are not the same (different mallocs, different cache
 interactions, etc), so profiling kkfsd may be helpful. This file describes
@@ -7,7 +7,7 @@ how to do profile using oprofile.
 1. boot a kernel with profiling support:
    - On kudos-pb, 2.6.12-kudos-prof
    - Or build a profiling kernel by enabling CONFIG_OPROFILE (module)
-2. load kkfsd and prepare to run the benchmark
+2. load kfstitchd and prepare to run the benchmark
 3. setup and start oprofile:
 	$ sudo opcontrol --setup --separate=kernel --vmlinux=/boot/vmlinux-2.6.12-kudos-prof
 	# you might enable deeper callstacks here, opcontrol --callgraph <n>
@@ -21,5 +21,5 @@ how to do profile using oprofile.
 5. stop oprofile:
 	$ sudo opcontrol --stop
 	$ sudo opcontrol --dump
-6. view the profile, assuming the kudos/kfs/ directory is at kfs/:
-	$ opreport -l -g -p kfs/ -t 1 > profile.out
+6. view the profile, assuming the fstitch/fscore/ directory is at fscore/:
+	$ opreport -l -g -p fscore/ -t 1 > profile.out

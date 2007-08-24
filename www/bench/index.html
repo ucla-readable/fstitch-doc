@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Kudos Test Metrics</title>
+<title>Featherstitch Test Metrics</title>
 
 <style type="text/css">
 div.flow { float: left; }
@@ -55,7 +55,7 @@ function sysName(testData)
 	if(testData[0] == "linux" && testData[1] == "safe")
 		name += ' ' + testData[1];
 	name += ' ' + testData[2] + ' ' + testData[3];
-	if(testData[0] == "kudos" && testData[4] != "opgroup")
+	if(testData[0] == "fstitch" && testData[4] != "patchgroup")
 		name += ' ' + testData[4];
 	else if(testData[0] == "linux" && testData[4] != "fsync")
 		name += ' ' + testData[4];
@@ -109,7 +109,7 @@ function addSpaceTest(tblId, testName, testData)
 	var row = document.getElementById(tblId).insertRow(-1);
 	var rollbackIndex = 25; // don't write #items for this index
 	var sysName = testName + ': ' + testData[3];
-	if (testData[4] != "opgroup")
+	if (testData[4] != "patchgroup")
 		sysName += ' ' + testData[4];
 	appendRowHeader(row, sysName);
 	appendRowHeader(row, testData[5]);
@@ -183,7 +183,7 @@ function loadData()
 <img src="graph.png" class="floatright" alt="graph icon">
 </p>
 
-<h1>Kudos Test Metrics</h1>
+<h1>Featherstitch Test Metrics</h1>
 
 <p>
 Time (<a href="#time_pit">Current</a>, History: <a href="#su_time_history">SU</a>, <a href="#meta_time_history">Meta</a>, <a href="#full_time_history">Full</a>),
@@ -292,7 +292,7 @@ I/O (<a href="#io_pit">Current</a>, <a href="#su_io_history">History</a>)
 
 <hr>
 <a name="history"></a>
-<h2>Kudos History</h2>
+<h2>Featherstitch History</h2>
 
 <a name="su"></a>
 <h3>SU</h3>
@@ -339,8 +339,8 @@ I/O (<a href="#io_pit">Current</a>, <a href="#su_io_history">History</a>)
 
 <!--
 <hr>
-<h2>Chdesc Overhead</h2>
-Plot chdesc memory vs number of block writes?
+<h2>Patch Overhead</h2>
+Plot patch memory vs number of block writes?
 (Is this a good way to give us an idea of how well optimizations work
 among different tests?)
 -->
