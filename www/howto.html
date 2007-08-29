@@ -308,10 +308,18 @@
 
 	<p>
 	To run Featherstitch inside <tt>gdb</tt> or <tt>valgrind</tt>, use
-	the <tt>FSTITCHD_WRAP</tt> environment variable:
+	set the <tt>FSTITCHD_WRAP</tt> environment variable to the wrapper
+	program.
 	</p>
 	<div class="code">
-	FSTITCHD_WRAP=gdb ./uufstitchd.sh unix_file=obj/fs/ext2.img
+	FSTITCHD_WRAP=gdb ./uufstitchd.sh mnt/ obj/fs/ext2.img
+	</div>
+	<p>
+	Or, as a shortcut for common wrappers, just pass the wrapper name to
+	<tt>uufstitch.sh</tt>:
+	</p>
+	<div class="code">
+	./uufstitchd.sh --gdb mnt/ obj/fs/ext2.img
 	</div>
 
 	<p>
