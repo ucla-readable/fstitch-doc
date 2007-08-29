@@ -31,6 +31,13 @@
 	svn co http://featherstitch.cs.ucla.edu/svn/trunk/fstitch ~/fstitch
 	</div>
 
+	<p>
+	Featherstitch is released under the terms of the <a
+	href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt">GNU
+	General Public License</a>. It is copyright 2005-2007 The Regents
+	of the University of California. (I think.)
+	</p>
+
 	<h2>Configuring your kernel</h2>
 
 	<p>
@@ -198,8 +205,8 @@
 	<p>
 	The patchgroup API is documented in
 	<tt>fstitch/fscore/patchgroup.h</tt> (TODO: link to source).<br>
-	To compile an application with patchgroup support,
-	the include path will need to include your <tt>fstitch/</tt>.
+	To compile an application with patchgroup support, the include path
+	will need to include your <tt>fstitch</tt> directory.
 	To link and run the application, the compiler and runtime linker
 	library paths will need to include <tt>fstitch/obj/kernel/lib/</tt>
 	(which contains <tt>patchgroup.so</tt>).
@@ -235,13 +242,13 @@
 	debugging Featherstitch a unique sound: "click, click, click...")
 	</p>
 
-	<!--
 	<p>
 	Some example diagrams the debugger has created are available:
 	<a href="small.png">small</a>,
 	<a href="medium.png">medium</a>,
 	<a href="large.png">large</a>,
 	<a href="huge.ps.gz">huge</a>,
+	<!--
 	<a href="enormous.ps.gz">enormous</a>,
 	<a href="gargantuan.ps.gz">gargantuan</a>,
 	<a href="monumental.ps.gz">monumental</a>,
@@ -249,9 +256,9 @@
 	<a href="titanic.ps.gz">titanic</a>,
 	<a href="colossal.ps.gz">colossal</a>,
 	<a href="epic.ps.gz">epic</a>,
+	-->
 	and <a href="vast.ps.gz">vast</a>.
 	</p>
-	-->
 
 	<h2>Userspace Featherstitch</h2>
 
@@ -295,18 +302,18 @@
 	After compiling, you can start Featherstitch by running
 	<tt>uufstitchd.sh</tt>, which accepts many of the same options as
 	the kernel version does. (However, the <tt>device=</tt> parameter
-	is instead called <tt>unix_file</tt>. Or, it can be passed positionally.)
-	An example disk image is
-	provided and built automatically as <tt>obj/fs/ext2.img</tt>. Here
-	is a simple example command to start userspace Featherstitch:
+	is instead called <tt>unix_file</tt>. Or, it can be passed
+	positionally.) An example disk image is provided and built
+	automatically as <tt>obj/fs/ext2.img</tt>. Here is a simple example
+	command to start userspace Featherstitch:
 	</p>
 	<div class="code">
 	mkdir -p mnt<br>
-	./uufstitchd.sh mnt/ obj/fs/ext2.img
+	./uufstitchd.sh mnt obj/fs/ext2.img
 	</div>
 	And an example which uses the unlink module for asynchronous writes:
 	<div class="code">
-	./uufstitchd.sh mnt/ unix_file=obj/fs/ext2.img use_unlink=1
+	./uufstitchd.sh mnt unix_file=obj/fs/ext2.img use_unlink=1
 	</div>
 
 	<p>
@@ -315,14 +322,14 @@
 	program.
 	</p>
 	<div class="code">
-	FSTITCHD_WRAP=gdb ./uufstitchd.sh mnt/ obj/fs/ext2.img
+	FSTITCHD_WRAP=gdb ./uufstitchd.sh mnt obj/fs/ext2.img
 	</div>
 	<p>
 	Or, as a shortcut for common wrappers, just pass the wrapper name to
 	<tt>uufstitch.sh</tt>:
 	</p>
 	<div class="code">
-	./uufstitchd.sh --gdb mnt/ obj/fs/ext2.img
+	./uufstitchd.sh --gdb mnt obj/fs/ext2.img
 	</div>
 
 	<p>
