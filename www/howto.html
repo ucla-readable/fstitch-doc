@@ -68,17 +68,17 @@
 	<h2>Patching your kernel</h2>
 
 	<p>
-	Featherstitch will compile and run with an unmodified Linux kernel,
-	but a few of its features will not work. In particular, patchgroups
-	and FUA disk I/O will not work. There are some patches in the
-	Featherstitch source that you can apply to the kernel to enable
-	these features. The following commands assume Linux 2.6.20.1
-	sources in <tt>~/linux-2.6.20.1</tt> and Featherstitch in
-	<tt>~/fstitch</tt>.
+	While you can use Featherstitch with an unmodified Linux
+	kernel, you will likely want to apply some or all of the patches below.
+	The commands below assume Linux 2.6.20.1 sources in
+	<tt>~/linux-2.6.20.1</tt> and Featherstitch in <tt>~/fstitch</tt>.
 	</p>
 
+	<h3>Patchgroups</h3>
+
 	<p>
-	For patchgroups:
+	Patchgroup support requires kernel process notifications to manage
+	the per-process patchgroup tables:
 	</p>
 	<div class="code">
 	cd ~/linux-2.6.20.1<br>
@@ -90,13 +90,33 @@
 	The config files above have this option enabled already.
 	</p>
 
+	<h3>Disk safety</h3>
+
 	<p>
-	For FUA disk I/O:
+	For Featherstitch to know when a disk write is committed to stable
+	storage you must either enable FUA disk I/O or switch the disk's
+	cache to write-through mode. In our experience their performance
+	is the same, but FUA is more flexible (e.g., each I/O request
+	can select whether to actually use FUA).
+	</p>
+
+	<p>		
+	For FUA disk I/O, patch the kernel (recommended):
 	</p>
 	<div class="code">
 	cd ~/linux-2.6.20.1<br>
 	patch -p1 &lt; ~/fstitch/patches/bio-fua-2.6.20.1.patch
 	</div>
+
+	<p>
+	Alternately, switch the disk's cache to write-through mode:
+	</p>
+	<div class="code">
+	hdparm -W 0 /dev/&lt;DISK&gt;
+	</div>
+
+	<h3>Remote operation</h3>
+	<p>TODO.</p>
 
 	<h2>Compiling and loading Featherstitch</h2>
 
@@ -211,11 +231,13 @@
 	</p>
 
 	<p>
-	First, you'll need a recent version of FUSE (we use 2.5.2). You'll
+	First, you'll need FUSE (we use 2.5.2). You'll
 	also need to copy <tt>fstitch/conf/fuse.conf</tt> to <tt>/etc</tt>,
 	and, if you want to run Featherstitch in <tt>valgrind</tt>, you'll
-	need to put <tt>fstitch/util/fusermount</tt> in your <tt>PATH</tt>.
-	(Make sure to edit it to point at the correct <tt>fusermount</tt>.)
+	need to put <tt>fstitch/util/fusermount</tt> in your <tt>PATH</tt>
+	(after modifying it to point to the location of the real
+	<tt>fusermount</tt>).
+	
 	</p>
 
 	<p>
@@ -241,13 +263,17 @@
 	After compiling, you can start Featherstitch by running
 	<tt>uufstitchd.sh</tt>, which accepts many of the same options as
 	the kernel version does. (However, the <tt>device=</tt> parameter
-	is instead called <tt>unix_file</tt>.) An example disk image is
+	is instead called <tt>unix_file</tt>. Or, it can be passed positionally.)
+	An example disk image is
 	provided and built automatically as <tt>obj/fs/ext2.img</tt>. Here
-	is an example command which uses the unlink module for asynchronous
-	writes:
+	is a simple example command to start userspace Featherstitch:
 	</p>
 	<div class="code">
-	./uufstitchd.sh unix_file=obj/fs/ext2.img use_unlink=1
+	./uufstitchd.sh mnt/ obj/fs/ext2.img
+	</div>
+	And an example which uses the unlink module for asynchronous writes:
+	<div class="code">
+	./uufstitchd.sh mnt/ unix_file=obj/fs/ext2.img use_unlink=1
 	</div>
 
 	<p>
