@@ -194,7 +194,16 @@
 	<h2>Using patchgroups</h2>
 
 	<p>
-	Coming soon.
+	The patchgroup API is documented in
+	<tt>fstitch/fscore/patchgroup.h</tt> (TODO: link to source).<br>
+	To compile an application with patchgroup support,
+	the include path will need to include your <tt>fstitch/</tt>.
+	To link and run the application, the compiler and runtime linker
+	library paths will need to include <tt>fstitch/obj/kernel/lib/</tt>
+	(which contains <tt>patchgroup.so</tt>).
+	The patchgroup-enabled gzip and subversion sources may serve as
+	useful examples for autotool-based build systems
+	(TODO: link to r2959 and r2999).
 	</p>
 
 	<h2>Debugging Featherstitch</h2>
