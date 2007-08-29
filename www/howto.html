@@ -301,6 +301,7 @@
 	is a simple example command to start userspace Featherstitch:
 	</p>
 	<div class="code">
+	mkdir -p mnt<br>
 	./uufstitchd.sh mnt/ obj/fs/ext2.img
 	</div>
 	And an example which uses the unlink module for asynchronous writes:
@@ -309,8 +310,8 @@
 	</div>
 
 	<p>
-	To run Featherstitch inside <tt>gdb</tt> or <tt>valgrind</tt>, use
-	set the <tt>FSTITCHD_WRAP</tt> environment variable to the wrapper
+	To run Featherstitch inside <tt>gdb</tt> or <tt>valgrind</tt>, set
+	the <tt>FSTITCHD_WRAP</tt> environment variable to the wrapper
 	program.
 	</p>
 	<div class="code">
