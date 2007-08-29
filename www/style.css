@@ -50,6 +50,11 @@ ul.big li {
 	padding-bottom: 0.15em;
 }
 
+ul.small {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
 img.floatright
 {
 	float: right;

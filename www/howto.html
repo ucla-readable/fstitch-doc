@@ -40,7 +40,7 @@
 	being, you will need to disable them in your kernel to compile and
 	run Featherstitch. The list is:
 	</p>
-	<ul>
+	<ul class="small">
 	<li><tt>CONFIG_SMP</tt></li>
 	<li>On older 2.6 kernels: <tt>CONFIG_PREEMPT</tt></li>
 	<li>On newer 2.6 kernels: all <tt>CONFIG_PREEMPT_*</tt> except <tt>CONFIG_PREEMPT_NONE</tt></li>
@@ -51,7 +51,7 @@
 	We also recommend a few settings to make sure all of our scripts
 	work well, and to enable additional debugging options:
 	</p>
-	<ul>
+	<ul class="small">
 	<li><tt>CONFIG_PROC_FS</tt></li>
 	<li><tt>CONFIG_IKCONFIG</tt></li>
 	<li><tt>CONFIG_IKCONFIG_PROC</tt></li>
@@ -87,7 +87,7 @@
 	<p>
 	You will also need to reconfigure your kernel to enable the new
 	<tt>CONFIG_FSTITCH_PROC</tt> option (in the "File systems" section).
-	The config files linked above have this option enabled already.
+	The config files above have this option enabled already.
 	</p>
 
 	<p>
@@ -98,36 +98,19 @@
 	patch -p1 &lt; ~/fstitch/patches/bio-fua-2.6.20.1.patch
 	</div>
 
-	<h2>Configuring Featherstitch</h2>
-
-	<p>
-	Eventually, we'd like to have a configuration file that determines
-	how Featherstitch starts up. For now, there is code in
-	<tt>fscore/fstitchd_init.c</tt> that detects disks, partitions, and
-	file systems, and instantiates Featherstitch modules to use them.
-	Some of its behavior can be adjusted using <tt>insmod</tt>
-	parameters, but you may need to edit this source file if your
-	configuration is very different than ours.
-
-	<h2>Compiling Featherstitch</h2>
+	<h2>Compiling and loading Featherstitch</h2>
 
 	<p>
 	You should be able to run <tt>make</tt> in the <tt>fstitch</tt>
-	directory at this point, and Featherstitch should detect what kernel
-	features are available and compile correctly. Please let us know if
-	you encounter any compile errors!
+	directory at this point, and Featherstitch should detect what
+	kernel features are available and compile correctly. (Please let us
+	know if you encounter any compile errors!) The Featherstitch kernel
+	module will be created as <tt>fscore/kfstitchd.ko</tt>. It has
+	several <tt>insmod</tt> options that affect how it searches for and
+	mounts supported file systems. Here are a few of the more useful
+	options:
 	</p>
-
-	<h2>Loading Featherstitch</h2>
-
-	<p>
-	The Featherstitch kernel module is created as
-	<tt>fscore/kfstitchd.ko</tt>. It has several <tt>insmod</tt>
-	options that affect the behavior of the code in
-	<tt>fscore/fstitchd_init.c</tt> as described above. Here are a few
-	of the more useful options:
-	</p>
-	<ul>
+	<ul class="small">
 	<li><tt>device</tt>: The block device to scan for supported file systems</li>
 	<li><tt>use_journal</tt>: Set to 1 (or 2) to use metadata (or full) journal_bd when .journal exists</li>
 	<li><tt>use_unlink</tt>: Set to 1 to use the unlink device for asynchronous writes</li>
@@ -141,13 +124,31 @@
 	</div>
 
 	<p>
+	For instance, to load Featherstitch using <tt>/dev/sdb</tt> and
+	metadata journaling, you would do:
+	</p>
+	<div class="code">
+	sudo insmod fscore/kfstitchd.ko device=/dev/sdb use_journal=1
+	</div>
+
+	<p>
 	Once Featherstitch is loaded, the file system(s) it detects can be
 	mounted using commands like:
 	</p>
 	<div class="code">
-	mount -t fstitch fstitch:/ /mnt<br>
-	mount -t fstitch fstitch:/dev /mnt/dev
+	sudo mount -t fstitch fstitch:/ /mnt<br>
+	sudo mount -t fstitch fstitch:/dev /mnt/dev
 	</div>
+
+	<p>
+	Eventually, we'd like to have a configuration file that determines
+	how Featherstitch starts up. For now, there is code in
+	<tt>fscore/fstitchd_init.c</tt> that detects disks, partitions, and
+	file systems, and instantiates Featherstitch modules to use them.
+	Some of its behavior can be adjusted using the <tt>insmod</tt>
+	parameters, but you may need to edit this source file if you want
+	to create a very different module configuration.
+	</p>
 
 	<h2>Using patchgroups</h2>
 
@@ -159,7 +160,7 @@
 
 	<p>
 	Featherstitch includes a built-in patch debugger. To enable it, set
-	<tt>FSTITCH_DEBUG</tt> to 1 in <tt>fscore/debug.h</tt> and
+	<tt>FSTITCH_DEBUG</tt> to <tt>1</tt> in <tt>fscore/debug.h</tt> and
 	recompile. When Featherstitch is loaded, it will create a file
 	<tt>/proc/kfstitchd_debug</tt> which should be read and saved
 	somewhere outside of the Featherstitch file system(s). This file
@@ -172,8 +173,14 @@
 	<p>
 	To analyze these debug traces, there is a utility called
 	<tt>kdb</tt> which will be created as <tt>obj/util/kdb</tt> when
-	Featherstitch is compiled.
-	This section will soon describe how to use it.
+	Featherstitch is compiled. It can step through the traces and allow
+	you to examine the status of all patches and dependencies in the
+	system, as well as render a graphical representation of the patches
+	at each step. (For this feature, you must have the "graphviz"
+	package installed, and specifically, its <tt>dot</tt> program.) It
+	has some brief documentation built in - try the "help" command.
+	(Also try the "gui" command, which is very useful and gives
+	debugging Featherstitch a unique sound: "click, click, click...")
 	</p>
 
 	<h2>Userspace Featherstitch</h2>
@@ -183,7 +190,50 @@
 	userspace. In this mode, patchgroups are not available, and instead
 	of the kernel block device layer, files in the normal Linux file
 	system are used as block devices.
-	This section will soon describe how to do this.
+	</p>
+
+	<p>
+	First, you'll need a recent version of FUSE (we use 2.5.2). You'll
+	also need to copy <tt>fstitch/conf/fuse.conf</tt> to <tt>/etc</tt>,
+	and, if you want to run Featherstitch in <tt>valgrind</tt>, you'll
+	need to put <tt>fstitch/util/fusermount</tt> in your <tt>PATH</tt>.
+	(Make sure to edit it to point at the correct <tt>fusermount</tt>.)
+	</p>
+
+	<p>
+	Assuming FUSE is installed in <tt>/usr/local</tt>, you could:
+	</p>
+	<div class="code">
+	sudo cp ~/fstitch/conf/fuse.conf /etc<br>
+	export PATH=~/fstitch/util:$PATH
+	</div>
+
+	<p>
+	Once FUSE is set up, you should be able to run <tt>make -f
+	Makefile.user</tt>, or, if you want to compile both Featherstitch
+	targets, just:
+	</p>
+	<div class="code">
+	cd ~/fstitch<br>
+	touch .user<br>
+	make
+	</div>
+
+	<p>
+	After compiling, you can start Featherstitch by running
+	<tt>uufstitchd.sh</tt>, which accepts many of the same options as
+	the kernel version does. (However, the <tt>device=</tt> parameter
+	is instead called <tt>unix_file</tt>.) An example disk image is
+	provided and built automatically as <tt>obj/fs/ext2.img</tt>. Here
+	is an example command which uses the unlink module for asynchronous
+	writes:
+	</p>
+	<div class="code">
+	./uufstitchd.sh unix_file=obj/fs/ext2.img use_unlink=1
+	</div>
+
+	<p>
+	To shut down userspace Featherstitch, simply hit <tt>^C</tt>.
 	</p>
 
 	<h2>Questions? Comments?</h2>
