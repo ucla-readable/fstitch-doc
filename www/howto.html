@@ -123,9 +123,10 @@
 	<p>
 	Although <a href="http://www.linuxjournal.com/article/1026">Linux
 	can execute an infinite loop in 6 seconds</a>, occasionally we have
-	seen one of our loops run just a bit longer than that. When this
-	happens locally, we power cycle the machine, but when we're working
-	on a crashbox remotely, it can be a bit of a drag. So, we made a
+	seen one of our buggy loops run just a bit longer than that. When
+	this happens locally, we can power cycle the machine, but when
+	we're working on a crashbox remotely, that machine is effectively
+	lost until we actually go to the lab and reboot it. So, we made a
 	patch for the soft lockup detector in Linux that reboots after
 	about a minute of soft lockup, which we suspect nearly always means
 	an infinite loop. To apply it, do this:
@@ -135,8 +136,9 @@
 	patch -p1 &lt; ~/fstitch/patches/softlockup-2.6.20.1.patch
 	</div>
 	<p>
-	You'll also need to make sure you've got
-	<tt>CONFIG_DETECT_SOFTLOCKUP</tt> enabled.
+	You will also need to make sure you've got
+	<tt>CONFIG_DETECT_SOFTLOCKUP</tt> enabled. (It is in our config
+	files.)
 	</p>
 
 	<h2>Compiling and loading Featherstitch</h2>
