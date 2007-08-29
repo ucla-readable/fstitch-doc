@@ -183,6 +183,36 @@
 	debugging Featherstitch a unique sound: "click, click, click...")
 	</p>
 
+	<!--
+	<p>
+	Some example diagrams the debugger has created are available:
+	<a href="small.png">small.png</a>,
+	<a href="large.png">large.png</a>,
+	<a href="jumbo.png">jumbo.png</a>,
+	<a href="huge.png">huge.png</a>,
+	<a href="humongous.png">humongous.png</a>,
+	<a href="herculean.png">herculean.png</a>,
+	<a href="giant.png">giant.png</a>,
+	<a href="gigantic.png">gigantic.png</a>,
+	<a href="enormous.png">enormous.png</a>,
+	<a href="ginormous.png">ginormous.png</a>,
+	<a href="gargantuan.png">gargantuan.png</a>,
+	<a href="massive.png">massive.png</a>,
+	<a href="elephantine.png">elephantine.png</a>,
+	<a href="mammoth.png">mammoth.png</a>,
+	<a href="monumental.png">monumental.png</a>,
+	<a href="behemoth.png">behemoth.png</a>,
+	<a href="leviathan.png">leviathan.png</a>,
+	<a href="titanic.png">titanic.png</a>,
+	<a href="colossal.png">colossal.png</a>,
+	<a href="monstrous.png">monstrous.png</a>,
+	<a href="immense.png">immense.png</a>,
+	<a href="epic.png">epic.png</a>,
+	<a href="galactic.png">galactic.png</a>,
+	and <a href="vast.png">vast.png</a>
+	</p>
+	-->
+
 	<h2>Userspace Featherstitch</h2>
 
 	<p>
@@ -230,6 +260,14 @@
 	</p>
 	<div class="code">
 	./uufstitchd.sh unix_file=obj/fs/ext2.img use_unlink=1
+	</div>
+
+	<p>
+	To run Featherstitch inside <tt>gdb</tt> or <tt>valgrind</tt>, use
+	the <tt>FSTITCHD_WRAP</tt> environment variable:
+	</p>
+	<div class="code">
+	FSTITCHD_WRAP=gdb ./uufstitchd.sh unix_file=obj/fs/ext2.img
 	</div>
 
 	<p>
