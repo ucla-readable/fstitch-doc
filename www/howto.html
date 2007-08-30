@@ -208,7 +208,7 @@
 	To compile an application with patchgroup support, the include path
 	will need to include your <tt>fstitch</tt> directory.
 	To link and run the application, the compiler and runtime linker
-	library paths will need to include <tt>fstitch/obj/kernel/lib/</tt>
+	library paths will need to include <tt>fstitch/obj/kernel/lib</tt>
 	(which contains <tt>patchgroup.so</tt>).
 	The patchgroup-enabled gzip and subversion sources may serve as
 	useful examples for autotool-based build systems
@@ -270,7 +270,7 @@
 	</p>
 
 	<p>
-	First, you'll need FUSE (we use 2.5.2). You'll
+	First, you'll need FUSE (we use version 2.5.2). You'll
 	also need to copy <tt>fstitch/conf/fuse.conf</tt> to <tt>/etc</tt>,
 	and, if you want to run Featherstitch in <tt>valgrind</tt>, you'll
 	need to put <tt>fstitch/util/fusermount</tt> in your <tt>PATH</tt>
