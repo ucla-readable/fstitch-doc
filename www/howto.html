@@ -18,17 +18,33 @@
 	<h2>Getting the source</h2>
 
 	<p>
-	The Featherstitch sources are maintained in a source repository of
-	some sort. (We haven't decided between svn and git just yet.)
-	Anyway, you need to follow some instructions that we haven't posted
-	yet to get them. Check back here later.
+	The Featherstitch sources are currently maintained in a
+	<a href="http://git.or.cz">Git</a> repository. Git is a distributed
+	source control management system, which among other things, makes
+	forking and merging much simpler than a centralized repository. Our
+	hope is that this will make it easier for others to do cool things
+	with Featherstitch.
 	</p>
 
 	<p>
-	For example, you might potentially be able to do this:
+	First, <a href="http://git.or.cz/">download and install git</a>,
+	version 1.5.0 or later. Precompiled packages are available for
+	major Linux distributions and for <a href="http://www.macports.org/">
+	MacPorts</a> on Mac OS X, among others. Once git is set up, you can
+	run a command like this:
 	</p>
 	<div class="code">
-	svn co http://featherstitch.cs.ucla.edu/svn/trunk/fstitch ~/fstitch
+	git clone git://featherstitch.cs.ucla.edu/fstitch/fstitch ~/fstitch
+	</div>
+	<p>
+	This downloads the Featherstitch sources, including the complete
+	history, into the directory <tt>~/fstitch</tt> (it will be about
+	20MiB). To later update to the latest sources, including all the
+	intermediate history, run:
+	</p>
+	<div class="code">
+	cd ~/fstitch<br>
+	git pull
 	</div>
 
 	<p>
@@ -36,6 +52,23 @@
 	href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt">GNU
 	General Public License</a>. It is copyright 2005-2007 The Regents
 	of the University of California.
+	</p>
+
+	<p>
+	We also have three other projects that we've modified to use
+	patchgroups: <a href="http://www.washington.edu/imap/">UW IMAP</a>,
+	<a href="http://subversion.tigris.org">Subversion</a>, and
+	<a href="http://www.gzip.org">gzip</a>. Our modified versions are
+	available from git as well:
+	</p>
+	<div class="code">
+	git clone git://featherstitch.cs.ucla.edu/fstitch/uwimap ~/uwimap<br>
+	git clone git://featherstitch.cs.ucla.edu/fstitch/subversion ~/subversion<br>
+	git clone git://featherstitch.cs.ucla.edu/fstitch/gzip ~/gzip<br>
+	</div>
+
+	<p>
+	To browse all of these repositories online, use our <a href="/gitweb">gitweb</a> browser.
 	</p>
 
 	<h2>Configuring your kernel</h2>
