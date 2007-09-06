@@ -11,6 +11,7 @@ body {
 	border-width: thin;
 	padding-left: 1em;
 	padding-right: 1em;
+	padding-bottom: 2ex;
 }
 
 .code {
@@ -61,4 +62,31 @@ img.floatright
 	float: right;
 	border: none;
 	margin-left: 1em;
+}
+
+.floatright {
+	float: right;
+	margin-left: 1em;
+	margin-bottom: 0.5ex;
+	font-size: small;
+	border: double 3px #000000;
+	padding: 0.8em;
+	padding-right: 0; /* huge is not full width */
+}
+.floatright p {
+	text-align: center;
+}
+.clear-floatright {
+	clear: both;
+}
+tr.thumb td {
+	vertical-align: middle;
+	width: 25%;
+	text-align: center;
+}
+tr.thumb img {
+	border: none;			
+}
+tr.thumb-title {
+	text-align: center;
 }
