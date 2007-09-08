@@ -1,0 +1,167 @@
+#!/bin/bash
+# Create a git repo from the featherstitch subversion repo
+
+MD="`cd "\`dirname "$0"\`"; pwd`"
+SVNP=/home/kudos/svn
+SVN=file://$SVNP
+SSVN=file://`pwd`/svn-no_sfcc
+SNDSVN=file://`pwd`/svn-no_sfcc-no_doc-rebase
+
+function try ()
+{
+	echo "+ $@" 1>&2
+	"$@"
+	R=$?
+	if [ $R -ne 0 ]; then echo "FAILED ($R): $@"; exit 1; fi
+}
+
+function svnimport ()
+{
+	try git-svnimport \
+		-i \
+                -I .gitignore -A $MD/svnauthors -r -m \
+		$@ 2>&1 | grep -v 'Unrecognized path:'
+}
+
+function svnimportsub ()
+{
+	NAME=$1
+	svnimport -C $NAME.git -T $NAME/trunk -b $NAME/branches -t $NAME/tags $SVN
+}
+
+function fix_git_dir ()
+{
+	try mv $1/.git/* $1/
+	try rmdir $1/.git
+	try rm -f $1/refs/heads/origin
+	cat >> $1/config <<EOF
+[hooks]
+	mailinglist = kudos@crystalorb.net
+	announcelist =
+EOF
+	try cp -f $MD/post-receive $1/hooks/
+}
+
+function delete_tags ()
+{
+	REPO=$1
+	shift
+	pushd $REPO; try git-tag -d $@; popd
+}
+
+function revtoobj ()
+{
+	REPO=$1
+	REV=$2
+	pushd $REPO > /dev/null
+	try git-log --pretty=oneline | sed 's/r\([0-9]\+\):/\1/' | awk "{if (\$2 < $REV) print \$1;}" | head -1
+	popd > /dev/null
+}
+
+function tag_rev ()
+{
+	REPO=$1
+	REV=$2
+	NAME=$3
+	MSG="$4"
+	OBJ=`revtoobj $REPO $REV`
+	pushd $REPO
+	try git-tag -a -m "$MSG" $NAME $OBJ
+	popd
+}
+
+function tag_ss ()
+{
+	tag_rev $1 3307 sosp-submit 'Tag SOSP 2007 submission.'
+}
+
+function tag_sfcc ()
+{
+	tag_rev $1 4241 sosp-final_camera_copy 'SOSP 2007 is ready!'
+}
+
+trap "rm -rf $MD/dlfsync.so svn.dump svn-no_sfcc.dump svn-no_sfcc-no_doc.dump svn-no_sfcc-no_doc-ignoreme.dump svn-no-sfcc-no_doc-rebase.dump svn-no_sfcc-no_doc-ignoreme.dump.orig svn-no_sfcc-no_doc-rebase.dump svn-no_sfcc-no_doc-rebase/ svn-no_sfcc/ fstitch/" EXIT
+
+# 190 is one less than the first kfs revision
+INITFSREV=190
+
+try svnadmin dump -q $SVNP > svn.dump
+
+# Remove sosp-final_camera_copy tag (it breaks git-svnimport)
+try svndumpfilter exclude --quiet /tags/sosp-final_camera_copy < svn.dump > svn-no_sfcc.dump
+
+try gcc -shared -o $MD/dlfsync.so $MD/dlfsync.c
+
+# Remove doc/ from /trunk
+DOCTAGS=
+for TAG in `svn ls $SVN/tags`; do
+	DOCTAGS="$DOCTAGS /tags/${TAG%/}/doc"
+done
+DOCBRANCHES=
+for BRANCH in `svn ls $SVN/branches`; do
+	DOCBRANCHES="$DOCBRANCHES /branches/${BRANCH%/}/doc"
+done
+try svndumpfilter exclude --quiet /trunk/doc $DOCTAGS $DOCBRANCHES < svn-no_sfcc.dump > svn-no_sfcc-no_doc.dump
+
+# Move /trunk/(kudos|fstitch) to /trunk
+try cp svn-no_sfcc-no_doc.dump svn-no_sfcc-no_doc-ignoreme.dump
+try patch -p0 < $MD/rebase_kudos.patch
+sed 's=^\(Node.*/\)\(kudos\|fstitch\)\(/\|$\)=\1=' < svn-no_sfcc-no_doc-ignoreme.dump > svn-no_sfcc-no_doc-rebase.dump
+
+try svnadmin create svn-no_sfcc-no_doc-rebase
+LD_PRELOAD=$MD/dlfsync.so try svnadmin load -q svn-no_sfcc-no_doc-rebase < svn-no_sfcc-no_doc-rebase.dump
+
+# Improve checkin message what is now the initial checkin
+try svnadmin setlog --bypass-hooks svn-no_sfcc-no_doc-rebase -r $INITFSREV $MD/r$INITFSREV.log
+
+svnimport -C fstitch.git -s $INITFSREV $SNDSVN
+fix_git_dir fstitch.git
+delete_tags fstitch.git osdi-submit paper
+tag_sfcc fstitch.git
+echo "Featherstitch" > fstitch.git/description
+touch "fstitch.git/git-daemon-export-ok"
+
+# Remove files that should have been removed by a rename
+# TODO: improve this?
+try git clone fstitch.git fstitch
+pushd fstitch
+try git rm fscore/chdesc.[hc] fscore/chdesc_util.[hc] fscore/kernel_opgroup_ioctl.h fscore/kernel_opgroup_ops.[hc] fscore/kernel_opgroup_scopes.[hc] fscore/opgroup.[hc] fscore/opgroup_lfs.[hc]
+try git commit -m "Remove files that were renamed in subversion r4253 but not removed by git-svnimport"
+try git push
+popd
+
+
+# Remove sosp-final_camera_copy tag (it breaks git-svnimport)
+try svnadmin create svn-no_sfcc
+LD_PRELOAD=$MD/dlfsync.so try svnadmin load -q svn-no_sfcc < svn-no_sfcc.dump
+
+svnimport -C doc.git -P doc $SSVN
+fix_git_dir doc.git
+tag_sfcc doc.git
+echo "Featherstitch documentation" > doc.git/description
+
+svnimportsub uwimap
+fix_git_dir uwimap.git
+delete_tags uwimap.git osdi-submit
+tag_ss uwimap.git
+tag_sfcc uwimap.git
+echo "Patchgroup-enabled UWIMAP" > uwimap.git/description
+touch "uwimap.git/git-daemon-export-ok"
+
+svnimportsub gzip
+fix_git_dir gzip.git
+tag_ss gzip.git
+tag_sfcc gzip.git
+echo "Patchgroup-enabled gzip" > gzip.git/description
+touch "gzip.git/git-daemon-export-ok"
+
+svnimportsub subversion
+fix_git_dir subversion.git
+tag_ss subversion.git
+tag_sfcc subversion.git
+echo "Patchgroup-enabled subversion" > subversion.git/description
+touch "subversion.git/git-daemon-export-ok"
+
+REPOS="fstitch.git doc.git gzip.git subversion.git uwimap.git"
+try chmod -R g+sw $REPOS
+try sudo chown fstitch $REPOS

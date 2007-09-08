@@ -1,0 +1,45 @@
+--- svn-no_sfcc-no_doc-ignoreme.dump	2007-09-07 14:12:43.000000000 -0700
++++ svn-no_sfcc-no_doc-ignoreme.dump	2007-09-07 14:53:38.000000000 -0700
+@@ -72,7 +72,7 @@
+ 2005-01-12T06:44:34.000000Z
+ PROPS-END
+ 
+-Node-path: trunk/kudos
++Node-path: trunk/ignoreme
+ Node-action: add
+ Node-kind: dir
+ Prop-content-length: 10
+@@ -84404,7 +84404,7 @@
+
+ 
+ 
+-Node-path: tags/startjosfs/kudos
++Node-path: tags/startjosfs/ignoreme
+ Node-action: delete
+ Content-length: 0
+ 
+@@ -6048433,15 +6048433,6 @@
+ 2007-08-24T00:00:40.455491Z
+ PROPS-END
+ 
+-Node-path: trunk/fstitch
+-Node-action: add
+-Node-kind: dir
+-Node-copyfrom-rev: 4252
+-Node-copyfrom-path: trunk/kudos
+-Content-length: 0
+-
+-
+-
+ Node-path: trunk/fstitch/conf/45-patchgroup.rules
+ Node-action: add
+ Node-kind: file
+@@ -6048712,7 +6048703,7 @@
+ 
+ 
+ 
+-Node-path: trunk/kudos
++Node-path: trunk/ignoreme
+ Node-action: delete
+ Content-length: 0
+ 
