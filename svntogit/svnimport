@@ -17,7 +17,7 @@ function try ()
 
 function svnimport ()
 {
-	try git-svnimport \
+	try $MD/git-svnimport \
 		-i \
                 -I .gitignore -A $MD/svnauthors -r -m \
 		$@ 2>&1 | grep -v 'Unrecognized path:'
@@ -120,15 +120,6 @@ delete_tags fstitch.git osdi-submit paper
 tag_sfcc fstitch.git
 echo "Featherstitch" > fstitch.git/description
 touch "fstitch.git/git-daemon-export-ok"
-
-# Remove files that should have been removed by a rename
-# TODO: improve this?
-try git clone fstitch.git fstitch
-pushd fstitch
-try git rm fscore/chdesc.[hc] fscore/chdesc_util.[hc] fscore/kernel_opgroup_ioctl.h fscore/kernel_opgroup_ops.[hc] fscore/kernel_opgroup_scopes.[hc] fscore/opgroup.[hc] fscore/opgroup_lfs.[hc]
-try git commit -m "Remove files that were renamed in subversion r4253 but not removed by git-svnimport"
-try git push
-popd
 
 
 # Remove sosp-final_camera_copy tag (it breaks git-svnimport)
