@@ -18,7 +18,7 @@
  Node-action: delete
  Content-length: 0
  
-@@ -6048433,15 +6048433,6 @@
+@@ -5657477,15 +5657477,6 @@
  2007-08-24T00:00:40.455491Z
  PROPS-END
  
@@ -34,7 +34,7 @@
  Node-path: trunk/fstitch/conf/45-patchgroup.rules
  Node-action: add
  Node-kind: file
-@@ -6048712,7 +6048703,7 @@
+@@ -5657756,7 +5657747,7 @@
  
  
  
