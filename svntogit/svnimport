@@ -80,7 +80,7 @@ function tag_sfcc ()
 	tag_rev $1 4241 sosp-final_camera_copy 'SOSP 2007 is ready!'
 }
 
-trap "rm -rf $MD/dlfsync.so svn.dump svn-no_sfcc.dump svn-no_sfcc-no_doc.dump svn-no_sfcc-no_doc-ignoreme.dump svn-no-sfcc-no_doc-rebase.dump svn-no_sfcc-no_doc-ignoreme.dump.orig svn-no_sfcc-no_doc-rebase.dump svn-no_sfcc-no_doc-rebase/ svn-no_sfcc/ fstitch/" EXIT
+trap "rm -rf $MD/dlfsync.so svn.dump svn-no_sfcc.dump svn-no_sfcc-no_doc.dump svn-no_sfcc-no_doc-ignoreme.dump svn-no-sfcc-no_doc-rebase.dump svn-no_sfcc-no_doc-ignoreme.dump.orig svn-no_sfcc-no_doc-rebase.dump svn-no_sfcc-no_doc-rebase/ svn-no_sfcc/" EXIT
 
 # 190 is one less than the first kfs revision
 INITFSREV=190
