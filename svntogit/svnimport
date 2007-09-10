@@ -39,7 +39,7 @@ function fix_git_dir ()
 	mailinglist = kudos@crystalorb.net
 	announcelist =
 EOF
-	try cp -f $MD/post-receive $1/hooks/
+	try cp -pf $MD/post-receive $1/hooks/
 }
 
 function delete_tags ()
