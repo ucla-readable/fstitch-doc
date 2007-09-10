@@ -155,4 +155,4 @@ touch "subversion.git/git-daemon-export-ok"
 
 REPOS="fstitch.git doc.git gzip.git subversion.git uwimap.git"
 try chmod -R g+sw $REPOS
-try sudo chown fstitch:fstitch $REPOS
+try sudo chown -R fstitch:fstitch $REPOS
