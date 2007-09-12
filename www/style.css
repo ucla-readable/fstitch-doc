@@ -90,3 +90,8 @@ tr.thumb img {
 tr.thumb-title {
 	text-align: center;
 }
+
+.about {
+	text-indent: 2em;
+	text-align: justify;
+}
