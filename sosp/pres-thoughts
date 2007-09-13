@@ -1,0 +1,77 @@
+- Motivation
+	- Difficult to implement journaling, su, etc
+		- Linux JBD only used by ext3. Not even ext4.
+		- ext3 and JBD get it wrong (rethink the sync)
+		- SU implementation is complicated (for them to do, to read, and particular to UFS implementation)
+	- Improve journal, su, etc (eg SU requires atomicity, dir renames?)
+	- Deeper understanding of journaling, su, etc (write-before relationship)
+	- Apps can't efficiently tell file system what consistency semantics they want (only have fsync/sync; dovecot)
+		- subversion server (more than one fsync per commit?)
+		- svnadmin load (when you will delete if it fails)
+		- imap and smtp servers
+		- mail clients?
+		- nfs server
+		- database server
+		- create modified file copy, delete original (eg gzip, editors)
+- Basics
+	- patch: explicit write-before relationship representation
+		- show with animation creating a couple patches, showing FS, cache, & disk?
+	- patch model
+		- patch on a single block
+		- committed, uncommitted, and in flight
+		- disk controller writes any in flight
+		- dependencies
+		- disk safety property
+		- in-flight safety property
+		- undo data
+	- show how SU and journaling use patches? (and remind people how these work)
+	- mention?
+		- don't track committed
+		- overlap deps
+		- empty patches
+		- no circular dep chains
+		- txns instead of write-before
+	- patchgroup:
+		- sync et al or assume underlying consistency model
+		- patchgroups bring patches (write-before) to applications
+		- interface (functions and lifespan)
+		- implementation
+		- sort and rm example?
+- Optimizations
+	- hard patches
+	- hard patch merging
+	- overlap merging
+	- ready patch lists
+	- other?
+		- parallel vs linear
+		- avoid unnecessary implicit deps
+		- file systems can optimize deps when they know certain states will not hit disk (eg inode clear -> dirent clear, when dirent won't exist, and free data blocks -> inode, when no dirent will exist)
+		- block allocation matters
+- Patchgroup case studies
+	- gzip?
+		- input file removal depends on output file creation
+	- subversion
+		- use patchgroups instead of relying on safe underlying fs semantics
+		- complex app
+	- uw imap
+		- use patchgroups instead of fsync (faster)
+		- simple way to overcome known speed issues (eg Dovecot comment)
+- Modules
+	- Ext2 and UFS
+	- Journal
+	- Buffer cache
+	- Loopback
+- Implementation?
+	- mention SATA/SCSI + TCQ/NCQ + (FUA or WT)
+	- Linux kernel, 2.6.20.1
+- Performance
+	- Effectiveness of patch optimizations
+	- Performance relative to Linux ext2 and ext3
+	- Correctness
+	- Patchgrou performance
+- Related work
+- Contributions
+	- Patch model and design
+	- Patch optimizations
+	- Patchgroup mechanism
+	- Several modules (eg journal)
