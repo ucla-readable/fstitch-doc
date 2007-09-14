@@ -35,6 +35,7 @@ function fix_git_dir ()
 	try rmdir $1/.git
 	try rm -f $1/refs/heads/origin
 	cat >> $1/config <<EOF
+	sharedRepository = all
 [hooks]
 	mailinglist = kudos@crystalorb.net
 	announcelist =
