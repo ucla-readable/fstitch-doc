@@ -94,7 +94,6 @@
 	<li><tt>CONFIG_SMP</tt></li>
 	<li>On older 2.6 kernels: <tt>CONFIG_PREEMPT</tt></li>
 	<li>On newer 2.6 kernels: all <tt>CONFIG_PREEMPT_*</tt> except <tt>CONFIG_PREEMPT_NONE</tt></li>
-	<li><tt>CONFIG_LBD</tt></li>
 	</ul>
 
 	<p>
@@ -113,7 +112,8 @@
 	</ul>
 
 	<p>
-	The kernel .config files we use for Linux 2.6.20.1 are available:
+	The kernel .config files we use for Linux 2.6.20.1 in Ubuntu 6.10 are
+	available:
 	<a href="config-2.6.20.1-fstitch-debug">for debugging</a>,
 	<a href="config-2.6.20.1-fstitch-prof">for profiling</a>, and
 	<a href="config-2.6.20.1-fstitch-fast">for benchmarking</a>.
