@@ -366,16 +366,16 @@
 	the kernel version does. (However, the <tt>device=</tt> parameter
 	is instead called <tt>unix_file</tt>. Or, it can be passed
 	positionally.) An example disk image is provided and built
-	automatically as <tt>obj/fs/ext2.img</tt>. Here is a simple example
+	automatically as <tt>obj/images/ext2.img</tt>. Here is a simple example
 	command to start userspace Featherstitch:
 	</p>
 	<div class="code">
 	mkdir -p mnt<br>
-	./uufstitchd.sh mnt obj/fs/ext2.img
+	./uufstitchd.sh mnt obj/images/ext2.img
 	</div>
 	And an example which uses the unlink module for asynchronous writes:
 	<div class="code">
-	./uufstitchd.sh mnt unix_file=obj/fs/ext2.img use_unlink=1
+	./uufstitchd.sh mnt unix_file=obj/images/ext2.img use_unlink=1
 	</div>
 
 	<p>
@@ -384,14 +384,14 @@
 	program.
 	</p>
 	<div class="code">
-	FSTITCHD_WRAP=gdb ./uufstitchd.sh mnt obj/fs/ext2.img
+	FSTITCHD_WRAP=gdb ./uufstitchd.sh mnt obj/images/ext2.img
 	</div>
 	<p>
 	Or, as a shortcut for common wrappers, just pass the wrapper name to
 	<tt>uufstitch.sh</tt>:
 	</p>
 	<div class="code">
-	./uufstitchd.sh --gdb mnt obj/fs/ext2.img
+	./uufstitchd.sh --gdb mnt obj/images/ext2.img
 	</div>
 
 	<p>
