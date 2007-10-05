@@ -307,7 +307,7 @@
 
 	<p>
 	To analyze these debug traces, there is a utility called
-	<tt>kdb</tt> which will be created as <tt>obj/util/kdb</tt> when
+	<tt>fdb</tt> which will be created as <tt>obj/util/fdb</tt> when
 	Featherstitch is compiled. It can step through the traces and allow
 	you to examine the status of all patches and dependencies in the
 	system, as well as render a graphical representation of the patches
