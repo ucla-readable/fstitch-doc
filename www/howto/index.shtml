@@ -198,10 +198,9 @@
 	directory at this point, and Featherstitch should detect what
 	kernel features are available and compile correctly. (Please let us
 	know if you encounter any compile errors!) The Featherstitch kernel
-	module will be created as <tt>fscore/kfstitchd.ko</tt>. It has
-	several <tt>insmod</tt> options that affect how it searches for and
-	mounts supported file systems. Here are a few of the more useful
-	options:
+	module will be created as <tt>kfstitchd.ko</tt>. It has several
+	<tt>insmod</tt> options that affect how it searches for and mounts
+	supported file systems. Here are a few of the more useful options:
 	</p>
 	<ul class="small">
 	<li><tt>device</tt>: The block device to scan for supported file systems</li>
@@ -213,7 +212,7 @@
 	The full list of supported options can be listed with this command:
 	</p>
 	<div class="code">
-	modinfo fscore/kfstitchd.ko
+	modinfo kfstitchd.ko
 	</div>
 
 	<p>
@@ -221,7 +220,7 @@
 	metadata journaling, you would do:
 	</p>
 	<div class="code">
-	sudo insmod fscore/kfstitchd.ko device=/dev/sdb use_journal=1
+	sudo insmod kfstitchd.ko device=/dev/sdb use_journal=1
 	</div>
 
 	<p>
@@ -236,7 +235,7 @@
 	<p>
 	Eventually, we'd like to have a configuration file that determines
 	how Featherstitch starts up. For now, there is code in
-	<tt>fscore/fstitchd_init.c</tt> that detects disks, partitions, and
+	<tt>fstitchd_init.c</tt> that detects disks, partitions, and
 	file systems, and instantiates Featherstitch modules to use them.
 	Some of its behavior can be adjusted using the <tt>insmod</tt>
 	parameters, but you may need to edit this source file if you want
@@ -308,7 +307,7 @@
 
 	<p>
 	To analyze these debug traces, there is a utility called
-	<tt>kdb</tt> which will be created as <tt>obj/util/kdb</tt> when
+	<tt>fdb</tt> which will be created as <tt>obj/util/fdb</tt> when
 	Featherstitch is compiled. It can step through the traces and allow
 	you to examine the status of all patches and dependencies in the
 	system, as well as render a graphical representation of the patches
