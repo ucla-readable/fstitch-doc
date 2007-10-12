@@ -1,5 +1,5 @@
-- bench/sosp/time_run crashed kudos-pb after a few minutes (probably tar
-with journaling):
+- bench/sosp/time_run crashed kudos-pb after a few minutes (meta journal's
+first rm, during insmod):
 [29827.351987] kfstitchd started (PID = 30795)
 [29827.356215] fstitchd (dextrin) starting
 [29827.360103] fstitchd basic initialization complete!
