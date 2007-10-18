@@ -1,0 +1,7 @@
+- uhfs_write() zeros out new blocks before adding the data.
+When the data covers the entire block, how about we avoid the zeroing?
+This might reduce cpu time.
+
+- learn how BSD SU and Linux JBD are actually implemented
+
+- prepare spectacular presentation
