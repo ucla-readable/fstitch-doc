@@ -337,7 +337,6 @@
 	need to put <tt>fstitch/util/fusermount</tt> in your <tt>PATH</tt>
 	(after modifying it to point to the location of the real
 	<tt>fusermount</tt>).
-	
 	</p>
 
 	<p>
@@ -347,6 +346,14 @@
 	sudo cp ~/fstitch/conf/fuse.conf /etc<br>
 	export PATH=~/fstitch/util:$PATH
 	</div>
+
+	<p>
+	The FUSE version of Featherstitch also works with <a href="http://code.google.com/p/macfuse/">MacFUSE</a>
+	on Mac OS X. However, currently the Featherstitch file system modules
+	are not endianness-aware, so the file system images it uses must be the
+	same endianness as the CPU. This is not usually a problem for modern
+	x86 Apple machines, but it affects the older PPC machines.
+	</p>
 
 	<p>
 	Once FUSE is set up, you should be able to run <tt>make -f
