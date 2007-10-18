@@ -53,7 +53,8 @@
 	<ul class="big">
 		<li>
 		<em>Generalized File System Dependencies</em>
-		[<a href="publications/featherstitch-sosp07.pdf">PDF</a>]<br>
+		[<a href="publications/featherstitch-sosp07.pdf">PDF</a>]
+		[Presentation: <a href="publications/featherstitch-sosp07-pres.ppt">PowerPoint</a>, <a href="publications/featherstitch-sosp07-pres.pdf">PDF</a>]<br>
 		Christopher Frost, Mike Mammarella, Eddie Kohler, Andrew de los Reyes, Shant Hovsepian, Andrew Matsuoka, and Lei Zhang<br>
 		Proceedings of the 21st Symposium on Operating Systems Principles (<a href="http://www.sosp.org/2007">SOSP 2007</a>)<br>
 		Stevenson, WA, October, 2007
