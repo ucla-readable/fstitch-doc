@@ -1,0 +1,49 @@
+Writing to a snapshotted block requires reading that block (!) and then
+writing the old and new versions. Will the performance overhead be acceptable?
+Our experience (w/o synthetic_read) is that the overhead is significant.
+Can modifying the in-memory block do the read asynchronously?
+
+Nomenclature nit: "A nil patch is a hard patch because it has no rollback
+data" (page 2). More precisely, a hard patch "cannot be reverted". A nil
+patch can be reverted (it makes no changes), so it is soft.
+
+is maplog optimization necessary?
+- entries are probably merged as-is (there are no block level cycles and
+  entries each depend on one patch which depends on no patches)
+- merging two patches not necessary to write the patches together
+
+Add an end record to show the snapshot is complete?
+	Why? Because the user requested a BITE, so they may care that all
+	data is in the snapshot.
+
+A note regarding optimizations to not have to write the entire maplog
+and snapstore: syncing anything when there are n outstanding snapshots
+requires writing all of the first n-1 snapshots. If this is common, then
+not having to sync the nth snapshot may not provide much benefit.
+Alternatively, perhaps this is reason to also make the n>1 case efficient.
+E.g., calculate the space needed for each snapshot and write maplog entries
+for multiple snapshots.
+
+Designing a fast write-back cache eviction algorithm may take some work.
+The snap cache probably wants to pick orderings based on the live cache's
+knowledge of block layout and block eviction.
+
+I might suggest trying to reduce the number of seeks to write a live block
+(seek for snapstore and seek for maplog, then write the live block).
+For example, combine snapstore and maplog? (Say, <block|snapshot#> instead
+of separate stores.)
+Or, store maplog on a small amount of fast storage.
+
+Not quite convinced that nil patches are a good way to go, mainly because
+they make block reading and patch merging more complex.
+
+Alternative: as creating patch b, create b' on another block with prev-data.
+ Pluses: no need to avoid merging. May improve merging. Accessing cached
+  pre-states is not as complex.
+ Minuses: Immediately selects pagelog block, which may kill this approach.
+
+Alternative: as creating patch b, copy the prev-data to a temporary
+ datastructure. Create the concrete patches for snapstore and maplog at
+ block write time.
+ Pluses: simple and allows delayed write order selection
+ Minuses: integration with the write-back cache is handled separately
