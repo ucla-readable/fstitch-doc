@@ -1,49 +1,82 @@
-Writing to a snapshotted block requires reading that block (!) and then
-writing the old and new versions. Will the performance overhead be acceptable?
-Our experience (w/o synthetic_read) is that the overhead is significant.
-Can modifying the in-memory block do the read asynchronously?
+Hi Liuba and Ross,
 
-Nomenclature nit: "A nil patch is a hard patch because it has no rollback
-data" (page 2). More precisely, a hard patch "cannot be reverted". A nil
-patch can be reverted (it makes no changes), so it is soft.
+We enjoyed your "Dodder-based Snapshots" paper draft; below are critical
+comments and suggestions that we hope you might find useful in further
+improving the system.
 
-is maplog optimization necessary?
-- entries are probably merged as-is (there are no block level cycles and
-  entries each depend on one patch which depends on no patches)
-- merging two patches not necessary to write the patches together
 
-Add an end record to show the snapshot is complete?
-	Why? Because the user requested a BITE, so they may care that all
-	data is in the snapshot.
+I. Disk Interactions
 
-A note regarding optimizations to not have to write the entire maplog
-and snapstore: syncing anything when there are n outstanding snapshots
-requires writing all of the first n-1 snapshots. If this is common, then
-not having to sync the nth snapshot may not provide much benefit.
-Alternatively, perhaps this is reason to also make the n>1 case efficient.
-E.g., calculate the space needed for each snapshot and write maplog entries
-for multiple snapshots.
+In the paper's design, writing to a block on the filesystem disk that
+is part of a snapshot requires reading that block and then writing the
+old version to snapstore and new version to the filesystem disk. It seems
+likely that this additional write, and especially the synchronous read,
+may significantly increase runtime. We have found that reading blocks that
+the system is completely overwriting increases runtime considerably.
 
-Designing a fast write-back cache eviction algorithm may take some work.
-The snap cache probably wants to pick orderings based on the live cache's
-knowledge of block layout and block eviction.
+But perhaps these block reads could be made asynchronously?
 
-I might suggest trying to reduce the number of seeks to write a live block
-(seek for snapstore and seek for maplog, then write the live block).
-For example, combine snapstore and maplog? (Say, <block|snapshot#> instead
-of separate stores.)
-Or, store maplog on a small amount of fast storage.
+You might also consider trying to reduce the number of seeks made to write
+(seek to write to snapstore and maplog,then seek to write the filesystem
+block). For example, you might try to combine the snapstore and maplog
+datastructures? (E.g., each record could contain the block data and the
+snapshot number instead of storing this data in two separate stores.)
+Or perhaps the maplog could reside in a small, fast storage device?
 
-Not quite convinced that nil patches are a good way to go, mainly because
-they make block reading and patch merging more complex.
+The paper gives an optimization that allows a particular new filesystem block
+to be written where there was a snapshot block and the old snapshot block
+to be written to snapstore without writing the entire snapshot to disk.
+However, if there is more than one outstanding snapshot, all but the most
+recent snapshot must be fully written to disk to write a single filesystem
+block. If this case is common, then this optimization may not provide
+much benefit. Or, perhaps this is reason to also make the multiple
+outstanding snapshot case efficient. For example, perhaps the system could
+calculate the space needed for each outstanding snapshot and write
+sparse maplog entries?
 
-Alternative: as creating patch b, create b' on another block with prev-data.
- Pluses: no need to avoid merging. May improve merging. Accessing cached
-  pre-states is not as complex.
- Minuses: Immediately selects pagelog block, which may kill this approach.
+In the current design it seems that user software cannot tell that a
+snapshot is complete. Since a BITE is requested to be able to later access
+the disk at that state, it seems like this may be useful? So perhaps
+something like an end record to atomically create a snapshot?
 
-Alternative: as creating patch b, copy the prev-data to a temporary
- datastructure. Create the concrete patches for snapstore and maplog at
- block write time.
- Pluses: simple and allows delayed write order selection
- Minuses: integration with the write-back cache is handled separately
+
+II. Software Optimizations
+
+Designing a fast write-back cache eviction algorithm may take some work,
+because what may be written to one disk can depend on what is on the
+other disk.
+
+The maplog optimization may not be necessary:
+1. Maplog entries are probably merged as-is, since there are no block level
+   cycles and the entries each depend on just one patch which depends on no
+   other patches.
+2. Merging two patches is not necessary to write the patches together.
+   Writing two patches together merely requires that both of the patches'
+   dependencies on other blocks be satisfied.
+
+
+III. Patches
+
+A nomenclature nit: "A nil patch is a hard patch because it has no rollback
+data" (page 2). More precisely, a hard patch is a patch that "cannot be
+reverted". However, a nil patch can be reverted, because it makes no changes,
+so it is soft.
+
+Not quite convinced that nil patches are a good way to go, because
+they of the complexity they add to block reading and patch merging.
+Below are two alternatives that, if you've not already considered them,
+might be helpful.
+
+As creating patch b, create b' on another block with prev-data.
+Good: No need to avoid merging. May improve merging. Accessing cached
+ pre-states is not as complex.
+Bad: Immediately selects the pagelog block.
+
+As creating patch b, copy the prev-data to a temporary in-mem datastructure.
+Then create the concrete patches for snapstore and maplog at block write time.
+Good: Simple and allows delayed write order selection.
+Bad: Integration with the write-back cache is handled separately.
+
+
+We'd love to talk more if you are interested. And we're sorry that this
+response is so delayed.
