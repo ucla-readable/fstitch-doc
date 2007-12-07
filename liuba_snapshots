@@ -17,9 +17,9 @@ the system is completely overwriting increases runtime considerably.
 But perhaps these block reads could be made asynchronously?
 
 You might also consider trying to reduce the number of seeks made to write
-(seek to write to snapstore and maplog,then seek to write the filesystem
+(seek to write to snapstore and maplog, then seek to write the filesystem
 block). For example, you might try to combine the snapstore and maplog
-datastructures? (E.g., each record could contain the block data and the
+data structures? (E.g., each record could contain the block data and the
 snapshot number instead of storing this data in two separate stores.)
 Or perhaps the maplog could reside in a small, fast storage device?
 
@@ -62,17 +62,16 @@ data" (page 2). More precisely, a hard patch is a patch that "cannot be
 reverted". However, a nil patch can be reverted, because it makes no changes,
 so it is soft.
 
-Not quite convinced that nil patches are a good way to go, because
-they of the complexity they add to block reading and patch merging.
-Below are two alternatives that, if you've not already considered them,
-might be helpful.
+Not quite convinced that nil patches are a good way to go, because of the
+complexity they add to block reading and patch merging. Below are two
+alternatives that, if you've not already considered them, might be helpful.
 
 As creating patch b, create b' on another block with prev-data.
 Good: No need to avoid merging. May improve merging. Accessing cached
  pre-states is not as complex.
 Bad: Immediately selects the pagelog block.
 
-As creating patch b, copy the prev-data to a temporary in-mem datastructure.
+As creating patch b, copy the prev-data to a temporary in-mem data structure.
 Then create the concrete patches for snapstore and maplog at block write time.
 Good: Simple and allows delayed write order selection.
 Bad: Integration with the write-back cache is handled separately.
