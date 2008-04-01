@@ -1,0 +1,81 @@
+Hi Liuba and Ross,
+
+We enjoyed your "Dodder-based Snapshots" paper draft; below are critical
+comments and suggestions that we hope you might find useful in further
+improving the system.
+
+
+I. Disk Interactions
+
+In the paper's design, writing to a block on the filesystem disk that
+is part of a snapshot requires reading that block and then writing the
+old version to snapstore and new version to the filesystem disk. It seems
+likely that this additional write, and especially the synchronous read,
+may significantly increase runtime. We have found that reading blocks that
+the system is completely overwriting increases runtime considerably.
+
+But perhaps these block reads could be made asynchronously?
+
+You might also consider trying to reduce the number of seeks made to write
+(seek to write to snapstore and maplog, then seek to write the filesystem
+block). For example, you might try to combine the snapstore and maplog
+data structures? (E.g., each record could contain the block data and the
+snapshot number instead of storing this data in two separate stores.)
+Or perhaps the maplog could reside in a small, fast storage device?
+
+The paper gives an optimization that allows a particular new filesystem block
+to be written where there was a snapshot block and the old snapshot block
+to be written to snapstore without writing the entire snapshot to disk.
+However, if there is more than one outstanding snapshot, all but the most
+recent snapshot must be fully written to disk to write a single filesystem
+block. If this case is common, then this optimization may not provide
+much benefit. Or, perhaps this is reason to also make the multiple
+outstanding snapshot case efficient. For example, perhaps the system could
+calculate the space needed for each outstanding snapshot and write
+sparse maplog entries?
+
+In the current design it seems that user software cannot tell that a
+snapshot is complete. Since a BITE is requested to be able to later access
+the disk at that state, it seems like this may be useful? So perhaps
+something like an end record to atomically create a snapshot?
+
+
+II. Software Optimizations
+
+Designing a fast write-back cache eviction algorithm may take some work,
+because what may be written to one disk can depend on what is on the
+other disk.
+
+The maplog optimization may not be necessary:
+1. Maplog entries are probably merged as-is, since there are no block level
+   cycles and the entries each depend on just one patch which depends on no
+   other patches.
+2. Merging two patches is not necessary to write the patches together.
+   Writing two patches together merely requires that both of the patches'
+   dependencies on other blocks be satisfied.
+
+
+III. Patches
+
+A nomenclature nit: "A nil patch is a hard patch because it has no rollback
+data" (page 2). More precisely, a hard patch is a patch that "cannot be
+reverted". However, a nil patch can be reverted, because it makes no changes,
+so it is soft.
+
+Not quite convinced that nil patches are a good way to go, because of the
+complexity they add to block reading and patch merging. Below are two
+alternatives that, if you've not already considered them, might be helpful.
+
+As creating patch b, create b' on another block with prev-data.
+Good: No need to avoid merging. May improve merging. Accessing cached
+ pre-states is not as complex.
+Bad: Immediately selects the pagelog block.
+
+As creating patch b, copy the prev-data to a temporary in-mem data structure.
+Then create the concrete patches for snapstore and maplog at block write time.
+Good: Simple and allows delayed write order selection.
+Bad: Integration with the write-back cache is handled separately.
+
+
+We'd love to talk more if you are interested. And we're sorry that this
+response is so delayed.
