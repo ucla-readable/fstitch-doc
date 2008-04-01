@@ -183,7 +183,7 @@
 	</p>
 	<div class="code">
 	cd ~/linux-2.6.20.1<br>
-	patch -p1 &lt; ~/fstitch/patches/softlockup-2.6.20.1.patch
+	patch -p0 &lt; ~/fstitch/patches/softlockup-2.6.20.1.patch
 	</div>
 	<p>
 	You will also need to make sure you've got
