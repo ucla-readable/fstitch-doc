@@ -68,6 +68,11 @@
 		</li>
 	</ul>
 
+	<h2>In the News</h2>
+	<ul>
+		<li><a href="http://lwn.net/Articles/354861/"><em>Featherstitch: Killing fsync() softly</em></a> (in <a href="http://www.lwn.net/">Linux Weekly News</a>)</li>
+	</ul>
+
 	<a href="http://www.gutenberg.org/etext/20386"><img class="floatright" src="images/featherstitch.jpg" width="345" height="364" alt="featherstitch"></a>
 
 	<h2>Software</h2>
