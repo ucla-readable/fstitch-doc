@@ -35,7 +35,7 @@
 	run a command like this:
 	</p>
 	<div class="code">
-	git clone git://featherstitch.cs.ucla.edu/fstitch/fstitch ~/fstitch
+	git clone <a href="https://github.com/ucla-readable/fstitch">https://github.com/ucla-readable/fstitch.git</a> ~/fstitch
 	</div>
 	<p>
 	This downloads the Featherstitch sources, including the complete
@@ -63,22 +63,23 @@
 	available from git as well:
 	</p>
 	<div class="code">
-	git clone git://featherstitch.cs.ucla.edu/fstitch/uwimap ~/uwimap<br>
-	git clone git://featherstitch.cs.ucla.edu/fstitch/subversion ~/subversion<br>
-	git clone git://featherstitch.cs.ucla.edu/fstitch/gzip ~/gzip<br>
+	git clone <a href="https://github.com/ucla-readable/fstitch-uwimap">https://github.com/ucla-readable/fstitch-uwimap.git</a> ~/uwimap<br>
+	git clone <a href="https://github.com/ucla-readable/fstitch-subversion">https://github.com/ucla-readable/fstitch-subversion.git</a> ~/subversion<br>
+	git clone <a href="https://github.com/ucla-readable/fstitch-gzip">https://github.com/ucla-readable/fstitch-gzip.git</a> ~/gzip<br>
 	</div>
 
 	<p>
-	To browse all of these repositories online, use our <a href="/gitweb">gitweb</a> browser.
+	You can browse all of these repositories on
+	<a href="https://github.com/ucla-readable">github</a>.
 	</p>
 
 	<p>
 	Alternatively to using git, you may download a live snapshot:
-	<a href="http://featherstitch.cs.ucla.edu/gitweb?p=fstitch;a=snapshot">fstitch.tar.gz</a>,
-	<a href="http://featherstitch.cs.ucla.edu/gitweb?p=uwimap;a=snapshot">uwimap.tar.gz</a>,
-	<a href="http://featherstitch.cs.ucla.edu/gitweb?p=subversion;a=snapshot">subversion.tar.gz</a>,
+	<a href="https://github.com/ucla-readable/fstitch/archive/master.zip">fstitch</a>,
+	<a href="https://github.com/ucla-readable/fstitch-uwimap/archive/master.zip">uwimap</a>,
+	<a href="https://github.com/ucla-readable/fstitch-subversion/archive/master.zip">subversion</a>,
 	and
-	<a href="http://featherstitch.cs.ucla.edu/gitweb?p=gzip;a=snapshot">gzip.tar.gz</a>.
+	<a href="https://github.com/ucla-readable/fstitch-gzip/archive/master.zip">gzip</a>,
 	</p>
 
 	<h2>Configuring your kernel</h2>
@@ -246,7 +247,7 @@
 
 	<p>
 	The patchgroup API is documented in
-	<a href="http://featherstitch.cs.ucla.edu/gitweb?p=fstitch;a=blob;f=fscore/patchgroup.h;hb=HEAD"><tt>fstitch/fscore/patchgroup.h</tt></a>.<br>
+	<a href="https://github.com/ucla-readable/fstitch/blob/master/fscore/patchgroup.h"><tt>fstitch/fscore/patchgroup.h</tt></a>.<br>
 	To compile an application with patchgroup support, the include path
 	will need to include your <tt>fstitch</tt> directory.
 	To link and run the application, the compiler and runtime linker
@@ -255,9 +256,9 @@
 	The patchgroup-enabled gzip and subversion sources may serve as
 	useful examples for autotool-based build systems
 	(autotool commits for:
-	<a href="http://featherstitch.cs.ucla.edu/gitweb?p=gzip;a=commit;h=f3494ef5e3d83e93718b560567f50e876cbc8e1c">gzip</a>
+	<a href="https://github.com/ucla-readable/fstitch-gzip/commit/f3494ef5e3d83e93718b560567f50e876cbc8e1c">gzip</a>
 	and
-	<a href="http://featherstitch.cs.ucla.edu/gitweb?p=subversion;a=commit;h=b2be08ef17aa4edbb9f8ed8a678dad3a47e5f652">subversion</a>).
+	<a href="https://github.com/ucla-readable/fstitch-subversion/commit/b2be08ef17aa4edbb9f8ed8a678dad3a47e5f652">subversion</a>).
 	</p>
 
 	<h2>Debugging Featherstitch</h2>
